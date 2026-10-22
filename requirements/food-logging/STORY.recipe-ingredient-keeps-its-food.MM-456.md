@@ -52,8 +52,13 @@ Choices I made without asking (say if any is wrong):
 - **"Change weight" is in a found line's menu**, beside Move up, Move down and Remove (sibling: MM-45's line menu in
   `RecipeForm`), and opens the weight under the line in place, with what the new weight comes to. A typed line has
   no such item.
-- **A food no longer installed is said, not guessed**: "Its food is not installed, so this line keeps its totals."
-  No weight is offered, since there is nothing to work it out from.
+- **A food no longer installed is said, not guessed**: the line's subtitle reads "200 g · 730 kcal · food not
+  installed", and its menu has no "Change weight" (panel review, 2026-10-21: an item that only says it cannot be
+  done is dropped), since there is nothing to work it out from.
+- **The weight is entered under its row**, indented as the row's entry slot, labelled "Weight g" (heard as "Weight g
+  for {name}"); it takes focus as it opens, and Save or Cancel returns focus to that line's "More actions for
+  {name}". The adder's button is "Add ingredient"; after adding, focus returns to "Search ingredients" (or
+  "Ingredient" when entering numbers) and "Added {name}" is said politely under it.
 - **A food found online counts as installed**: it is kept in the user's own database (MM-58), so it is found again.
 
 ## Progress
@@ -73,6 +78,13 @@ Built 2026-10-21. Not run locally; CI validates.
   totals and says so); `test/data/upgrade.test.ts` (a version 19 database comes up with its lines kept and
   sourceless, and keeps a source saved after).
 - Stories: `EditRecipeLineWeight` and `EditRecipeLineFoodGone` in `Food.stories.tsx`.
+- Panel review fixes (2026-10-21): `RecipeForm` looks up which found lines' foods are installed and offers "Change
+  weight" only for them, the subtitle saying "food not installed" otherwise, and returns focus to the line's menu
+  button; `RecipeLineWeight` autofocuses "Weight g", seated under its row (`.food-line-weight`), and draws nothing
+  should its food go while open; `RecipeIngredientAdder`'s "Add ingredient", focus back to the first field and a
+  polite "Added {name}". Tests in `test/food/customFoods.test.tsx` (focus in and out of the weight; no "Change
+  weight" and the subtitle for a food gone; focus and "Added" after adding). Stories: `EditRecipeLineFoodGone`
+  (now the line and its menu), `NewRecipeIngredientAdded`.
 
 ## Owed on a phone
 - The upgrade from 19 to 20 on the owner's phone keeps every saved recipe, and a found line's weight changes in place

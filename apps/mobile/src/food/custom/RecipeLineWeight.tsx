@@ -21,8 +21,10 @@ interface RecipeLineWeightProps {
 
 /**
  * Changes a found line's weight in place (MM-456): its totals are worked out
- * again from its food's numbers per 100 g as the pack has them now. When that
- * food is not installed, the line keeps its totals and says so.
+ * again from its food's numbers per 100 g as the pack has them now. Drawn
+ * under its row, indented as the row's own entry slot, with the field taking
+ * focus as it opens. Offered only for a line whose food is installed
+ * (`RecipeForm`); should the food go while it is open, nothing is drawn.
  */
 export function RecipeLineWeight({ line, onDone }: RecipeLineWeightProps) {
   const { state } = useApp();
@@ -37,20 +39,21 @@ export function RecipeLineWeight({ line, onDone }: RecipeLineWeightProps) {
   );
   if (catalog === undefined || looked === undefined) return null;
   const food = looked.food;
-  if (food === undefined) {
-    return (
-      <div className="food-ingredient-adder">
-        <p className="app-caption">Its food is not installed, so this line keeps its totals.</p>
-        <MmButton label="Keep its totals" kind="text" onPress={() => onDone()} />
-      </div>
-    );
-  }
+  if (food === undefined) return null;
   const weight = parseNumber(grams);
   const per100g = new NutritionTotals({ kcal: food.kcal, proteinG: food.proteinG, carbsG: food.carbsG, fatG: food.fatG });
   const reweighed = weight === undefined ? undefined : reweighedIngredient(line, per100g, weight);
   return (
-    <div className="food-ingredient-adder">
-      <MmTextField label={`New weight g for ${line.name}`} kind="number" value={grams} onChange={setGrams} />
+    <div className="food-line-weight">
+      <MmTextField
+        label="Weight g"
+        name={`Weight g for ${line.name}`}
+        kind="number"
+        value={grams}
+        onChange={setGrams}
+        autoFocus
+        onSubmit={reweighed === undefined ? undefined : () => onDone(reweighed)}
+      />
       <p className="app-caption">
         {reweighed === undefined
           ? 'Worked out again from the food as it is installed now.'

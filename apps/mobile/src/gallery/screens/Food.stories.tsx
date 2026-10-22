@@ -913,17 +913,49 @@ export const EditRecipeLineWeight = screenStory({
   },
 });
 
-/** MM-456: a found line whose food is no longer installed keeps its totals and says so. */
-export const EditRecipeLineFoodGone = screenStory({
+/** MM-456: a found line's new weight saved: the line reads it, and focus is back on that line's menu button. */
+export const EditRecipeLineWeightSaved = screenStory({
   covers: ['MyFoodsStep'],
-  shows: 'Its food is not installed, so this line keeps its totals.',
-  scenario: withRiceBowl('a-pack-since-removed'),
+  shows: '100 g · 365 kcal',
+  scenario: withRiceBowl(FixturePack.packId),
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
     await press(/^Demo rice bowl/)(canvas);
     await press('More actions for White rice, raw')(canvas);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
+    const field = await inSheet(canvas).findByRole('textbox', { name: 'Weight g for White rice, raw' }, { timeout: 10000 });
+    await userEvent.clear(field);
+    await userEvent.type(field, '100');
+    await press('Save weight')(canvas);
+  },
+});
+
+/** MM-456: a found line whose food is no longer installed keeps its totals, says so, and its menu offers no weight change. */
+export const EditRecipeLineFoodGone = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: '200 g · 730 kcal · food not installed',
+  scenario: withRiceBowl('a-pack-since-removed'),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo rice bowl/)(canvas);
+    await press('More actions for White rice, raw')(canvas);
+  },
+});
+
+/** MM-456: an ingredient just added: focus back in the search, and "Added …" said politely. */
+export const NewRecipeIngredientAdded = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: 'Added White rice, cooked',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press('New recipe')(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
+    await press(/^White rice, cooked/)(canvas);
+    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
+    await press('Add ingredient')(canvas);
   },
 });
 

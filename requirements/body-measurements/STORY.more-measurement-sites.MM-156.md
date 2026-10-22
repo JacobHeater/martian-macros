@@ -108,6 +108,15 @@ Choices I made without asking (say if any is wrong):
   (`MeasurementSiteFigure`, in `WaistProtocolFigure`'s strokes); the sites screen is a list of `MmSwitchRow`s as
   Nutrition goals' switches are; a site's history screen draws `WaistChart` with the site's noise, as Progress draws
   the waist's.
+- **Panel review (2026-10-21)**: each site in the session is an `MmSection` with the tape's mark (sibling: the
+  Progress sections), not a raw heading; its drawing is in full the first session and behind "How to measure" from
+  the second. A site left with two of three readings says "Type one reading, or all three." on its first empty
+  field (said once focus leaves the site, never while the third is being reached); a reading no such site can be
+  is said on its own field ("That hips reading looks off. Check it."), which takes focus, in place of a snack. The
+  side can be changed from a "Limb side" row on the sites screen (`overlays.options`); with limbs already measured,
+  the snack says earlier entries were on the other side (no schema change: entries do not record a side). "Choose
+  sites" is the last row of the sites group, its subtitle "3 of 6"; limb facts are captions under the group.
+  Body-measurement charts' 90-day and one-year ranges are allowed in `design/visual-language.md`.
 
 ## Progress
 Built 2026-10-21. Not run locally; CI validates.
@@ -133,6 +142,11 @@ Built 2026-10-21. Not run locally; CI validates.
 - Stories: `ProgressMeasurementsSuggested`, `ProgressMeasurementsWaistOnly`, `ProgressMeasurementsLimbs`,
   `MeasurementSessionFirst`, `MeasurementSessionSites`, `MeasurementSites`, `MeasurementSitesChosen`, `SiteHistory`,
   `SiteHistoryEmpty`.
+- Panel review fixes (2026-10-21): `MeasurementSessionScreen`, `MeasurementSitesScreen`, `MeasurementsCard`,
+  `MmTextField`'s `onBlur`; `design/visual-language.md`. Tests in `test/progress/measurementSites.test.tsx` (the
+  implausible value on its field with focus; two of three said once the site is left; the drawing from the second
+  session; "3 of 6"; changing the limb side). Stories: `MeasurementSessionTwoOfThree`, `MeasurementSessionLooksOff`,
+  `MeasurementSitesLimbSide`.
 
 Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
 - `waistChangeOf` takes `siteNoiseCm`; `siteChangeOf` passes the site's figure and no longer applies the factor itself.

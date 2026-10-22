@@ -94,7 +94,11 @@ Scenario: Switching back
 - **Hidden shows no weight chart** (its axis is a weight); Trend only draws the line and band without dots, and
   nothing can be picked on it.
 - **The offer** is a notice on the Dashboard (built as the relief offer is) only while no display has been chosen;
-  "Choose" opens the same sheet, "Not now" or a choice remembers it, and it never shows again.
+  "Choose" opens the same sheet, "No thanks" (amended from "Not now", panel review 2026-10-21, since it is never
+  offered again) or a display chosen remembers it, and it never shows again. Backing out of the sheet keeps the
+  offer. "No thanks" says where the choice lives: "You can change this in Settings, Appearance."
+- **The offer is for synced scales**: a typed weigh-in is one a day (`weight_entries` holds one row per day), so
+  more than one a day can only come from the health platform's weigh-ins, which are what the pattern reads.
 - Already true and now tested: no notification carries a figure (MM-146's prompts).
 - **A bodyweight lift's estimate is body weight (safety panel review, 2026-10-21).** `estimatedOneRepMax` adds the
   body weight for a bodyweight exercise, and that estimate was shown through `Fmt.load`, which is never hidden; with
@@ -132,6 +136,9 @@ Built 2026-10-21. Not run locally; CI validates.
   `ProgressWeightTrendOnly`, `ProgressWeightHidden`, `CoachWeightHidden`, `ChangeWeightDisplay`,
   `WeightDisplayTrendOnlyByDefault`, `HealthCheckEatingDisorderWeightDisplay`.
 - Not built: a weekly report outside the app does not exist, so "report" is the in-app monthly report.
+- Panel review fixes (2026-10-21): `WeightDisplayOfferCard` marks the offer answered only when the sheet returns a
+  choice; "No thanks" with its snack. `test/safeguards/weightDisplay.test.tsx` (backing out keeps the offer; "No
+  thanks" remembers it and says where to change it). Story `DashboardWeightDisplayOfferDeclined`.
 
 Review fixes 2026-10-21 (branch fix/body-comp-review). Not run locally; CI validates.
 - `StrengthPoint.bestSet` and `PersonalRecord.load`/`bestSet` (from `buildStrengthTrends`, `personalRecordsOf`),

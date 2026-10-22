@@ -441,3 +441,13 @@ export const DashboardWeightDisplayOffer = screenStory({
   shows: 'How much of your weight to show',
   scenario: frequentWeighingScenario,
 });
+
+/** MM-118: the offer declined: remembered, and where the choice lives said. */
+export const DashboardWeightDisplayOfferDeclined = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'You can change this in Settings, Appearance.',
+  scenario: frequentWeighingScenario,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'No thanks' }, { timeout: 5000 }));
+  },
+});
