@@ -22,6 +22,7 @@ import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
 import { MmSegmented } from '../ui/MmSegmented';
+import { useOverlays } from '../ui/useOverlays';
 import { MicrosPanel } from './MicrosPanel';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
@@ -89,6 +90,7 @@ export function CalorieHero({
   pressLabel,
 }: CalorieHeroProps) {
   const { services, state } = useApp();
+  const overlays = useOverlays();
   // Simple detail shows calories and protein only (MM-49).
   const level = useLoaded(state.detailLevel) ?? 'standard';
   const picture = useLoaded(state.macroPicture) ?? 'bars';
@@ -171,7 +173,7 @@ export function CalorieHero({
       {switchable ? (
         <div className="food-hero-switch">
           <MmSegmented<MacroPicture>
-            name="What the card shows"
+            name="Macro picture"
             compact
             segments={[
               { value: 'bars', label: 'Grams' },
@@ -180,7 +182,11 @@ export function CalorieHero({
             ]}
             selected={chosen}
             onChange={(next) => {
-              if (next !== undefined) void services.preferences.saveMacroPicture(next);
+              if (next === undefined) return;
+              // A choice that could not be kept is said, as Settings says one (MM-179, MM-347).
+              void services.preferences.saveMacroPicture(next).catch(() => {
+                overlays.snack('Could not keep that choice.');
+              });
             }}
           />
         </div>
