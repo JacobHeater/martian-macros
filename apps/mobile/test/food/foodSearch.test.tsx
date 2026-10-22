@@ -83,6 +83,19 @@ it('a food can be logged by palm, recorded as a hand portion', async () => {
   expect(entry === undefined ? '' : portionSummary(entry).toLowerCase()).toContain('estimat');
 });
 
+it('the hand portion a food suits is offered first (MM-46)', async () => {
+  const sheet = await openSheet();
+  await pickBanana(sheet);
+  const names = within(sheet)
+    .getAllByRole('button')
+    .map((b) => b.textContent ?? '');
+  const cupped = names.indexOf('Cupped hands');
+  // A banana is fruit: a cupped hand before a palm, and every hand portion still there.
+  expect(cupped).toBeGreaterThan(-1);
+  expect(cupped).toBeLessThan(names.indexOf('Palms'));
+  expect(names).toContain('Thumbs');
+});
+
 it('with nothing found the sheet offers manual entry', async () => {
   const sheet = await openSheet();
   await typeIn(sheet, 'Search foods', 'zzzzq');

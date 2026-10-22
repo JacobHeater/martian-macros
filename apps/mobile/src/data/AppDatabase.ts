@@ -116,6 +116,14 @@ export class AppDatabase {
     return result;
   }
 
+  /**
+   * Rebuilds the file so that pages freed by deleting rows hold none of
+   * what they held (MM-62). Not inside a transaction: SQLite refuses that.
+   */
+  vacuum(): Promise<void> {
+    return this.sql.execute('VACUUM');
+  }
+
   close(): Promise<void> {
     this.watchers.clear();
     return this.sql.close();
