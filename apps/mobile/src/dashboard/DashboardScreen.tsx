@@ -32,7 +32,7 @@ import { saveWaistReadings } from '../progress/saveWaistReadings';
 import { useWeightJump } from '../progress/useWeightJump';
 import { weightJumpContent } from '../progress/weightJumpContent';
 import { ReminderPausedNotice } from '../reminders/ReminderPausedNotice';
-import { MmDisclosure } from '../ui/MmDisclosure';
+import { MmSection } from '../ui/MmSection';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmRhythmStrip } from '../ui/MmRhythmStrip';
@@ -319,10 +319,17 @@ export function DashboardScreen() {
         />
         <ProcessCard />
       </MmListGroup>
-      {/* Named for 7 or 30 days, not for a week (MM-176). */}
-      <MmDisclosure title="History" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
+      {/* Named for 7 or 30 days, not for a week (MM-176); a section like the other screens' (owner), not a bare disclosure. */}
+      <MmSection
+        icon="history"
+        title="History"
+        summary="Intake, weight and more, 7 or 30 days back"
+        collapsible
+        initiallyExpanded={false}
+        remember="dashboard.more"
+      >
         <DashboardMetrics pausesUnchecked={pausesFailed} />
-      </MmDisclosure>
+      </MmSection>
     </>
   );
 }
