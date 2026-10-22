@@ -27,7 +27,7 @@ export const fnddsCitation =
 
 export const packAttribution =
   'Food data from Open Food Facts (openfoodfacts.org), available under the ' +
-  'Open Database License (opendatacommons.org/licenses/odbl/1-0/), and from ' +
+  'Open Database License (opendatacommons.org/licenses/odbl/1-0/), and from USDA: ' +
   usdaFdcCitation +
   ' Including ' +
   fnddsCitation +
