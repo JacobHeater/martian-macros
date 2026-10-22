@@ -447,6 +447,34 @@ export const HealthConnectStoppedAskingCannotOpen = screenStory({
   },
 });
 
+/** MM-323: weight allowed on Health Connect's own page, opened from that snack: back in the app it is read, and a snack says so. */
+export const HealthConnectStoppedAskingAllowedThere = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Weight allowed.',
+  device: healthPlatform({ stopsAsking: ['weight'], allowsThere: ['weight'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('button', { name: 'Open Health Connect' }));
+  },
+});
+
+/** MM-323: back from Health Connect's own page with nothing allowed there: a snack says nothing changed. */
+export const HealthConnectStoppedAskingNothingChanged = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Nothing changed.',
+  device: healthPlatform({ stopsAsking: ['weight'] }),
+  open: settingsAt('healthConnect'),
+  walk: async (canvas) => {
+    const weight = await within(canvas).findByRole('button', { name: /^Weight/ });
+    reveal(weight);
+    await userEvent.click(weight);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('button', { name: 'Open Health Connect' }));
+  },
+});
+
 /** MM-320: Health Connect could not be read: a snack says so, and nothing kept changes. */
 export const HealthConnectReadFailed = screenStory({
   covers: ['SettingsScreen'],
@@ -1229,4 +1257,30 @@ export const SettingsBackupPhotos = screenStory({
     },
   }),
   open: ({ navigator }) => void navigator.push(() => <SettingsScreen open="backup" />),
+});
+
+// ---- MM-118: the weight display ----
+
+/** MM-118: the weight display chosen from Appearance: Everything, Trend only, Hidden, each with what it shows. */
+export const ChangeWeightDisplay = screenStory({
+  covers: ['SettingsScreen', 'WeightDisplaySheet'],
+  shows: 'Your backup and any export still contain the numbers.',
+  open: settingsAt('appearance'),
+  walk: pressAnywhere('Change weight display'),
+});
+
+/** MM-118: with an eating-disorder history and nothing chosen, the display starts at Trend only. */
+export const WeightDisplayTrendOnlyByDefault = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Trend only',
+  scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
+  open: settingsAt('appearance'),
+});
+
+/** MM-118: the health check with an eating-disorder history ticked: weigh-ins start as the trend only, said here. */
+export const HealthCheckEatingDisorderWeightDisplay = screenStory({
+  covers: ['HealthCheckScreen'],
+  shows: /^With this ticked, weigh-ins show as the trend only/,
+  scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
+  open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
 });

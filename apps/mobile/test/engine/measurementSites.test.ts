@@ -67,6 +67,16 @@ describe('a site’s change, by the waist’s rule with its own noise', () => {
     expect(siteChangeOf({ measurements: waist, site: 'waist', asOf: today, days: 84 })?.direction).toBe('noClearChange');
   });
 
+  it('a single-reading entry outside both ends compared leaves the threshold at 1.4 times the site’s noise', () => {
+    const arm = weekly('upperArm', 33, 34);
+    const old = new SiteObservation({ site: 'upperArm', date: today.addDays(-140), valueCm: 33, readings: [33] });
+    expect(siteChangeOf({ measurements: [old, ...arm], site: 'upperArm', asOf: today, days: 84 })?.thresholdCm).toBeCloseTo(1.4 * 0.5, 9);
+    // At an end, it is half as much again.
+    const atEnd = new SiteObservation({ site: 'upperArm', date: today, valueCm: 34, readings: [34] });
+    const withEnd = [...arm.filter((o) => o.date.epochDay !== today.epochDay), atEnd];
+    expect(siteChangeOf({ measurements: withEnd, site: 'upperArm', asOf: today, days: 84 })?.thresholdCm).toBeCloseTo(1.4 * 0.5 * 1.5, 9);
+  });
+
   it('only that site’s entries are read', () => {
     expect(siteChangeOf({ measurements: weekly('thigh', 58, 60), site: 'calf', asOf: today })).toBeUndefined();
   });
@@ -97,8 +107,8 @@ describe('Limits of a tape', () => {
 
   it('in a lean gain, limbs up with the waist steady is consistent with the gain, and the reverse with the fat-heavy notice', () => {
     const gain = limbFactsOf({
-      measurements: [...weekly('waist', 90, 90), ...weekly('upperArm', 33, 34)],
-      sites: new Set(['upperArm']),
+      measurements: [...weekly('waist', 90, 90), ...weekly('upperArm', 33, 34), ...weekly('thigh', 58, 60)],
+      sites: new Set(['upperArm', 'thigh']),
       asOf: today,
     });
     expect(leanGainPairOf(gain)).toBe('limbsUpWaistSteady');
@@ -111,5 +121,24 @@ describe('Limits of a tape', () => {
     expect(leanGainPairOf(fatHeavy)).toBe('waistUpLimbsSteady');
     expect(leanGainPairText('waistUpLimbsSteady')).toMatch(/consistent with/);
     expect(leanGainPairOf([])).toBeUndefined();
+  });
+
+  it('one limb alone just past its threshold says nothing together; one well past it, or two limbs up, does', () => {
+    const facts = (arm: number, thigh?: number) =>
+      limbFactsOf({
+        measurements: [...weekly('waist', 90, 90), ...weekly('upperArm', 33, arm), ...(thigh === undefined ? [] : weekly('thigh', 58, thigh))],
+        sites: new Set<MeasurementSite>(thigh === undefined ? ['upperArm'] : ['upperArm', 'thigh']),
+        asOf: today,
+      });
+    // Up about 0.83 cm against a threshold of 0.7: up, but one limb alone needs 1.05.
+    const barely = facts(34);
+    expect(barely[0]?.limb.direction).toBe('up');
+    expect(leanGainPairOf(barely)).toBeUndefined();
+    // With a second limb measured and steady, still nothing.
+    expect(leanGainPairOf(facts(34, 58))).toBeUndefined();
+    // Up about 1.67 cm: well past it.
+    expect(leanGainPairOf(facts(35))).toBe('limbsUpWaistSteady');
+    // Two limbs up, each just past: together they count.
+    expect(leanGainPairOf(facts(34, 59.5))).toBe('limbsUpWaistSteady');
   });
 });

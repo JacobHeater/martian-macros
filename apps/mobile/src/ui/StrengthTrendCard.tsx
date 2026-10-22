@@ -2,6 +2,8 @@ import { HistoryChart } from '../charts/HistoryChart';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { StrengthTrend } from '../engine/StrengthTrend';
 import { Fmt } from '../format/Fmt';
+import { liftChangeWords } from '../format/liftChangeWords';
+import { setText } from '../format/setText';
 import { InfoCard } from './InfoCard';
 import { MmButton } from './MmButton';
 import './ui.css';
@@ -19,9 +21,11 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
   const points = trend.points;
   const first = points[0];
   const latest = points[points.length - 1];
+  // A bodyweight lift's estimate carries the body weight: with the weight hidden, its best set and its change in words (MM-118).
+  const bodyHidden = fmt.weightHidden && trend.exercise?.load === 'bodyweight';
   const changeLabel = (weeks: number) => {
     const change = trend.changeOverDays(weeks * 7);
-    return `${weeks} weeks: ${change === undefined ? 'Not enough history' : fmt.weightDelta(change)}`;
+    return `${weeks} weeks: ${change === undefined ? 'Not enough history' : bodyHidden ? liftChangeWords(change) : fmt.loadDelta(change)}`;
   };
   const sinceFirst = first === undefined ? 0 : first.date.daysUntil(today);
   return (
@@ -37,35 +41,41 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
         </p>
       ) : (
         <>
-          <p className="mm-card-figure">{fmt.weight(latest.trendKg)}</p>
-          <p className="mm-card-caption">Smoothed e1RM · {Fmt.longDate(latest.date)}</p>
+          <p className="mm-card-figure">
+            {bodyHidden ? (latest.bestSet === undefined ? 'Best set' : setText(latest.bestSet, fmt, 'bodyweight')) : fmt.load(latest.trendKg)}
+          </p>
+          <p className="mm-card-caption">
+            {bodyHidden ? 'Best set' : 'Smoothed e1RM'} · {Fmt.longDate(latest.date)}
+          </p>
           <p className="mm-card-facts">
             {[4, 12].map((weeks) => (
               <span key={weeks}>{changeLabel(weeks)}</span>
             ))}
           </p>
-          <HistoryChart
-            today={today}
-            days={showFullHistory && sinceFirst >= 91 ? sinceFirst + 1 : 91}
-            unit={fmt.weightUnit}
-            series={[
-              {
-                label: 'Session best e1RM',
-                kind: 'target',
-                dashed: true,
-                connectRecordedPoints: true,
-                maximumGapDays: 28,
-                values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.estimateKg)])),
-              },
-              {
-                label: 'Smoothed e1RM',
-                kind: 'estimate',
-                connectRecordedPoints: true,
-                maximumGapDays: 28,
-                values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.trendKg)])),
-              },
-            ]}
-          />
+          {bodyHidden ? null : (
+            <HistoryChart
+              today={today}
+              days={showFullHistory && sinceFirst >= 91 ? sinceFirst + 1 : 91}
+              unit={fmt.weightUnit}
+              series={[
+                {
+                  label: 'Session best e1RM',
+                  kind: 'target',
+                  dashed: true,
+                  connectRecordedPoints: true,
+                  maximumGapDays: 28,
+                  values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.estimateKg)])),
+                },
+                {
+                  label: 'Smoothed e1RM',
+                  kind: 'estimate',
+                  connectRecordedPoints: true,
+                  maximumGapDays: 28,
+                  values: new Map(points.map((point) => [point.date, fmt.weightFromKg(point.trendKg)])),
+                },
+              ]}
+            />
+          )}
           {points.length === 1 ? (
             <p className="mm-card-text">One qualifying session. More sessions are needed for a trend.</p>
           ) : null}
@@ -73,8 +83,9 @@ export function StrengthTrendCard({ trend, fmt, today, onHistory, showFullHistor
       )}
       {trend.exercise?.load === 'bodyweight' ? (
         <p className="mm-card-text">
-          Uses total bodyweight plus added or assisted weight. A weigh-in on or before each session, no more than 7
-          days old, is required.
+          {bodyHidden
+            ? 'Your weight is hidden, so this shows your best set and whether the lift is going up. Its estimate includes your body weight.'
+            : 'Uses total bodyweight plus added or assisted weight. A weigh-in on or before each session, no more than 7 days old, is required.'}
         </p>
       ) : null}
       <p className="mm-card-caption">

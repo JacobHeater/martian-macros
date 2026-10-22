@@ -18,11 +18,13 @@ import { usePaceSheet } from './usePaceSheet';
  */
 export function StallCard() {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const stall = useCell(state.stallAssessment);
   const setup = useLoaded(state.setup);
   const openPaceSheet = usePaceSheet();
   if (stall === undefined || setup === undefined || stall.status !== 'stalled') return null;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const [body, options] = stallText(stall, fmt);
   const actionFor = (option: string): (() => void) | undefined =>
     /gentler pace/.test(option) && openPaceSheet !== undefined ? () => void openPaceSheet() : undefined;
@@ -48,10 +50,11 @@ export function StallCard() {
         <StatRow label="Period" value={`Last ${stall.windowDays} days`} />
         <StatRow label="Fully logged days" value={`${stall.usableFoodDays}`} />
         <StatRow label="Weigh-ins" value={`${stall.weighIns}`} />
-        {stall.slopeKgPerWeek === undefined ? null : (
+        {/* Weights a week: not shown with the weight hidden (MM-118). */}
+        {stall.slopeKgPerWeek === undefined || fmt.weightHidden ? null : (
           <StatRow label="Trend" value={`${fmt.weightDelta(stall.slopeKgPerWeek)} a week`} />
         )}
-        {stall.intendedKgPerWeek === undefined ? null : (
+        {stall.intendedKgPerWeek === undefined || fmt.weightHidden ? null : (
           <StatRow label="Intended" value={`${fmt.weightDelta(stall.intendedKgPerWeek)} a week`} />
         )}
       </MmDisclosure>

@@ -17,6 +17,8 @@ import { StatRow } from '../ui/StatRow';
  */
 export function InsightCard() {
   const { services, state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const selection = useCell(state.insightSelection);
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
@@ -30,7 +32,7 @@ export function InsightCard() {
 
   if (selection === undefined || setup === undefined) return null;
   const insight = selection.insight;
-  const [title, body, evidence] = insightText(insight, new Fmt(setup.unitSystem));
+  const [title, body, evidence] = insightText(insight, new Fmt(setup.unitSystem, { weightDisplay }));
   return (
     <MmSection
       icon="insight"

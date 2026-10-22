@@ -69,11 +69,16 @@ const facts = ({
   });
 
 it('missing days are gaps; averages only include recorded days', () => {
-  const result = facts({ intake: [food(0, 1000, { complete: true }), food(2, 2000)] });
+  // Day 3 has nothing logged and is not marked complete: a gap, not a zero.
+  const result = facts({ intake: [food(0, 1000, { complete: true }), food(2, 2000), food(3, 0)] });
   expect(result.calories.size).toBe(2);
   expect(result.calories.has(today.addDays(-1))).toBe(false);
+  expect(result.calories.has(today.addDays(-3))).toBe(false);
   expect(result.meanCalories).toBe(1500);
   expect(result.meanProtein).toBe(100);
+  // MM-176: each average says the days it uses, and gaps are not among them.
+  expect(result.finishedDays).toBe(2);
+  expect(result.proteinDays).toBe(2);
   expect(result.loggedDays).toBe(2);
   expect(result.activeDays).toBe(7);
 });
@@ -118,6 +123,11 @@ it('paused observations stay visible but are not counted or targeted', () => {
   expect(result.completeDays).toBe(1);
   expect(result.weighInDays).toBe(0);
   expect(result.calorieTargets.has(today)).toBe(false);
+  // MM-176: the averages count the days the Logging row counts, so the paused day is left out.
+  expect(result.finishedDays).toBe(1);
+  expect(result.proteinDays).toBe(1);
+  expect(result.meanCalories).toBe(2000);
+  expect(result.pausedDays).toBe(1);
 });
 
 it('screening suppresses target comparisons, not logged facts', () => {

@@ -10,11 +10,13 @@ import { Screen } from '../app/Screen';
 /** "What to expect", reread from the Coach tab any time (MM-158), from the goal and pace in force now. */
 export function WhatToExpectScreen() {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const setup = useLoaded(state.setup);
   const snapshot = useCell(state.coach);
   const current = useCell(state.currentTargets);
   if (setup === undefined) return null;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const weightKg = snapshot?.trendWeightKg ?? 0;
   const paceFraction =
     current !== undefined

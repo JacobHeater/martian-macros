@@ -1,3 +1,4 @@
+import { usePaceInWords } from '../coach/usePaceInWords';
 import { useEffect, useState } from 'react';
 import { InsightCard } from '../coach/InsightCard';
 import { RowWithInsight } from '../coach/RowWithInsight';
@@ -21,6 +22,7 @@ import { Loadable } from '../state/Loadable';
 import { dayTargetsOn } from '../state/dayTargetsOn';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
+import { useHeldFailure } from '../app/useHeldFailure';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { AlcoholLine } from '../food/AlcoholLine';
@@ -44,6 +46,7 @@ import { rhythmDays } from './rhythmDays';
 import { WaistRow } from './WaistRow';
 import { WaterRow } from './WaterRow';
 import { WeighInRow } from './WeighInRow';
+import { WeightDisplayOfferCard } from './WeightDisplayOfferCard';
 
 /**
  * How the user is doing today, in tiers (MM-254): the safety notices, the
@@ -52,10 +55,15 @@ import { WeighInRow } from './WeighInRow';
  */
 export function DashboardScreen() {
   const { services, state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
+  const paceInWords = usePaceInWords();
   const overlays = useOverlays();
   const navigator = useNavigator();
   const setupState = useCell(state.setup);
   const pausesState = useCell(state.pauses);
+  // Asked again after a failure, the day stays drawn and the button keeps its place (MM-183).
+  const pausesRead = useHeldFailure(pausesState, () => state.retryPauses());
   const today = useCell(state.today);
   const foodState = useCell(state.foodForDay(today));
   const historyState = useCell(state.targetsHistory);
@@ -100,7 +108,7 @@ export function DashboardScreen() {
   const setup = Loadable.valueOf(setupState);
   if (setup === undefined) return null;
   // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
-  const pausesFailed = Loadable.hasFailed(pausesState);
+  const pausesFailed = pausesRead.failed;
   if ([foodState, historyState, weightsState].some((source) => Loadable.hasFailed(source))) {
     return (
       <ReadFailedNotice
@@ -115,7 +123,7 @@ export function DashboardScreen() {
   const entries = foodState.value;
   const history = historyState.value;
   const weights = weightsState.value;
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   // Under the weigh-in for two weeks after a cut (MM-130): why the scale rises, before it does.
   const weightOwn: InlineInsightContent[] = jump === undefined ? [] : [weightJumpContent(jump, fmt, today, 'dashboard')];
   if (
@@ -183,12 +191,14 @@ export function DashboardScreen() {
         <ReadFailedNotice
           title="Could not check whether today is paused"
           consequence="Today’s targets are not shown until it can."
-          onRetry={() => state.retryPauses()}
+          onRetry={pausesRead.retry}
+          pending={pausesRead.pending}
         />
       ) : null}
       <UnderEatingNotice />
       <ReminderPausedNotice />
       <ReliefOfferCard />
+      <WeightDisplayOfferCard />
       <ReportReadyNotice />
       <CalorieHero
         intake={intake}
@@ -230,14 +240,15 @@ export function DashboardScreen() {
             onSaveWeight={async (kg) => {
               setJustSaved('weight');
               await services.weights.saveWeight(today, kg);
-              confirm(`Saved ${fmt.weight(kg)} for today`);
+              // No echo of the reading unless every reading is shown (MM-118).
+              confirm(fmt.readingsShown ? `Saved ${fmt.weight(kg)} for today` : 'Saved');
             }}
           />
         ) : last === undefined || trend.length < 2 ? (
           <MmListRow
             leadingIcon="scale"
-            title={fmt.weight(todaysWeight.weightKg)}
-            subtitle="Today’s weigh-in · the trend starts tomorrow"
+            title={fmt.readingsShown ? fmt.weight(todaysWeight.weightKg) : 'Weighed in today'}
+            subtitle={fmt.readingsShown ? 'Today’s weigh-in · the trend starts tomorrow' : 'The trend starts tomorrow'}
             opens
             autoFocus={justSaved === 'weight'}
             onPress={() => open('progress')}
@@ -247,11 +258,16 @@ export function DashboardScreen() {
             <MmListRow
               leadingIcon="scale"
               autoFocus={justSaved === 'weight'}
-              title={`Trend ${fmt.weight(last.levelKg)}`}
-              subtitle={[
-                `Today ${fmt.weight(todaysWeight.weightKg)}`,
-                ...(weekAgo === undefined ? [] : [`7 days ${fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`]),
-              ].join(' · ')}
+              // Trend only shows no reading; Hidden no figure, the pace in words instead (MM-118).
+              title={fmt.weightHidden ? (paceInWords ?? 'Weighed in today') : `Trend ${fmt.weight(last.levelKg)}`}
+              subtitle={
+                fmt.weightHidden
+                  ? 'Weighed in today · against your plan’s pace'
+                  : [
+                      ...(fmt.readingsShown ? [`Today ${fmt.weight(todaysWeight.weightKg)}`] : []),
+                      ...(weekAgo === undefined ? [] : [`7 days ${fmt.weightDelta(last.levelKg - weekAgo.levelKg)}`]),
+                    ].join(' · ') || 'Weighed in today'
+              }
               opens
               onPress={() => open('progress')}
             />
@@ -303,8 +319,9 @@ export function DashboardScreen() {
         />
         <ProcessCard />
       </MmListGroup>
-      <MmDisclosure title="More about this week" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
-        <DashboardMetrics />
+      {/* Named for 7 or 30 days, not for a week (MM-176). */}
+      <MmDisclosure title="History" subtitle="Intake, protein, weight, waist, coverage and recovery, 7 or 30 days back" remember="dashboard.more">
+        <DashboardMetrics pausesUnchecked={pausesFailed} />
       </MmDisclosure>
     </>
   );

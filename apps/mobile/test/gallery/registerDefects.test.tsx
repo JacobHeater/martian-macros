@@ -46,7 +46,7 @@ it('MM-334: Food loading says nothing of pauses, and a failed pause read keeps t
 it('MM-335: the history under the Dashboard has no headline of its own and no cards inside the disclosure', async () => {
   renderApp(repos, today);
   await dashboardLoaded();
-  const more = screen.getByRole('button', { name: /More about this week/ });
+  const more = screen.getByRole('button', { name: /^History/ });
   await userEvent.click(more);
   expect(screen.queryByRole('heading', { name: 'Your metrics' })).not.toBeInTheDocument();
 });

@@ -7,6 +7,10 @@ import type { Fmt } from './Fmt';
  * carbohydrate and water return, not fat.
  */
 export function reboundText(fmt: Fmt): string {
+  // No figure with the weight hidden (MM-118).
+  if (fmt.weightHidden) {
+    return 'Expect the scale to rise a little over the next week or two. That is stored carbohydrate and water returning, not fat. Your trend will settle.';
+  }
   const whole = (kg: number) => roundHalfAwayFromZero(fmt.weightFromKg(kg)) + 0;
   return (
     `Expect the scale to rise ${whole(0.5)} to ${whole(2)} ${fmt.weightUnit} over the next week or two. ` +

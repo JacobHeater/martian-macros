@@ -32,20 +32,25 @@ export function weightJumpText(
   const daysAgo = e.date.daysUntil(today);
   const size = fmt.weight(Math.abs(e.deviationKg));
   const side = e.above ? 'above' : 'below';
+  // With the weight hidden (MM-118) no figure is said: the weigh-in is above or below the trend.
+  const by = fmt.weightHidden ? 'well' : size;
   const head =
     daysAgo === 0
-      ? `Today’s weigh-in is ${size} ${side} your trend.`
+      ? `Today’s weigh-in is ${by} ${side} your trend.`
       : daysAgo === 1
-        ? `Yesterday’s weigh-in was ${size} ${side} your trend.`
-        : `The weigh-in on ${Fmt.day(e.date, today)} was ${size} ${side} your trend.`;
+        ? `Yesterday’s weigh-in was ${by} ${side} your trend.`
+        : `The weigh-in on ${Fmt.day(e.date, today)} was ${by} ${side} your trend.`;
 
   const sentences = [head];
-  const evidence: (readonly [string, string])[] = [
-    ['Weigh-in', fmt.weight(e.readingKg)],
-    ['Trend', fmt.weight(e.trendKg)],
-    [e.above ? 'Above the trend by' : 'Below the trend by', size],
-    ['Day-to-day noise', `about ${fmt.weight(e.thresholdKg)}`],
-  ];
+  // The reading itself only with every reading shown; no weight at all with the weight hidden (MM-118).
+  const evidence: (readonly [string, string])[] = fmt.weightHidden
+    ? []
+    : [
+        ...(fmt.readingsShown ? [['Weigh-in', fmt.weight(e.readingKg)] as const] : []),
+        ['Trend', fmt.weight(e.trendKg)],
+        [e.above ? 'Above the trend by' : 'Below the trend by', size],
+        ['Day-to-day noise', `about ${fmt.weight(e.thresholdKg)}`],
+      ];
 
   if (e.causes.length === 0) {
     const where = place === 'progress' ? 'under Weight events below' : 'as a weight event in Progress';
@@ -62,16 +67,23 @@ export function weightJumpText(
 
   const calories = e.calories;
   if (calories === undefined) {
+    // The energy is the difference times the energy in a kilogram of fat, so with the weight hidden it is not said (MM-118).
     evidence.push([
       e.above ? 'For this to be fat' : 'For this to be fat loss',
-      `${aboutKcal(e.fatKcal)} ${e.above ? 'over' : 'under'} your expenditure yesterday`,
+      fmt.weightHidden
+        ? `Far more ${e.above ? 'over' : 'under'} your expenditure than one day can be`
+        : `${aboutKcal(e.fatKcal)} ${e.above ? 'over' : 'under'} your expenditure yesterday`,
     ]);
   } else {
     // Honest in both directions: a day far over target is not hidden, and neither is how little of it can be fat.
     const atMost = calories.figures['fatAtMostKg'] ?? 0;
     evidence.push([
       e.above ? 'Fat this could have stored' : 'Fat this could have lost',
-      atMost > 0 ? `At most about ${fmt.weight(atMost)}` : `None: still ${e.above ? 'under' : 'over'} your expenditure`,
+      atMost > 0
+        ? fmt.weightHidden
+          ? 'Very little'
+          : `At most about ${fmt.weight(atMost)}`
+        : `None: still ${e.above ? 'under' : 'over'} your expenditure`,
     ]);
     evidence.push(['The rest of the difference', e.above ? 'Water and food still being digested' : 'Water and less food in you']);
   }

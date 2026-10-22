@@ -74,6 +74,15 @@ export function HealthStep({ screening, female, onChange, heading = true }: Heal
         </>
       ) : null}
       {item('History of an eating disorder', 'eatingDisorderHistory')}
+      {/* MM-118: with this history, weigh-ins start as the trend only, said here and changeable. */}
+      {s.eatingDisorderHistory ? (
+        <Notice
+          text={
+            'With this ticked, weigh-ins show as the trend only, never a single reading, unless you choose otherwise ' +
+            'in Settings, under Appearance, Weight display. The coach uses every weigh-in either way.'
+          }
+        />
+      ) : null}
       {item('Chronic kidney disease', 'chronicKidneyDisease')}
       {item('Thyroid condition', 'thyroidCondition')}
       {item('Testosterone therapy or anabolic steroids', 'androgenUse')}
