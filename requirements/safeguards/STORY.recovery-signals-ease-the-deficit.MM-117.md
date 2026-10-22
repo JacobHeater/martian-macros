@@ -1,6 +1,6 @@
 ---
 id: MM-117
-status: in-progress
+status: done
 component: safeguards
 related: [MM-110, MM-24, MM-31, MM-77, MM-79, MM-116, MM-128, MM-135, MM-138, MM-141, MM-432]
 ---
@@ -119,11 +119,20 @@ Built (2026-10-21, feat/mm-116-recovery-check-in):
   triggers), `reliefOffer.test.tsx` (the card from logged workouts), `templates.test.ts` (the words, none asking for less food or
   more exercise). Story: `CoachReliefOfferLifts` (Coach).
 
-Not built:
+Built (2026-10-21):
+- **The pace by its name and what it costs** (MM-128): under the suggestion the card says the slower pace as the pace
+  choice does, "Gentle is 0.5% a week: about N kcal a day under your expenditure, for a target of N kcal.", with the
+  pace's sentence of consequence (`reliefPaceText`, from `state.paceOptions`). The button still reads "Slow to 0.5% a
+  week". Tests: "the slower pace is named, with what it costs" in `test/coach/reliefOffer.test.tsx`, and the words in
+  `test/format/templates.test.ts`. Not run locally; CI validates.
+
+Left as decided:
 - It is a notice, not an entry in the insight catalog (MM-141), so it is not rationed with insights. It is a safety offer and should
   not be.
-- The pace names and what each costs (MM-128): the offer shows the percentage only.
-- Not checked on a device, the strength trigger included.
+
+## Owed on a phone
+- The offer on a device, from hard check-ins and from falling lifts, and a look at CoachReliefOffer and
+  CoachReliefOfferLifts in the three palettes with the pace line.
 
 ## Note (2026-10-13, MM-249)
 "Short sleep adds a line, not a trigger" is superseded: MM-252 makes a fourteen-night average under six hours a recovery signal of its own in this rule, and the offer names the gentler pace. The sentence stays worded "appears to" until the panel pass MM-249 asks for.
