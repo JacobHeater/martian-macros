@@ -29,15 +29,20 @@
   /* A chosen segment and the current tab are lit (MM-555); the ink on them. */
   --chosen: #c4f24f;
   --on-chosen: #0a081b;
-  /* The blacklight (MM-556): the art's violets and hot pink as the structure. Cards wear a glowing violet edge, the
+  /* The blacklight (MM-556): the art's violets and hot pink as the structure. Cards wear a violet edge, the
      navigation bar a hot-pink line, a screen's title the lettering's lime-yellow into tangerine, a section's mark the
-     mountains' lilac. */
+     neon orange. The neons are fills too: the calorie arc is neon orange, a chosen chip hot pink, a meal's add plate
+     neon orange, each with the ink on it. */
   --edge: #6b3df5;
-  --glow: color-mix(in srgb, #6b3df5 45%, transparent);
   --accent-line: #ff3d8b;
   --title-from: #f3f552;
   --title-to: #ff6a2c;
-  --mark: #b98cff;
+  --mark: #ff8a3d;
+  --arc: #ff6a2c;
+  --pop: #ff3d8b;
+  --on-pop: #0a081b;
+  --flare: #ff6a2c;
+  --on-flare: #0a081b;
   --ion: #45e9f2;
   --on-ion: #0a081b;
   --energy: #fff8e9;
@@ -80,11 +85,15 @@
   --chosen: #1c2842;
   --on-chosen: #ecf0f8;
   --edge: #2b3853;
-  --glow: transparent;
   --accent-line: transparent;
   --title-from: #ecf0f8;
   --title-to: #ecf0f8;
   --mark: #a9b4ca;
+  --arc: #ecf0f8;
+  --pop: #1c2842;
+  --on-pop: #ecf0f8;
+  --flare: #1c2842;
+  --on-flare: #ecf0f8;
   --ion: #3fd8f0;
   --on-ion: #031a20;
   --energy: #ecf0f8;
@@ -126,11 +135,15 @@
   --chosen: #e3e8f5;
   --on-chosen: #0c1220;
   --edge: #cbd3e3;
-  --glow: transparent;
   --accent-line: transparent;
   --title-from: #0c1220;
   --title-to: #0c1220;
   --mark: #46526b;
+  --arc: #0c1220;
+  --pop: #e3e8f5;
+  --on-pop: #0c1220;
+  --flare: #e3e8f5;
+  --on-flare: #0c1220;
   --ion: #0a7890;
   --on-ion: #ffffff;
   --energy: #0c1220;
