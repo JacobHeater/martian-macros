@@ -19,7 +19,7 @@ export function AdherenceCard() {
   const weightLossMedication = useLoaded(state.setup)?.screening.weightLossMedication ?? false;
   if (summary === undefined || floor === undefined) return null;
   return (
-    <MmSection icon="checklist" title="Your last 7 days">
+    <MmSection framed icon="checklist" title="Your last 7 days">
       {adherenceLines(summary, { floorKcal: floor, underEatingNotice, weightLossMedication }).map(({ label, value, detail }) => (
         <StatRow key={label} label={label} value={value} detail={detail} />
       ))}

@@ -48,7 +48,7 @@ export function RecentInsightsSection({ insights }: { insights: readonly RecentI
     state.homeTab.put(home[insight.area]);
   };
   return (
-    <MmSection
+    <MmSection framed
       icon="insight"
       title="Recent insights"
       summary={

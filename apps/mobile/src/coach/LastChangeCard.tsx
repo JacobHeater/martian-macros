@@ -46,7 +46,7 @@ export function LastChangeCard({ history, today, holdNote }: LastChangeCardProps
       explanationLineText(largest);
   }
   return (
-    <MmSection
+    <MmSection framed
       icon="history"
       title={`Last change · ${Fmt.day(current.effectiveFrom, today)}`}
       trailing={

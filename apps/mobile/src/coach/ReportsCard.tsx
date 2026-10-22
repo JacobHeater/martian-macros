@@ -21,7 +21,7 @@ export function ReportsCard() {
   const latest = periods[periods.length - 1];
   const fresh = latest !== undefined && latest.readyOn.daysUntil(today) < 7;
   return (
-    <MmSection
+    <MmSection framed
       icon="report"
       title="Monthly reports"
       summary={`${periods.length} ${periods.length === 1 ? 'report' : 'reports'}, newest ${Fmt.shortDay(latest!.from)} – ${Fmt.shortDay(latest!.to)}`}
