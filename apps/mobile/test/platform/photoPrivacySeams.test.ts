@@ -83,6 +83,33 @@ photoCameraContract('No camera (media devices absent)', () => camera(undefined),
 it('the web view’s camera, stopped, stops every track of its stream', async () => {
   const given = stream();
   const preview = await camera(async () => given).start('user');
-  preview?.stop();
+  if (typeof preview !== 'string') preview.stop();
   expect(given.tracks.every((track) => track.stopped)).toBe(true);
+});
+
+/** A `getUserMedia` that refuses with the error named `name`. */
+const refusing = (name: string) =>
+  camera(async () => {
+    throw new DOMException('Refused', name);
+  });
+
+// MM-560: the iPhone's live reload loads the app over the network in plain http, where the web view gives no
+// camera at all. The screen told the person to allow the camera in settings, where it already was.
+it('a page that is not secure gets no camera, and says so rather than that it was not allowed', async () => {
+  vi.stubGlobal('isSecureContext', false);
+  expect(await camera(undefined).start('user')).toBe('insecurePage');
+});
+
+it('with media devices absent on a secure page, there is no camera', async () => {
+  vi.stubGlobal('isSecureContext', true);
+  expect(await camera(undefined).start('user')).toBe('noCamera');
+});
+
+it('a refusal is told apart by its name', async () => {
+  expect(await refusing('NotAllowedError').start('user')).toBe('notAllowed');
+  expect(await refusing('SecurityError').start('user')).toBe('insecurePage');
+  expect(await refusing('NotReadableError').start('user')).toBe('busy');
+  expect(await refusing('AbortError').start('user')).toBe('busy');
+  expect(await refusing('NotFoundError').start('user')).toBe('noCamera');
+  expect(await refusing('OverconstrainedError').start('user')).toBe('noCamera');
 });

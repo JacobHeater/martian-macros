@@ -633,6 +633,14 @@ export const PhotoCameraUnavailable = screenStory({
   open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
 });
 
+/** MM-560: a page that may use no camera (the iPhone's live reload): said as that, not as a setting to change. */
+export const PhotoCameraInsecurePage = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: /loaded from a development server over the network/,
+  device: async (services) => ({ ...services, photoCamera: new FixturePhotoCamera({ available: false, problem: 'insecurePage' }) }),
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
 /** MM-157: the self-timer counting, its seconds large over the picture and said aloud, with the way to cancel it. */
 export const PhotoCameraTimer = screenStory({
   covers: ['PhotoCameraScreen'],
