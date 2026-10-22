@@ -2,9 +2,11 @@ import { existsSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { stderr, stdout } from 'node:process';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { webBuildEnv } from './android.ts';
+import { iosLivePlan } from './iosLivePlan.ts';
 import { appIdOf, displayNameOf, identityOf, iosSuffixOf, type Identity } from './identity.ts';
-import { capture, run } from './proc.ts';
+import { capture, run, start } from './proc.ts';
 
 const webApp = 'apps/mobile';
 const iosProject = `${webApp}/ios/App`;
@@ -187,7 +189,11 @@ async function installedSimulators(): Promise<Simulator[]> {
  * shell and a simulator build (MM-403), or a signed phone build (MM-412;
  * the team as `xcodebuildArgs` says, docs/ios-signing.md).
  */
-export async function runIosBuild(repoRoot: string, args: readonly string[], { seed = false }: { seed?: boolean } = {}): Promise<number> {
+export async function runIosBuild(
+  repoRoot: string,
+  args: readonly string[],
+  { seed = false, afterSync }: { seed?: boolean; afterSync?: () => void } = {},
+): Promise<number> {
   if (process.platform !== 'darwin') {
     stderr.write('An iOS build needs a Mac with Xcode.\n');
     return 69;
@@ -200,6 +206,7 @@ export async function runIosBuild(repoRoot: string, args: readonly string[], { s
   }
   const synced = await run(['npm', 'run', 'ios'], { cwd: `${repoRoot}/${webApp}`, env: webBuildEnv(process.env, { seed, identity }) });
   if (synced !== 0) return synced;
+  afterSync?.();
   const phone = args.includes('--phone');
   return run(xcodebuildArgs({ release: args.includes('--release'), identity, phone, team: process.env['MM_APPLE_TEAM'] }), {
     cwd: `${repoRoot}/${iosProject}`,
@@ -267,6 +274,7 @@ async function runOnPhone(repoRoot: string, args: readonly string[]): Promise<nu
     stderr.write(`${identity}\n`);
     return 64;
   }
+  if (args.includes('--live')) return runOnPhoneLive(repoRoot, args, phone, identity);
   stdout.write(`${phone.name} (${phone.model}, iOS ${phone.osVersion}): building ${displayNameOf(identity)}\n`);
   const built = await runIosBuild(repoRoot, args.filter((arg) => arg !== '--seed'), { seed: args.includes('--seed') });
   if (built !== 0) return built;
@@ -278,6 +286,83 @@ async function runOnPhone(repoRoot: string, args: readonly string[]): Promise<nu
     stderr.write('Installed, but not opened. The first time, trust the developer on the phone: Settings, General, VPN & Device Management, then open the app.\n');
   }
   return launched;
+}
+
+/** This Mac's Wi-Fi (or Ethernet) IPv4 address, or `MM_LIVE_HOST` when set; undefined when it has none. */
+async function lanAddress(): Promise<string | undefined> {
+  const named = process.env['MM_LIVE_HOST'];
+  if (named !== undefined && named !== '') return named;
+  for (const port of ['en0', 'en1', 'en2']) {
+    const found = await capture(['ipconfig', 'getifaddr', port]);
+    if (found.code === 0 && found.stdout.trim() !== '') return found.stdout.trim();
+  }
+  return undefined;
+}
+
+/** Whether the dev server answers at `url` within `ms`. */
+async function answersAt(url: string, ms: number): Promise<boolean> {
+  const until = Date.now() + ms;
+  while (Date.now() < until) {
+    try {
+      await fetch(url);
+      return true;
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+  return false;
+}
+
+/**
+ * `mm run --ios --phone --live [--port N]` (MM-557): the app on the iPhone
+ * from the Vite dev server, with hot reload. The phone reaches the Mac over
+ * the Wi-Fi they share; the shell is built with its synced (git-ignored)
+ * `capacitor.config.json` pointed there, and the next `mm run --ios --phone`
+ * puts the bundled app back. Runs until Ctrl+C.
+ */
+async function runOnPhoneLive(repoRoot: string, args: readonly string[], phone: Phone, identity: Identity): Promise<number> {
+  const host = await lanAddress();
+  if (host === undefined) {
+    stderr.write('This Mac has no network address the phone can reach. Join the Mac and the iPhone to the same Wi-Fi, or set MM_LIVE_HOST.\n');
+    return 69;
+  }
+  const plan = iosLivePlan(args, host);
+  if (typeof plan === 'string') {
+    stderr.write(`${plan}\n`);
+    return 64;
+  }
+  const app = `${repoRoot}/${webApp}`;
+  const synced = `${repoRoot}/${iosProject}/App/capacitor.config.json`;
+  stdout.write(`${phone.name} (${phone.model}, iOS ${phone.osVersion}): building ${displayNameOf(identity)} to load from ${plan.url}\n`);
+  const built = await runIosBuild(repoRoot, args.filter((arg) => arg !== '--seed'), {
+    seed: args.includes('--seed'),
+    afterSync: () => writeFileSync(synced, plan.liveConfig(readFileSync(synced, 'utf8'))),
+  });
+  if (built !== 0) return built;
+  const server = start(plan.devServer, { cwd: app, env: webBuildEnv(process.env, { seed: args.includes('--seed'), identity }) });
+  if (!(await answersAt(plan.url, 30_000))) {
+    stderr.write(`The dev server did not answer at ${plan.url}. Is another one using the port? Try --port.\n`);
+    await server.stop();
+    return 69;
+  }
+  const installed = await run(['xcrun', 'devicectl', 'device', 'install', 'app', '--device', phone.id, builtApp(repoRoot, args.includes('--release'), true)]);
+  if (installed !== 0) {
+    await server.stop();
+    return installed;
+  }
+  const launched = await run(['xcrun', 'devicectl', 'device', 'process', 'launch', '--terminate-existing', '--device', phone.id, appIdOf(identity)]);
+  if (launched !== 0) stderr.write('Installed, but not opened. Open it on the phone; the first time, allow it to find devices on the local network.\n');
+  stdout.write(
+    `\nLive on ${phone.name} from ${plan.url}: save a file under apps/mobile/src and the app reloads.\n` +
+      'The phone and this Mac must stay on the same Wi-Fi. Ctrl+C ends the session; while it is off the app cannot load,\n' +
+      'so run mm run --ios --phone afterwards to put the bundled app back.\n\n',
+  );
+  await new Promise<void>((resolve) => {
+    process.once('SIGINT', () => resolve());
+    void server.exited.then(() => resolve());
+  });
+  await server.stop();
+  return 0;
 }
 
 /** `mm run --ios [-d UDID]`: builds, installs and launches on a simulator (MM-403); with `--phone`, on the iPhone (MM-412). */
