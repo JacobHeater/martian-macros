@@ -113,7 +113,7 @@ export function HealthPlatformSection() {
       if (await services.healthSource.stoppedAsking(type)) {
         overlays.snack(`${name} no longer asks for ${label.toLowerCase()} here. You can allow it in ${name} instead.`, {
           label: `Open ${name}`,
-          onAction: () => void openPermissions(),
+          onAction: () => void openPermissions(type),
         });
         return;
       }
