@@ -38,6 +38,22 @@ class MmBackupPlugin : Plugin() {
 
     private fun tempFile(name: String): File = File(context.cacheDir, "mm-backup-${UUID.randomUUID()}-$name")
 
+    /**
+     * Where the encrypted copy handed to the send chooser is kept. The other
+     * app may still be reading it when the chooser returns, so it is deleted
+     * the next time the app starts, or before the next one is shared (MM-63).
+     */
+    private fun sharedDir(): File = File(context.cacheDir, "mm-backup-shared")
+
+    private fun clearShared() {
+        sharedDir().deleteRecursively()
+    }
+
+    override fun load() {
+        super.load()
+        executor.execute { clearShared() }
+    }
+
     @PluginMethod
     fun snapshot(call: PluginCall) {
         val name = call.getString("name") ?: return call.reject("snapshot needs the database's name.")
@@ -82,7 +98,10 @@ class MmBackupPlugin : Plugin() {
     fun share(call: PluginCall) {
         val name = call.getString("name") ?: return call.reject("share needs a name.")
         try {
-            val file = File(context.cacheDir, name)
+            clearShared()
+            val dir = sharedDir()
+            dir.mkdirs()
+            val file = File(dir, File(name).name)
             file.writeBytes(Base64.decode(call.getString("data") ?: "", Base64.DEFAULT))
             val uri: Uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
             val send = Intent(Intent.ACTION_SEND)
