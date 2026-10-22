@@ -119,6 +119,11 @@
     background var(--motion-fast),
     color var(--motion-fast);
 }
+/* Martian's add plate is a neon-orange fill at rest (MM-556); pressed, hovered or focused it still fills Ember. */
+.theme-martian .mm-icon-button-plate {
+  background: var(--flare);
+  color: var(--on-flare);
+}
 .mm-icon-button-add:not(:disabled):hover .mm-icon-button-plate,
 .mm-icon-button-add:not(:disabled):focus-visible .mm-icon-button-plate,
 .mm-icon-button-add:not(:disabled):active .mm-icon-button-plate,
@@ -179,10 +184,8 @@
   min-height: 72px;
   padding: var(--space-8) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
   background: var(--raised);
-  /* Martian's hot-pink line and its glow along the top (MM-556); none elsewhere. */
-  box-shadow:
-    0 -1px 0 var(--accent-line),
-    0 -6px 18px color-mix(in srgb, var(--accent-line) 30%, transparent);
+  /* Martian's hot-pink line along the top (MM-556); none elsewhere. */
+  box-shadow: 0 -1px 0 var(--accent-line);
 }
 .mm-nav-destination {
   display: flex;
@@ -280,18 +283,9 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
-/* Martian's cards glow under blacklight (MM-556); the hero's glow is the stripes' hot pink. */
-.theme-martian .mm-surface,
-.theme-martian .mm-list-group {
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent),
-    0 0 14px var(--glow);
-}
+/* Martian's hero is edged in the stripes' hot pink (MM-556). */
 .theme-martian .mm-hero {
   border-color: var(--accent-line);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent),
-    0 0 18px color-mix(in srgb, var(--accent-line) 40%, transparent);
 }
 .theme-martian .mm-hero-backdrop {
   --mm-limb: color-mix(in srgb, var(--edge) 30%, transparent);
@@ -769,7 +763,12 @@
   transition: background var(--motion-fast);
 }
 .mm-chip-selected {
-  background: var(--selected);
+  background: var(--pop);
+  color: var(--on-pop);
+}
+/* On Martian's hot-pink fill the check takes the ink (MM-556). */
+.theme-martian .mm-chip-selected .mm-chip-check {
+  color: var(--on-pop);
 }
 .mm-chip-check {
   display: grid;
@@ -1571,9 +1570,10 @@
   stroke: color-mix(in srgb, var(--energy) 22%, transparent);
   stroke-linecap: butt;
 }
+/* The calorie arc: neon orange in Martian, the energy colour elsewhere (MM-556). */
 .mm-horizon-fill,
 .mm-horizon-ring {
-  stroke: var(--energy);
+  stroke: var(--arc);
 }
 .mm-horizon-dot {
   fill: var(--energy);
