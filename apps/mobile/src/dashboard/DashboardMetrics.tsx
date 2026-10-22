@@ -1,3 +1,4 @@
+import { usePaceInWords } from '../coach/usePaceInWords';
 import { HistoryChart } from '../charts/HistoryChart';
 import type { HistorySeries } from '../charts/HistorySeries';
 import { TrendChart } from '../charts/TrendChart';
@@ -39,6 +40,8 @@ interface DashboardMetricsProps {
  */
 export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsProps) {
   const { state } = useApp();
+  // How much of the person's weight is shown (MM-118).
+  const weightDisplay = useCell(state.weightDisplay);
   const setup = Loadable.valueOf(useCell(state.setup));
   const today = useCell(state.today);
   const days = useCell(state.dashboardRange);
@@ -49,6 +52,7 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
   const pauses = useCell(state.pauses);
   const recovery = useCell(state.recoveryCheckIns);
   const snapshot = useCell(state.coach);
+  const paceInWords = usePaceInWords();
   if (setup === undefined) return null;
   // Pauses that cannot be read take out only what they decide: targets and coverage (MM-183, MM-334).
   const unchecked = pausesUnchecked || Loadable.hasFailed(pauses);
@@ -72,7 +76,7 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
     onboardedOn: setup.onboardedOn,
     targetsAllowed: allowed && !unchecked,
   });
-  const fmt = new Fmt(setup.unitSystem);
+  const fmt = new Fmt(setup.unitSystem, { weightDisplay });
   const waists = waist.value.filter((w) => !w.date.isBefore(facts.start) && !w.date.isAfter(today));
   const latestWaist = waists[waists.length - 1];
   const estimates = new Map<CalendarDate, number>();
@@ -111,7 +115,10 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
   const charted = facts.finishedDays + facts.pausedDays > 0;
   let weightSummary = 'No weigh-ins in these days yet';
   if (firstTrend !== undefined && lastTrend !== undefined && trend.length > 1 && weighIns > 1) {
-    weightSummary = `${fmt.weightDelta(lastTrend.levelKg - firstTrend.levelKg)} since ${Fmt.shortDay(firstTrend.date)}`;
+    // With the weight hidden (MM-118), the pace in words against the plan's.
+    weightSummary = fmt.weightHidden
+      ? (paceInWords ?? 'Weighed in; the trend is still being worked out')
+      : `${fmt.weightDelta(lastTrend.levelKg - firstTrend.levelKg)} since ${Fmt.shortDay(firstTrend.date)}`;
   } else if (weighIns > 0) weightSummary = 'One weigh-in so far: the trend needs two';
   let waistSummary = 'Not measured in these days';
   if (firstWaist !== undefined && latestWaist !== undefined && waists.length > 1) {
@@ -183,17 +190,26 @@ export function DashboardMetrics({ pausesUnchecked = false }: DashboardMetricsPr
             )}
       </MmSection>
       <MmSection icon="scale" title="Weight trend" summary={weightSummary} onPress={open('progress')} opens="Opens Progress">
-        {weighIns < 2 ? null : (
+        {/* No chart with the weight hidden; with the trend only, the line and band without the dots (MM-118). */}
+        {weighIns < 2 || fmt.weightHidden ? null : (
           <>
             <TrendChart
               trend={snapshot?.trend ?? []}
-              weights={weights.value}
+              weights={fmt.readingsShown ? weights.value : []}
               today={today}
               rangeDays={days}
               fmt={fmt}
-              label={`Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`}
+              label={
+                fmt.readingsShown
+                  ? `Weight trend in ${fmt.weightUnit}, ${days} days, with observations and uncertainty band.`
+                  : `Weight trend in ${fmt.weightUnit}, ${days} days, with its uncertainty band.`
+              }
             />
-            <p className="app-caption">Dots are weigh-ins; the line is the trend. The band shows its uncertainty.</p>
+            <p className="app-caption">
+              {fmt.readingsShown
+                ? 'Dots are weigh-ins; the line is the trend. The band shows its uncertainty.'
+                : 'The line is the trend. The band shows its uncertainty.'}
+            </p>
           </>
         )}
       </MmSection>

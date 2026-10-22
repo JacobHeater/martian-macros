@@ -23,8 +23,10 @@ function middle(of: readonly WaistObservation[]): number {
  * nearest the day `days` ago. The latest entry has to be from the last
  * two weeks. A difference is a change only when it exceeds the noise of a
  * difference, 1.4 times the noise figure; inside that it is no clear
- * change. The figure is `waistNoiseOf` the entries, half as much again
- * when either end includes a single reading, unless `noiseCm` is given.
+ * change. The figure is `waistNoiseOf` the entries, or `siteNoiseCm` for
+ * another site (MM-156), half as much again when either of the two ends
+ * compared includes a single reading (an entry outside both ends changes
+ * nothing); `noiseCm`, when given, is the figure as it stands.
  *
  * With `sinceStart`, the comparison is with the first three entries ever
  * instead, so the starting point is not one noisy reading.
@@ -35,12 +37,15 @@ export function waistChangeOf({
   days = 28,
   sinceStart = false,
   noiseCm,
+  siteNoiseCm,
 }: {
   waist: Iterable<WaistObservation>;
   asOf: CalendarDate;
   days?: number;
   sinceStart?: boolean;
   noiseCm?: number | undefined;
+  /** Another site's own noise figure, in place of the waist's (MM-156). */
+  siteNoiseCm?: number | undefined;
 }): WaistChange | undefined {
   const all = [...waist];
   const entries = all.filter((entry) => !entry.date.isAfter(asOf)).sort((a, b) => a.date.compareTo(b.date));
@@ -85,7 +90,7 @@ export function waistChangeOf({
   // The user's own figure once there is one; half as much again when
   // either end rests on a single reading.
   const single = [...recent, ...baseline].some((e) => e.isSingleReading);
-  const noise = noiseCm ?? waistNoiseOf(all) * (single ? WaistRule.singleReadingFactor : 1);
+  const noise = noiseCm ?? (siteNoiseCm ?? waistNoiseOf(all)) * (single ? WaistRule.singleReadingFactor : 1);
   const threshold = WaistRule.differenceFactor * noise;
   // A hair of tolerance, so a change of exactly the threshold counts
   // whatever the arithmetic did to its last digit.

@@ -1,4 +1,5 @@
 import { Fmt } from '../format/Fmt';
+import { setText } from '../format/setText';
 import { Screen } from '../app/Screen';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -34,7 +35,14 @@ export function StrengthHistoryScreen({ exerciseId }: { exerciseId: string }) {
               <MmListRow
                 key={point.workoutId}
                 title={Fmt.longDate(point.date)}
-                subtitle={`Best set: estimated max ${fmt.weight(point.estimateKg)} · smoothed ${fmt.weight(point.trendKg)}`}
+                subtitle={
+                  // A bodyweight lift's estimate carries the body weight: with the weight hidden, the set alone (MM-118).
+                  fmt.weightHidden && trend.exercise?.load === 'bodyweight'
+                    ? point.bestSet === undefined
+                      ? 'Best set'
+                      : `Best set ${setText(point.bestSet, fmt, 'bodyweight')}`
+                    : `Best set: estimated max ${fmt.load(point.estimateKg)} · smoothed ${fmt.load(point.trendKg)}`
+                }
               />
             ))}
           </InfoCard>

@@ -145,11 +145,16 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 23 left it: without the weight display, chosen or offered (MM-118). */
+const versionTwentyThree = currentSchema
+  .replace(`  "weight_display" TEXT NULL CHECK ("weight_display" IS NULL OR "weight_display" IN ('everything', 'trendOnly', 'hidden')),\n`, '')
+  .replace('  "weight_display_offered" INTEGER NOT NULL DEFAULT 0 CHECK ("weight_display_offered" IN (0, 1)),\n', '');
+
 /**
  * The schema as version 22 left it: the waist in a table of its own, and no other site measured (MM-156). The
  * waist's table goes back where it was, after the day marks, so every older version is derived from this one.
  */
-const versionTwentyTwo = currentSchema
+const versionTwentyTwo = versionTwentyThree
   .replace(/CREATE TABLE "body_measurements" \([\s\S]*?\n\);\nCREATE TABLE "measurement_settings" \([\s\S]*?\n\);\n/, '')
   .replace(
     /(CREATE TABLE "day_marks" \([\s\S]*?\n\);\n)/,
@@ -759,4 +764,33 @@ it('a version 22 database comes up to date with the waist in the new store, unch
   expect([...(await first(repos.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);
   await repos.measurements.saveMeasurement('neck', day, 37.5, { readings: [37.5, 37.4, 37.6] });
   expect((await first(repos.measurements.watchSite('neck'))).map((o) => o.valueCm)).toEqual([37.5]);
+});
+
+// MM-118: a version 23 database comes up to date with no weight display chosen and none offered; its other preferences
+// are kept, and a display chosen from then on is kept.
+it('a version 23 database comes up to date with no weight display chosen, and keeps one chosen after', async () => {
+  expect(versionTwentyThree).not.toContain('weight_display');
+  expect(versionTwentyThree).toContain('body_measurements');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 23, schema: versionTwentyThree });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute("INSERT INTO user_preferences (id, theme_preference, primary_scale_source_id) VALUES (1, 'dark', 'gym')");
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'user_preferences')).toEqual(expect.arrayContaining(['weight_display', 'weight_display_offered']));
+  expect(await first(repos.preferences.watchWeightDisplay()), 'none chosen').toBeUndefined();
+  expect(await first(repos.preferences.watchWeightDisplayOffered())).toBe(false);
+  expect(await first(repos.preferences.watchPrimaryScale())).toBe('gym');
+  await repos.preferences.saveWeightDisplay('hidden');
+  await repos.preferences.markWeightDisplayOffered();
+  expect(await first(repos.preferences.watchWeightDisplay())).toBe('hidden');
+  expect(await first(repos.preferences.watchWeightDisplayOffered())).toBe(true);
 });

@@ -125,7 +125,9 @@ is changing.
   (reference weight, settling after a phase change); MM-115 (raise when loss
   outruns the limit); MM-111 (underweight guard); MM-132 (body-fat thresholds
   under uncertainty).
-- Remaining: MM-35. Epics: MM-22, MM-110.
+- Remaining: none. Epics: MM-22, MM-110.
+- Done 2026-10-21: MM-35 (the spike's finding: keep the two-step model with MM-131's settling windows; revisit when
+  MM-502 gives a lean-mass signal or real logs show carbohydrate explaining water).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-173 (Honest low days from a noisy logger are dropped as partial, and the estimate drifts high).
 
 ## Notes for whoever builds it

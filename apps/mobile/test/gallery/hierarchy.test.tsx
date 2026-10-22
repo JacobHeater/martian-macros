@@ -21,10 +21,11 @@ interface ComposedStory {
 
 /**
  * The six destinations' own stories (the first story of each screens module), over the demo scenario,
- * and the Dashboard on a morning before the weigh-in (MM-292), the state the owner found on his phone.
+ * and the Dashboard on a morning before the weigh-in (MM-292), the state the owner found on his phone, and with
+ * the offer to ease a deficit (MM-117), whose choices must not take the Dashboard's one primary.
  */
 const modules = import.meta.glob<StoriesModule>('../../src/gallery/screens/*.stories.tsx', { eager: true });
-const destinations = ['Dashboard', 'Food', 'Coach', 'Progress', 'Train', 'Settings', 'NotWeighedToday'];
+const destinations = ['Dashboard', 'Food', 'Coach', 'Progress', 'Train', 'Settings', 'NotWeighedToday', 'DashboardReliefOffer'];
 const stories = Object.entries(modules).flatMap(([path, module]) =>
   Object.entries(composeStories(module, preview) as unknown as Record<string, ComposedStory>)
     .filter(([name]) => destinations.includes(name))
