@@ -18,6 +18,9 @@ import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRe
 import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { MenstruationRepository } from '../domain/repositories/MenstruationRepository';
 import type { WaistRepository } from '../domain/repositories/WaistRepository';
+import type { MeasurementRepository } from '../domain/repositories/MeasurementRepository';
+import type { MeasurementSettingsRepository } from '../domain/repositories/MeasurementSettingsRepository';
+import { WaistFromMeasurements } from '../domain/measurements/WaistFromMeasurements';
 import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
@@ -53,7 +56,8 @@ import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
 import { SqlGoalBodyFatRepository } from './SqlGoalBodyFatRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
-import { SqlWaistRepository } from './SqlWaistRepository';
+import { SqlMeasurementRepository } from './SqlMeasurementRepository';
+import { SqlMeasurementSettingsRepository } from './SqlMeasurementSettingsRepository';
 import { SqlWaterRepository } from './SqlWaterRepository';
 import { SqlWeightEventRepository } from './SqlWeightEventRepository';
 import { SqlWeightRepository } from './SqlWeightRepository';
@@ -69,7 +73,11 @@ export class SqlRepositories {
   readonly setup: SetupRepository;
   readonly weights: WeightRepository;
   readonly weightEvents: WeightEventRepository;
+  /** The waist, one site of `measurements` (MM-156). */
   readonly waist: WaistRepository;
+  /** Every site's tape measurements, the waist's among them (MM-156). */
+  readonly measurements: MeasurementRepository;
+  readonly measurementSettings: MeasurementSettingsRepository;
   readonly flowDays: MenstruationRepository;
   /** The nights of sleep the person typed, or imported nights kept beside them (MM-250). */
   readonly sleep: SleepRepository;
@@ -104,7 +112,9 @@ export class SqlRepositories {
     this.setup = new SqlSetupRepository(db);
     this.weights = new SqlWeightRepository(db);
     this.weightEvents = new SqlWeightEventRepository(db);
-    this.waist = new SqlWaistRepository(db);
+    this.measurements = new SqlMeasurementRepository(db);
+    this.waist = new WaistFromMeasurements(this.measurements);
+    this.measurementSettings = new SqlMeasurementSettingsRepository(db);
     this.flowDays = new SqlMenstruationRepository(db);
     this.sleep = new SqlSleepRepository(db);
     this.water = new SqlWaterRepository(db);

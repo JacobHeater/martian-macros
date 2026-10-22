@@ -71,6 +71,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     weightEvents: repos.weightEvents,
     water: repos.water,
     waist: repos.waist,
+    measurements: repos.measurements,
+    measurementSettings: repos.measurementSettings,
     flowDays: repos.flowDays,
     sleep: repos.sleep,
     food: repos.food,
