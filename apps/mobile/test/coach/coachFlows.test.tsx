@@ -57,7 +57,8 @@ it('puts the goal first under the hero, before the one thing to do', async () =>
   const follows = (a: Node, b: Node) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
   expect(follows(hero, goal)).toBe(true);
   expect(follows(goal, oneThing)).toBe(true);
-  expect(document.querySelector('.mm-section')?.contains(goal)).toBe(true);
+  // The first section after the hero's Heads up, when there is one (MM-553).
+  expect([...document.querySelectorAll('.mm-section')].find((section) => !section.classList.contains('mm-section-caution'))?.contains(goal)).toBe(true);
   expect(screen.getByRole('button', { name: 'Change goal' })).toBeInTheDocument();
 });
 

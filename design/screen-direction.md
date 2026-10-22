@@ -89,9 +89,12 @@ in here.
    beside its siblings, and every panel brief asks whether it matches them.
 
 **Outside the rules.** Safety content (the under-eating notice, the relief
-offer, the policy cautions, the pause banner, the target flags) is outside
-the rationing: it sits above the hero, in full, in that order, never
-collapsed and never as "the one thing to do". Material uncertainty is
+offer, the pause banner) is outside the rationing: it sits above the hero,
+in full, in that order, never collapsed and never as "the one thing to do".
+The policy cautions and the target flags are one "Heads up" section
+directly under the hero, folded by default to its count with the caution's
+icon and colour on the folded line, each note in full once opened (owner,
+2026-10-22, MM-553). Material uncertainty is
 outside rule 1's "never inline": one sentence stays with the chart it
 qualifies (the weight trend's band), and a held or settling estimate says
 so in the line that is visible when its disclosure is closed.
@@ -125,7 +128,7 @@ MM-254 to MM-259. The story names are the register's.
 |---|---|---|
 | Dashboard (`Screens/Today`, Dashboard and FirstDay) | A hero, a second macro picture, a weight card, a streak card, an insight card and six history cards of the same weight. | The hero with the Grams/Split switch and the confidence word labelled; the rhythm strip of the last seven days; the insight as a section; weight (or, on a morning before the weigh-in, the weigh-in row with its field, MM-291), waist (or, with none this week, the waist row with its field and a secondary Save, MM-301), next check-in, training and the streak as rows of one group; the history behind the "History" disclosure ("More about this week" until MM-176). |
 | Food (`Screens/Food`, Food and NothingLogged) | A hero, a second macro picture, four meal cards, a segmented completeness control at the foot. | The hero with the switch; the meals as sections with their icons, subtotal and add button, entries as rows with a method icon beside its word; the completeness row after the last meal with its state in words, the mark repeated in the day header; "More about today" one tap down. |
-| Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the goal with "Change goal" (MM-299); the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, body), recovery and reports folded to one line when nothing is due. |
+| Coach (`Screens/Coach`, Coach) | Up to eleven cards of equal weight, the targets' cautions inside a card. | The safeguards above the hero in full; the hero with the next check-in and the confidence word; the cautions and target flags as one "Heads up" section under it, folded to its count (MM-553); the goal with "Change goal" (MM-299); the one thing to do; sections with icons (targets, last change, slowed progress, the recomp review, the last seven days, recovery, reports, metabolism, confidence, body), recovery and reports folded to one line when nothing is due. |
 | Progress (`Screens/Progress`, Progress) | An entry card, a chart card with a four-line caption, an events card with a four-line paragraph, a waist card with the technique inline, strength cards. | One hero: the weigh-in and the trend with its range switch, one line about the band, "How to read this" one tap down; weight events as rows with an icon and the day in words, the add action in the header; Waist and Strength folded to their lines. |
 | Train (`Screens/Train`, Train) | Two full-width buttons, a chip, thirteen identical rows. | One primary, Repeat as a text action; the strip of the last seven days; the weekly volume as a section that opens its screen; workouts grouped by this week, last week and month, each row with the day, the length and a record mark with its words. |
 | Settings (`Screens/Settings`, Settings and MeasuredBodyFat) | Twelve groups mixing chips, a segmented control, sliders and rows. | Seven sections of rows in the order of use (Today's setup, You, Reminders, Data, Appearance, About, Erase), every row with its icon, the choosers opening the options dialog; the two sliders stay in their rows as the one other inline control. |

@@ -55,6 +55,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { DataGapNote } from './DataGapNote';
 import { GoalBodyFatSheet } from './GoalBodyFatSheet';
+import { HeadsUpSection } from './HeadsUpSection';
 import { dataGapsOf } from './dataGapsOf';
 import { LastChangeCard } from './LastChangeCard';
 import { LeanGainCard } from './LeanGainCard';
@@ -264,49 +265,40 @@ export function CoachScreen() {
     confidence: snapshot.confidence,
     eatingDisorderHistory: setup.screening.eatingDisorderHistory,
   });
+  const headsUp = [
+    ...[...snapshot.policy.cautions].map(cautionMessage),
+    ...(current === undefined
+      ? []
+      : [...current.targets.flags].map((flag) =>
+          flag === 'raisedForSafePace' && paceNote !== undefined ? `${targetFlagMessage(flag)} ${paceNote}` : targetFlagMessage(flag),
+        )),
+  ];
   return (
     <>
-      {/* The safeguards are outside the rationing: above the hero, in full, in this order. */}
-      {[...snapshot.policy.cautions].map((caution) => (
-        <div key={caution} className="app-stack-item">
-          <Notice kind="caution" text={cautionMessage(caution)} />
-        </div>
-      ))}
+      {/* The safeguards above the hero, in this order; the cautions and target flags are the Heads up section under it (MM-553). */}
       <PauseBanner />
       <UnderEatingNotice />
       <TrainingLapseNotice />
       <ReliefOfferCard />
+      {/* The one calorie visual (MM-187): today against the targets in force, or the guide during a pause. */}
       {current === undefined ? null : (
-        <>
-          {/* The one calorie visual (MM-187): today against the targets in force, or the guide during a pause. */}
-          <CalorieHero
-            intake={intakeDayFrom(today, food)}
-            entries={food}
-            targets={pause !== undefined ? guide : current.targets}
-            paused={pause !== undefined}
-            status={`Next check-in ${Fmt.day(nextCheckIn(setup, current), today)}`}
-            confidence={confidence}
-            onStatusPress={() => void navigator.push(() => <TargetsHistoryScreen />)}
-          />
-          {[...current.targets.flags].map((flag) => (
-            <div key={flag} className="app-stack-item">
-              <Notice
-                kind="caution"
-                text={
-                  flag === 'raisedForSafePace' && paceNote !== undefined
-                    ? `${targetFlagMessage(flag)} ${paceNote}`
-                    : targetFlagMessage(flag)
-                }
-              />
-            </div>
-          ))}
-          {breakRebound ? (
-            <div className="app-stack-item">
-              <Notice text={reboundText(fmt)} />
-            </div>
-          ) : null}
-        </>
+        <CalorieHero
+          intake={intakeDayFrom(today, food)}
+          entries={food}
+          targets={pause !== undefined ? guide : current.targets}
+          paused={pause !== undefined}
+          status={`Next check-in ${Fmt.day(nextCheckIn(setup, current), today)}`}
+          confidence={confidence}
+          onStatusPress={() => void navigator.push(() => <TargetsHistoryScreen />)}
+        />
       )}
+      {/* The health check's cautions, then the target flags: one section under the hero, folded to its count (MM-553, overriding MM-256's "in full"). */}
+      <HeadsUpSection notes={headsUp} />
+      {current !== undefined && breakRebound ? (
+        <div className="app-stack-item">
+          <Notice text={reboundText(fmt)} />
+        </div>
+      ) : null}
       {trainingNote === undefined ? null : (
         <div className="app-stack-item">
           <Notice text={trainingNote} />

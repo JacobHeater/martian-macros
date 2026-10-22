@@ -311,12 +311,37 @@ export const TargetHistoryNotSet = screenStory({
   open: ({ navigator }) => void navigator.push(() => <TargetsHistoryScreen />),
 });
 
-/** MM-321: two health-check answers that bring the coach's cautions, above everything. */
+/** MM-321, MM-553: two health-check answers that bring the coach's cautions, folded into "Heads up" under the hero. */
 export const CoachCautions = screenStory({
   covers: ['CoachScreen'],
   shows: 'Your metabolism',
   scenario: demoWith({ screening: { thyroidCondition: true, insulinOrSulfonylurea: true } }),
   open: onCoach,
+});
+
+/** MM-553: the health check's cautions, then the target flags, as the owner saw them: four notes, one "Heads up" line. */
+const headsUpScenario = demoWith({
+  screening: { weightAffectingMedication: true, sleepDisorder: true },
+  then: async (repos, today) => {
+    await repos.targets.saveTargets(storyTargets(today.addDays(-3), { kcal: 1500, flags: ['deficitCapped', 'flooredAtSafetyMinimum'] }));
+  },
+});
+
+/** MM-553 (owner, 2026-10-22): the cautions and target flags folded under the hero to their count, the caution mark kept. */
+export const CoachHeadsUp = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^\d+ notes about your targets$/,
+  scenario: headsUpScenario,
+  open: onCoach,
+});
+
+/** MM-553: "Heads up" opened: each caution, then each flag, in full. */
+export const CoachHeadsUpOpened = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Your deficit is capped at 35% of your expenditure/,
+  scenario: headsUpScenario,
+  open: onCoach,
+  walk: pressOnCoach(/^Heads up/),
 });
 
 /** MM-321: "Change goal": the goals the coach allows, the recommended one marked. */
@@ -476,6 +501,7 @@ export const CoachOnChosenBreak = screenStory({
   shows: /^This is the two-week break you chose/,
   scenario: onBreakScenario('requestedBreak'),
   open: onCoach,
+  walk: pressOnCoach(/^Heads up/),
 });
 
 /** MM-135: the break the app planned at twenty weeks, the safety floor, in its first week. */
@@ -484,6 +510,7 @@ export const CoachOnPlannedBreak = screenStory({
   shows: /^You’ve been in a deficit for 20 weeks/,
   scenario: onBreakScenario('dietBreak'),
   open: onCoach,
+  walk: pressOnCoach(/^Heads up/),
 });
 
 /** MM-135 (the panel's UX-6): the relief card's three buttons at 200% text, "Carry on" on its own line. */
@@ -925,6 +952,7 @@ export const CoachWeightLossMedicationFastPace = screenStory({
   shows: /Targets went up\. This pace is faster than the app would set/,
   scenario: weightLossMedicationScenario(),
   open: onCoach,
+  walk: pressOnCoach(/^Heads up/),
 });
 
 /** MM-113, MM-114: far below the floor on the medication: the notice adds the prescriber lines before the support line. */
@@ -941,6 +969,7 @@ export const CoachNotOnWeightLossMedication = screenStory({
   shows: /^You were losing weight faster than the app aims for at your body fat, because faster loss costs more muscle\. Targets went up\.$/,
   scenario: weightLossMedicationScenario({ ticked: false }),
   open: onCoach,
+  walk: pressOnCoach(/^Heads up/),
 });
 
 /** MM-113, MM-149: why the targets are what they are, on the medication: the protein-minimum days lead the week. */

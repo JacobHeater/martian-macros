@@ -6,6 +6,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openTab } from '../support/openTab';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -49,6 +50,8 @@ it('in the caution zone the Coach screen carries a caution', async () => {
   await repos.weights.saveWeight(today, 63);
   renderApp(repos, today);
   await openTab('Coach');
+  // In the Heads up section under the hero, folded to its count (MM-553).
+  await openHeadsUp();
   expect(await screen.findByText(/close to the low end of the healthy range/)).toBeInTheDocument();
 });
 

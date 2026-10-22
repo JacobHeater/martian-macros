@@ -9,6 +9,7 @@ import type { TargetsRecord } from '../../src/engine/TargetsRecord';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
+import { openHeadsUp } from '../support/openHeadsUp';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
@@ -118,6 +119,7 @@ it('a reduction can be kept for now, once', async () => {
   expect(h[1]?.targets.flags).toEqual(new Set(['heldByUser']));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   expect(screen.queryByText(/Calories unchanged/)).not.toBeInTheDocument();
+  await openHeadsUp();
   expect((await screen.findAllByText(/kept last week/)).length).toBeGreaterThan(0);
 });
 
