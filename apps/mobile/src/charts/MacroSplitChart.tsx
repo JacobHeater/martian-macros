@@ -87,8 +87,12 @@ export function MacroSplitChart({ intake, isPreview = false, compact = false, ne
         </svg>
         <ul className="chart-split-list">
           {MacroKind.values.map((macro) => (
-            <li key={macro} className={`chart-split-item chart-text-${macro}`}>
-              <span>{MacroKind.label(macro, { netCarbs })}</span>
+            <li key={macro} className="chart-split-item">
+              {/* MM-554: the name and figure in text; the colour is carried by the key, not by the words. */}
+              <span>
+                <span className={`chart-key chart-key-${macro}`} aria-hidden="true" />
+                {MacroKind.label(macro, { netCarbs })}
+              </span>
               <span>{figures(macro)}</span>
             </li>
           ))}
