@@ -913,6 +913,24 @@ export const EditRecipeLineWeight = screenStory({
   },
 });
 
+/** MM-456: a found line's new weight saved: the line reads it, and focus is back on that line's menu button. */
+export const EditRecipeLineWeightSaved = screenStory({
+  covers: ['MyFoodsStep'],
+  shows: '100 g · 365 kcal',
+  scenario: withRiceBowl(FixturePack.packId),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Saved')(canvas);
+    await press(/^Demo rice bowl/)(canvas);
+    await press('More actions for White rice, raw')(canvas);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
+    const field = await inSheet(canvas).findByRole('textbox', { name: 'Weight g for White rice, raw' }, { timeout: 10000 });
+    await userEvent.clear(field);
+    await userEvent.type(field, '100');
+    await press('Save weight')(canvas);
+  },
+});
+
 /** MM-456: a found line whose food is no longer installed keeps its totals, says so, and its menu offers no weight change. */
 export const EditRecipeLineFoodGone = screenStory({
   covers: ['MyFoodsStep'],
