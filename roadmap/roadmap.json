@@ -521,7 +521,8 @@
             "MM-235",
             "MM-238",
             "MM-300",
-            "MM-412"
+            "MM-412",
+            "MM-557"
           ]
         },
         {
@@ -1128,6 +1129,7 @@
           "MM-300",
           "MM-8",
           "MM-412",
+          "MM-557",
           "MM-536",
           "MM-550"
         ],
@@ -1208,9 +1210,10 @@
         },
         {
           "step": 7,
-          "title": "Live reload on a device (MM-300): mm run --live, the dev server through adb reverse and Capacitor live reload",
+          "title": "Live reload on a device (MM-300): mm run --live, the dev server through adb reverse and Capacitor live reload; on the iPhone over Wi-Fi (MM-557)",
           "tickets": [
-            "MM-300"
+            "MM-300",
+            "MM-557"
           ],
           "milestone": "M2"
         },

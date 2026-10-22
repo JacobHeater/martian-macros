@@ -59,6 +59,13 @@
 	<string>To open your progress photos only after you unlock with Face ID.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>To read the kinds of health data you allow, such as weigh-ins from your scale, and, when you ask during setup, your sex, date of birth and height, so you need not type them. Nothing read leaves this device.</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Only while the app is being developed: to load it from the developer's Mac on your Wi-Fi. The app sends nothing over your network.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>To write what you log in the app to Apple Health, only for the kinds you turn on in Settings: food, water, the weight you type and finished workouts. The app changes or removes only what it wrote.</string>
 </dict>
