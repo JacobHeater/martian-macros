@@ -1939,8 +1939,21 @@
 .mm-section-framed.mm-section-closed {
   padding-bottom: var(--space-4);
 }
-.mm-section-framed + .mm-section-framed {
+/* Cards stand 12 px apart, folded or open; this outranks the open-after-closed 24 px above. */
+.mm-section.mm-section-framed + .mm-section.mm-section-framed {
   margin-top: var(--space-12);
+}
+/* The card's padding ends it, not the last line's own margin. */
+.mm-section-framed .mm-section-body > :last-child {
+  margin-bottom: 0;
+}
+/* A text button's label lines up with the words beside it: the button keeps its tap area, its padding hangs out. */
+.mm-section-body > .mm-button-text:first-child,
+.mm-section-body > p + .mm-button-text {
+  margin-inline-start: calc(-1 * var(--space-12));
+}
+.mm-section-head > .mm-button-text:last-child {
+  margin-inline-end: calc(-1 * var(--space-12));
 }
 .mm-section-framed .mm-list-group,
 .mm-section-framed .mm-surface {
