@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Pause } from '../../src/domain/Pause';
+import { RecoveryCheckIn } from '../../src/domain/RecoveryCheckIn';
 import { ReminderKind } from '../../src/domain/ReminderKind';
 import { ReminderSetting } from '../../src/domain/ReminderSetting';
 import { InMemoryExactAlarms } from '../../src/fixtures/InMemoryExactAlarms';
@@ -221,6 +222,22 @@ it('a pause silences its days', async () => {
   await open();
   await expect.poll(() => scheduler.scheduled.length).toBeGreaterThan(0);
   expect(scheduler.scheduled.some((r) => pause.covers(r.date))).toBe(false);
+});
+
+/** MM-116's reminder: once a week, on the day the five questions fall due. */
+it('the recovery check-in reminder waits for its day, and answering moves it a week on', async () => {
+  await open();
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('switch', { name: /^How you are holding up/ }));
+  await expect.poll(async () => (await stored()).length).toBe(1);
+  expect((await stored())[0]?.minuteOfDay).toBe(9 * 60);
+  // Setup was 200 days ago: it falls due every seventh day from then, next in three days.
+  await expect.poll(() => scheduler.scheduled[0]?.date).toBe(today.addDays(3));
+  expect(scheduler.scheduled.every((r) => r.kind === 'recoveryCheckIn' && r.minuteOfDay === 9 * 60)).toBe(true);
+  await repos.recovery.saveRecoveryCheckIn(
+    new RecoveryCheckIn({ date: today, hunger: 3, energy: 3, sleep: 3, training: 3, mood: 3 }),
+  );
+  await expect.poll(() => scheduler.scheduled[0]?.date).toBe(today.addDays(7));
 });
 
 describe('ignored for a week', () => {

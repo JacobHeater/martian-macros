@@ -1,6 +1,6 @@
 ---
 id: MM-403
-status: in-progress
+status: done
 component: app-shell
 related: [MM-228, MM-232, MM-242, MM-69, MM-404, MM-405, MM-406]
 ---
@@ -118,3 +118,25 @@ Scenario: The web is still never a product
   the terms, onboarding and a weigh-in survive a force quit; Apple Health
   on the device (MM-69); the camera on the device (MM-406); a reminder at
   its time (MM-405).
+
+## Progress
+Done 2026-10-21.
+- Built 2026-10-19 and verified then on the iPhone 17 Pro Max simulator (Xcode 26.3): the shell builds, installs
+  and launches through `mm build ios` and `mm run --ios`; the demo seed was written and read through `MmDb`. The
+  owner's iPhone is reached with `mm run --ios --phone` (MM-412).
+- The plugins: `MmDb` and `MmPacks` (MM-404), `MmReminders` (MM-405), `MmScanner` (MM-406), `MmHealth` (MM-69,
+  MM-489), and `MmBackup` (MM-63), registered from `MainViewController`; the dev-only `MmScreenshot` (MM-536).
+- "Not now" on iOS and on Android, and the platform service: `test/app/termsOfUse.test.tsx` and
+  `test/platform/runningOn.test.ts`; the browser keeps everything in memory (`openAppServices`, MM-228).
+- Added while finishing, since CI builds no iOS app: `test/ios/iosShell.test.ts` reads the shell's source. Every
+  plugin the Android shell registers has a Swift twin of the same name, registered from `MainViewController`, built
+  in the app target and offering every method of the Kotlin one; the deployment target is iOS 15.0; the app is
+  portrait only; the camera and Apple Health purpose strings are there. Not run locally; CI validates.
+
+## Owed on a phone
+The owner's checklist, once a build from current main is on the iPhone:
+- The app installs from `mm run --ios --phone`; the terms, onboarding and a weigh-in survive a force quit.
+- "Not now" on the terms offers no "Close the app" and says to go back to the Home Screen.
+- Each plugin's own phone checks: MM-404 (storage and a pack download), MM-405 (a reminder at its time), MM-406 (the
+  camera), MM-69 and MM-489 (Apple Health).
+- The iOS build of everything changed since 2026-10-19, which CI does not compile.

@@ -37,3 +37,7 @@ Scenario: Cancelling
   When backup files exist (MM-63), erasing should also say that backups elsewhere are not touched.
 
 **Note (2026-10-12, MM-242).** After an erase the app shows the terms of use (MM-242), then the theme chooser (MM-184), then onboarding. "Onboarding is shown" in the criteria above predates both. The agreement to the terms is erased with everything else.
+
+**Fixed 2026-10-21 (`fix/privacy-housekeeping`, panel review).** `SqlDataEraser.eraseAll` now runs `VACUUM` after the
+delete (`AppDatabase.vacuum`, outside the transaction, which SQLite requires), so erased rows do not remain in free
+pages. Test: `test/data/eraseVacuums.test.ts` (no free page left, and the file shrank). Not run locally; CI validates.

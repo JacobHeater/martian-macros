@@ -83,10 +83,10 @@ to declare.
    weigh-ins. Do it before any import exists, against the fake. MM-71 is
    done, with the primary scale chosen in Settings (2026-10-21); what it
    left is step 12.
-3. **Health Connect (MM-68).** M3. Agree the workout table with WS-10 before
-   importing sessions.
-4. **History backfill (MM-73).** M3. Built 2026-10-21 behind the interfaces, device checks owed; a
-   re-read after an expired token keeps it (MM-498, built 2026-10-21).
+3. **Health Connect (MM-68).** M3. Done 2026-10-21, with the offer at onboarding's weight question, imported
+   period days in the trend and the height suggestion; importing sessions is MM-490 (WS-10).
+4. **History backfill (MM-73).** M3. Done 2026-10-21, with onboarding offering today's imported weigh-in; a
+   re-read after an expired token keeps it (MM-498).
 5. **Sync while the app is open (MM-72, MM-516, MM-523).** M4. MM-72 built 2026-10-21 from the app's lifecycle: opening
    always reads, coming back to the front reads once the last read is fifteen minutes old, one read at a time. No background
    sync (the owner, 2026-10-21; MM-516 closed). Where missing data weakens coaching, the app says so and the user decides (MM-523).
@@ -95,7 +95,8 @@ to declare.
    turned off (MM-514). Each ticket lists what is owed on a phone.
 7. **HealthKit (MM-69).** M4. When development moves to the Mac. HealthKit's
    biological-sex value may pre-fill the onboarding question when it is male
-   or female; other values are ignored and the user always confirms.
+   or female; other values are ignored and the user always confirms. Done 2026-10-21:
+   "Fill in from Apple Health" on onboarding's first step fills sex, date of birth and height; phone checks owed.
 12. **What MM-71 left (MM-441, MM-442).** M4. A weigh-in window for a
     morning that is not 04:00 to 12:00, and steps through the platform's
     own aggregation (native, needs a device). Built 2026-10-21: the window
