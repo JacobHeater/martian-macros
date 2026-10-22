@@ -1,6 +1,6 @@
 ---
 id: MM-447
-status: proposed
+status: done
 component: training
 related: [MM-191, MM-212, MM-222]
 ---
@@ -54,5 +54,40 @@ Scenario: The workout's times
   And starting the clock again from now can be taken back or is asked first
 ```
 
+## Decisions
+The owner's answers were not given; the coordinator, for the owner (2026-10-21), had the recommended answer built as
+the default for each, and these are easy to overrule:
+- **The bar offers "Resume" while paused**, in place of the disabled "Start set", and says "Tap Resume to start the
+  clock again." It is the screen's only Resume (panel review, 2026-10-21): the clock card says "Paused" and shows no
+  button while paused, so the screen has one primary way on. The bar shows no figure while paused (a 0:00 read as a
+  reset), and its buttons wrap to their own line at large text sizes.
+- **The workout clock is read as "Workout time …"**, as the bar's figure is read as a spoken duration.
+- **Pausing says when it drops a set being timed**: a snack, "Paused. The set being timed was dropped; start it again
+  after you resume." Nothing is said when no set was being timed. The set is still dropped (MM-191: a pause is not part
+  of a set).
+- **"Edit times" is "Edit workout times"**; a set's times stay on the set.
+- **"Start the clock again from now" asks first** (title "Start the clock again from now?", confirm "Start again",
+  Cancel the stronger choice, MM-280), since it cannot be taken back.
+- **Train has a section in `design/screen-direction.md`** ("Train and a workout"), written from the built screen.
+- **Finishing a workout stays one tap, neither confirmed nor reversible**: a finished workout's sets and times can
+  still be corrected, and it can be deleted. A reopen would also have to take back what was written to the health
+  platform (MM-489), which is the health-sync lane's; ask for it as its own ticket if it is wanted.
+- **A rest that has ended is not made readable here**: MM-191 holds that a rest is not its own record, and set times
+  and timers are MM-191's.
+
+Siblings reused (MM-318): the clock card's Resume (label and play icon) for the bar's; the workout's delete question
+(`overlays.confirm`) for the restart question; the pack download's paused wording for the snack.
+
 ## Notes
-- Not built. Each point waits on the owner's answer above.
+- Built 2026-10-21: `SetTimerBar.tsx` (Resume while paused, its instruction), `WorkoutClockCard.tsx` (the dropped-set
+  snack, "Edit workout times"), `WorkoutTimesScreen.tsx` (the restart question).
+- Tests: `test/train/workoutTimes.test.tsx` ("holds the set timer, and drops a set being timed" now checks the dropped
+  set is said and the bar's Resume; "says nothing was dropped when no set was being timed"; "can be started again from
+  now" confirms; "is not started again when the question is turned down"; "names the times it edits as the
+  workout's"). Stories `Train/WorkoutPausedDroppedSet` and `Train/WorkoutTimesRestartAsks`.
+- Not run locally; CI validates. Not reviewed by the design panel: the changes reuse existing controls and wording on
+  the same screen.
+- Review fixes 2026-10-21 (`fix/mm-447-review`): one Resume (the clock card's removed while paused), the clock's
+  spoken label "Workout time …", no 0:00 on the bar while paused, `.train-timer` wraps. Tests:
+  `test/train/workoutTimes.test.tsx` (one Resume, no figure while paused, the clock's label); the
+  `Train/WorkoutPausedDroppedSet` story checks one primary button after its walk. Not run locally; CI validates.
