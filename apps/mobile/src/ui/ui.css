@@ -282,6 +282,28 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
+/* Martian's frame: the stripe set beside the brand lettering along the navigation bar's top, three violet lines, each
+   fainter. One solid colour per line; no text behind them, as the bar's top padding clears them. */
+.theme-martian .mm-navigation-bar {
+  box-shadow: none;
+  background-image:
+    linear-gradient(var(--accent-line), var(--accent-line)),
+    linear-gradient(color-mix(in srgb, var(--accent-line) 50%, transparent), color-mix(in srgb, var(--accent-line) 50%, transparent)),
+    linear-gradient(color-mix(in srgb, var(--accent-line) 22%, transparent), color-mix(in srgb, var(--accent-line) 22%, transparent));
+  background-size: 100% 1px, 100% 1px, 100% 1px;
+  background-position: 0 0, 0 3px, 0 6px;
+  background-repeat: no-repeat;
+}
+/* With more contrast asked for, decoration goes: the stripes become one plain line, the hero's rings and limb go. */
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .mm-navigation-bar {
+    background-image: none;
+    box-shadow: 0 -1px 0 var(--accent-line);
+  }
+  .mm-hero-backdrop {
+    display: none;
+  }
+}
 /* Martian's sheen (owner: "it needs some sheen", then "it looks forced"): only a hint of light from above. A card is
    faintly lighter at its top with a dim highlight on its top edge and a small shadow under it; a neon fill keeps a faint
    top edge. No gloss bands, no glow. */

@@ -50,6 +50,25 @@
 .app-body-roomy {
   padding: var(--space-24);
 }
+/* Martian's pages end on ground: a faint violet mountain ridge after the last of the content, seen only once
+   everything is read. Its empty top is the gap above it; on a short page it sits at the bottom. */
+.theme-martian .app-body::after {
+  content: '';
+  flex: none;
+  height: 56px;
+  margin: auto calc(-1 * var(--space-16)) calc(-1 * var(--space-24));
+  background: color-mix(in srgb, var(--accent-line) 16%, transparent);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 56' preserveAspectRatio='none'%3E%3Cpath d='M0 56V46L22 40L38 44L60 30L74 38L96 34L118 42L140 36L156 24L170 34L196 40L220 32L240 38L262 28L280 36L304 42L326 34L344 40L360 36V56Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.theme-martian .app-body-roomy::after {
+  margin: auto calc(-1 * var(--space-24)) calc(-1 * var(--space-24));
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .app-body::after {
+    display: none;
+  }
+}
 .app-body-barless {
   padding-top: calc(var(--space-24) + env(safe-area-inset-top));
 }

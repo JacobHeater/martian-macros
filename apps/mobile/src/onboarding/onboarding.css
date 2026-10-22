@@ -8,6 +8,16 @@
 .onboarding-welcome-top {
   flex: 2;
 }
+/* Martian's arrival is the art's night sky (visual-language.md's starfield): hand-placed stars in the empty space above
+   the name, still, in cream. Nothing to read sits there. */
+.theme-martian .onboarding-welcome-top {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60' fill='%23fff8e9'%3E%3Ccircle cx='8' cy='6' r='0.5' fill-opacity='0.28'/%3E%3Ccircle cx='19' cy='12' r='0.3' fill-opacity='0.18'/%3E%3Ccircle cx='27' cy='4' r='0.4' fill-opacity='0.22'/%3E%3Ccircle cx='36' cy='15' r='0.25' fill-opacity='0.14'/%3E%3Ccircle cx='44' cy='8' r='0.6' fill-opacity='0.3'/%3E%3Ccircle cx='53' cy='3' r='0.3' fill-opacity='0.2'/%3E%3Ccircle cx='61' cy='11' r='0.45' fill-opacity='0.24'/%3E%3Ccircle cx='70' cy='6' r='0.3' fill-opacity='0.16'/%3E%3Ccircle cx='79' cy='14' r='0.5' fill-opacity='0.26'/%3E%3Ccircle cx='88' cy='5' r='0.35' fill-opacity='0.2'/%3E%3Ccircle cx='95' cy='17' r='0.25' fill-opacity='0.14'/%3E%3Ccircle cx='14' cy='24' r='0.35' fill-opacity='0.18'/%3E%3Ccircle cx='31' cy='29' r='0.25' fill-opacity='0.12'/%3E%3Ccircle cx='49' cy='22' r='0.3' fill-opacity='0.16'/%3E%3Ccircle cx='66' cy='27' r='0.4' fill-opacity='0.2'/%3E%3Ccircle cx='83' cy='25' r='0.25' fill-opacity='0.13'/%3E%3Ccircle cx='22' cy='41' r='0.3' fill-opacity='0.14'/%3E%3Ccircle cx='73' cy='44' r='0.25' fill-opacity='0.12'/%3E%3Cpath transform='translate(16 9) scale(1.2)' d='M0-2L.4-.4 2 0 .4.4 0 2-.4.4-2 0-.4-.4Z' fill-opacity='.3'/%3E%3Cpath transform='translate(62 18) scale(1.2)' d='M0-2L.4-.4 2 0 .4.4 0 2-.4.4-2 0-.4-.4Z' fill-opacity='.3'/%3E%3C/svg%3E") center bottom / 100% auto no-repeat;
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .onboarding-welcome-top {
+    background: none;
+  }
+}
 .onboarding-welcome-bottom {
   flex: 3;
 }
