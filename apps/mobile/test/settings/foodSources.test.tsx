@@ -37,6 +37,15 @@ it('the sources screen names each source, its licence and its address, and what 
   expect(sources.getAllByText(/martian-macros-food-data/).length).toBeGreaterThan(0);
   expect(sources.getByText(/Those services see your IP address/)).toBeInTheDocument();
   expect(sources.getByText(/not been reviewed by a lawyer/)).toBeInTheDocument();
+  // Each source's terms on its own row: USDA public domain with its requested citation, Open Food Facts ODbL for the
+  // database and DbCL for its contents; and USDA's citation in the attribution, in its own words.
+  expect(sources.getByText(/Public domain, with a citation requested/)).toBeInTheDocument();
+  expect(sources.getByText(/Database: Open Database License 1\.0 · contents: Database Contents License 1\.0/)).toBeInTheDocument();
+  expect(
+    sources.getByText(/U\.S\. Department of Agriculture, Agricultural Research Service\. FoodData Central, 2019\. fdc\.nal\.usda\.gov\./),
+  ).toBeInTheDocument();
+  // Addresses are text: nothing on the screen opens a browser (MM-57's decision).
+  expect(topLayer().querySelector('a[href]')).toBeNull();
   // The licences are never called verified, and the records never promised right.
   expect(topLayer().textContent).not.toMatch(/verified/i);
 });

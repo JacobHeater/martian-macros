@@ -11,7 +11,7 @@ import './foodPacks.css';
 /**
  * Where the food data comes from and under what terms (MM-57), and what the
  * app sends online and to whom (MM-58): each source as one row (name, licence,
- * address), the longer account as paragraphs under its group, and the privacy
+ * address; addresses are text, never links, so nothing opens a browser), the longer account as paragraphs under its group, and the privacy
  * sentence in body type where it is read first. Built like the Food database
  * screen beside it; the packs on the phone and the online choice have their
  * homes there and in Settings, so this screen does not repeat them.
@@ -28,8 +28,16 @@ export function FoodSourcesScreen() {
       </p>
       <GroupHeader text="The sources" />
       <MmListGroup>
-        <MmListRow leadingIcon="document" title="USDA FoodData Central" subtitle="Public domain · fdc.nal.usda.gov" />
-        <MmListRow leadingIcon="document" title="Open Food Facts" subtitle="Open Database License 1.0 · openfoodfacts.org" />
+        <MmListRow
+          leadingIcon="document"
+          title="USDA FoodData Central"
+          subtitle="Public domain, with a citation requested · fdc.nal.usda.gov"
+        />
+        <MmListRow
+          leadingIcon="document"
+          title="Open Food Facts"
+          subtitle="Database: Open Database License 1.0 · contents: Database Contents License 1.0 · openfoodfacts.org"
+        />
       </MmListGroup>
       <p className="app-text app-muted">
         FoodData Central is the US Department of Agriculture’s database: its Foundation Foods, SR Legacy, FNDDS survey
@@ -67,8 +75,9 @@ export function FoodSourcesScreen() {
       <p className="app-text app-muted">
         Food data from Open Food Facts (openfoodfacts.org), available under the Open Database License, and from USDA
         FoodData Central (fdc.nal.usda.gov), US Department of Agriculture, Agricultural Research Service, including the
-        USDA Food and Nutrient Database for Dietary Studies 2021-2023. The licensing reading behind this screen has not
-        been reviewed by a lawyer.
+        USDA Food and Nutrient Database for Dietary Studies 2021-2023. FoodData Central is cited as USDA asks: U.S.
+        Department of Agriculture, Agricultural Research Service. FoodData Central, 2019. fdc.nal.usda.gov. The
+        licensing reading behind this screen has not been reviewed by a lawyer.
       </p>
     </Screen>
   );
