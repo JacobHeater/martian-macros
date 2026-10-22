@@ -16,5 +16,10 @@ export function bodyFatNote(basis: BodyFatBasis, { eatingDisorderHistory }: { ea
         : `${BodyFatRule.minWaistEntries} waist measurements within ${BodyFatRule.waistWindowDays / 7} weeks narrow this range.`;
     case 'waist':
       return 'From your height, weight and waist. A tape narrows the range but cannot pin body fat down.';
+    case 'scale':
+      return (
+        'Your scale’s readings over weeks join your height and weight. Averaging removes the day-to-day scatter, ' +
+        'not a scale’s fixed bias, so it stays a range.'
+      );
   }
 }

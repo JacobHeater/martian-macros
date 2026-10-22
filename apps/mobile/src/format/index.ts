@@ -5,9 +5,13 @@
  */
 export * from './adherenceLines';
 export * from './bodyFatNote';
+export * from './byteSizeText';
+export * from './comparedPhotoLines';
+export * from './photoPoseLabel';
 export * from './bodyFatRange';
 export * from './bodyFatRangeText';
 export * from './goalBodyFatCheckText';
+export * from './goalBodyFatSubtitle';
 export * from './phaseEndText';
 export * from './phaseNextTitle';
 export * from './phaseRecommendationText';
@@ -24,6 +28,7 @@ export * from './detailLevelDescription';
 export * from './detailLevelLabel';
 export * from './elapsedText';
 export * from './equipmentLabel';
+export * from './exerciseNameOf';
 export * from './explanationLineText';
 export * from './extraNutrientsLine';
 export * from './Fmt';

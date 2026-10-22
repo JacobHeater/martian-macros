@@ -6,7 +6,7 @@ import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepo
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { integer, named, number, optionalNumber, optionalText, orNull, text } from './columns';
+import { integer, named, number, optionalInteger, optionalNumber, optionalText, orNull, text } from './columns';
 import { insert } from './insert';
 import { update } from './update';
 import { microsFromRow } from './microsFromRow';
@@ -37,7 +37,14 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
       const byRecipe = new Map<number, RecipeIngredient[]>();
       for (const l of lines) {
         const recipeId = integer(l, 'recipe_id');
-        const ingredient = { name: text(l, 'name'), grams: optionalNumber(l, 'grams'), totals: totalsOf(l) };
+        const packId = optionalText(l, 'source_pack_id');
+        const foodId = optionalInteger(l, 'source_food_id');
+        const ingredient: RecipeIngredient = {
+          name: text(l, 'name'),
+          grams: optionalNumber(l, 'grams'),
+          totals: totalsOf(l),
+          source: packId === undefined || foodId === undefined ? undefined : { packId, foodId },
+        };
         const ingredients = byRecipe.get(recipeId);
         if (ingredients === undefined) byRecipe.set(recipeId, [ingredient]);
         else ingredients.push(ingredient);
@@ -100,6 +107,8 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
           protein_g: i.totals.proteinG,
           carbs_g: i.totals.carbsG,
           fat_g: i.totals.fatG,
+          source_pack_id: orNull(i.source?.packId),
+          source_food_id: orNull(i.source?.foodId),
         });
       }
       return id;

@@ -9,11 +9,14 @@ import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import type { TermsAcceptance } from '../domain/TermsAcceptance';
 import type { ThemePreference } from '../domain/ThemePreference';
+import { WeighInWindow } from '../healthIngest/WeighInWindow';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { Watched } from '../lang/Watched';
 import { ObservableValue } from './ObservableValue';
 
-/** `PreferencesRepository` held in memory. */
-export class InMemoryPreferencesRepository implements PreferencesRepository {
+/** `PreferencesRepository` held in memory, with the weigh-in window (MM-441). */
+export class InMemoryPreferencesRepository implements PreferencesRepository, WeighInWindowReader, WeighInWindowWriter {
   private readonly theme = new ObservableValue<ThemePreference>('unselected');
   private readonly easyToMiss = new ObservableValue(new EasyToMissPreference());
   private readonly detail = new ObservableValue<DetailLevel>('standard');
@@ -32,6 +35,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
   private readonly easeIntoMaintenance = new ObservableValue(false);
   private readonly usualCookingFat = new ObservableValue<CookingFatKind>('oil');
   private readonly primaryScale = new ObservableValue<string | undefined>(undefined);
+  private readonly weighInWindow = new ObservableValue(WeighInWindow.usual);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -184,10 +188,19 @@ export class InMemoryPreferencesRepository implements PreferencesRepository {
     this.primaryScale.value = sourceId;
   }
 
+  watchWeighInWindow(): Watched<WeighInWindow> {
+    return this.weighInWindow.watch();
+  }
+
+  async saveWeighInWindow(window: WeighInWindow | undefined): Promise<void> {
+    this.weighInWindow.value = window ?? WeighInWindow.usual;
+  }
+
   /** Back to the defaults (used by `InMemoryDataEraser`). */
   clear(): void {
     this.usualCookingFat.value = 'oil';
     this.primaryScale.value = undefined;
+    this.weighInWindow.value = WeighInWindow.usual;
     this.exactTargets.value = false;
     this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;

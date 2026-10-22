@@ -10,6 +10,10 @@ import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
+import { WeighInWindow } from '../healthIngest/WeighInWindow';
+import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
+import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
+import { FormatError } from '../lang/FormatError';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
@@ -18,10 +22,11 @@ import { upsert } from './upsert';
 import type { Values } from './Values';
 
 /**
- * `PreferencesRepository` kept in the database, in one row. Each save
- * changes its own column and leaves the rest as they are.
+ * `PreferencesRepository` kept in the database, in one row, with the
+ * weigh-in window (MM-441). Each save changes its own column and leaves the
+ * rest as they are.
  */
-export class SqlPreferencesRepository implements PreferencesRepository {
+export class SqlPreferencesRepository implements PreferencesRepository, WeighInWindowReader, WeighInWindowWriter {
   private readonly db: AppDatabase;
 
   constructor(db: AppDatabase) {
@@ -88,6 +93,24 @@ export class SqlPreferencesRepository implements PreferencesRepository {
 
   savePrimaryScale(sourceId: string | undefined): Promise<void> {
     return this.save({ primary_scale_source_id: orNull(sourceId) });
+  }
+
+  watchWeighInWindow(): Watched<WeighInWindow> {
+    return this.watch((row) => {
+      const start = row === undefined ? undefined : optionalInteger(row, 'weigh_in_window_start_minute');
+      const end = row === undefined ? undefined : optionalInteger(row, 'weigh_in_window_end_minute');
+      if (start === undefined && end === undefined) return WeighInWindow.usual;
+      // One end kept without the other, or a window kept backwards, is refused when read, never defaulted.
+      if (start === undefined || end === undefined) throw new FormatError('The stored weigh-in window has only one end.');
+      return new WeighInWindow({ startMinute: start, endMinute: end });
+    });
+  }
+
+  saveWeighInWindow(window: WeighInWindow | undefined): Promise<void> {
+    return this.save({
+      weigh_in_window_start_minute: orNull(window?.startMinute),
+      weigh_in_window_end_minute: orNull(window?.endMinute),
+    });
   }
 
   watchMacroPicture(): Watched<MacroPicture> {

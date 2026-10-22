@@ -3,6 +3,12 @@ import { storyWorkout } from './storyWorkout';
 import { userEvent, within } from 'storybook/test';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
+import { FixturePhotoCamera } from '../../fixtures/FixturePhotoCamera';
+import { fixturePhotoJpeg } from '../../fixtures/fixturePhotoJpeg';
+import { InMemoryDeviceLock } from '../../fixtures/InMemoryDeviceLock';
+import { PhotoCameraScreen } from '../../progress/PhotoCameraScreen';
+import { PhotoCompareScreen } from '../../progress/PhotoCompareScreen';
+import { ProgressPhotosScreen } from '../../progress/ProgressPhotosScreen';
 import { StrengthHistoryScreen } from '../../progress/StrengthHistoryScreen';
 import { StrengthLiftsScreen } from '../../progress/StrengthLiftsScreen';
 import { WeightEventEntrySheet } from '../../progress/WeightEventEntrySheet';
@@ -515,5 +521,129 @@ export const SleepSaved = screenStory({
     await userEvent.type(hours, '7');
     await userEvent.type(within(canvas).getByRole('textbox', { name: 'Last night, Minutes' }), '20');
     await userEvent.click(within(canvas).getByRole('button', { name: 'Save night' }));
+  },
+});
+
+// ---- MM-157: progress photos, private to the phone ----
+
+/** The demo, with a set of photos a month ago and front and side ones today. */
+const photosScenario: StoryScenario = async (repos, today) => {
+  await new DemoSeed(today).replace(repos);
+  const kept = (pose: 'front' | 'side' | 'back', daysAgo: number) =>
+    repos.progressPhotos.savePhoto({
+      date: today.addDays(-daysAgo),
+      pose,
+      takenAt: new Date(Date.UTC(2026, 9, 1, 7)),
+      width: 1200,
+      height: 1600,
+      jpeg: fixturePhotoJpeg,
+    });
+  for (const pose of ['front', 'side', 'back'] as const) await kept(pose, 28);
+  await kept('front', 0);
+  await kept('side', 0);
+};
+
+/** Opens the photos from Progress. */
+const openPhotos = ({ navigator }: StoryStage) => void navigator.push(() => <ProgressPhotosScreen />);
+
+/** MM-157: Progress with the photos' line, saying when the last set was taken. */
+export const ProgressWithPhotos = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^Last set /,
+  scenario: photosScenario,
+  open: ({ state }) => state.homeTab.put('progress'),
+});
+
+/** MM-157: no photos yet: what a set is, and how often is enough. */
+export const ProgressPhotosNone = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'No photos yet. Each pose is optional; take what you are comfortable with.',
+  open: openPhotos,
+});
+
+/** MM-157: two sets, newest first, each to delete; Take photos and Compare. */
+export const ProgressPhotosSets = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'Compare two days',
+  scenario: photosScenario,
+  open: openPhotos,
+});
+
+/** MM-157: the photos opened from Progress's own line, after the phone's lock. */
+export const ProgressPhotosFromProgress = screenStory({
+  covers: ['ProgressScreen', 'ProgressPhotosScreen'],
+  shows: 'Compare two days',
+  scenario: photosScenario,
+  open: ({ state }) => state.homeTab.put('progress'),
+  walk: pressNamed(/^Progress photos/),
+});
+
+/** MM-157: "Take photos" opens the camera, with the last front photo laid over it. */
+export const ProgressPhotosTakePhotos = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCameraScreen'],
+  shows: 'Line yourself up with the faint photo: the same distance and the same framing.',
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Take photos'),
+});
+
+/** MM-157: "Compare two days" opens the comparison. */
+export const ProgressPhotosCompare = screenStory({
+  covers: ['ProgressPhotosScreen', 'PhotoCompareScreen'],
+  shows: /Trend|Waist/,
+  scenario: photosScenario,
+  open: openPhotos,
+  walk: pressNamed('Compare two days'),
+});
+
+/** MM-157: the phone's lock was not passed: nothing shows until it is. */
+export const ProgressPhotosLocked = screenStory({
+  covers: ['ProgressPhotosScreen'],
+  shows: 'Locked',
+  scenario: photosScenario,
+  device: async (services) => ({ ...services, deviceLock: new InMemoryDeviceLock('refused') }),
+  open: openPhotos,
+});
+
+/** MM-157: the camera on a first set: the checklist, and no earlier photo to line up with. */
+export const PhotoCameraFirstTime = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'Each time, the same way',
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: the camera with the last front photo laid over it faintly. */
+export const PhotoCameraOverlay = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'Line yourself up with the faint photo: the same distance and the same framing.',
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: no camera allowed: how to allow it. */
+export const PhotoCameraUnavailable = screenStory({
+  covers: ['PhotoCameraScreen'],
+  shows: 'The camera could not be opened',
+  device: async (services) => ({ ...services, photoCamera: new FixturePhotoCamera({ available: false }) }),
+  open: ({ navigator }) => void navigator.push(() => <PhotoCameraScreen />),
+});
+
+/** MM-157: two days side by side, the same pose, with each day's trend weight and waist. */
+export const PhotoCompare = screenStory({
+  covers: ['PhotoCompareScreen'],
+  shows: /Trend|Waist/,
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCompareScreen />),
+});
+
+/** MM-157: a pose with one day only: two are needed to compare. */
+export const PhotoCompareOneDay = screenStory({
+  covers: ['PhotoCompareScreen'],
+  shows: 'Two days with a back photo are needed to compare.',
+  scenario: photosScenario,
+  open: ({ navigator }) => void navigator.push(() => <PhotoCompareScreen />),
+  walk: async (canvas) => {
+    const back = await within(canvas.ownerDocument.body).findByRole('button', { name: 'Back', pressed: false }, { timeout: 5000 });
+    await userEvent.click(back);
   },
 });

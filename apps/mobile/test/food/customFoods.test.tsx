@@ -259,6 +259,104 @@ it('an ingredient the pack has raw and cooked asks which was weighed', async () 
   expectClose(line?.totals.kcal ?? 0, 730, 1e-9);
 });
 
+/** MM-456: a saved rice bowl of one line, 200 g "White rice, raw" from `packId`, at `kcal` for the line. */
+async function saveRiceBowl(packId: string, kcal = 730): Promise<void> {
+  await repos.customFoods.saveCustomFood(
+    new CustomFood({
+      id: 0,
+      name: 'Rice bowl',
+      kind: 'recipe',
+      servingDescription: '1 serving',
+      perServing: new NutritionTotals({ kcal: kcal / 2, proteinG: 7, carbsG: 80, fatG: 0.7 }),
+      servings: 2,
+      ingredients: [
+        {
+          name: 'White rice, raw',
+          grams: 200,
+          totals: new NutritionTotals({ kcal, proteinG: 14, carbsG: 160, fatG: 1.4 }),
+          source: { packId, foodId: 3 },
+        },
+        { name: 'Butter', grams: 10, totals: new NutritionTotals({ kcal: 72, proteinG: 0, carbsG: 0, fatG: 8 }) },
+      ],
+    }),
+  );
+}
+
+/** Opens the saved recipe called `name` to change it, with the fixture pack installed. */
+async function editRecipe(name: string): Promise<HTMLElement> {
+  renderApp(repos, today, { change: withCatalog(await fixtureCatalog()) });
+  await openTab('Food');
+  const sheet = await openAddFood();
+  await press(sheet, 'Saved');
+  await userEvent.click(await within(sheet).findByRole('button', { name: new RegExp(`^${name}`) }));
+  await within(sheet).findByRole('heading', { name: 'Edit your recipe' });
+  return sheet;
+}
+
+it('an ingredient found in the pack keeps the food it came from; one typed keeps none (MM-456)', async () => {
+  const sheet = await newRecipe('Rice bowl');
+  await typeIn(sheet, 'Search ingredients', 'white rice');
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^White rice, cooked/ }));
+  await typeIn(sheet, 'Weight g', '200');
+  await press(sheet, 'Raw');
+  await press(sheet, 'Add');
+  await press(sheet, 'Enter numbers instead');
+  await typeIn(sheet, 'Ingredient', 'Butter');
+  await typeIn(sheet, 'kcal', '72');
+  await press(sheet, 'Add');
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved()).length).toBe(1);
+  const [rice, butter] = (await saved())[0]?.ingredients ?? [];
+  expect(rice?.source).toEqual({ packId: 'fixture', foodId: 3 });
+  expect(butter?.source, 'a line typed as totals records no source').toBeUndefined();
+});
+
+it("a found line's weight is changed in place, from the food as installed (MM-456)", async () => {
+  await saveRiceBowl('fixture');
+  const sheet = await editRecipe('Rice bowl');
+  await press(sheet, 'More actions for White rice, raw');
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
+  // The food is looked up in the pack first.
+  await within(sheet).findByRole('textbox', { name: 'New weight g for White rice, raw' });
+  await typeIn(sheet, 'New weight g for White rice, raw', '100');
+  expect(within(sheet).getByText('100 g is about 365 kcal.')).toBeInTheDocument();
+  await press(sheet, 'Save weight');
+  expect(within(sheet).getByText('100 g · 365 kcal')).toBeInTheDocument();
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved())[0]?.ingredients[0]?.grams).toBe(100);
+  const [rice] = (await saved())[0]?.ingredients ?? [];
+  expectClose(rice?.totals.kcal ?? 0, 365, 1e-9);
+  expect(rice?.source, 'it still knows its food').toEqual({ packId: 'fixture', foodId: 3 });
+});
+
+it('a line typed as totals cannot be weighed again (MM-456)', async () => {
+  await saveRiceBowl('fixture');
+  const sheet = await editRecipe('Rice bowl');
+  await press(sheet, 'More actions for Butter');
+  expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+  expect(screen.queryByRole('menuitem', { name: 'Change weight' })).not.toBeInTheDocument();
+});
+
+it("a pack's change does not rewrite a saved recipe until its line is edited (MM-456)", async () => {
+  // Saved when the pack said 350 kcal per 100 g; it now says 365.
+  await saveRiceBowl('fixture', 700);
+  const sheet = await editRecipe('Rice bowl');
+  expect(within(sheet).getByText('200 g · 700 kcal')).toBeInTheDocument();
+  await press(sheet, 'Save recipe');
+  await expect.poll(async () => (await saved())[0]?.ingredients[0]?.totals.kcal).toBe(700);
+});
+
+it('a line whose food is no longer installed keeps its totals and says so (MM-456)', async () => {
+  await saveRiceBowl('a-pack-since-removed');
+  const sheet = await editRecipe('Rice bowl');
+  await press(sheet, 'More actions for White rice, raw');
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Change weight' }));
+  expect(await within(sheet).findByText('Its food is not installed, so this line keeps its totals.')).toBeInTheDocument();
+  expect(within(sheet).queryByRole('textbox', { name: /^New weight g/ })).not.toBeInTheDocument();
+  await press(sheet, 'Keep its totals');
+  expect(within(sheet).getByText('200 g · 730 kcal')).toBeInTheDocument();
+});
+
 it("a recipe's ingredients can be put in another order", async () => {
   const sheet = await newRecipe('Chili');
   await press(sheet, 'Enter numbers instead');

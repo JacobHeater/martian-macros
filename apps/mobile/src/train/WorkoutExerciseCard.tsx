@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { InlineInsight } from '../coach/InlineInsight';
 import { useExerciseInsights } from '../coach/useExerciseInsights';
 import { useInsightPreview } from '../coach/useInsightPreview';
+import { Exercise } from '../domain/training/Exercise';
 import type { Workout } from '../domain/training/Workout';
 import type { WorkoutSet } from '../domain/training/WorkoutSet';
 import { defaultLoadStepKg } from '../engine/defaultLoadStepKg';
@@ -9,6 +10,7 @@ import { defaultRepRange } from '../engine/defaultRepRange';
 import { previousSetsOf } from '../engine/previousSetsOf';
 import { suggestProgression } from '../engine/suggestProgression';
 import { elapsedText } from '../format/elapsedText';
+import { exerciseNameOf } from '../format/exerciseNameOf';
 import { Fmt } from '../format/Fmt';
 import { progressionSettingsText } from '../format/progressionSettingsText';
 import { progressionText } from '../format/progressionText';
@@ -24,6 +26,7 @@ import { MmButton } from '../ui/MmButton';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmListRow } from '../ui/MmListRow';
 import { useOverlays } from '../ui/useOverlays';
+import { ExercisePickerScreen } from './ExercisePickerScreen';
 import { ProgressionSettingsScreen } from './ProgressionSettingsScreen';
 import { SetEditor } from './SetEditor';
 import { setTimesRefusal } from './setTimesRefusal';
@@ -95,8 +98,17 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
         settings,
       });
   const timeLimit = () => workout.endedAt ?? services.clock.now();
-  // An exercise of the user's own that has since been deleted.
-  const name = exercise?.name ?? 'Deleted exercise';
+  // An exercise of the user's own that has since been deleted, or an imported movement the library cannot place (MM-490).
+  const name = exerciseNameOf(entry.exerciseId, exercise);
+  const other = entry.exerciseId === Exercise.otherId;
+
+  /** Moves an imported "Other exercise"'s sets to the exercise the user says it was (MM-490). */
+  const moveSets = async () => {
+    const exerciseId = await navigator.push<string>((done) => <ExercisePickerScreen onPick={done} />);
+    if (exerciseId === undefined) return;
+    setOpen(undefined);
+    await controller.moveExercise(workout, index, exerciseId);
+  };
 
   const removeExercise = async () => {
     const sure =
@@ -141,6 +153,16 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
       title={name}
       trailing={<MmIconButton icon="close" label={`Remove ${name}`} onPress={() => void removeExercise()} />}
     >
+      {other ? (
+        <>
+          <p className="app-caption">
+            Imported from a movement the exercise library does not know. Its sets count toward no muscle until you say what
+            it was.
+          </p>
+          <MmButton label="Move sets to an exercise" kind="secondary" expand onPress={() => void moveSets()} />
+          <div className="app-gap-small" />
+        </>
+      ) : null}
       {lastTime.length === 0 ? null : (
         <p className="app-caption train-last-time">Last time: {lastTime.map((s) => setText(s, fmt, load)).join(', ')}</p>
       )}
@@ -169,7 +191,7 @@ export function WorkoutExerciseCard({ workout, index }: WorkoutExerciseCardProps
                 start,
                 end,
                 notAfter: timeLimit(),
-                nameOf: (exerciseId) => exercises.get(exerciseId)?.name ?? 'Deleted exercise',
+                nameOf: (exerciseId) => exerciseNameOf(exerciseId, exercises.get(exerciseId)),
               })
             }
             load={load}

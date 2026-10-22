@@ -970,6 +970,7 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-404",
           "MM-160",
           "MM-161",
           "MM-162",
@@ -985,8 +986,7 @@
         ],
         "remaining": [
           "MM-159",
-          "MM-228",
-          "MM-404"
+          "MM-228"
         ]
       },
       "sequence": [
@@ -1122,11 +1122,11 @@
           "MM-300",
           "MM-8",
           "MM-412",
+          "MM-536",
           "MM-550"
         ],
         "remaining": [
-          "MM-1",
-          "MM-536"
+          "MM-1"
         ]
       },
       "sequence": [
@@ -1418,6 +1418,7 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-403",
           "MM-90",
           "MM-98",
           "MM-99",
@@ -1541,7 +1542,8 @@
           "MM-436",
           "MM-437",
           "MM-417",
-          "MM-109"
+          "MM-109",
+          "MM-375"
         ],
         "remaining": [
           "MM-89",
@@ -1553,9 +1555,7 @@
           "MM-183",
           "MM-224",
           "MM-242",
-          "MM-453",
-          "MM-375",
-          "MM-403"
+          "MM-453"
         ]
       },
       "sequence": [
@@ -2278,16 +2278,16 @@
           "MM-136",
           "MM-142",
           "MM-155",
-          "MM-34"
+          "MM-34",
+          "MM-157",
+          "MM-502"
         ],
         "remaining": [
           "MM-15",
           "MM-501",
-          "MM-502",
           "MM-118",
           "MM-154",
-          "MM-156",
-          "MM-157"
+          "MM-156"
         ]
       },
       "sequence": [
@@ -2457,6 +2457,7 @@
           "MM-384",
           "MM-385",
           "MM-386",
+          "MM-387",
           "MM-471",
           "MM-388",
           "MM-396",
@@ -2473,6 +2474,7 @@
           "MM-413",
           "MM-42",
           "MM-43",
+          "MM-44",
           "MM-58",
           "MM-435",
           "MM-49",
@@ -2481,17 +2483,15 @@
           "MM-152",
           "MM-167",
           "MM-45",
+          "MM-456",
           "MM-428",
-          "MM-429"
+          "MM-429",
+          "MM-46",
+          "MM-406"
         ],
         "remaining": [
-          "MM-387",
           "MM-37",
-          "MM-44",
-          "MM-456",
-          "MM-46",
-          "MM-305",
-          "MM-406"
+          "MM-305"
         ]
       },
       "sequence": [
@@ -2766,12 +2766,12 @@
           "MM-140",
           "MM-117",
           "MM-141",
-          "MM-368"
+          "MM-368",
+          "MM-405",
+          "MM-507"
         ],
         "remaining": [
-          "MM-507",
-          "MM-145",
-          "MM-405"
+          "MM-145"
         ]
       },
       "sequence": [
@@ -2962,16 +2962,16 @@
           "MM-196",
           "MM-214",
           "MM-215",
-          "MM-222"
+          "MM-222",
+          "MM-189",
+          "MM-515",
+          "MM-191",
+          "MM-490",
+          "MM-447",
+          "MM-489"
         ],
         "remaining": [
-          "MM-74",
-          "MM-189",
-          "MM-489",
-          "MM-515",
-          "MM-490",
-          "MM-191",
-          "MM-447"
+          "MM-74"
         ]
       },
       "sequence": [
@@ -3096,22 +3096,22 @@
           "MM-71",
           "MM-72",
           "MM-188",
+          "MM-68",
+          "MM-73",
           "MM-498",
           "MM-395",
           "MM-522",
-          "MM-516"
-        ],
-        "remaining": [
-          "MM-66",
-          "MM-68",
-          "MM-69",
+          "MM-516",
           "MM-70",
           "MM-513",
           "MM-514",
-          "MM-441",
           "MM-442",
-          "MM-73",
           "MM-314",
+          "MM-69",
+          "MM-441"
+        ],
+        "remaining": [
+          "MM-66",
           "MM-323",
           "MM-523"
         ]
@@ -3213,7 +3213,7 @@
         },
         {
           "step": 12,
-          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; the rule built, its column and Settings row wait on a schema version), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
+          "title": "What MM-71 left: a weigh-in window for a morning that is not 04:00 to 12:00 (MM-441; built: the rule, its column in schema version 19 and the Settings row; device check owed), and steps through the platform's own aggregation (MM-442; built in both shells, device checks owed)",
           "tickets": [
             "MM-441",
             "MM-442"
@@ -3236,7 +3236,7 @@
       "file": "ws-12-backup-and-portability.md",
       "intent": "A user-initiated, encrypted snapshot the user can restore, on storage they chose through the system share sheet.",
       "recommendedOrder": 13,
-      "status": "in-progress",
+      "status": "built",
       "riskLevel": "medium",
       "parallelGroup": "PG-C",
       "dependsOn": [
@@ -3259,13 +3259,12 @@
       ],
       "sourceRequirements": {
         "built": [
+          "MM-59",
           "MM-65",
           "MM-63",
           "MM-64"
         ],
-        "remaining": [
-          "MM-59"
-        ]
+        "remaining": []
       },
       "sequence": [
         {
