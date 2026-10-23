@@ -94,15 +94,13 @@
   gap: var(--space-8);
 }
 
-/* Sleep (MM-250): the last two weeks of nights as chips that wrap, then hours and minutes, then the note beside Save as the waist's is. */
+/* Sleep (MM-250, MM-578): how a night is counted, the fortnight's bars to choose from, their count, then the chosen
+   night's hours and minutes on their surface. Measured steps, as the food sheets' (owner, 2026-10-22). */
 .progress-sleep-how {
-  margin: 0 0 var(--space-12);
+  margin: 0 0 var(--space-16);
 }
-.progress-sleep-nights {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-8);
-  margin-bottom: var(--space-12);
+.progress-sleep-count {
+  margin: var(--space-8) 0 var(--space-24);
 }
 .progress-sleep-save {
   display: flex;
