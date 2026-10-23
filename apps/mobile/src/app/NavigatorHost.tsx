@@ -2,6 +2,7 @@ import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { CloseScreenContext } from './CloseScreenContext';
 import type { Navigator } from './Navigator';
 import { NavigatorContext } from './NavigatorContext';
+import { useEdgeSwipe } from '../ui/useEdgeSwipe';
 
 interface Pushed {
   readonly id: number;
@@ -13,7 +14,8 @@ interface Pushed {
 /**
  * Shows `children`, and over them whatever screens have been pushed. A
  * screen that is covered stays alive, hidden, so it is as it was left when
- * the one over it closes.
+ * the one over it closes. A swipe in from either side closes the one on top
+ * (MM-578).
  */
 export function NavigatorHost({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<readonly Pushed[]>([]);
@@ -53,6 +55,9 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
     return false;
   }, []);
 
+  const top = useRef<HTMLDivElement>(null);
+  const swipeBack = useEdgeSwipe(top, () => true, () => void closeTop());
+
   const navigator = useMemo<Navigator>(
     () => ({ push, closeAll, closeTop, depth: stack.length }),
     [push, closeAll, closeTop, stack.length],
@@ -63,11 +68,14 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
       <div className="app-layer" hidden={stack.length > 0}>
         {children}
       </div>
-      {stack.map((pushed, i) => (
-        <div key={pushed.id} className="app-layer" hidden={i < stack.length - 1}>
-          <CloseScreenContext.Provider value={pushed.close}>{pushed.node}</CloseScreenContext.Provider>
-        </div>
-      ))}
+      {stack.map((pushed, i) => {
+        const onTop = i === stack.length - 1;
+        return (
+          <div key={pushed.id} ref={onTop ? top : undefined} className="app-layer" hidden={!onTop} {...(onTop ? swipeBack : {})}>
+            <CloseScreenContext.Provider value={pushed.close}>{pushed.node}</CloseScreenContext.Provider>
+          </div>
+        );
+      })}
     </NavigatorContext.Provider>
   );
 }
