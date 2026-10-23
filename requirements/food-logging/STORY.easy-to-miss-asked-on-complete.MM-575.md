@@ -27,6 +27,9 @@ confirmation that nothing was missed.
 - **When it is asked stays MM-152's**: every time in the first 14 days, then at most once a week; never when
   turned off in Settings; never with an eating-disorder history or while the under-eating notice is up
   (MM-114). When it is not due, Complete marks the day at once, as before.
+- **It can be turned off** (the owner, 2026-10-22): Settings' switch, "Easy-to-miss check", says what it does:
+  "Before a day is marked complete, asks about cooking oil, drinks, sauces, and bites and tastes." Off, Complete
+  marks the day at once.
 - The low-day question (MM-114) still follows for a day far below the floor.
 - The chips under a completed day are gone.
 
@@ -53,5 +56,5 @@ Scenario: Not due
 
 ## Progress
 Built: `EasyToMissSheet`, `showEasyToMissSheet`, `EasyToMissAnswer`, `FoodCompletenessRow`; `EasyToMissLine`
-removed. Tested in `test/food/easyToMiss.test.tsx` and `test/food/foodAndTheRest.test.tsx`. Not run locally;
+removed. Tested in `test/food/easyToMiss.test.tsx`, `test/settings/settingsFlows.test.tsx` and `test/food/foodAndTheRest.test.tsx`. Not run locally;
 CI validates.
