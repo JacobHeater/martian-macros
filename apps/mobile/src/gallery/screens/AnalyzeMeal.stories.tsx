@@ -175,10 +175,10 @@ export const AddFoodRecentMeal = screenStory({
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today),
 });
 
-/** MM-587: a recent meal found by search. */
+/** MM-587, MM-596: a meal found by search, from the whole log. */
 export const AddFoodSearchFindsMeal = screenStory({
   covers: ['AddFoodSheet'],
-  shows: /^Your recent meal/,
+  shows: /^From your log · 3 foods/,
   scenario: loggedMealScenario,
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today),
   walk: async (canvas) => {

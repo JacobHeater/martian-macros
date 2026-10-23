@@ -56,6 +56,7 @@ export * from './food/label/LabelField';
 export * from './food/label/LabelReading';
 export * from './food/label/parseNutritionLabel';
 export * from './food/label/readLabelColumns';
+export * from './food/meal/distinctByName';
 export * from './food/meal/eatenWhenIn';
 export * from './food/meal/entryOfMealItem';
 export * from './food/meal/FoodEvidence';

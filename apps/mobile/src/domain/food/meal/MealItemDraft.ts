@@ -1,5 +1,6 @@
 import type { Micronutrients } from '../micros/Micronutrients';
 import type { FoodEvidence } from './FoodEvidence';
+import type { UsualPortion } from './UsualPortion';
 
 /**
  * One food of an analysed meal before it is logged (MM-586): as the
@@ -11,7 +12,10 @@ export interface MealItemDraft {
   readonly name: string;
   /** Two to four plain words to look the food up by in the packs ("chicken breast roasted"). */
   readonly lookup?: string | undefined;
+  /** How much of it was eaten in this meal. */
   readonly grams?: number | undefined;
+  /** A reasonable serving of it on its own, for logging it again (MM-595); required of an answer. */
+  readonly usualPortion?: UsualPortion | undefined;
   readonly kcal?: number | undefined;
   readonly proteinG?: number | undefined;
   readonly carbsG?: number | undefined;

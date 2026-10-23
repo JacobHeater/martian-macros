@@ -6,12 +6,19 @@ import type { MealItemDraft } from './MealItemDraft';
 /**
  * What is wrong with one food of an analysed meal (MM-586), in words the
  * person and the assistant can both act on; empty when it can be logged.
- * Every number the grade needs is required, none may be negative, the grams
- * must be plausible, and the calories must agree with the macros (MM-53).
+ * Every number the grade needs is required, and a usual portion (MM-595);
+ * none may be negative, the grams must be plausible, and the calories must
+ * agree with the macros (MM-53).
  */
 export function mealItemProblems(item: MealItemDraft): string[] {
   const problems: string[] = [];
   if (item.name.trim() === '') problems.push('It has no name.');
+  // A usual portion, to log it again on its own (MM-595).
+  const usual = item.usualPortion;
+  if (usual === undefined) problems.push('Missing its usual portion (a reasonable serving of it on its own, and its grams).');
+  else if (!(usual.grams > 0) || usual.grams > maxMealItemGrams) {
+    problems.push(`A usual portion of ${usual.grams} g is not plausible (more than 0, at most ${maxMealItemGrams.toLocaleString('en-US')}).`);
+  }
   const required: readonly [string, number | undefined][] = [
     ['grams', item.grams],
     ['calories', item.kcal],

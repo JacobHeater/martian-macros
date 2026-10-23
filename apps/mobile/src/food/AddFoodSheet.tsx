@@ -4,6 +4,7 @@ import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
+import { useAsync } from '../app/useAsync';
 import { atwaterKcal } from '../domain/atwaterKcal';
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
@@ -161,6 +162,28 @@ function filledFrom(e: FoodEntry): Form {
     source: e.source,
     basis: 'enteredTotals',
   };
+  // A food of an analysed meal comes back as one usual portion of it (MM-595, MM-596), never the amount the meal had.
+  const usual = portion?.reference;
+  if (e.source === 'photoEstimate' && usual?.basis === 'per100g' && usual.servingGrams !== undefined && usual.servingGrams > 0) {
+    const grams = usual.servingGrams;
+    const eaten = portion?.quantity !== undefined && portion.quantity > 0 ? portion.quantity : grams;
+    return {
+      ...form,
+      ...extrasOf(e, eaten / grams),
+      source: 'labelServing',
+      unit: 'serving',
+      quantity: '1',
+      quantityWasEntered: true,
+      calcRef: {
+        basis: 'perServing',
+        servingUnit: 'serving',
+        servingDescription: usual.servingDescription,
+        servingGrams: grams,
+        nutrition: usual.nutrition.times(grams / 100),
+      },
+      calcAlcoholPerKcal: alcoholPerKcal(e),
+    };
+  }
   if (portion?.quantity !== undefined && portion.unit !== undefined) {
     form = { ...form, unit: portion.unit, quantity: editableNumber(portion.quantity), quantityWasEntered: true };
     if (e.source === 'labelServing' && portion.unit === 'serving' && portion.quantity > 0) {
@@ -271,6 +294,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const isEditing = entry !== undefined;
 
   const [search, setSearch] = useState(isEditing ? '' : (initialQuery ?? ''));
+  // Everything ever logged that the search names (MM-596): the app's own foods and meals, found however old.
+  const typed = search.trim();
+  const fromLog = useAsync(
+    async () =>
+      typed === ''
+        ? { foods: [], meals: [] }
+        : { foods: await services.food.searchLoggedFoods(typed), meals: await services.food.searchLoggedMeals(typed) },
+    typed,
+    { keep: true },
+  );
   const [step, setStep] = useState<Step>(() => {
     if (isEditing) return { at: 'manual' };
     return estimateSize === undefined ? { at: 'choices' } : { at: 'estimating' };
@@ -559,6 +592,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id })),
     ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m) })),
   ].sort((a, b) => b.newest - a.newest);
+  /** A food from the log's grade, as it was logged (MM-596). */
+  const entryGradeBeside = (e: FoodEntry) => {
+    const grade = gradeOfFood?.(e.name) ?? gradeOfFoodEntry(e, { hand });
+    return <FoodGrade grade={grade} subject={e.name} />;
+  };
   const mealGradeBeside = (m: LoggedMeal) => {
     const grade = gradeOfLoggedMeal(m, { hand });
     return grade === undefined ? undefined : <FoodGrade grade={grade} subject={m.name} scope="meal" />;
@@ -855,23 +893,20 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                     trailingAction={gradeBeside(food.name)}
                   />
                 ))}
-              {recentMeals
-                .filter((m) => matches(m.name))
-                .map((m) => (
-                  <RecentMealRow key={`recent-meal-${m.key}`} meal={m} onPress={() => void logAgain(m)} trailingAction={mealGradeBeside(m)} />
-                ))}
-              {recents
-                .filter((e) => matches(e.name))
-                .map((e) => (
-                  <RecentFoodRow key={`recent-${e.id}`} entry={e} onPress={() => fill(e)} trailingAction={gradeBeside(e.name)} />
-                ))}
+              {/* Everything ever logged that matches, not only the recent (MM-596). */}
+              {(fromLog?.meals ?? []).map((m) => (
+                <RecentMealRow key={`logged-meal-${m.key}`} lead="From your log" meal={m} onPress={() => void logAgain(m)} trailingAction={mealGradeBeside(m)} />
+              ))}
+              {(fromLog?.foods ?? []).map((e) => (
+                <RecentFoodRow key={`logged-${e.id}`} lead="From your log" entry={e} onPress={() => fill(e)} trailingAction={entryGradeBeside(e)} />
+              ))}
               <FoodSearchResults
                 query={query}
                 onPick={(food) => void pick(food)}
                 alsoFound={
                   customFoods.some((food) => matches(food.name)) ||
-                  recents.some((e) => matches(e.name)) ||
-                  recentMeals.some((m) => matches(m.name))
+                  (fromLog?.foods.length ?? 0) > 0 ||
+                  (fromLog?.meals.length ?? 0) > 0
                 }
               />
               {/* Beside the phone's results, never inside them, so it keeps its state while they settle (MM-58). */}

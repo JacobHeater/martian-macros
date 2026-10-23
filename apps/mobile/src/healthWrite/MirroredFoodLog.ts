@@ -40,6 +40,14 @@ export class MirroredFoodLog implements FoodRepository {
     return this.log.watchRecentMeals(options);
   }
 
+  searchLoggedFoods(query: string, options?: { limit?: number }): Promise<FoodEntry[]> {
+    return this.log.searchLoggedFoods(query, options);
+  }
+
+  searchLoggedMeals(query: string, options?: { limit?: number }): Promise<LoggedMeal[]> {
+    return this.log.searchLoggedMeals(query, options);
+  }
+
   lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
     return this.log.lastLoggedFrom(packId, foodIds);
   }

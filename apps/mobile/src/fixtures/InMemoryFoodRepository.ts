@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import { distinctByName } from '../domain/food/meal/distinctByName';
 import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -100,6 +101,19 @@ export class InMemoryFoodRepository implements FoodRepository {
         [...all].reverse().filter((e) => e.loggedMeal !== undefined).slice(0, 400),
         limit,
       ),
+    );
+  }
+
+  async searchLoggedFoods(query: string, { limit = 25 }: { limit?: number } = {}): Promise<FoodEntry[]> {
+    const wanted = query.trim().toLowerCase();
+    return distinctByName([...this.entries.value].reverse().filter((e) => e.name.toLowerCase().includes(wanted)), limit);
+  }
+
+  async searchLoggedMeals(query: string, { limit = 10 }: { limit?: number } = {}): Promise<LoggedMeal[]> {
+    const wanted = query.trim().toLowerCase();
+    return recentMealsIn(
+      [...this.entries.value].reverse().filter((e) => e.loggedMeal?.name.toLowerCase().includes(wanted) === true),
+      limit,
     );
   }
 
