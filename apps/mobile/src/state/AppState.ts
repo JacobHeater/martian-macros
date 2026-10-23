@@ -575,6 +575,7 @@ export class AppState {
   readonly selectedDay = new ValueCell<CalendarDate | undefined>(undefined);
 
   private readonly foodByDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
+  private readonly foodBeforeDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
   private readonly waterByDay = new Map<number, Cell<Loadable<WaterEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
   private readonly reportIntakeByIndex = new Map<number, Cell<Loadable<IntakeDay[]>>>();
@@ -1691,6 +1692,16 @@ export class AppState {
     if (cell === undefined) {
       cell = stream(() => this.services.food.watchFood(date));
       this.foodByDay.set(date.epochDay, cell);
+    }
+    return cell;
+  }
+
+  /** The food of the 28 days before `date`, oldest first, for the hero's usual day (MM-572). */
+  foodBefore(date: CalendarDate): Cell<Loadable<FoodEntry[]>> {
+    let cell = this.foodBeforeDay.get(date.epochDay);
+    if (cell === undefined) {
+      cell = stream(() => this.services.food.watchFoodBetween(date.addDays(-28), date.addDays(-1)));
+      this.foodBeforeDay.set(date.epochDay, cell);
     }
     return cell;
   }

@@ -265,7 +265,7 @@ it('a searched food is logged by weight and calculated', async () => {
   expect(p?.unit).toBe('gram');
   expect(p?.reference?.basis).toBe('per100g');
   expect(p?.reference?.nutrition.kcal).toBe(89);
-  expect(await screen.findByText(/150 g · calculated from 89 kcal per 100 g/)).toBeInTheDocument();
+  expect(await screen.findByText('150 g')).toBeInTheDocument();
 });
 
 it('editing a calculated entry restores it and recalculates', async () => {
@@ -295,7 +295,7 @@ it('an entry logged by serving is restored as logged', async () => {
   await manual(sheet, 'Bar', '160');
   await typeAmount(sheet, '1.5');
   await save(sheet);
-  expect(await screen.findByText(/1\.5 servings · calculated from 160 kcal per serving/)).toBeInTheDocument();
+  expect(await screen.findByText('1.5 servings')).toBeInTheDocument();
   sheet = await openEntry('Bar');
   expect(amountField(sheet)).toHaveValue('1.5');
   expect(within(sheet).getByText(/Logs 240 kcal/)).toBeInTheDocument();
@@ -402,7 +402,9 @@ it('an entry from before amounts were recorded invents none', async () => {
     }),
   );
   await openFood();
-  expect(await screen.findByText('Weighed · amount not recorded')).toBeInTheDocument();
+  // An amount that was never recorded draws no line on the row (MM-564); the editor says so.
+  expect(await screen.findByText('Old rice')).toBeInTheDocument();
+  expect(screen.queryByText(/amount not recorded/)).not.toBeInTheDocument();
   const sheet = await openEntry('Old rice');
   expect(within(sheet).getByText(/logged without an amount/)).toBeInTheDocument();
   expect(amountField(sheet)).not.toBeInTheDocument();

@@ -408,5 +408,56 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
         after: 1,
       });
     });
+
+    it('MM-570: the time eaten is kept, changed by an update, and unknown stays unknown', async () => {
+      const timed = (id: number, eatenAt: number | undefined) =>
+        new FoodEntry({ id, date: d1, meal: 'lunch', name: 'Soup', kcal: 300, proteinG: 10, carbsG: 30, fatG: 8, source: 'weighed', eatenAt });
+      const a = await repo.addFood(timed(0, 12 * 60 + 7));
+      await repo.addFood(entry(d1, 'Untimed'));
+      const midnight = await repo.addFood(timed(0, 0));
+      const lastMinute = await repo.addFood(timed(0, 1439));
+      const read = async () => new Map((await first(repo.watchFood(d1))).map((e) => [e.id, e.eatenAt] as const));
+      expect([...(await read()).values()]).toEqual([12 * 60 + 7, undefined, 0, 1439]);
+      await repo.updateFood(timed(a, 19 * 60 + 45));
+      expect(found(await read(), a)).toBe(19 * 60 + 45);
+      expect(found(await read(), midnight)).toBe(0);
+      expect(found(await read(), lastMinute)).toBe(1439);
+      // Read through the other reads too: the recent foods and a run of days.
+      expect((await first(repo.watchRecentFoods())).find((e) => e.name === 'Soup')?.eatenAt).toBeDefined();
+      expect((await first(repo.watchFoodBetween(d1, d1))).map((e) => e.eatenAt)).toEqual([19 * 60 + 45, undefined, 0, 1439]);
+    });
+
+    it('MM-570: a run of days holds every entry from its first day to its last, both included, by day then as added', async () => {
+      const d0 = CalendarDate.of(2025, 12, 31);
+      const d3 = CalendarDate.of(2026, 1, 3);
+      await repo.addFood(entry(d2, 'Second day, first'));
+      await repo.addFood(entry(d0, 'Before'));
+      await repo.addFood(entry(d1, 'First day'));
+      await repo.addFood(entry(d3, 'After'));
+      await repo.addFood(entry(d2, 'Second day, second'));
+      expect((await first(repo.watchFoodBetween(d1, d2))).map((e) => e.name)).toEqual([
+        'First day',
+        'Second day, first',
+        'Second day, second',
+      ]);
+      expect((await first(repo.watchFoodBetween(d0, d0))).map((e) => e.name)).toEqual(['Before']);
+      expect((await first(repo.watchFoodBetween(d0, d3))).map((e) => e.date)).toEqual([d0, d1, d2, d2, d3]);
+    });
+
+    it('MM-570: a run of days with nothing in it, or that ends before it starts, is empty', async () => {
+      await repo.addFood(entry(d1, 'Oats'));
+      expect(await first(repo.watchFoodBetween(CalendarDate.of(2026, 2, 1), CalendarDate.of(2026, 2, 28)))).toEqual([]);
+      expect(await first(repo.watchFoodBetween(d2, d1))).toEqual([]);
+    });
+
+    it('MM-570: a run of days gives its current entries first, then again when one is added inside it', async () => {
+      await repo.addFood(entry(d1, 'Oats'));
+      await expectChangeEmits(repo.watchFoodBetween(d1, d2), {
+        see: (l) => l.map((e) => e.name),
+        before: ['Oats'],
+        change: () => repo.addFood(entry(d2, 'Eggs')),
+        after: ['Oats', 'Eggs'],
+      });
+    });
   });
 }

@@ -231,8 +231,8 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
             />
             <MmSwitchRow
               leadingIcon="insight"
-              title="Easy-to-miss reminder"
-              subtitle="A line under a completed day that names things people often forget to log."
+              title="Easy-to-miss check"
+              subtitle="Before a day is marked complete, asks about cooking oil, drinks, sauces, and bites and tastes."
               value={easyToMiss}
               onChange={(on) => void services.preferences.saveEasyToMissEnabled(on)}
             />

@@ -1,14 +1,36 @@
+/* The hero's head (MM-571): what was eaten, and what is left or over beside it. */
+.food-hero-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+.food-hero-eaten,
+.food-hero-delta {
+  display: flex;
+  flex-direction: column;
+}
+.food-hero-delta {
+  align-items: flex-end;
+  text-align: end;
+}
 .food-hero-figure {
   display: block;
   margin: 0;
   font: var(--type-figure-xl);
-  text-align: center;
+}
+.food-hero-delta-figure {
+  font: var(--type-title);
 }
 .food-hero-caption {
   display: block;
   margin: 0;
   color: var(--text2);
-  text-align: center;
+}
+.food-hero-story {
+  margin: var(--space-12) 0 0;
+  font: var(--type-body);
 }
 .food-hero-macros {
   display: flex;
@@ -110,7 +132,12 @@
   min-width: 0;
 }
 .food-entry-name {
+  display: -webkit-box;
+  overflow: hidden;
   font: var(--type-body);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 .food-entry-line {
   color: var(--text2);
@@ -120,7 +147,9 @@
   color: var(--text3);
 }
 .food-entry-kcal {
-  font: var(--type-heading);
+  font: var(--type-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .food-entry-open {
   flex: 1;
@@ -142,10 +171,17 @@
   align-items: center;
   border-top: 1px solid var(--outline);
 }
+/* As wide as the meal's mark, so a row's icon stands under it and its words under the meal's title (MM-569). */
 .food-entry-method {
   display: grid;
   flex: none;
+  place-items: center;
+  width: 24px;
   color: var(--text2);
+}
+/* The coach's line under a food keeps the same columns: its bulb under the row's icon, its words under the name. */
+.mm-section-flush .coach-inline-insight {
+  --note-icon: 24px;
 }
 .food-complete-row {
   margin-top: var(--space-12);
@@ -159,8 +195,8 @@
   display: grid;
   color: var(--text2);
 }
-.food-easy-to-miss {
-  margin-bottom: var(--space-8);
+.food-easy-to-miss-confirm {
+  margin-top: var(--space-16);
 }
 .food-sheet {
   padding: var(--space-4) var(--space-16) var(--space-16);

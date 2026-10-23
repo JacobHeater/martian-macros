@@ -8,6 +8,7 @@ export function gradeOfCatalogFood(food: CatalogFood): FoodGradeValue {
   return gradeOfNutrition({
     kcal: food.kcal,
     proteinG: food.proteinG,
+    carbsG: food.carbsG,
     fiberG: food.fiberG,
     sodiumMg: food.sodiumMg,
     sugarsG: food.micros.sugars,

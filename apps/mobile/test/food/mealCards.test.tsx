@@ -1,135 +1,35 @@
-import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { beforeEach, expect, it } from 'vitest';
+import { screen } from '@testing-library/react';
+import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
-import { Meal } from '../../src/domain/Meal';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { mealLabel } from '../../src/format/mealLabel';
-import { enterManually, foodSheet, press, typeIn } from '../support/addFood';
-import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { macroGrams } from '../support/macroPreview';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
-import { dashboardLoaded } from '../support/dashboardLoaded';
+import { declarationsOf } from '../support/stylesheetRules';
 
-/** The meals of the Food screen, one section each (MM-255). Carried over from meal_cards_test.dart. */
+/** MM-569: the meals read as cards like the hero, their rows on the header's columns. */
 const today = CalendarDate.of(2026, 10, 10);
-let repos: InMemoryRepositories;
 
-beforeEach(async () => {
-  repos = new InMemoryRepositories();
+it('each meal and the water are framed cards whose rows run on the header’s columns', async () => {
+  const repos = new InMemoryRepositories();
   await repos.preferences.saveThemePreference('martian');
-});
-
-async function openFood({ populated = false }: { populated?: boolean } = {}): Promise<void> {
-  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-60), healthCheckConfirmedOn: today }));
-  await repos.weights.saveWeight(today, 82);
-  if (populated) {
-    for (const meal of Meal.values) {
-      await repos.food.addFood(
-        foodOn(today, { name: `Food for ${meal}`, meal, kcal: 500, proteinG: 30, carbsG: 60, fatG: 16 }),
-      );
-    }
-  }
+  await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
+  await repos.food.addFood(foodOn(today, { name: 'Eggs', meal: 'breakfast', kcal: 140 }));
   renderApp(repos, today);
   await openTab('Food');
-  await screen.findByRole('region', { name: 'Breakfast' });
-}
-
-const card = (meal: Meal) => screen.getByRole('region', { name: mealLabel(meal) });
-const toggle = (meal: Meal) => within(card(meal)).getByRole('button', { name: new RegExp(`^${mealLabel(meal)}`) });
-const body = () => document.querySelector<HTMLElement>('.app-body') as HTMLElement;
-
-it('each empty meal has a separate section and an add control with a name', async () => {
-  await openFood();
-  for (const meal of Meal.values) {
-    expect(card(meal).closest('.mm-section')).not.toBeNull();
-    expect(card(meal).closest('.mm-surface'), 'a section is never on a card').toBeNull();
-    expect(
-      within(card(meal)).getByRole('button', { name: `Add food to ${mealLabel(meal).toLowerCase()}` }),
-    ).toBeInTheDocument();
+  await screen.findByText('Eggs');
+  for (const name of ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Water']) {
+    const section = screen.getByRole('region', { name });
+    expect(section, name).toHaveClass('mm-section-framed', 'mm-section-flush');
   }
-  expect(new Set(Meal.values.map((meal) => card(meal).closest('.mm-section'))).size).toBe(Meal.values.length);
+  // The row's icon is as wide as the meal's mark and keeps the header's gap, so the name sits under the title.
+  expect(declarationsOf('src/ui/ui.css', '.mm-section-flush .mm-section-body')).toMatch(/padding-left: 0/);
+  expect(declarationsOf('src/food/food.css', '.food-entry-method')).toMatch(/width: 24px/);
+  expect(declarationsOf('src/food/food.css', '.food-entry')).toMatch(/gap: var\(--space-12\)/);
+  expect(declarationsOf('src/ui/ui.css', '.mm-section-head-body')).toMatch(/gap: var\(--space-12\)/);
+  // The owner, 2026-10-22: each row drew a flat box over the card's sheen. At rest a row has no ground of its own.
+  expect(declarationsOf('src/ui/ui.css', '.mm-swipe-row')).not.toMatch(/background/);
+  const row = document.querySelector('.mm-swipe');
+  expect(row).not.toHaveClass('mm-swipe-moving');
 });
-
-// MM-255: one macro picture at a time, the choice remembered and shared with the Dashboard (MM-254).
-it('shows the bars or the donut, never both, and remembers which', async () => {
-  await openFood({ populated: true });
-  expect(document.querySelectorAll('.mm-macro-bar').length).toBeGreaterThan(0);
-  expect(document.querySelectorAll('.chart-split-ring')).toHaveLength(0);
-  // MM-290: the switch names the split a split; nothing in it says "Share".
-  expect(screen.queryByRole('button', { name: 'Share' })).not.toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Split' }));
-  await screen.findByRole('img', { name: /^Logged macronutrient energy split/ });
-  expect(document.querySelectorAll('.mm-macro-bar')).toHaveLength(0);
-  expect(await first(repos.preferences.watchMacroPicture())).toBe('donut');
-  await openTab('Dashboard');
-  await dashboardLoaded();
-  expect(document.querySelectorAll('.chart-split-ring')).toHaveLength(1);
-  expect(document.querySelectorAll('.mm-macro-bar')).toHaveLength(0);
-});
-
-// MM-315: the day's explanation names the macro picture as the switch does, the split (MM-290).
-it('the explanation under the day says Split, never share', async () => {
-  await openFood({ populated: true });
-  await userEvent.click(screen.getByRole('button', { name: /^More about this day/ }));
-  const text = body().textContent ?? '';
-  expect(text).toContain('The Split picture counts protein and carbs');
-  expect(text.toLowerCase()).not.toContain('share picture');
-});
-
-it('meals expand independently and keep their add controls', async () => {
-  await openFood({ populated: true });
-  expect(screen.getByText('Food for lunch')).toBeVisible();
-  await userEvent.click(toggle('lunch'));
-  expect(toggle('lunch')).toHaveAttribute('aria-expanded', 'false');
-  expect(screen.getByText('Food for lunch')).not.toBeVisible();
-  expect(within(card('lunch')).getByRole('button', { name: 'Add food to lunch' })).toBeInTheDocument();
-  expect(screen.getByText('Food for breakfast')).toBeVisible();
-  await userEvent.click(toggle('lunch'));
-  expect(screen.getByText('Food for lunch')).toBeVisible();
-});
-
-it('the Food split follows the selected day; the Dashboard stays on today', async () => {
-  // The split is the donut picture (MM-255); the person chose it.
-  await repos.preferences.saveMacroPicture('donut');
-  await repos.food.addFood(
-    foodOn(today.addDays(-1), { name: 'Yesterday only', meal: 'lunch', kcal: 200, proteinG: 10, carbsG: 20, fatG: 5 }),
-  );
-  await openFood({ populated: true });
-  await userEvent.click(screen.getByRole('button', { name: 'Previous day' }));
-  await screen.findByText('Yesterday only');
-  expect(macroGrams(body(), 'Protein')).toBe(10);
-  await openTab('Dashboard');
-  await dashboardLoaded();
-  expect(macroGrams(body(), 'Protein')).toBe(120);
-});
-
-for (const collapsed of [false, true]) {
-  it(`Add does not toggle the meal (collapsed: ${collapsed})`, async () => {
-    await openFood({ populated: true });
-    if (collapsed) await userEvent.click(toggle('breakfast'));
-    const add = within(card('breakfast')).getByRole('button', { name: 'Add food to breakfast' });
-    expect(add).toHaveClass('mm-icon-button-add');
-    expect(add).not.toHaveTextContent('+');
-    await userEvent.click(add);
-    const sheet = await foodSheet();
-    expect(within(sheet).getByRole('textbox', { name: 'Search foods' })).toBeInTheDocument();
-    expect(within(sheet).queryByRole('textbox', { name: 'Food name' })).not.toBeInTheDocument();
-
-    // The sheet opened for breakfast: what is logged from it goes there.
-    await enterManually(sheet);
-    expect(within(sheet).getByRole('button', { name: 'Breakfast' })).toHaveAttribute('aria-pressed', 'true');
-    await typeIn(sheet, 'Food name', 'Toast');
-    await typeIn(sheet, /^Calories/, '100');
-    await press(sheet, 'Log it');
-    await expect.poll(async () => (await first(repos.food.watchFood(today))).length).toBe(Meal.values.length + 1);
-    expect((await first(repos.food.watchFood(today))).find((e) => e.name === 'Toast')?.meal).toBe('breakfast');
-
-    expect(toggle('breakfast')).toHaveAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    if (collapsed) expect(screen.getByText('Food for breakfast')).not.toBeVisible();
-    else expect(screen.getByText('Food for breakfast')).toBeVisible();
-  });
-}

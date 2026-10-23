@@ -169,6 +169,19 @@ export function OverlaysCatalog({ kind }: { kind: OverlayKind }) {
           onDone={nothing}
         />
       ) : null}
+      {kind === 'popoverRows' ? (
+        <MmPopover
+          title="Protein"
+          label="Top foods for protein"
+          rows={[
+            { label: 'Chicken breast', figures: '31 g', tag: 'Lunch' },
+            { label: 'Grade AA Large Brown Eggs', figures: '12 g', tag: 'Breakfast' },
+            { label: 'Greek yogurt', figures: '10 g', tag: 'Snack' },
+          ]}
+          anchor={menuAnchor}
+          onDone={nothing}
+        />
+      ) : null}
     </MmOverlays>
   );
 }
