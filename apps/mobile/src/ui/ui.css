@@ -2144,6 +2144,13 @@
 .mm-section-meter {
   padding: var(--space-4) 0 var(--space-12);
 }
+.mm-section-flush .mm-section-body {
+  padding-left: 0;
+}
+/* A row that swipes on a card covers what is behind it in the card's own colour (MM-569). */
+.mm-section-framed .mm-swipe-row {
+  background: var(--surface);
+}
 .mm-section-body[hidden] {
   display: none;
 }
