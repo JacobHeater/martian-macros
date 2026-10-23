@@ -19,7 +19,7 @@ interface WaistEntryCardProps {
   recordedToday?: string | undefined;
   /** How many measurements there are: the protocol is drawn in full for the first three (MM-155). */
   entries: number;
-  /** The waist over time, drawn under the entry once there is one (MM-155). */
+  /** The waist over time under the entry (MM-155), or what it waits for before the first measurement (MM-578). */
   chart?: ReactNode;
   /** Saves one reading or three, in the user's unit. If it fails, the section says "That value looks off". */
   onSave: (readings: readonly number[]) => Promise<void>;

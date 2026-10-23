@@ -97,6 +97,8 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
 6. **More sites (MM-156).** M4. Done 2026-10-21: one store by site (schema 23, the
    waist moved in), the measuring session, the sites and limb side, the
    suggestion offered once, per-site charts and the limb facts.
+   MM-578 (2026-10-22): every Progress section but the photos draws a
+   graphic, and says plainly in its place when there is nothing to draw.
 7. **Body-fat range (MM-34, MM-501, MM-502).** M4. MM-34 is built: the
    formula joined by the waist, shown as a range. The Navy method (MM-501)
    needs neck and hip from step 6; scale readings with a per-device bias
@@ -128,7 +130,7 @@ storage rules above.
 - Remaining: MM-155, MM-136, MM-20, MM-142.
 - Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed), MM-502 (smart-scale
   readings in the body-fat range, each scale's own bias), MM-156 (more measurement sites; the waist moved
-  into one store by site), MM-501 (the Navy tape method in the body-fat range),
+  into one store by site), MM-578 (a graphic in every Progress section), MM-501 (the Navy tape method in the body-fat range),
   MM-118 (the weight display: Everything, Trend only or Hidden).
   Epics: MM-15, MM-154.
 
