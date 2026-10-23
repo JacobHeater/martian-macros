@@ -111,7 +111,7 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
           const value = low + interval * step;
           return (
             <g key={step}>
-              <line className="chart-grid" x1={left} x2={width - 4} y1={y(value)} y2={y(value)} />
+              <line className="chart-grid" x1={left} x2={width} y1={y(value)} y2={y(value)} />
               {step === 0 || step === 3 ? null : (
                 <text className="chart-axis" x={left - 6} y={y(value) + 4} textAnchor="end">
                   {Fmt.whole(value)}
@@ -124,7 +124,8 @@ export function HistoryChart({ series, today, days, unit, minimum, maximum }: Hi
           <text
             key={day}
             className="chart-axis"
-            x={x(day)}
+            // The last date ends at the chart's edge, as the grid and the words above it do (MM-583).
+            x={i === 2 ? width : x(day)}
             y={height - 8}
             textAnchor={i === 0 ? 'start' : i === 2 ? 'end' : 'middle'}
           >

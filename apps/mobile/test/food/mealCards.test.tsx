@@ -24,7 +24,7 @@ it('each meal and the water are framed cards whose rows run on the header’s co
     expect(section, name).toHaveClass('mm-section-framed', 'mm-section-flush');
   }
   // The row's icon is as wide as the meal's mark and keeps the header's gap, so the name sits under the title.
-  expect(declarationsOf('src/ui/ui.css', '.mm-section-flush .mm-section-body')).toMatch(/padding-left: 0/);
+  expect(declarationsOf('src/ui/ui.css', '.mm-section-flush > .mm-section-body')).toMatch(/padding-left: 0/);
   expect(declarationsOf('src/food/food.css', '.food-entry-method')).toMatch(/width: 24px/);
   expect(declarationsOf('src/food/food.css', '.food-entry')).toMatch(/gap: var\(--space-12\)/);
   expect(declarationsOf('src/ui/ui.css', '.mm-section-head-body')).toMatch(/gap: var\(--space-12\)/);

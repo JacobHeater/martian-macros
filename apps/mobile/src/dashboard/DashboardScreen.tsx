@@ -324,6 +324,8 @@ export function DashboardScreen() {
         icon="history"
         title="History"
         summary="Intake, weight and more, 7 or 30 days back"
+        // Its sections bring their own icon column: indented under the title as well, a chart stood 72 px in (MM-583).
+        flush
         collapsible
         initiallyExpanded={false}
         remember="dashboard.more"

@@ -122,7 +122,7 @@ export function TrendChart({
     >
       {gridValues.map((value) => (
         <g key={value}>
-          <line className="chart-grid" x1={left} x2={width - 4} y1={y(value)} y2={y(value)} />
+          <line className="chart-grid" x1={left} x2={width} y1={y(value)} y2={y(value)} />
           <text className="chart-axis" x={left - 6} y={y(value) + 4} textAnchor="end">
             {toStringAsFixed(value, 0)}
           </text>
