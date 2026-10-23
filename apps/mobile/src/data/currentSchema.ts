@@ -98,8 +98,10 @@ CREATE TABLE "food_entries" (
   "sugar_alcohols_g" REAL NULL,
   "preparation" TEXT NULL,
   "conversion_kind" TEXT NULL,
-  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0)
+  "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0),
+  "eaten_at_minute" INTEGER NULL CHECK ("eaten_at_minute" IS NULL OR "eaten_at_minute" BETWEEN 0 AND 1439)
 );
+CREATE INDEX "food_entries_epoch_day" ON "food_entries" ("epoch_day");
 CREATE TABLE "day_marks" (
   "epoch_day" INTEGER NOT NULL,
   "completeness" TEXT NOT NULL,

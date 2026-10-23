@@ -5,6 +5,7 @@ import type { MicronutrientTotal } from '../domain/food/micros/MicronutrientTota
 import { microsDayOf } from '../domain/food/micros/microsDayOf';
 import { referenceAmount } from '../domain/food/micros/referenceAmount';
 import { ReferenceWithheld } from '../domain/food/micros/ReferenceWithheld';
+import { topSourcesOf } from '../domain/food/micros/topSourcesOf';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { NutritionGoals } from '../domain/NutritionGoals';
 import type { UserSetup } from '../domain/UserSetup';
@@ -50,7 +51,8 @@ const joined = (...parts: (string | undefined)[]) => {
  * vitamins, then the label's other lines, each with what today's foods
  * state and how many of them state it. A vitamin or mineral is drawn
  * against its reference amount; sodium against the user's limit when one is
- * set (MM-311). Nothing changes colour for being under or over.
+ * set (MM-311). Nothing changes colour for being under or over. Each row
+ * opens to the five foods that add the most of it (MM-561).
  */
 export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) {
   const totals = microsDayOf(entries);
@@ -64,6 +66,7 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
   const row = (total: MicronutrientTotal) => {
     const n = total.nutrient;
     const name = Micronutrient.label(n);
+    const sources = topSourcesOf(entries, n).map((s) => ({ name: s.name, figures: nutrientAmount(n, s.amount) }));
     if (n === 'sodium' && limit !== undefined) {
       const over = total.over(limit);
       return (
@@ -77,6 +80,7 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
           )}
           amount={total.known}
           reference={limit}
+          sources={sources}
         />
       );
     }
@@ -89,6 +93,7 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
         note={joined(coverage(total), ref === undefined ? undefined : `reference ${nutrientAmount(n, ref)}`)}
         amount={total.known}
         reference={ref}
+        sources={sources}
       />
     );
   };

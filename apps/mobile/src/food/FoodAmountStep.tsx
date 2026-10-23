@@ -43,9 +43,11 @@ import { Notice } from '../ui/Notice';
 import type { AmountChoice } from './AmountChoice';
 import { FoodGrade } from './FoodGrade';
 import { FoodTrustMark } from './FoodTrustMark';
+import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { MealChips } from './MealChips';
 import { microsOfPackFood } from './microsOfPackFood';
 import { preparationOf } from './preparationOf';
+import { TimeEatenRow } from './TimeEatenRow';
 import { weighedConsequence } from './weighedConsequence';
 import { weighedStateLabel } from './weighedStateLabel';
 import './food.css';
@@ -140,6 +142,8 @@ export function FoodAmountStep({
   const [useAlternate, setUseAlternate] = useState(remembered);
   const [quantity, setQuantity] = useState(() => defaultQuantity(first));
   const [meal, setMeal] = useState(firstMeal);
+  // Logged for today, it starts at now; for another day, it has no time until one is given (MM-570).
+  const [eatenAt, setEatenAt] = useState<number | undefined>(() => eatenAtWhenLogged(day, services.clock));
   const [oil, setOil] = useState<CookingFat>('none');
   /** The fat chosen here, once chosen; until then the person's usual (MM-152). */
   const [fatChosen, setFatChosen] = useState<CookingFatKind | undefined>(undefined);
@@ -231,6 +235,7 @@ export function FoodAmountStep({
           preparation: custom === undefined ? preparationOf(food) : undefined,
           conversion: conversionFor(choice.unit, reference, { hand }),
         },
+        eatenAt,
       }),
     );
     const oilTotals = CookingFat.totals(oil, fat);
@@ -249,6 +254,8 @@ export function FoodAmountStep({
           fatG: oilTotals.fatG,
           source: 'householdMeasure',
           portion: { method: 'householdMeasure', basis: 'enteredTotals', quantity: 1, unit: CookingFat.unit(oil) },
+          // The fat it was cooked in was eaten with it.
+          eatenAt,
         }),
       );
     }
@@ -395,6 +402,7 @@ export function FoodAmountStep({
       )}
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <div className="app-gap" />
       <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
       {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}

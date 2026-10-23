@@ -32,7 +32,9 @@ const meaning = {
 function notCountedSentences(grade: { notCounted: readonly GradeOmission[]; statedMicronutrients: number }): string[] {
   const sentences: string[] = [];
   const of = GradeMicronutrient.values.length;
-  const label = grade.notCounted.filter((o) => o !== 'micronutrients').map(GradeOmission.label);
+  // A fiber that is not stated was bounded by the carbs, too few to change the letter (MM-567).
+  if (grade.notCounted.includes('fiber')) sentences.push('Fiber isn’t stated for this food, but it has too few carbs for fiber to change the grade.');
+  const label = grade.notCounted.filter((o) => o !== 'micronutrients' && o !== 'fiber').map(GradeOmission.label);
   if (label.length > 0) {
     const list = label.join(' and ');
     const verb = label.length === 1 ? 'isn’t' : 'aren’t';
@@ -69,6 +71,11 @@ export function FoodGrade({ grade, subject, scope = 'food' }: FoodGradeProps) {
       label={graded ? `Grade ${spoken(grade.letter)} for ${subject}` : `No grade for ${subject}. Why?`}
       expanded={open}
       onExplain={(anchor) => {
+        // A second press closes the explanation (MM-565).
+        if (open) {
+          overlays.closeTop();
+          return;
+        }
         setOpen(true);
         const explanation =
           grade.kind === 'graded'

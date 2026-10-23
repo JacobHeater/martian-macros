@@ -30,7 +30,7 @@ export function MmSwipeToRemove({ children, onRemove }: MmSwipeToRemoveProps) {
 
   return (
     <div
-      className="mm-swipe"
+      className={`mm-swipe${offset === 0 ? '' : ' mm-swipe-moving'}`}
       onPointerDown={(event) => {
         from.current = event.clientX;
         dragged.current = false;

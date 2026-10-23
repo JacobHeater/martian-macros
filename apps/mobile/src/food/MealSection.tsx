@@ -9,6 +9,7 @@ import type { Meal } from '../domain/Meal';
 import { mealHasSolidProtein } from '../engine/mealHasSolidProtein';
 import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
+import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -26,6 +27,7 @@ import { foodEntryLinesId } from './foodEntryLinesId';
 import { FoodGrade } from './FoodGrade';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
+import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 interface MealSectionProps {
@@ -48,11 +50,19 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const today = useCell(state.today);
   const total = entries.reduce((sum, e) => sum + e.kcal, 0);
   const protein = entries.reduce((sum, e) => sum + e.proteinG, 0);
+  const netCarbs = useNetCarbs();
+  const carbs = entries.reduce((sum, e) => sum + (netCarbs ? e.netCarbsG : e.carbsG), 0);
+  const fat = entries.reduce((sum, e) => sum + e.fatG, 0);
   const hand = useCell(state.handSize);
-  // Full detail shows the protein of the meal and a quiet marker when it
-  // is a solid serving for the reference weight (MM-125). There is no
-  // per-meal target.
-  const full = DetailLevel.showsExtras(useLoaded(state.detailLevel) ?? 'standard');
+  // Full detail shows a quiet marker when the meal's protein is a solid
+  // serving for the reference weight (MM-125). There is no per-meal target.
+  const level = useLoaded(state.detailLevel) ?? 'standard';
+  const full = DetailLevel.showsExtras(level);
+  // The meal's macros beside its calories, in the entries' own letters (MM-563); protein alone at Simple.
+  const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
+  const macros = DetailLevel.showsCarbsAndFat(level)
+    ? `P ${whole(protein)} · C ${whole(carbs)} · F ${whole(fat)}`
+    : `P ${whole(protein)}`;
   const weightKg = useCell(state.coach)?.trendWeightKg;
   const solid =
     full &&
@@ -76,13 +86,16 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   };
 
   return (
+    // Each meal is a card, as the hero is, with its rows on the header's columns (MM-569).
     <MmSection
+      framed
+      flush
       icon={mealIcon(meal)}
       title={label}
       summary={
         entries.length === 0 ? undefined : (
           <span className="food-meal-total">
-            {full ? `${Fmt.kcal(total)} · ${Fmt.grams(protein)} protein` : Fmt.kcal(total)}
+            {`${Fmt.kcal(total)} · ${macros}`}
             {solid ? (
               <span className="food-meal-marker" role="img" aria-label="A solid serving of protein">
                 <MmIcon name="checkCircle" size={16} />

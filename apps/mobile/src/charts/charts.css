@@ -224,3 +224,77 @@
 .chart-waist-band {
   fill: color-mix(in srgb, currentColor 14%, transparent);
 }
+
+/* ---- The day's running total (MM-571): the hero's calorie picture, one hue, nothing judged ---- */
+.chart-intake-area {
+  fill: color-mix(in srgb, var(--arc) 16%, transparent);
+}
+.chart-intake-hatch {
+  fill: color-mix(in srgb, var(--arc) 55%, transparent);
+}
+.chart-intake-line {
+  fill: none;
+  stroke: var(--arc);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.chart-intake-step {
+  fill: var(--arc);
+}
+/* A food whose time was not recorded stands at its meal's usual time, as an open dot (owner, 2026-10-22). */
+.chart-intake-step-approximate {
+  fill: var(--surface);
+  stroke: var(--arc);
+  stroke-width: 2;
+}
+.chart-intake-target {
+  stroke: var(--text);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+.chart-intake-band {
+  fill: color-mix(in srgb, var(--energy) 10%, transparent);
+}
+.chart-intake-crossed {
+  fill: var(--text);
+}
+.chart-intake-tick {
+  stroke-dasharray: 1 4;
+}
+.chart-intake-now {
+  stroke: var(--ion);
+  stroke-width: 1.5;
+}
+.chart-intake-now-text {
+  fill: var(--ion);
+  font-weight: 600;
+}
+.chart-intake-total {
+  fill: var(--text);
+  font-weight: 600;
+}
+/* The usual day (MM-572): a quiet dashed line under today's, in the strongest neutral's half. */
+.chart-intake-usual {
+  fill: none;
+  stroke: color-mix(in srgb, var(--text2) 60%, transparent);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.chart-intake-key {
+  margin: var(--space-8) 0 0;
+  color: var(--text2);
+}
+.chart-intake-key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.chart-intake-key-today {
+  width: 16px;
+  height: 3px;
+  background: var(--arc);
+}
+.chart-intake-key-usual {
+  width: 16px;
+  border-top: 2px dashed color-mix(in srgb, var(--text2) 60%, transparent);
+}

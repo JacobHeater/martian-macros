@@ -1144,6 +1144,32 @@
   color: var(--text2);
   font: var(--type-body);
 }
+.mm-popover-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  margin: var(--space-12) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.mm-popover-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  font: var(--type-body);
+}
+.mm-popover-row-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-popover-row-figures {
+  flex: none;
+  color: var(--text2);
+  font-variant-numeric: tabular-nums;
+}
 .mm-popover-actions {
   display: flex;
   justify-content: flex-end;
@@ -1385,10 +1411,12 @@
 
 /* One nutrient of the Micros view (MM-310). */
 .mm-nutrient-row {
+  padding: var(--space-8) 0;
+}
+.mm-nutrient-row-main {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  padding: var(--space-8) 0;
 }
 .mm-nutrient-row-head {
   display: flex;
@@ -1405,6 +1433,40 @@
 .mm-nutrient-row-note {
   font: var(--type-caption);
   color: var(--text2);
+}
+.mm-nutrient-row-chevron {
+  display: grid;
+  align-self: center;
+  color: var(--text3);
+  transition: transform var(--motion-base);
+}
+.mm-nutrient-row-chevron-open {
+  transform: rotate(180deg);
+}
+.mm-nutrient-row-sources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: var(--space-8) 0 0;
+  padding: 0 0 0 var(--space-12);
+  border-inline-start: 2px solid var(--outline);
+  list-style: none;
+}
+.mm-nutrient-row-source {
+  display: flex;
+  gap: var(--space-8);
+  font: var(--type-caption);
+  color: var(--text2);
+}
+.mm-nutrient-row-source-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mm-nutrient-row-source-figures {
+  color: var(--text);
 }
 
 .mm-day-stepper {
@@ -1639,8 +1701,17 @@
 .mm-horizon-hollow {
   fill: var(--surface);
 }
-.mm-horizon-glow {
-  fill: color-mix(in srgb, var(--ion) 80%, transparent);
+.mm-horizon-glow-core {
+  stop-color: var(--ion);
+  stop-opacity: 0.8;
+}
+.mm-horizon-glow-mid {
+  stop-color: var(--ion);
+  stop-opacity: 0.45;
+}
+.mm-horizon-glow-edge {
+  stop-color: var(--ion);
+  stop-opacity: 0;
 }
 .theme-light .mm-horizon-glow {
   display: none;
@@ -1662,6 +1733,9 @@
   border-radius: var(--radius-sheet-top) var(--radius-sheet-top) 0 0;
   background: var(--raised);
   animation: mm-sheet-rise var(--motion-slow) ease-out;
+}
+.mm-sheet-tall {
+  height: 90%;
 }
 .theme-light .mm-sheet {
   box-shadow: 0 8px 24px rgb(12 18 32 / 12%);
@@ -1736,11 +1810,18 @@
   background: var(--sunken);
   color: var(--danger);
 }
+/* At rest a row has no ground of its own: it shows what it sits on, card or canvas, sheen and all, and the delete
+   behind it is not drawn. Only while it is dragged does it take a ground, to slide over the delete (MM-569). */
 .mm-swipe-row {
   position: relative;
+}
+.mm-swipe:not(.mm-swipe-moving) > .mm-swipe-behind {
+  visibility: hidden;
+}
+.mm-swipe-moving > .mm-swipe-row {
   background: var(--surface);
 }
-.mm-section .mm-swipe-row {
+.mm-section:not(.mm-section-framed) .mm-swipe-moving > .mm-swipe-row {
   background: var(--canvas);
 }
 
@@ -2069,6 +2150,9 @@
 /* The meter spans the section, under its icon too (MM-326). */
 .mm-section-meter {
   padding: var(--space-4) 0 var(--space-12);
+}
+.mm-section-flush .mm-section-body {
+  padding-left: 0;
 }
 .mm-section-body[hidden] {
   display: none;

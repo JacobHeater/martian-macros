@@ -57,7 +57,7 @@ it('MM-206: the Dashboard shows today whatever day the Food screen is on', async
   // By the bar at the bottom, not the intake figure, which clears the chosen day.
   // Since MM-438 the Dashboard has no Add food; its figure is still today's.
   await openTab('Dashboard');
-  expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('1,700')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Add food' })).not.toBeInTheDocument();
 
@@ -77,8 +77,8 @@ it('MM-187: the Food screen shows exactly one arc', async () => {
   await repos.targets.saveTargets(targetsFrom(today.addDays(-3), { kcal: 2000 }));
   renderApp(repos, today);
   await openTab('Food');
-  await screen.findByText(/kcal left of 2,000/);
-  expect(document.querySelectorAll('.mm-horizon')).toHaveLength(1);
+  await screen.findByText(/left of 2,000/);
+  expect(document.querySelectorAll('.chart-intake')).toHaveLength(1);
 });
 
 for (const failed of [false, true]) {
@@ -108,11 +108,11 @@ for (const failed of [false, true]) {
       const retry = screen.getByRole('button', { name: 'Try again' });
       broken = false;
       await userEvent.click(retry);
-      expect(await screen.findByText(/kcal left of 2,000/)).toBeInTheDocument();
+      expect(await screen.findByText(/left of 2,000/)).toBeInTheDocument();
       expect(screen.queryByText('Could not check whether this day is paused')).toBeNull();
     } else {
       expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
-      expect(document.querySelector('.mm-horizon')).toBeNull();
+      expect(document.querySelector('.chart-intake')).toBeNull();
     }
   });
 }
@@ -125,7 +125,7 @@ it('MM-148: a paused day on the Food screen is a guide, never over', async () =>
   renderApp(repos, today);
   await openTab('Food');
   expect(await screen.findByText(/paused, guide/)).toBeInTheDocument();
-  expect(screen.queryByText(/kcal over/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^over [\d,]+/)).not.toBeInTheDocument();
 });
 
 /** MM-114, from under_eating_notice_test.dart. */
@@ -138,6 +138,11 @@ async function markComplete(name: string, kcal: number): Promise<HTMLElement> {
   await userEvent.click(await screen.findByRole('button', { name: /^Is this day fully logged\?/ }));
   const options = await screen.findByRole('dialog', { name: 'Is this day fully logged?' });
   await userEvent.click(within(options).getByRole('option', { name: 'Complete' }));
+  // In the first weeks the easy-to-miss check comes first (MM-575); nothing was missed.
+  const asked = await screen.findByRole('dialog', { name: /^(Anything easy to miss\?|Is this everything you ate today\?)$/ });
+  if (asked.getAttribute('aria-label') === 'Anything easy to miss?') {
+    await userEvent.click(within(asked).getByRole('button', { name: 'Nothing missed, mark complete' }));
+  }
   return screen.findByRole('dialog', { name: 'Is this everything you ate today?' });
 }
 

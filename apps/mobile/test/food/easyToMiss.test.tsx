@@ -12,18 +12,18 @@ import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
 /**
- * MM-152: the easy-to-miss line under a completed day. Carried over from
- * easy_to_miss_test.dart, with the case from under_eating_notice_test.dart
- * that hides it while logged days sit far below the floor (MM-114).
+ * MM-575 (the owner, 2026-10-22): the easy-to-miss foods are asked about as a
+ * day is marked complete, and only "nothing missed" marks it; a missed one
+ * opens add-food. MM-152's schedule and MM-114's exceptions still decide when
+ * the check is due. The chips under a completed day are gone.
  */
 const today = CalendarDate.of(2026, 10, 5);
 let repos: InMemoryRepositories;
 
 async function start({
   dayOfUse = 3,
-  complete = true,
   eatingDisorderHistory = false,
-}: { dayOfUse?: number; complete?: boolean; eatingDisorderHistory?: boolean } = {}): Promise<void> {
+}: { dayOfUse?: number; eatingDisorderHistory?: boolean } = {}): Promise<void> {
   repos = new InMemoryRepositories();
   await repos.preferences.saveThemePreference('martian');
   await repos.setup.saveSetup(
@@ -34,89 +34,103 @@ async function start({
     }),
   );
   await repos.weights.saveWeight(today, 82);
-  await repos.food.addFood(
-    foodOn(today, { name: 'Soup', meal: 'lunch', kcal: 300, proteinG: 10, carbsG: 30, fatG: 5 }),
-  );
-  if (complete) await repos.dayMarks.setCompleteness(today, 'complete');
+  await repos.food.addFood(foodOn(today, { name: 'Soup', meal: 'lunch', kcal: 2000, proteinG: 100, carbsG: 200, fatG: 60 }));
 }
 
-async function openFood(): Promise<void> {
+/** Opens Food and chooses Complete on the day's row; gives the dialog that comes next, if any. */
+async function chooseComplete(): Promise<HTMLElement | null> {
   renderApp(repos, today);
   await openTab('Food');
-  await screen.findByRole('region', { name: 'Breakfast' });
+  await userEvent.click(await screen.findByRole('button', { name: /^Is this day fully logged\?/ }));
+  const options = await screen.findByRole('dialog', { name: 'Is this day fully logged?' });
+  await userEvent.click(within(options).getByRole('option', { name: 'Complete' }));
+  await expect.poll(() => screen.queryByRole('dialog', { name: 'Is this day fully logged?' })).toBeNull();
+  return screen.queryByRole('dialog', { name: 'Anything easy to miss?' });
 }
 
-const line = () => screen.queryByText('Easy to miss');
+const marked = () => first(repos.dayMarks.watchCompleteness(today));
 
-it('the line appears under a completed day in the first weeks', async () => {
+it('marking a day complete asks about the easy-to-miss foods, and nothing missed marks it', async () => {
   await start();
-  await openFood();
-  expect(await screen.findByText('Easy to miss')).toBeInTheDocument();
-  for (const item of ['cooking oil', 'drinks', 'sauces', 'bites and tastes']) {
-    expect(screen.getByRole('button', { name: item })).toBeInTheDocument();
+  const check = await chooseComplete();
+  expect(check).not.toBeNull();
+  for (const item of ['Cooking oil', 'Drinks', 'Sauces', 'Bites and tastes']) {
+    expect(within(check!).getByRole('button', { name: item })).toBeInTheDocument();
   }
-  // Recorded once it is shown.
-  await expect.poll(async () => (await first(repos.preferences.watchEasyToMiss())).lastShown).toBe(today);
+  expect(await marked()).toBe('unmarked');
+  await userEvent.click(within(check!).getByRole('button', { name: 'Nothing missed, mark complete' }));
+  await expect.poll(marked).toBe('complete');
+  expect(await first(repos.preferences.watchEasyToMiss())).toMatchObject({ lastShown: today });
 });
 
-it('it is not shown for a day that is not marked complete', async () => {
-  await start({ complete: false });
-  await openFood();
-  expect(line()).not.toBeInTheDocument();
-});
-
-it('cooking oil opens add-food with oil searched', async () => {
+it('a missed food opens add-food on it, and the day is not marked', async () => {
   await start();
-  await openFood();
-  await userEvent.click(await screen.findByRole('button', { name: 'cooking oil' }));
+  const check = await chooseComplete();
+  await userEvent.click(within(check!).getByRole('button', { name: 'Cooking oil' }));
   const sheet = await foodSheet();
   expect(within(sheet).getByRole('textbox', { name: 'Search foods' })).toHaveValue('oil');
+  expect(await marked()).toBe('unmarked');
 });
 
 it('bites and tastes opens the estimate sheet at Light', async () => {
   await start();
-  await openFood();
-  await userEvent.click(await screen.findByRole('button', { name: 'bites and tastes' }));
+  const check = await chooseComplete();
+  await userEvent.click(within(check!).getByRole('button', { name: 'Bites and tastes' }));
   const sheet = await foodSheet();
   expect(within(sheet).getByRole('heading', { name: 'Estimate a meal' })).toBeInTheDocument();
   expect(within(sheet).getByRole('button', { name: /^Light · about/ })).toHaveAttribute('aria-pressed', 'true');
 });
 
-it('a month in, shown yesterday: not shown', async () => {
+it('closing the check marks nothing', async () => {
+  await start();
+  await chooseComplete();
+  await userEvent.keyboard('{Escape}');
+  await expect.poll(() => screen.queryByRole('dialog')).toBeNull();
+  expect(await marked()).toBe('unmarked');
+});
+
+it('the chips under a completed day are gone', async () => {
+  await start();
+  await repos.dayMarks.setCompleteness(today, 'complete');
+  renderApp(repos, today);
+  await openTab('Food');
+  await screen.findByText('Soup');
+  expect(screen.queryByText('Easy to miss')).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'cooking oil' })).not.toBeInTheDocument();
+});
+
+it('a month in, asked yesterday: marked at once', async () => {
   await start({ dayOfUse: 30 });
   await repos.preferences.markEasyToMissShown(today.addDays(-1));
-  await openFood();
-  expect(line()).not.toBeInTheDocument();
+  expect(await chooseComplete()).toBeNull();
+  await expect.poll(marked).toBe('complete');
 });
 
-it('a month in, not shown for a week: shown', async () => {
+it('a month in, not asked for a week: asked', async () => {
   await start({ dayOfUse: 30 });
   await repos.preferences.markEasyToMissShown(today.addDays(-8));
-  await openFood();
-  expect(await screen.findByText('Easy to miss')).toBeInTheDocument();
+  expect(await chooseComplete()).not.toBeNull();
 });
 
-it('turned off in settings, it never appears', async () => {
+it('turned off in settings, never asked', async () => {
   await start();
   await repos.preferences.saveEasyToMissEnabled(false);
-  await openFood();
-  expect(line()).not.toBeInTheDocument();
+  expect(await chooseComplete()).toBeNull();
+  await expect.poll(marked).toBe('complete');
 });
 
-it('not shown with an eating-disorder history', async () => {
+it('never asked with an eating-disorder history', async () => {
   await start({ eatingDisorderHistory: true });
-  await openFood();
-  expect(line()).not.toBeInTheDocument();
+  expect(await chooseComplete()).toBeNull();
+  await expect.poll(marked).toBe('complete');
 });
 
-it('not shown while logged days sit far below the floor', async () => {
+it('never asked while logged days sit far below the floor', async () => {
   await start({ dayOfUse: 41 });
   for (let i = 1; i <= 9; i++) {
     const day = today.addDays(-i);
     await repos.food.addFood(foodOn(day, { name: 'Food', kcal: 1050, proteinG: 80, carbsG: 100, fatG: 30 }));
     await repos.dayMarks.setCompleteness(day, 'complete');
   }
-  await repos.food.addFood(foodOn(today, { kcal: 2000, proteinG: 120, carbsG: 220, fatG: 70 }));
-  await openFood();
-  expect(line()).not.toBeInTheDocument();
+  expect(await chooseComplete()).toBeNull();
 });

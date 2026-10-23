@@ -20,6 +20,8 @@ const notContainers: Record<string, string> = {
   '.mm-progress': 'A bar that clips its fill; nothing in it is pressed.',
   '.mm-progress-wave': 'The fill’s ripple, clipped to its round end (MM-329); nothing in it is pressed.',
   '.mm-picker-value': 'A line of text that ends in an ellipsis.',
+  '.mm-nutrient-row-source-name': 'A food’s name in a nutrient’s list, ending in an ellipsis (MM-561).',
+  '.mm-popover-row-label': 'A food’s name in a popover’s list, ending in an ellipsis (MM-562).',
   '.mm-camera': 'The camera’s picture and the last photo over it, clipped to its corners (MM-157); nothing in it is pressed.',
 };
 

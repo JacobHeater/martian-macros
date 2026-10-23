@@ -25,6 +25,7 @@ import { gradeCalibrationFoods } from '../support/gradeCalibrationFoods';
 const lentils: GradeNutrition = {
   kcal: 116,
   proteinG: 9,
+  carbsG: 20,
   fiberG: 7.9,
   sodiumMg: 2,
   sugarsG: 1.8,
@@ -233,13 +234,37 @@ describe('gradeOfNutrition', () => {
   });
 
   it('names what is missing and never counts it as zero', () => {
-    expect(gradeOfNutrition({ ...lentils, fiberG: undefined, sodiumMg: undefined })).toEqual({
+    expect(gradeOfNutrition({ ...lentils, carbsG: undefined, fiberG: undefined, sodiumMg: undefined })).toEqual({
       kind: 'ungradable',
-      reason: 'Can’t be graded: fiber and sodium aren’t stated for this food.',
+      reason: 'Fiber and sodium aren’t stated for this food, so it can’t be graded.',
     });
     expect(gradeOfNutrition({ ...lentils, sodiumMg: undefined })).toEqual({
       kind: 'ungradable',
-      reason: 'Can’t be graded: sodium isn’t stated for this food.',
+      reason: 'Sodium isn’t stated for this food, so it can’t be graded.',
+    });
+  });
+
+  // MM-567: grated parmesan said "fiber isn't stated", yet with almost no carbs fiber cannot change its letter.
+  it('grades a food whose unstated fiber could not change its letter, and says fiber was not stated', () => {
+    const parmesan: GradeNutrition = {
+      kcal: 392,
+      proteinG: 36,
+      carbsG: 3.2,
+      fiberG: undefined,
+      sodiumMg: 1600,
+      sugarsG: 0.8,
+      saturatedFatG: 16,
+      alcoholG: undefined,
+      micros: {},
+    };
+    const graded = gradeOfNutrition(parmesan);
+    expect(graded).toMatchObject({ kind: 'graded', notCounted: ['fiber', 'micronutrients'] });
+    expect(graded).toEqual({ ...gradeOfNutrition({ ...parmesan, fiberG: 0 }), notCounted: ['fiber', 'micronutrients'] });
+    expect(gradeOfNutrition({ ...parmesan, carbsG: 0, sugarsG: undefined })).toMatchObject({ kind: 'graded' });
+    // Where the carbs could hold enough fiber to move the letter, it is still not guessed.
+    expect(gradeOfNutrition({ ...lentils, fiberG: undefined })).toEqual({
+      kind: 'ungradable',
+      reason: 'Fiber isn’t stated for this food, and with its carbs it could change the grade.',
     });
   });
 
@@ -320,7 +345,7 @@ describe('a pack food, a food of one’s own, and a logged entry', () => {
   it('grades a pack food from its values per 100 g, counting what it states', () => {
     expect(gradeOfCatalogFood(pack({}))).toEqual({ kind: 'graded', letter: 'A-', score: 11, notCounted: ['sugars', 'saturatedFat', 'micronutrients'], statedMicronutrients: 0 });
     expect(gradeOfCatalogFood(pack({ sugars: 1.8, saturatedFat: 0.05, potassium: 369, calcium: 19, iron: 3.3, magnesium: 36, zinc: 1.3, folate: 181 }))).toMatchObject({ kind: 'graded', notCounted: [], statedMicronutrients: 6 });
-    expect(gradeOfCatalogFood(pack({}, { fiberG: undefined }))).toMatchObject({ kind: 'ungradable', reason: 'Can’t be graded: fiber isn’t stated for this food.' });
+    expect(gradeOfCatalogFood(pack({}, { fiberG: undefined }))).toMatchObject({ kind: 'ungradable', reason: 'Fiber isn’t stated for this food, and with its carbs it could change the grade.' });
   });
 
   it('grades a food of one’s own by its serving weight, and never a recipe', () => {
@@ -338,7 +363,7 @@ describe('a pack food, a food of one’s own, and a logged entry', () => {
     expect(gradeOfCustomFood(bar)).toEqual({ kind: 'graded', letter: 'B+', score: 7, notCounted: ['micronutrients'], statedMicronutrients: 0 });
     expect(gradeOfCustomFood(new CustomFood({ ...bar, id: 2, servingGrams: undefined })).kind).toBe('ungradable');
     expect(gradeOfCustomFood(new CustomFood({ ...bar, id: 4, micros: new Micronutrients({ sodium: 150 }) }))).toMatchObject({ notCounted: ['sugars', 'saturatedFat', 'micronutrients'] });
-    expect(gradeOfCustomFood(new CustomFood({ ...bar, id: 5, micros: new Micronutrients({}) }))).toMatchObject({ kind: 'ungradable', reason: 'Can’t be graded: sodium isn’t stated for this food.' });
+    expect(gradeOfCustomFood(new CustomFood({ ...bar, id: 5, micros: new Micronutrients({}) }))).toMatchObject({ kind: 'ungradable', reason: 'Sodium isn’t stated for this food, so it can’t be graded.' });
     const recipe = new CustomFood({ id: 3, name: 'Stew', kind: 'recipe', servingDescription: '1 bowl', servings: 4, cookedWeightGrams: 1600, perServing: bar.perServing, ingredients: [] });
     expect(gradeOfCustomFood(recipe)).toMatchObject({ kind: 'ungradable', reason: 'Recipes can’t be graded yet: their ingredients don’t carry fiber or sodium.' });
   });

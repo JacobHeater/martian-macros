@@ -93,7 +93,7 @@ it('food can be logged to a past day', async () => {
 it('being over target is stated plainly', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40))], foods: [food('Big meal', 3000, today)] });
   await openFood();
-  expect(await screen.findByText('kcal over 2,400')).toBeInTheDocument();
+  expect(await screen.findByText('over 2,400')).toBeInTheDocument();
   expect(screen.getByText('600')).toBeInTheDocument();
 });
 

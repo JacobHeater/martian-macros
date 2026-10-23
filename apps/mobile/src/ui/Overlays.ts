@@ -2,6 +2,7 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { ReactNode } from 'react';
 import type { MmAnchor } from './MmAnchor';
 import type { MmMenuItem } from './MmMenuItem';
+import type { MmPopoverRow } from './MmPopoverRow';
 
 /**
  * The questions and short messages a screen can put over itself. Each
@@ -70,9 +71,14 @@ export interface Overlays {
 
   /**
    * Brings a panel up from the bottom of the screen. `content` draws it and
-   * is given the way to close it, with an answer or without one.
+   * is given the way to close it, with an answer or without one. A "tall"
+   * sheet keeps one height whatever it holds (MM-566).
    */
-  sheet<T>(label: string, content: (close: (answer?: T) => void) => ReactNode): Promise<T | undefined>;
+  sheet<T>(
+    label: string,
+    content: (close: (answer?: T) => void) => ReactNode,
+    options?: { size?: 'fit' | 'tall' },
+  ): Promise<T | undefined>;
 
   /**
    * Opens a short menu of actions at `anchor` (the trigger's edges), drawn
@@ -85,9 +91,16 @@ export interface Overlays {
    * Explains something in a few words beside what was pressed, at `anchor`
    * (MM-370), drawn where nothing can clip it. Resolves once it is closed.
    * `label` is what a screen reader hears for it, when the title reads
-   * badly aloud ("Grade B-" said as "Grade B minus").
+   * badly aloud ("Grade B-" said as "Grade B minus"). `rows`, when given,
+   * are listed under the message (MM-562: a macro's top foods).
    */
-  popover(explanation: { title: string; message: string; anchor: MmAnchor; label?: string | undefined }): Promise<void>;
+  popover(explanation: {
+    title: string;
+    message?: string | undefined;
+    rows?: readonly MmPopoverRow[] | undefined;
+    anchor: MmAnchor;
+    label?: string | undefined;
+  }): Promise<void>;
 
   /**
    * Closes the question on top as simply dismissed, as the phone's back

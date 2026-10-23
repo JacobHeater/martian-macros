@@ -21,6 +21,15 @@ export class InMemoryFoodRepository implements FoodRepository {
     return this.entries.watchAs((all) => all.filter((e) => e.date.epochDay === date.epochDay));
   }
 
+  watchFoodBetween(first: CalendarDate, last: CalendarDate): Watched<FoodEntry[]> {
+    return this.entries.watchAs((all) =>
+      all
+        .filter((e) => e.date.epochDay >= first.epochDay && e.date.epochDay <= last.epochDay)
+        // Stable: entries of one day stay in the order added.
+        .sort((a, b) => a.date.epochDay - b.date.epochDay),
+    );
+  }
+
   async addFood(entry: FoodEntry): Promise<number> {
     const id = this.nextId++;
     this.entries.value = [
@@ -41,6 +50,7 @@ export class InMemoryFoodRepository implements FoodRepository {
         sodiumMg: entry.sodiumMg,
         alcoholG: entry.alcoholG,
         micros: entry.micros,
+        eatenAt: entry.eatenAt,
       }),
     ];
     return id;

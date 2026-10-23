@@ -27,6 +27,10 @@ export class MirroredFoodLog implements FoodRepository {
     return this.log.watchFood(date);
   }
 
+  watchFoodBetween(first: CalendarDate, last: CalendarDate): Watched<FoodEntry[]> {
+    return this.log.watchFoodBetween(first, last);
+  }
+
   watchRecentFoods(options?: { limit?: number }): Watched<FoodEntry[]> {
     return this.log.watchRecentFoods(options);
   }

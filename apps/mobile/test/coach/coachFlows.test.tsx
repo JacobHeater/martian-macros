@@ -135,14 +135,14 @@ async function seedArc(): Promise<void> {
   );
 }
 
-const arcs = () => document.querySelectorAll('.app-layer:not([hidden]) .mm-horizon');
+const arcs = () => document.querySelectorAll('.app-layer:not([hidden]) .chart-intake');
 
 for (const tab of ['Dashboard', 'Coach']) {
   it(`${tab} shows exactly one arc`, async () => {
     await seedArc();
     renderApp(repos, today);
     if (tab !== 'Dashboard') await openTab(tab);
-    await screen.findByText(/kcal left of 2,000/);
+    await screen.findByText(/left of 2,000/);
     expect(arcs()).toHaveLength(1);
   });
 }
@@ -151,7 +151,7 @@ it('the Coach screen has no calorie figure of its own', async () => {
   await seedArc();
   renderApp(repos, today);
   await openTab('Coach');
-  expect(await screen.findByText(/kcal left of 2,000/)).toBeInTheDocument();
+  expect(await screen.findByText(/left of 2,000/)).toBeInTheDocument();
   // The old hero card said "kcal a day" under a figure of its own.
   expect(screen.queryByText('kcal a day')).not.toBeInTheDocument();
   expect(screen.queryByText('Daily targets')).not.toBeInTheDocument();
@@ -167,5 +167,5 @@ it('during a pause the Coach arc is the guide, never over', async () => {
   await openTab('Coach');
   expect(await screen.findByText(/paused, guide/)).toBeInTheDocument();
   expect(arcs()).toHaveLength(1);
-  expect(screen.queryByText(/kcal over/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^over [\d,]+/)).not.toBeInTheDocument();
 });
