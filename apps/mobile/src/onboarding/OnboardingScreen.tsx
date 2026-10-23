@@ -28,6 +28,7 @@ import { useLoaded } from '../app/useLoaded';
 import { healthPlatformName } from '../format/healthPlatformName';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import type { HealthDataType } from '../healthIngest/HealthDataType';
+import { MartianRidge } from '../ui/MartianRidge';
 import { MmButton } from '../ui/MmButton';
 import { StepProgress } from '../ui/StepProgress';
 import { useOverlays } from '../ui/useOverlays';
@@ -419,7 +420,10 @@ export function OnboardingScreen() {
       <div className="onboarding-progress">
         <StepProgress current={step} count={stepCount} />
       </div>
-      <main className="app-body app-body-roomy">{body}</main>
+      <main className="app-body app-body-roomy">
+        {body}
+        <MartianRidge />
+      </main>
       <div className="onboarding-actions">
         {step > 0 ? <MmButton label="Back" kind="text" onPress={saving ? undefined : () => setStep(step - 1)} /> : null}
         <span className="onboarding-spacer" />
