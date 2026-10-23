@@ -138,6 +138,11 @@ async function markComplete(name: string, kcal: number): Promise<HTMLElement> {
   await userEvent.click(await screen.findByRole('button', { name: /^Is this day fully logged\?/ }));
   const options = await screen.findByRole('dialog', { name: 'Is this day fully logged?' });
   await userEvent.click(within(options).getByRole('option', { name: 'Complete' }));
+  // In the first weeks the easy-to-miss check comes first (MM-575); nothing was missed.
+  const asked = await screen.findByRole('dialog', { name: /^(Anything easy to miss\?|Is this everything you ate today\?)$/ });
+  if (asked.getAttribute('aria-label') === 'Anything easy to miss?') {
+    await userEvent.click(within(asked).getByRole('button', { name: 'Nothing missed, mark complete' }));
+  }
   return screen.findByRole('dialog', { name: 'Is this everything you ate today?' });
 }
 
