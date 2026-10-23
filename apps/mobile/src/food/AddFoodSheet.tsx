@@ -49,6 +49,7 @@ import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
 import { defaultMeal } from './defaultMeal';
+import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
 import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { FoodAmountStep } from './FoodAmountStep';
@@ -59,6 +60,7 @@ import { OnlineSearchResults } from './online/OnlineSearchResults';
 import { MealChips } from './MealChips';
 import { RecentFoodRow } from './RecentFoodRow';
 import { BarcodeScanStep } from './scan/BarcodeScanStep';
+import { TimeEatenRow } from './TimeEatenRow';
 import './food.css';
 
 interface AddFoodSheetProps {
@@ -270,6 +272,10 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const [askAlcohol, setAskAlcohol] = useState(false);
   const [meal, setMeal] = useState<Meal>(() => entry?.meal ?? firstMeal ?? defaultMeal(services.clock));
   const [day, setDay] = useState(entry?.date ?? firstDay);
+  // An entry being corrected keeps its time until it is changed; a new one logged for today starts at now (MM-570).
+  const [eatenAt, setEatenAt] = useState<number | undefined>(() =>
+    entry === undefined ? eatenAtWhenLogged(firstDay, services.clock) : entry.eatenAt,
+  );
   const set = (changes: Partial<Form>) => setForm((current) => ({ ...current, ...changes }));
 
   const p = parseNumber(form.protein) ?? 0;
@@ -468,6 +474,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         calc === undefined
           ? scaledMicros.with('sugars', typed(form.sugars)).with('saturatedFat', typed(form.saturatedFat))
           : scaledMicros,
+      eatenAt,
     });
     await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
     onDone();
@@ -749,6 +756,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       ) : null}
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       {/* What will be recorded, in every state the action is enabled, and before it is (MM-218): one wording across the sheet. */}
       {totals !== undefined ? (
         <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="logged-totals">

@@ -1,20 +1,7 @@
 import type { FoodEntry } from '../domain/FoodEntry';
-import type { Meal } from '../domain/Meal';
+import { mealUsualMinute } from '../domain/mealUsualMinute';
 import type { NutritionRecord } from '../healthIngest/NutritionRecord';
 import { foodRecordId } from './foodRecordId';
-
-/**
- * When each meal is written on its day, as hours and minutes (MM-70). The
- * app keeps a food's day and meal, not the minute it was logged, so a meal
- * is written at the same time whenever it is written again, and an edit
- * replaces it rather than moving it.
- */
-const mealTime: Record<Meal, readonly [hour: number, minute: number]> = {
-  breakfast: [8, 0],
-  lunch: [12, 30],
-  snack: [15, 30],
-  dinner: [18, 30],
-};
 
 /** How long each written meal lasts on the platform, which wants a span. */
 const mealMs = 30 * 60 * 1000;
@@ -26,8 +13,10 @@ const mealMs = 30 * 60 * 1000;
  * own, so a change replaces it and a removal finds it.
  */
 export function nutritionRecordOf(entry: FoodEntry, id: number, namespace: string): NutritionRecord {
-  const [hour, minute] = mealTime[entry.meal];
-  const start = new Date(entry.date.year, entry.date.month - 1, entry.date.day, hour, minute);
+  // At the time it was eaten when that is known (MM-570), otherwise at its meal's usual time (MM-70). The time is the
+  // entry's own, so a food is written at the same time whenever it is written again, and an edit replaces it.
+  const minute = entry.eatenAt ?? mealUsualMinute(entry.meal);
+  const start = new Date(entry.date.year, entry.date.month - 1, entry.date.day, Math.trunc(minute / 60), minute % 60);
   return {
     id: foodRecordId(namespace, id),
     start,

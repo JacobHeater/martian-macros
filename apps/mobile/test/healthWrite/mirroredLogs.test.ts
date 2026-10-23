@@ -87,6 +87,14 @@ describe('food (MM-70)', () => {
     expect(written?.saturatedFatG).toBeUndefined();
   });
 
+  it('MM-570: a food with a time eaten is written at that time, on its own day', async () => {
+    const { platform, food } = setUp(true);
+    const id = await food.addFood(
+      new FoodEntry({ id: 0, date: today, meal: 'lunch', name: 'Soup', kcal: 300, proteinG: 10, carbsG: 30, fatG: 8, source: 'weighed', eatenAt: 13 * 60 + 7 }),
+    );
+    expect(platform.nutrition.get(`martian-macros-food-ns1-${id}`)?.start).toEqual(new Date(2026, 9, 5, 13, 7));
+  });
+
   it('An edit is mirrored: changed to 450 kcal, the platform has 450, not 960', async () => {
     const { platform, food } = setUp(true);
     const id = await food.addFood(lunch(510));
