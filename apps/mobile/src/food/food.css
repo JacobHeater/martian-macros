@@ -198,14 +198,31 @@
 .food-easy-to-miss-confirm {
   margin-top: var(--space-16);
 }
+/* Room to breathe on a sheet (MM-576): 28 px from its sides, and a break between every field, row of chips and group. */
 .food-sheet {
-  padding: var(--space-4) var(--space-16) var(--space-16);
+  padding: var(--space-4) calc(var(--space-24) + var(--space-4)) calc(var(--space-24) + var(--space-4));
 }
-.food-label-spaced {
+.food-sheet > .mm-field,
+.food-sheet > .food-fields,
+.food-sheet > .food-extra-fields {
   margin-top: var(--space-12);
 }
-.food-chips {
+.food-sheet > .app-row {
   margin-top: var(--space-8);
+}
+.food-sheet > .mm-list-row {
+  margin-block: var(--space-8) 0;
+}
+/* A text action's label lines up with the words above it: its tap area keeps its padding, which hangs out. */
+.food-sheet > .mm-button-text:not(.mm-button-expand) {
+  margin-top: var(--space-4);
+  margin-inline-start: calc(-1 * var(--space-12));
+}
+.food-label-spaced {
+  margin-top: calc(var(--space-24) + var(--space-4));
+}
+.food-chips {
+  margin-top: var(--space-12);
 }
 .food-fields {
   display: flex;
@@ -219,7 +236,7 @@
   flex: 1.5;
 }
 .food-totals {
-  margin: var(--space-12) 0 0;
+  margin: var(--space-20) 0 0;
 }
 .food-ingredient-adder {
   margin-top: var(--space-12);

@@ -121,3 +121,15 @@ it('a copy has no time eaten, whatever the original had', () => {
   const [copy] = entriesCopiedTo(today, [foodOn(today.addDays(-1), { name: 'Pasta', eatenAt: 19 * 60 })]);
   expect(copy?.eatenAt).toBeUndefined();
 });
+
+it('the meal and the time eaten come before the food name, at the top of the form (MM-576)', async () => {
+  renderApp(repos, today);
+  await openTab('Food');
+  const sheet = await openAddFood('breakfast');
+  await enterManually(sheet);
+  const name = within(sheet).getByLabelText('Food name');
+  const meal = within(sheet).getByRole('group', { name: 'Meal' });
+  // Each control precedes the next in the document, so it is read and reached first.
+  expect(meal.compareDocumentPosition(timeRow(sheet)) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(timeRow(sheet).compareDocumentPosition(name) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+});
