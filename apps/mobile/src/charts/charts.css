@@ -298,3 +298,123 @@
   width: 16px;
   border-top: 2px dashed color-mix(in srgb, var(--text2) 60%, transparent);
 }
+
+/* ---- Every Progress section's graphic (MM-578) ---- */
+/* A graphic with nothing to draw yet: its frame, faint, with what it waits for over it. */
+.chart-placeholder {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 100px;
+  margin: var(--space-8) 0;
+}
+.chart-placeholder-tall {
+  min-height: 190px;
+}
+.chart-placeholder-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.chart-placeholder-grid {
+  stroke: var(--outline);
+  stroke-width: 1;
+  stroke-dasharray: 4 6;
+  vector-effect: non-scaling-stroke;
+}
+.chart-placeholder-words {
+  position: relative;
+  max-width: 32ch;
+  padding: var(--space-24) var(--space-12);
+  text-align: center;
+}
+.chart-placeholder-text {
+  display: flex;
+  gap: var(--space-8);
+  align-items: flex-start;
+  margin: 0;
+  color: var(--text);
+  font: var(--type-caption);
+  text-align: start;
+}
+.chart-placeholder-text .mm-icon {
+  flex: none;
+  color: var(--text2);
+}
+.chart-placeholder-count {
+  /* In line with the words above it, past the icon. */
+  margin: var(--space-4) 0 0 calc(20px + var(--space-8));
+  text-align: start;
+  color: var(--text2);
+  font: var(--type-caption);
+}
+/* Days on a line: a weight event's dot in caution, a period day's in the trend's colour. */
+.chart-track {
+  margin: var(--space-8) 0;
+}
+.chart-track-mark {
+  stroke: var(--canvas);
+  stroke-width: 1.5;
+}
+.chart-track-event .chart-track-mark {
+  fill: var(--caution);
+}
+.chart-track-period .chart-track-mark {
+  fill: var(--ion);
+}
+/* Nights of sleep: a bar each, an open slot where a night was not recorded, the chosen night strongest. */
+.chart-nights {
+  margin: var(--space-8) 0 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  border-radius: var(--radius-control);
+}
+.chart-nights:focus-visible {
+  outline: 2px solid var(--ion);
+  outline-offset: 2px;
+}
+/* The chosen night's column, lit behind its bar; the whole column answers a tap. */
+.chart-night-column {
+  fill: color-mix(in srgb, var(--text) 10%, transparent);
+}
+.chart-night-hit {
+  fill: transparent;
+}
+.chart-night-letter.chart-night-picked {
+  fill: var(--chosen);
+  font-weight: 600;
+}
+.chart-night {
+  fill: color-mix(in srgb, var(--ion) 40%, transparent);
+}
+/* The seven-night average, in the trend's colour over the muted bars, as the weight trend's line is. */
+.chart-night-trend {
+  color: var(--ion);
+  pointer-events: none;
+}
+.chart-night-missing {
+  fill: none;
+  stroke: var(--outline);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+.chart-night.chart-night-picked {
+  fill: var(--chosen);
+}
+.chart-night-missing.chart-night-picked {
+  stroke: var(--chosen);
+}
+/* A lift's or a site's small line, at the end of its row. */
+.chart-row-trend {
+  display: block;
+}
+/* A graphic in a section runs the column's width, under the section's icon too, as its list group and surface do
+   (MM-344); only words stay in line with the title. */
+.mm-section-body > .chart-placeholder,
+.mm-section-body > .chart-plot {
+  margin-left: calc(-1 * (24px + var(--space-12)));
+}
+.mm-section-body > .chart-plot {
+  width: calc(100% + 24px + var(--space-12));
+}

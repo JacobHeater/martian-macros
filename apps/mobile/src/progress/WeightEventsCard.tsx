@@ -1,3 +1,5 @@
+import { ChartPlaceholder } from '../charts/ChartPlaceholder';
+import { DayTrack } from '../charts/DayTrack';
 import type { WeightEvent } from '../domain/WeightEvent';
 import { WeightEventType } from '../domain/WeightEventType';
 import { effectiveWeightEvents } from '../engine/effectiveWeightEvents';
@@ -21,7 +23,10 @@ const same = (a: WeightEvent, b: WeightEvent) => a.date === b.date && a.type ===
  * The things the user has noted that move the scale without being fat or
  * muscle: illness, travel, a training change, a big meal, creatine. A
  * section with the add action in its header and one row per event, newest
- * first, each with its icon and what it does to the trend (MM-257).
+ * first, each with its icon and what it does to the trend (MM-257). Above
+ * the rows, the trend chart's days as a line with a dot on each event's, or
+ * what the line waits for (MM-578). Folded to a line of how many fall in the
+ * trend's range, beside its add action (MM-578).
  */
 export function WeightEventsCard() {
   const { services, state } = useApp();
@@ -29,6 +34,7 @@ export function WeightEventsCard() {
   const events = useCell(state.weightEvents);
   const setup = useLoaded(state.setup);
   const today = useCell(state.today);
+  const rangeDays = useCell(state.progressRangeDays);
 
   const remove = async (event: WeightEvent) => {
     try {
@@ -46,12 +52,32 @@ export function WeightEventsCard() {
     });
     if (all.length === 0) {
       return (
-        <p className="app-caption">
-          Note illness, travel, a training change, a big meal or creatine here, so the trend can tell water from
-          tissue.
-        </p>
+        <ChartPlaceholder
+          text={
+            'No weight events yet. Note illness, travel, a training change, a big meal or creatine here, so the trend ' +
+            'can tell water from tissue. Each one is a dot on the trend’s days.'
+          }
+        />
       );
     }
+    const start = today.addDays(1 - rangeDays);
+    const inRange = all.filter((event) => !event.date.isBefore(start));
+    const track =
+      inRange.length === 0 ? (
+        <ChartPlaceholder text={`None in the last ${rangeDays} days, the trend chart’s range. Earlier events are listed below.`} />
+      ) : (
+        <DayTrack
+          days={rangeDays}
+          today={today}
+          marks={inRange.map((event) => event.date)}
+          kind="event"
+          label={
+            `Weight events over the last ${rangeDays} days: ` +
+            inRange.map((event) => `${weightEventLabel(event.type)}, ${Fmt.day(event.date, today)}`).join('; ') +
+            '.'
+          }
+        />
+      );
     const effective = effectiveWeightEvents(stored);
     const effect = (event: WeightEvent) => {
       if (event.type === 'startedCreatine' || event.type === 'stoppedCreatine') {
@@ -61,7 +87,7 @@ export function WeightEventsCard() {
         ? 'Scale noise widened around this event.'
         : 'Recorded only; two other events in this 14-day window already affect the trend.';
     };
-    return [...all].reverse().map((event) => (
+    const rows = [...all].reverse().map((event) => (
       <MmListRow
         key={`${event.date.epochDay}-${event.type}`}
         leadingIcon={weightEventIcon(event.type)}
@@ -79,12 +105,34 @@ export function WeightEventsCard() {
         }
       />
     ));
+    return (
+      <>
+        {track}
+        {rows}
+      </>
+    );
   };
+
+  // Folded to a line once the events are read (the owner, 2026-10-22, MM-578), as Sleep and Waist are; while they are
+  // being read, or could not be, the section stays open so what it says is seen.
+  let summary: string | undefined;
+  if (events.ready) {
+    const fromOnboarding = onboardingCreatine(events.value, setup);
+    const known = [...events.value, ...(fromOnboarding === undefined ? [] : [fromOnboarding])];
+    const shown = known.filter((event) => !event.date.isBefore(today.addDays(1 - rangeDays))).length;
+    if (known.length === 0) summary = 'None noted yet.';
+    else if (shown === 0) summary = `None in the last ${rangeDays} days; ${known.length} earlier.`;
+    else summary = `${shown} in the last ${rangeDays} days.`;
+  }
 
   return (
     <MmSection
       icon="calendar"
       title="Weight events"
+      summary={summary}
+      collapsible={events.ready}
+      initiallyExpanded={false}
+      remember="progress.weight-events"
       trailing={
         <MmIconButton
           icon="plus"

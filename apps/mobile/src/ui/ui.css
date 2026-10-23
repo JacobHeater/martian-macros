@@ -2157,11 +2157,14 @@
 .mm-section-body[hidden] {
   display: none;
 }
-/* A list group, a surface or a failed read's notice inside a section runs the column's width (MM-344). */
+/* A list group, a surface or a failed read's notice inside a section runs the column's width (MM-344). Its width is
+   left to fill the row: a surface's own 100% is the indented body's, which stopped it 36 px short of the edge
+   (MM-579). */
 .mm-section-body > .mm-list-group,
 .mm-section-body > .mm-surface,
 .mm-section-body > [role='alert'],
 .mm-section-body-flush {
+  width: auto;
   margin-left: calc(-1 * (24px + var(--space-12)));
 }
 
@@ -2441,6 +2444,11 @@
   position: relative;
   isolation: isolate;
   flex: none;
+  /* Clear ground above the ridge (MM-581): on a long page its auto margin is nothing, and the alien's tap area reached
+     over the last row, so a tap meant for it could press the row or button above. A transparent border, not padding,
+     so the alien, the UFO and the ridge, placed inside it, keep their places; it lets presses through as the rest. */
+  box-sizing: content-box;
+  border-top: 24px solid transparent;
   height: 56px;
   pointer-events: none;
 }
@@ -2565,8 +2573,14 @@
     opacity: 1;
     transform: translate(0, -4px) rotate(-4deg);
   }
-  100% {
+  60% {
     opacity: 1;
+    transform: translate(18px, -30vh) rotate(-8deg);
+  }
+  /* Gone by the end of the flight (MM-580): kept at its last frame for the five seconds the alien is away, a UFO still
+     drawn there sat in the page, over the app bar, when the person scrolled back up. */
+  100% {
+    opacity: 0;
     transform: translate(48px, -100vh) rotate(-12deg);
   }
 }
