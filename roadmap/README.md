@@ -289,7 +289,7 @@ changes unless the step's description no longer fits.
 
 **When a session ends:** say in `requirements/HANDOFF.md` which workstream
 step or milestone the session advanced and what that makes available, or
-that nothing moved and why. Run `mm roadmap` so the progress page agrees.
+that nothing moved and why.
 
 **When a ticket is added:**
 
@@ -327,7 +327,8 @@ terms of use were placed, and the file names here name the React app. See
 - the ordering edges contain no cycle;
 - each milestone's ticket list matches the steps tagged with it.
 
-`mm roadmap --check` says whether the committed progress page is current.
+The progress page is not committed (owner, 2026-10-22): `mm roadmap` builds
+it locally to look at, and nothing checks it.
 
 ## Limits of this roadmap
 

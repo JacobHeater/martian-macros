@@ -75,8 +75,9 @@ Agent usage goes to feature work, not validation. CI validates.
 - **Keep the roadmap current (MM-245).** A ticket you create goes into a
   workstream in the same PR, as `built` when it is done and `remaining` and in
   a step otherwise. Insert it next to a related ID, not at the end of a list,
-  so sibling PRs touch different lines. Run `mm roadmap` (a generator, not a
-  check) so the committed progress page agrees.
+  so sibling PRs touch different lines. The progress page
+  (`roadmap/progress.html`) is not committed (owner, 2026-10-22): never
+  regenerate or stage it; `mm roadmap` builds it locally on request.
 - **Keep the handoff current (MM-174)**, once a session: add the session at
   the top, delete the oldest of the three, and keep "Where things stand"
   true and short (what is in flight, what to build next, what waits on the
