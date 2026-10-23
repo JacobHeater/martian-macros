@@ -138,3 +138,5 @@ so rice is offered oil too; the fade stays by calendar days since onboarding, th
 ## UI/UX
 - Cooked with oil, which fat — apps/mobile/src/gallery/screens/Food.stories.tsx (Story: AddFoodAmountCookedWithOil). The chip
   row below the spoon, built like "Amount in"; the Logs line naming both entries.
+
+**Changed by the owner on 2026-10-22 (MM-575):** the line of chips under a completed day is gone; the same four items are asked as the day is marked complete, and only "nothing missed" marks it.

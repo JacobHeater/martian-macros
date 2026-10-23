@@ -27,8 +27,7 @@ it('no stylesheet gives text a macro colour', () => {
 it("the split's names and figures are text, with the macro's colour on a key before the name", () => {
   const day = CalendarDate.of(2026, 10, 16);
   const view = render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 566, proteinG: 40, carbsG: 61, fatG: 18 })} compact />);
-  const item = screen.getByText('40 g · 28.3%').closest('li')!;
-  expect(item.className).toBe('chart-split-item');
+  expect(screen.getByText('40 g · 28.3%').closest('.chart-split-item')).not.toBeNull();
   for (const macro of ['protein', 'carbs', 'fat']) {
     expect(view.container.querySelector(`.chart-split-item .chart-key-${macro}`), macro).not.toBeNull();
   }

@@ -77,8 +77,8 @@ export function nutrientDensityScore(per100g: NutrientDensityInput): NutrientDen
   return { score, points, micronutrientsPercent, statedMicronutrients: stated.length, sugarsKept, notCounted: order(notCounted) };
 }
 
-/** Sugars, saturated fat, then the vitamins and minerals, as the popover names them. */
+/** Fiber, sugars, saturated fat, then the vitamins and minerals, as the popover names them. */
 function order(omissions: readonly GradeOmission[]): readonly GradeOmission[] {
-  const sequence: readonly GradeOmission[] = ['sugars', 'saturatedFat', 'micronutrients'];
+  const sequence: readonly GradeOmission[] = ['fiber', 'sugars', 'saturatedFat', 'micronutrients'];
   return sequence.filter((o) => omissions.includes(o));
 }

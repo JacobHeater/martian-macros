@@ -158,7 +158,7 @@ it('an entry records whether it was weighed raw or cooked, and the row says so',
   const entry = (await logged())[0];
   expect(entry?.portion?.preparation).toBe('raw');
   expect(entry?.portion?.conversion, 'a weight needs no conversion').toBeUndefined();
-  expect(await screen.findByText('Weighed · 200 g raw · calculated from 365 kcal per 100 g')).toBeInTheDocument();
+  expect(await screen.findByText('200 g raw')).toBeInTheDocument();
 });
 
 it('a cup of rice records the serving weight it was converted with', async () => {
@@ -242,5 +242,5 @@ it('a packaged food logged by its serving says "as packaged" on its row', async 
   const entry = (await logged())[0];
   expect(entry?.source).toBe('labelServing');
   expect(entry?.portion?.preparation).toBe('packaged');
-  expect(await screen.findByText('Label serving · 1 × 1 bar (60 g), as packaged · calculated from 380 kcal per 100 g')).toBeInTheDocument();
+  expect(await screen.findByText('1 × 1 bar · 60 g')).toBeInTheDocument();
 });

@@ -23,6 +23,7 @@ export function gradeOfFoodEntry(entry: FoodEntry, { hand }: { hand?: HandSize |
   return gradeOfNutrition({
     kcal: entry.kcal * scale,
     proteinG: entry.proteinG * scale,
+    carbsG: entry.carbsG * scale,
     fiberG: per100(entry.fiberG),
     sodiumMg: per100(entry.sodiumMg),
     sugarsG: per100(entry.micros.of('sugars')),

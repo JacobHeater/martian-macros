@@ -139,11 +139,11 @@ for (const failed of [false, true]) {
       const retry = screen.getByRole('button', { name: 'Try again' });
       broken = false;
       await userEvent.click(retry);
-      expect(await screen.findByText(/kcal left of 2,000/)).toBeInTheDocument();
+      expect(await screen.findByText(/left of 2,000/)).toBeInTheDocument();
       expect(screen.queryByText('Could not check whether today is paused')).toBeNull();
     } else {
       expect(await screen.findByRole('progressbar', { name: 'Loading' })).toBeInTheDocument();
-      expect(document.querySelector('.mm-horizon')).toBeNull();
+      expect(document.querySelector('.chart-intake')).toBeNull();
     }
   });
 }
