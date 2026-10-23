@@ -53,4 +53,14 @@ describe('the Martian ridge', () => {
     expect(css).toMatch(/animation: mm-ufo-leave var\(--motion-abduct\)/);
     expect(readFileSync('src/theme/tokens.css', 'utf8')).toMatch(/--motion-abduct: 0ms;/);
   });
+
+  // MM-580: the flight ended fully drawn and was held there (`forwards`) until the alien came back, so scrolling up
+  // found the UFO parked in the page.
+  it('MM-580: the UFO has faded out by the end of its flight, so it is never left in the page', () => {
+    const css = readFileSync('src/ui/ui.css', 'utf8');
+    const flight = /@keyframes mm-ufo-leave \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? '';
+    const last = /100% \{([^}]*)\}/.exec(flight)?.[1] ?? '';
+    expect(last).toMatch(/opacity: 0;/);
+    expect(css).toMatch(/animation: mm-ufo-leave var\(--motion-abduct\) ease-in forwards;/);
+  });
 });
