@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { ChartPlaceholder } from '../charts/ChartPlaceholder';
 import { NightsChart } from '../charts/NightsChart';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { SleepNight } from '../domain/SleepNight';
@@ -14,7 +13,6 @@ import { useCell } from '../app/useCell';
 import { MmButton } from '../ui/MmButton';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
-import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmDurationField } from '../ui/MmDurationField';
 import { MmSection } from '../ui/MmSection';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
@@ -27,12 +25,12 @@ const nightsShown = 14;
 
 /**
  * The nights of sleep (MM-250): last night as the section's line, and the
- * last two weeks as chips, each a night to type or correct in hours and
- * minutes, with Save as a quiet action beside the note, as the waist's is.
- * A night is kept against the morning it ended on. A night read from the
- * health platform shows here and is kept unless the person types one for
- * the same morning. Hours only: no score. The fortnight is drawn as bars
- * above the entry, or said to be empty (MM-578).
+ * last two weeks as bars (MM-578), a column a night, recorded or not: a tap
+ * on one chooses that night to type or correct in hours and minutes below,
+ * with Save as a quiet action, as the waist's is. A night is kept against
+ * the morning it ended on. A night read from the health platform shows here
+ * and is kept unless the person types one for the same morning. Hours only:
+ * no score.
  */
 export function SleepNightCard() {
   const { services, state } = useApp();
@@ -41,7 +39,7 @@ export function SleepNightCard() {
   const loaded = useCell(state.sleepNights);
   const [picked, setPicked] = useState<CalendarDate>(today);
   const [typed, setTyped] = useState<{ hours: string; minutes: string }>();
-  const chipsRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<SVGSVGElement>(null);
   // A read that went wrong is said, never shown as no nights (MM-334).
   if (Loadable.hasFailed(loaded)) {
     return (
@@ -76,8 +74,8 @@ export function SleepNightCard() {
     try {
       await services.sleep.saveSleepNight(new SleepNight({ date: picked, minutesAsleep: toSave, source: 'typed' }));
       setTyped(undefined);
-      // Focus to the night just saved, the next thing to choose; not dropped to the page (the MM-416 review).
-      chipsRef.current?.querySelector<HTMLElement>('button[aria-pressed="true"], button')?.focus();
+      // Focus to the nights, the next thing to choose from; not dropped to the page (the MM-416 review).
+      chartRef.current?.focus();
       // Said where the action was taken, and aloud (the panel's F2).
       overlays.snack(`Saved: ${night}, ${sleepDurationText(toSave)}.`);
     } catch {
@@ -93,14 +91,17 @@ export function SleepNightCard() {
   const recent = Array.from({ length: nightsShown }, (_, i) => today.addDays(-i));
   const recorded = recent.filter((date) => byDay.has(date)).length;
   const anyImported = recent.some((date) => byDay.get(date)?.source === 'imported');
-  // The note names the picked night in every state (the panel's F10), then counts the fortnight.
-  let about: string;
-  if (existing === undefined) about = `${night}: not recorded yet.`;
+  // The row's line is the chosen night's alone (the panel's F10); the fortnight is counted under its chart.
+  let note: string;
+  if (existing === undefined) note = 'Not recorded yet.';
   else if (existing.source === 'imported') {
-    about = `${night}: ${sleepDurationText(existing.minutesAsleep)} from ${existing.sourceName ?? platform}. A night you type is used instead.`;
-  } else about = `${night}: ${sleepDurationText(existing.minutesAsleep)}, typed.`;
-  let note = `${about} ${recorded} of the last ${nightsShown} nights recorded.`;
-  if (anyImported && existing?.source !== 'imported') note += ` A night you type is used instead of one read from ${platform}.`;
+    note = `${sleepDurationText(existing.minutesAsleep)} from ${existing.sourceName ?? platform}. Type to use yours instead.`;
+  } else note = `${sleepDurationText(existing.minutesAsleep)}, typed.`;
+  let count =
+    recorded === 0
+      ? `No nights recorded in the last ${nightsShown} yet, 0 of ${nightsShown}. Tap a night to type it.`
+      : `${recorded} of the last ${nightsShown} nights recorded. Tap a night to type or correct it. The line is the 7-night average.`;
+  if (anyImported) count += ` A night you type is used instead of one read from ${platform}.`;
 
   return (
     <MmSection icon="sleep" title="Sleep" summary={summary} collapsible initiallyExpanded={lastNight === undefined}>
@@ -109,27 +110,29 @@ export function SleepNightCard() {
         today.
       </p>
 
-      {recorded === 0 ? (
-        <ChartPlaceholder
-          text={`No nights recorded in the last ${nightsShown}. Each night you type, or that ${platform} has, is a bar here.`}
-          count={{ done: 0, of: nightsShown, unit: 'nights' }}
-        />
-      ) : (
-        <NightsChart
-          minutes={new Map(recent.flatMap((date) => (byDay.has(date) ? [[date, (byDay.get(date) as SleepNight).minutesAsleep] as const] : [])))}
-          today={today}
-          nights={nightsShown}
-          picked={picked}
-          label={
-            `Hours asleep, the last ${nightsShown} nights: ${recorded} recorded. ` +
-            recent
-              .filter((date) => byDay.has(date))
-              .map((date) => `${label(date)}, ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}`)
-              .join('; ') +
-            '.'
-          }
-        />
-      )}
+      {/* The fortnight drawn, and the way to choose a night (MM-578): every night a column, recorded or not. */}
+      <NightsChart
+        ref={chartRef}
+        minutes={new Map(recent.flatMap((date) => (byDay.has(date) ? [[date, (byDay.get(date) as SleepNight).minutesAsleep] as const] : [])))}
+        today={today}
+        nights={nightsShown}
+        picked={picked}
+        onPick={(date) => {
+          setPicked(date);
+          setTyped(undefined);
+        }}
+        label={
+          `Hours asleep, the last ${nightsShown} nights: ${recorded} recorded. ` +
+          recent
+            .filter((date) => byDay.has(date))
+            .map((date) => `${label(date)}, ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}`)
+            .join('; ') +
+          `. The line is the 7-night average. Chosen: ${night}. Arrow keys choose another night.`
+        }
+      />
+      <p className="app-caption progress-sleep-count">{count}</p>
+      {/* The chosen night said aloud as it changes, as the trend chart's picked weigh-in is (MM-142). */}
+      <span className="mm-visually-hidden" aria-live="polite">{`${night}: ${note}`}</span>
 
       <MmListGroup>
         <MmListRow
@@ -137,19 +140,6 @@ export function SleepNightCard() {
           subtitle={note}
           entry={
             <>
-              <div ref={chipsRef} className="progress-sleep-nights" role="group" aria-label="Nights, the last two weeks">
-                {recent.map((date) => (
-                  <MmChoiceChip
-                    key={date.epochDay}
-                    label={byDay.has(date) ? `${label(date)} · ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}` : label(date)}
-                    selected={date === picked}
-                    onSelect={() => {
-                      setPicked(date);
-                      setTyped(undefined);
-                    }}
-                  />
-                ))}
-              </div>
               <MmDurationField
                 name={night}
                 hours={shown.hours}

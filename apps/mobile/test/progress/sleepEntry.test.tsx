@@ -63,7 +63,8 @@ async function type(h: string, m: string): Promise<void> {
 it('7 h 20 m typed for last night is kept as 440 minutes, typed, and said on the line', async () => {
   await openSleep();
   expect(within(section).getByText('Last night not recorded yet.')).toBeInTheDocument();
-  expect(within(section).getByText('Last night: not recorded yet. 0 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('Last night: Not recorded yet.')).toBeInTheDocument();
+  expect(within(section).getByText('No nights recorded in the last 14 yet, 0 of 14. Tap a night to type it.')).toBeInTheDocument();
   // Heard as the night and its part, once (the panel's F1).
   expect(hours()).toHaveAttribute('aria-label', 'Last night, Hours');
   await type('7', '20');
@@ -74,10 +75,13 @@ it('7 h 20 m typed for last night is kept as 440 minutes, typed, and said on the
   expect(night?.minutesAsleep).toBe(440);
   expect(night?.source).toBe('typed');
   expect(await within(section).findByText('Last night 7 h 20 m.')).toBeInTheDocument();
-  expect(within(section).getByText('Last night: 7 h 20 m, typed. 1 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('Last night: 7 h 20 m, typed.')).toBeInTheDocument();
+  expect(within(section).getByText('1 of the last 14 nights recorded. Tap a night to type or correct it. The line is the 7-night average.')).toBeInTheDocument();
   // Said where the action was taken, and aloud (the panel's F2).
   expect(screen.getByRole('status')).toHaveTextContent('Saved: Last night, 7 h 20 m.');
 });
+
+const fromWatch = '2 of the last 14 nights recorded. Tap a night to type or correct it. The line is the 7-night average. A night you type is used instead of one read from Health Connect.';
 
 it('imported sessions make one night, and a typed value for that night is used instead', async () => {
   const source = FakeHealthSource.fromJson(watchHistory());
@@ -86,8 +90,9 @@ it('imported sessions make one night, and a typed value for that night is used i
   await openSleep();
   // Two sessions summed, kept against the morning they ended on, with the watch named.
   expect(within(section).getByText('Last night 6 h 50 m, from Watch.')).toBeInTheDocument();
-  expect(within(section).getByRole('button', { name: 'The night before · 6 h 40 m' })).toBeInTheDocument();
-  expect(within(section).getByText(/^Last night: 6 h 50 m from Watch\. A night you type is used instead\. 2 of the last 14 nights recorded\.$/)).toBeInTheDocument();
+  expect(within(section).getByRole('img', { name: /The night before, 6 h 40 m/ })).toBeInTheDocument();
+  expect(within(section).getByText('Last night: 6 h 50 m from Watch. Type to use yours instead.')).toBeInTheDocument();
+  expect(within(section).getByText(fromWatch)).toBeInTheDocument();
   expect([hours().value, minutes().value]).toEqual(['6', '50']);
 
   await type('7', '20');
@@ -98,13 +103,15 @@ it('imported sessions make one night, and a typed value for that night is used i
   // The import is kept, not used: another read changes nothing.
   await new HealthImporter({ source, store: repos.healthSamples }).import('sleep');
   expect((await stored())[0]?.source).toBe('typed');
-  expect(within(section).getByText(/^Last night: 7 h 20 m, typed\. 2 of the last 14 nights recorded\. A night you type is used instead of one read from Health Connect\.$/)).toBeInTheDocument();
+  expect(within(section).getByText('Last night: 7 h 20 m, typed.')).toBeInTheDocument();
+  expect(within(section).getByText(fromWatch)).toBeInTheDocument();
 });
 
 it('any night of the last fourteen can be typed, and a mistyped value is refused in place', async () => {
   await repos.sleep.saveSleepNight(new SleepNight({ date: today, minutesAsleep: 420, source: 'typed' }));
   await openSleep();
-  await userEvent.click(within(section).getByRole('button', { name: /^The night before/ }));
+  // A night is chosen on the chart: a tap in its column (MM-578).
+  await userEvent.click(section.querySelector('[data-ago="1"]') as Element);
   expect([hours().value, minutes().value]).toEqual(['', '']);
   await type('25', '0');
   expect(within(section).getByText('Up to 24 hours.')).toBeInTheDocument();
@@ -128,7 +135,8 @@ it('any night of the last fourteen can be typed, and a mistyped value is refused
     [today.addDays(-1), 365],
     [today, 420],
   ]);
-  expect(within(section).getByText('The night before: 6 h 5 m, typed. 2 of the last 14 nights recorded.')).toBeInTheDocument();
+  expect(within(section).getByText('The night before: 6 h 5 m, typed.')).toBeInTheDocument();
+  expect(within(section).getByText('2 of the last 14 nights recorded. Tap a night to type or correct it. The line is the 7-night average.')).toBeInTheDocument();
 });
 
 // The panel's F4: a read that went wrong is said, with a way to try again, never shown as no nights.
