@@ -1701,8 +1701,17 @@
 .mm-horizon-hollow {
   fill: var(--surface);
 }
-.mm-horizon-glow {
-  fill: color-mix(in srgb, var(--ion) 80%, transparent);
+.mm-horizon-glow-core {
+  stop-color: var(--ion);
+  stop-opacity: 0.8;
+}
+.mm-horizon-glow-mid {
+  stop-color: var(--ion);
+  stop-opacity: 0.45;
+}
+.mm-horizon-glow-edge {
+  stop-color: var(--ion);
+  stop-opacity: 0;
 }
 .theme-light .mm-horizon-glow {
   display: none;
