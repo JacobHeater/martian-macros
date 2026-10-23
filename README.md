@@ -1,8 +1,8 @@
 # Martian Macros
 
-Body-composition coaching for Android: adaptive energy expenditure,
-progressive macro targets, and recomposition tracking, built as a React app
-inside a thin native shell (MM-228). Offline-first; your health data never
+Body-composition coaching for iPhone and Android: adaptive energy
+expenditure, progressive macro targets, and recomposition tracking, built as
+a React app inside a thin native shell on each (MM-228, MM-403). Offline-first; your health data never
 leaves the device unless you export an encrypted backup.
 
 ## Quick start
