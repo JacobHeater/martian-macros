@@ -80,20 +80,20 @@ it('ticked, the calorie card says what is logged so far and the aim, with protei
   const caption = await screen.findByText('so far, aiming for about 1,900 kcal');
   expect(screen.getAllByText('900').length).toBeGreaterThan(0);
   expect(before(screen.getByText(/^60 g · min 130 · target 160$/), caption)).toBe(true);
-  expect(screen.queryByText(/kcal left of/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/left of/)).not.toBeInTheDocument();
 });
 
 it('ticked and over the target, the usual over wording is shown', async () => {
   await seed({ screening: ticked, todayKcal: 2400 });
   await openFood();
-  expect(await screen.findByText(/^kcal over 1,900/)).toBeInTheDocument();
+  expect(await screen.findByText(/^over 1,900/)).toBeInTheDocument();
   expect(screen.queryByText(/aiming for about/)).not.toBeInTheDocument();
 });
 
 it('not ticked, the calorie card says what is left, protein under the calories', async () => {
   await seed({ screening: new ScreeningAnswers({ weightAffectingMedication: true }), todayKcal: 900 });
   await openFood();
-  const caption = await screen.findByText('kcal left of 1,900');
+  const caption = await screen.findByText('left of 1,900');
   expect(screen.queryByText(/aiming for about/)).not.toBeInTheDocument();
   expect(before(caption, screen.getByText(/^60 g · min 130 · target 160$/))).toBe(true);
 });

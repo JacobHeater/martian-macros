@@ -76,7 +76,7 @@ it('a normal day shows calories, protein and the trend weight', async () => {
     foods: [food('Lunch', 700, 45), food('Dinner', 700, 50)],
   });
   renderApp(repos, today);
-  expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('1,000')).toBeInTheDocument();
   expect(screen.getByText('95 / 170 g')).toBeInTheDocument();
   // The weight row (MM-254, MM-298): the trend names itself; today's entry and the week beneath.

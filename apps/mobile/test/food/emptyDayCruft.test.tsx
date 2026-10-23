@@ -56,10 +56,11 @@ it('a meal with food still folds', async () => {
   expect(within(region).getByRole('button', { name: /^Breakfast/ })).toHaveAttribute('aria-expanded', 'true');
 });
 
-it('on Food the calorie figure is spoken once, by its text, not again by the arc', async () => {
+// MM-389, MM-571: the figure is spoken once, by its text; the chart says the running total, not the figure again.
+it('on Food the calorie figure is spoken once, by its text, and the chart speaks the running total', async () => {
   await openFood();
-  expect(document.querySelector('.mm-horizon')).toHaveAttribute('aria-hidden', 'true');
-  expect(screen.queryByRole('img', { name: /kcal left of/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('img', { name: /^Running total: / })).toBeInTheDocument();
+  expect(screen.queryByRole('img', { name: /left of/ })).not.toBeInTheDocument();
 });
 
 it('a past day says nothing about today, in the headings or the disclosure', async () => {

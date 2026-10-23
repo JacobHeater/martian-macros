@@ -39,7 +39,7 @@ async function openFood(): Promise<void> {
 it('a computed target of 2,473 kcal and 172 g of protein shows as 2,475 and 170', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2473, proteinG: 172 })] });
   await openFood();
-  expect(await screen.findByText('kcal left of 2,475')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,475')).toBeInTheDocument();
   expect(screen.getByText('2,475')).toBeInTheDocument();
   expect(screen.getByText(/0 \/ 170 g/)).toBeInTheDocument();
 });
@@ -48,21 +48,21 @@ it('with exact targets on, 2,473 is shown and the band is unchanged', async () =
   await repos.preferences.saveExactTargets(true);
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2473 })], foods: [day(2400)] });
   await openFood();
-  expect(await screen.findByText('kcal left of 2,473 · on target')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,473 · on target')).toBeInTheDocument();
   expect(screen.getByText('73')).toBeInTheDocument();
 });
 
 it('inside the band the card says on target, below it says what is left, above it says over', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2400 })], foods: [day(2310)] });
   await openFood();
-  expect(await screen.findByText('kcal left of 2,400 · on target')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,400 · on target')).toBeInTheDocument();
   expect(screen.getByText('90')).toBeInTheDocument();
 });
 
 it('below the band: what is left, with no judgement', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2400 })], foods: [day(2200)] });
   await openFood();
-  expect(await screen.findByText('kcal left of 2,400')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
   expect(screen.getByText('200')).toBeInTheDocument();
   expect(screen.queryByText(/on target/)).not.toBeInTheDocument();
 });
@@ -70,7 +70,7 @@ it('below the band: what is left, with no judgement', async () => {
 it('above the band: over', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2400 })], foods: [day(2560)] });
   await openFood();
-  expect(await screen.findByText('kcal over 2,400')).toBeInTheDocument();
+  expect(await screen.findByText('over 2,400')).toBeInTheDocument();
   expect(screen.getByText('160')).toBeInTheDocument();
 });
 
@@ -78,14 +78,14 @@ it('a smaller target has a band of 100 kcal either side, never narrower', async 
   // 5% of 2,000 is 100: the band is 1,900 to 2,100.
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2000 })], foods: [day(1901)] });
   await openFood();
-  expect(await screen.findByText('kcal left of 2,000 · on target')).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,000 · on target')).toBeInTheDocument();
 });
 
 it('a day below the calorie floor is never on target (MM-114)', async () => {
   // The band of a 1,400 target reaches down to 1,300, but 1,301 kcal is under the floor of this person.
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 1400 })], foods: [day(1301)] });
   await openFood();
-  expect(await screen.findByText('kcal left of 1,400')).toBeInTheDocument();
+  expect(await screen.findByText('left of 1,400')).toBeInTheDocument();
   expect(screen.queryByText(/on target/)).not.toBeInTheDocument();
 });
 
@@ -93,7 +93,7 @@ it('the band is drawn on the arc as a zone', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2400 })], foods: [day(2310)] });
   await openFood();
   await screen.findByText(/on target/);
-  expect(document.querySelector('.mm-horizon-band')).not.toBeNull();
+  expect(document.querySelector('.chart-intake-band')).not.toBeNull();
 });
 
 it('carbohydrate and fat are never judged', async () => {

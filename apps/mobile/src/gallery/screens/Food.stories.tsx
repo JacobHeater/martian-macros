@@ -15,6 +15,7 @@ import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { onTargetScenario } from './onTargetScenario';
+import { runningTotalScenario } from './runningTotalScenario';
 import { onlineFoods } from './onlineFoods';
 import { storyPackHost } from './storyPackHost';
 import type { FoodCatalog } from '../../foodCatalog/FoodCatalog';
@@ -80,7 +81,7 @@ export const NothingLogged = screenStory({
 /** MM-123: a day inside the band, the larger of 5% and 100 kcal either side: the arc shows the zone and the caption says on target. */
 export const FoodOnTarget = screenStory({
   covers: ['FoodScreen'],
-  shows: /kcal left of 2,[0-9]{3} · on target/,
+  shows: /left of 2,[0-9]{3} · on target/,
   scenario: onTargetScenario,
   open: ({ state }) => state.homeTab.put('food'),
 });
@@ -1471,7 +1472,7 @@ export const FoodOnWeightLossMedication = screenStory({
 /** MM-113: over the target on the medication: the usual "over" words. */
 export const FoodOverOnWeightLossMedication = screenStory({
   covers: ['FoodScreen'],
-  shows: /^kcal over 2,100/,
+  shows: /^over 2,100/,
   scenario: weightLossMedicationScenario({ todayKcal: 2600 }),
   open: ({ state }) => state.homeTab.put('food'),
 });
@@ -1479,7 +1480,7 @@ export const FoodOverOnWeightLossMedication = screenStory({
 /** MM-113: the same day with the answer not ticked: what is left, and protein in its usual place. */
 export const FoodNotOnWeightLossMedication = screenStory({
   covers: ['FoodScreen'],
-  shows: /^kcal left of 2,100/,
+  shows: /^left of 2,100/,
   scenario: weightLossMedicationScenario({ ticked: false }),
   open: ({ state }) => state.homeTab.put('food'),
 });
@@ -1492,4 +1493,20 @@ export const EasyToMissCheck = screenStory({
     state.homeTab.put('food');
     void showEasyToMissSheet(overlays);
   },
+});
+
+/** MM-571, MM-572: the hero as a running total over the clock, passed at dinner, with the usual day drawn under it. */
+export const HeroRunningTotal = screenStory({
+  covers: ['FoodScreen'],
+  shows: /^You passed your target at dinner, 7:15 PM\./,
+  scenario: runningTotalScenario({ usualDays: 7 }),
+  open: yesterdaysFood,
+});
+
+/** MM-572: the usual day before there are enough days with meal times: it says what it waits for, with the count. */
+export const HeroUsualDayWaiting = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Your usual day appears after 7 days with meal times · 2 of 7',
+  scenario: runningTotalScenario({ usualDays: 2 }),
+  open: yesterdaysFood,
 });

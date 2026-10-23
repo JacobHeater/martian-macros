@@ -62,7 +62,7 @@ it('the same day without a pause is over', async () => {
   await seed();
   await eat(3400);
   renderApp(repos, today);
-  expect(await screen.findByText(/kcal over/)).toBeInTheDocument();
+  expect(await screen.findByText(/^over [\d,]+/)).toBeInTheDocument();
 });
 
 it('a pause is set from Settings, starting today', async () => {
