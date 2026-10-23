@@ -29,3 +29,6 @@ tool/node_modules/
 
 # A test run started at the repository root leaves a Vitest cache here; the app's dependencies live in apps/mobile.
 /node_modules/
+
+# The roadmap progress page is built locally on request, never committed (owner, 2026-10-22).
+roadmap/progress.html
