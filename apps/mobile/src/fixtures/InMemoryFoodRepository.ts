@@ -1,4 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { Watched } from '../lang/Watched';
@@ -51,6 +53,8 @@ export class InMemoryFoodRepository implements FoodRepository {
         alcoholG: entry.alcoholG,
         micros: entry.micros,
         eatenAt: entry.eatenAt,
+        loggedMeal: entry.loggedMeal,
+        evidence: entry.evidence,
       }),
     ];
     return id;
@@ -75,7 +79,10 @@ export class InMemoryFoodRepository implements FoodRepository {
 
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {
     return this.entries.watchAs((all) => {
-      const newestFirst = [...all].reverse().slice(0, 200);
+      const newestFirst = [...all]
+        .reverse()
+        .filter((e) => e.loggedMeal === undefined)
+        .slice(0, 200);
       const seen = new Set<string>();
       const distinct = newestFirst.filter((e) => {
         const name = e.name.toLowerCase();
@@ -85,6 +92,15 @@ export class InMemoryFoodRepository implements FoodRepository {
       });
       return distinct.slice(0, Math.max(0, limit));
     });
+  }
+
+  watchRecentMeals({ limit = 5 }: { limit?: number } = {}): Watched<LoggedMeal[]> {
+    return this.entries.watchAs((all) =>
+      recentMealsIn(
+        [...all].reverse().filter((e) => e.loggedMeal !== undefined).slice(0, 400),
+        limit,
+      ),
+    );
   }
 
   /** Empties the log. Ids keep counting, as in the database. */

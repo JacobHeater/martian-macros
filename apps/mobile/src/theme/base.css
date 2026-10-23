@@ -46,6 +46,14 @@ button {
   color: inherit;
 }
 
+/* A control's words are pressed, never selected or offered to copy by a long press (MM-593). */
+button,
+[role='button'] {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 :focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;

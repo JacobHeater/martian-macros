@@ -71,6 +71,7 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
   // Version 4 (MM-308): the micronutrients a food log entry keeps. Version 9 (MM-397): sugar alcohols.
   // Version 15 (MM-167, MM-151): the state the food was logged in and the conversion that made its unit grams.
   // Version 25 (MM-570): the minute of its day it was eaten.
+  // Version 26 (MM-586, MM-587): the meal it is one of, and where an analysed meal's food got its numbers.
   food_entries: [
     ...Micronutrient.added.map((n) => Micronutrient.column(n)),
     'sugar_alcohols_g',
@@ -78,6 +79,10 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'conversion_kind',
     'conversion_factor',
     'eaten_at_minute',
+    'logged_meal_key',
+    'logged_meal_name',
+    'evidence_kind',
+    'evidence_citation',
   ],
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
   custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],

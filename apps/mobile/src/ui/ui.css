@@ -1472,10 +1472,20 @@
 .mm-day-stepper {
   display: inline-flex;
   align-items: center;
+  /* The day's name is a control, not text to copy, even on today when it is not a button (MM-593). */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .mm-day-stepper-label {
   padding: 0 var(--space-12);
   font: var(--type-title);
+}
+/* An arrow with nowhere to go keeps its room, so the day's name does not move (MM-592). */
+.mm-day-stepper-end {
+  flex: none;
+  width: 48px;
+  height: 48px;
 }
 
 .mm-demo {

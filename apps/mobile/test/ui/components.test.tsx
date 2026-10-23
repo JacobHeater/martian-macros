@@ -247,7 +247,7 @@ describe('what is said in words, not by color alone', () => {
 });
 
 describe('stepping between days', () => {
-  it('the day is a way back to today except on today, and an end of the range is off', async () => {
+  it('the day is a way back to today except on today, and an end of the range draws no arrow (MM-592)', async () => {
     let back = 0;
     const { rerender } = render(
       <DayStepper label="Yesterday" onPrevious={() => undefined} onNext={() => undefined} onLabelPress={() => back++} />,
@@ -258,7 +258,7 @@ describe('stepping between days', () => {
     rerender(<DayStepper label="Today" onPrevious={() => undefined} onNext={undefined} onLabelPress={undefined} />);
     expect(screen.queryByRole('button', { name: 'Today' })).not.toBeInTheDocument();
     expect(screen.getByText('Today')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Next day' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: 'Next day' }), 'no arrow to nowhere').not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Previous day' })).toBeEnabled();
   });
 });

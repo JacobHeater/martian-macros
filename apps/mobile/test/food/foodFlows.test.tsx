@@ -127,6 +127,6 @@ it('the day picker steps back and returns to today', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Yesterday' }));
   expect(screen.getAllByText('Today').length).toBeGreaterThan(0);
   expect(screen.queryByRole('button', { name: 'Yesterday' })).not.toBeInTheDocument();
-  // There is no tomorrow to step to.
-  expect(screen.getByRole('button', { name: 'Next day' })).toBeDisabled();
+  // There is no tomorrow to step to, so no arrow is drawn (MM-592).
+  expect(screen.queryByRole('button', { name: 'Next day' })).not.toBeInTheDocument();
 });

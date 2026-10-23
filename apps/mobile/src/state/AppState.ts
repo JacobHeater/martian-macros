@@ -15,6 +15,7 @@ import type { WaterEntry } from '../domain/water/WaterEntry';
 import type { EasyToMissPreference } from '../domain/food/easyToMiss/EasyToMissPreference';
 import type { HandSize } from '../domain/food/hand/HandSize';
 import type { FoodEntry } from '../domain/FoodEntry';
+import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import type { IntakeDay } from '../domain/IntakeDay';
 import { Meal } from '../domain/Meal';
 import type { Pause } from '../domain/Pause';
@@ -370,6 +371,8 @@ export class AppState {
    */
   readonly waterGoal: Cell<WaterGoal | undefined>;
   readonly recentFoods: Cell<Loadable<FoodEntry[]>>;
+  /** The meals logged most recently, each once, for logging again in one press (MM-587). */
+  readonly recentMeals: Cell<Loadable<LoggedMeal[]>>;
 
   /** The engine's current view of the user; undefined until setup and the stored history have loaded. */
   readonly coach: Cell<CoachSnapshot | undefined>;
@@ -720,6 +723,7 @@ export class AppState {
     this.easeIntoMaintenance = stream(() => s.preferences.watchEaseIntoMaintenance());
     this.nutritionGoals = stream(() => s.preferences.watchNutritionGoals());
     this.recentFoods = stream(() => s.food.watchRecentFoods());
+    this.recentMeals = stream(() => s.food.watchRecentMeals());
 
     this.coach = derived(() => {
       const setup = of(this.setup);

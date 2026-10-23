@@ -22,6 +22,7 @@ import type { ReferenceNutrition } from '../domain/food/portion/ReferenceNutriti
 import { scaleNutrition } from '../domain/food/portion/scaleNutrition';
 import { unitsOffered } from '../domain/food/portion/unitsOffered';
 import { FoodEntry } from '../domain/FoodEntry';
+import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import { IntakeDay } from '../domain/IntakeDay';
 import { macrosMatchEnergy } from '../domain/macrosMatchEnergy';
 import type { Meal } from '../domain/Meal';
@@ -52,6 +53,10 @@ import { defaultMeal } from './defaultMeal';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
 import { EstimateMealStep } from './estimate/EstimateMealStep';
+import { AnalyzeMealStep } from './meal/AnalyzeMealStep';
+import { gradeOfLoggedMeal } from './meal/gradeOfLoggedMeal';
+import { RecentMealRow } from './meal/RecentMealRow';
+import { relogMeal } from './meal/relogMeal';
 import { FoodAmountStep } from './FoodAmountStep';
 import { FoodGrade } from './FoodGrade';
 import { FoodSearchResults } from './FoodSearchResults';
@@ -223,6 +228,7 @@ type Step =
   | { readonly at: 'manual' }
   | { readonly at: 'scanning' }
   | { readonly at: 'estimating' }
+  | { readonly at: 'analyzing' }
   | { readonly at: 'myFoods'; readonly barcode?: string | undefined; readonly draft?: CustomFood | undefined }
   | {
       readonly at: 'amount';
@@ -248,6 +254,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const overlays = useOverlays();
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
+  const recentMeals = useLoaded(state.recentMeals) ?? [];
   const [allRecents, setAllRecents] = useState(false);
   const customFoods = useLoaded(state.customFoods) ?? [];
   // The form shows the fields for the chosen level and stores what it holds (MM-49).
@@ -523,10 +530,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         meal={meal}
         initialSize={estimateSize ?? 'regular'}
         onManual={() => setStep({ at: 'manual' })}
+        onAnalyze={() => setStep({ at: 'analyzing' })}
         onBack={choices}
         onDone={onDone}
       />
     );
+  }
+  if (step.at === 'analyzing') {
+    return <AnalyzeMealStep day={firstDay} meal={meal} onBack={() => setStep({ at: 'estimating' })} onDone={onDone} />;
   }
   if (step.at === 'scanning') {
     return (
@@ -542,6 +553,22 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
 
   const query = search.trim();
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
+  // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food.
+  const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
+  const recentRows: readonly ({ kind: 'food'; entry: FoodEntry } | { kind: 'meal'; meal: LoggedMeal })[] = [
+    ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id })),
+    ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m) })),
+  ].sort((a, b) => b.newest - a.newest);
+  const mealGradeBeside = (m: LoggedMeal) => {
+    const grade = gradeOfLoggedMeal(m, { hand });
+    return grade === undefined ? undefined : <FoodGrade grade={grade} subject={m.name} scope="meal" />;
+  };
+  /** Logs a recent meal again, to the sheet's day and slot, at its time, in one press (MM-587). */
+  const logAgain = async (m: LoggedMeal) => {
+    await relogMeal(services.food, m, { date: day, meal, eatenAt });
+    overlays.snack(`Logged ${m.name}`);
+    onDone();
+  };
 
   /**
    * The amount: units to choose, and a field that takes decimals and
@@ -607,7 +634,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       <>
         <p className="food-label food-label-spaced">How was it measured?</p>
         <div className="app-row" role="group" aria-label="How was it measured?">
-          {QuantitySource.values.map((source) => (
+          {/* A photo estimate comes only from an AI meal analysis (MM-586), never from typing. */}
+          {QuantitySource.values.filter((source) => source !== 'photoEstimate').map((source) => (
             <MmChoiceChip
               key={source}
               label={quantitySourceLabel(source)}
@@ -827,6 +855,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                     trailingAction={gradeBeside(food.name)}
                   />
                 ))}
+              {recentMeals
+                .filter((m) => matches(m.name))
+                .map((m) => (
+                  <RecentMealRow key={`recent-meal-${m.key}`} meal={m} onPress={() => void logAgain(m)} trailingAction={mealGradeBeside(m)} />
+                ))}
               {recents
                 .filter((e) => matches(e.name))
                 .map((e) => (
@@ -835,25 +868,40 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               <FoodSearchResults
                 query={query}
                 onPick={(food) => void pick(food)}
-                alsoFound={customFoods.some((food) => matches(food.name)) || recents.some((e) => matches(e.name))}
+                alsoFound={
+                  customFoods.some((food) => matches(food.name)) ||
+                  recents.some((e) => matches(e.name)) ||
+                  recentMeals.some((m) => matches(m.name))
+                }
               />
               {/* Beside the phone's results, never inside them, so it keeps its state while they settle (MM-58). */}
               <OnlineSearchResults query={query} onPick={(food) => void pick(food)} />
             </>
-          ) : recents.length > 0 ? (
+          ) : recentRows.length > 0 ? (
             <>
               <p className="food-label food-label-spaced">Recent foods</p>
               {/* Rows, never a sideways scroller: a long name wraps (MM-439). The five newest first, as search pages its results (MM-410). */}
-              {(allRecents ? recents : recents.slice(0, recentsFirst)).map((e, index) => (
-                <RecentFoodRow
-                  key={e.id}
-                  entry={e}
-                  onPress={() => fill(e)}
-                  trailingAction={gradeBeside(e.name)}
-                  autoFocus={allRecents && index === recentsFirst}
-                />
-              ))}
-              {allRecents || recents.length <= recentsFirst ? null : (
+              {/* A meal is among them as one row, by when it was last logged (MM-587). */}
+              {(allRecents ? recentRows : recentRows.slice(0, recentsFirst)).map((row, index) =>
+                row.kind === 'meal' ? (
+                  <RecentMealRow
+                    key={`meal-${row.meal.key}`}
+                    meal={row.meal}
+                    onPress={() => void logAgain(row.meal)}
+                    trailingAction={mealGradeBeside(row.meal)}
+                    autoFocus={allRecents && index === recentsFirst}
+                  />
+                ) : (
+                  <RecentFoodRow
+                    key={row.entry.id}
+                    entry={row.entry}
+                    onPress={() => fill(row.entry)}
+                    trailingAction={gradeBeside(row.entry.name)}
+                    autoFocus={allRecents && index === recentsFirst}
+                  />
+                ),
+              )}
+              {allRecents || recentRows.length <= recentsFirst ? null : (
                 <MmButton label="More recent foods" kind="text" expand onPress={() => setAllRecents(true)} />
               )}
             </>

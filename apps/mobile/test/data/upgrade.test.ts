@@ -146,8 +146,17 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 25 left it: no food is one of a meal, and none says where its numbers came from (MM-586, MM-587). */
+const versionTwentyFive = currentSchema.replace(
+  ',\n  "logged_meal_key" TEXT NULL,\n' +
+    '  "logged_meal_name" TEXT NULL CHECK (("logged_meal_key" IS NULL) = ("logged_meal_name" IS NULL)),\n' +
+    `  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN ('cited', 'matched', 'estimated', 'yours')),\n` +
+    '  "evidence_citation" TEXT NULL\n',
+  '\n',
+);
+
 /** The schema as version 24 left it: without the minute of its day a food was eaten, nor the food log's day index (MM-570). */
-const versionTwentyFour = currentSchema
+const versionTwentyFour = versionTwentyFive
   .replace(',\n  "eaten_at_minute" INTEGER NULL CHECK ("eaten_at_minute" IS NULL OR "eaten_at_minute" BETWEEN 0 AND 1439)\n', '\n')
   .replace('CREATE INDEX "food_entries_epoch_day" ON "food_entries" ("epoch_day");\n', '');
 
@@ -834,4 +843,53 @@ it('a version 24 database comes up to date with its foods kept and untimed, and 
   );
   expect((await first(repos.food.watchFood(day)))[0]?.eatenAt).toBe(13 * 60);
   await expect(sql.execute('UPDATE food_entries SET eaten_at_minute = 1440')).rejects.toThrow();
+});
+
+// MM-586, MM-587: a version 25 database comes up to date with every food it holds kept, none of them one of a meal;
+// a meal logged from then on keeps its key, its name and where each food's numbers came from.
+it('a version 25 database comes up to date with its foods kept and in no meal, and keeps a meal logged after', async () => {
+  expect(versionTwentyFive).not.toContain('logged_meal_key');
+  expect(versionTwentyFive).not.toContain('evidence_kind');
+  expect(versionTwentyFive).toContain('"eaten_at_minute" INTEGER NULL CHECK ("eaten_at_minute" IS NULL OR "eaten_at_minute" BETWEEN 0 AND 1439)\n);');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 25, schema: versionTwentyFive });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute(
+    "INSERT INTO food_entries (epoch_day, meal, name, kcal, protein_g, carbs_g, fat_g, quantity_source) VALUES (?, 'lunch', 'Soup', 300, 10, 30, 8, 'weighed')",
+    [day.epochDay],
+  );
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  const [kept] = await first(repos.food.watchFood(day));
+  expect(kept?.name).toBe('Soup');
+  expect(kept?.loggedMeal, 'a food already logged is in no meal').toBeUndefined();
+  expect(kept?.evidence).toBeUndefined();
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: day,
+      meal: 'dinner',
+      name: 'Rice',
+      kcal: 200,
+      proteinG: 4,
+      carbsG: 44,
+      fatG: 0.5,
+      source: 'photoEstimate',
+      loggedMeal: { key: 'k1', name: 'Taco night' },
+      evidence: { kind: 'cited', citation: 'USDA FDC 168878' },
+    }),
+  );
+  const rice = (await first(repos.food.watchFood(day))).find((e) => e.name === 'Rice');
+  expect(rice?.loggedMeal).toEqual({ key: 'k1', name: 'Taco night' });
+  expect(rice?.evidence).toEqual({ kind: 'cited', citation: 'USDA FDC 168878' });
+  await expect(sql.execute("UPDATE food_entries SET logged_meal_name = NULL WHERE name = 'Rice'"), 'a key needs a name').rejects.toThrow();
+  await expect(sql.execute("UPDATE food_entries SET evidence_kind = 'guessed'")).rejects.toThrow();
 });

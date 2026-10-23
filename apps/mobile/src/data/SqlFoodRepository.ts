@@ -1,4 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { Watched } from '../lang/Watched';
@@ -26,6 +28,10 @@ const valuesOf = (entry: FoodEntry): Values => ({
   sodium_mg: orNull(entry.sodiumMg),
   alcohol_g: orNull(entry.alcoholG),
   eaten_at_minute: orNull(entry.eatenAt),
+  logged_meal_key: orNull(entry.loggedMeal?.key),
+  logged_meal_name: orNull(entry.loggedMeal?.name),
+  evidence_kind: orNull(entry.evidence?.kind),
+  evidence_citation: orNull(entry.evidence?.citation),
   ...microsValues(entry.micros),
   ...portionValues(entry.portion),
 });
@@ -84,7 +90,8 @@ export class SqlFoodRepository implements FoodRepository {
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {
     return this.db.watch(['food_entries'], async (db) => {
       const seen = new Set<string>();
-      const distinct = (await db.select('SELECT * FROM food_entries ORDER BY id DESC LIMIT 200'))
+      // A meal's foods are offered as the meal (MM-587), not one by one.
+      const distinct = (await db.select('SELECT * FROM food_entries WHERE logged_meal_key IS NULL ORDER BY id DESC LIMIT 200'))
         .map(foodFromRow)
         .filter((entry) => {
           const name = entry.name.toLowerCase();
@@ -94,5 +101,14 @@ export class SqlFoodRepository implements FoodRepository {
         });
       return distinct.slice(0, Math.max(0, limit));
     });
+  }
+
+  watchRecentMeals({ limit = 5 }: { limit?: number } = {}): Watched<LoggedMeal[]> {
+    return this.db.watch(['food_entries'], async (db) =>
+      recentMealsIn(
+        (await db.select('SELECT * FROM food_entries WHERE logged_meal_key IS NOT NULL ORDER BY id DESC LIMIT 400')).map(foodFromRow),
+        limit,
+      ),
+    );
   }
 }

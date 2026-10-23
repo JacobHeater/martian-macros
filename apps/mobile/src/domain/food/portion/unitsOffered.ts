@@ -39,5 +39,7 @@ export function unitsOffered(
       return ['thumb'];
     case 'quickAdd':
       return [];
+    case 'photoEstimate':
+      return ['gram'];
   }
 }

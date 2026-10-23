@@ -5,6 +5,8 @@ import { gradeOfMeal } from '../engine/gradeOfMeal';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { FoodEntry } from '../domain/FoodEntry';
+import { foodLogRows } from '../domain/food/meal/foodLogRows';
+import { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import type { Meal } from '../domain/Meal';
 import { mealHasSolidProtein } from '../engine/mealHasSolidProtein';
 import { Fmt } from '../format/Fmt';
@@ -25,6 +27,7 @@ import { entriesCopiedTo } from './entriesCopiedTo';
 import { FoodEntryTile } from './FoodEntryTile';
 import { foodEntryLinesId } from './foodEntryLinesId';
 import { FoodGrade } from './FoodGrade';
+import { LoggedMealRow } from './meal/LoggedMealRow';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
 import { useNetCarbs } from './useNetCarbs';
@@ -127,7 +130,15 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
         </>
       }
     >
-      {entries.map((entry) => {
+      {/* A meal's foods are one row, where its first food was (MM-587). */}
+      {foodLogRows(entries).map((row) => {
+        if (row instanceof LoggedMeal) {
+          const rowGrade =
+            preview.entryGrades?.get(row.name) ??
+            gradeOfMeal(row.items.map((item) => ({ kcal: item.kcal, grade: gradeOf(item) })), 'meal');
+          return <LoggedMealRow key={`meal-${row.key}`} loggedMeal={row} day={day} grade={rowGrade} />;
+        }
+        const entry = row;
         const grade = gradeOf(entry);
         const note = preview.entryNotes?.get(entry.name);
         return (

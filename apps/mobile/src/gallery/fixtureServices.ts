@@ -13,6 +13,7 @@ import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoodCache';
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
+import { InMemoryClipboard } from '../fixtures/InMemoryClipboard';
 import { InMemoryExternalLinks } from '../fixtures/InMemoryExternalLinks';
 import { FakeHealthSource } from '../healthIngest/testing/FakeHealthSource';
 import { constant } from '../lang/constant';
@@ -45,6 +46,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     restSignal: { restOver: () => undefined },
     // Never the device's browser: a link pressed is only kept (MM-454).
     externalLinks: new InMemoryExternalLinks(),
+    // Never the device's clipboard: what is copied is only kept (MM-586).
+    clipboard: new InMemoryClipboard(),
     // Never the device's notifications.
     reminderScheduler: new InMemoryReminderScheduler(),
     // Exact alarms allowed, unless a story or a test is about asking (MM-248).

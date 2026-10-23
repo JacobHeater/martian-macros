@@ -165,7 +165,11 @@ describe('every label of every kind', () => {
     ['equipment', all(Equipment.values, equipmentLabel)],
     ['timeSpanProblem', all(TimeSpanProblem.values, timeSpanProblemMessage)],
     // MM-219: typed totals are "Estimated totals" now, told from "Estimate a meal", the way in; the Flutter app said "Estimate".
-    ['quantitySource', { ...all(QuantitySource.values, quantitySourceLabel), quickAdd: 'Estimate' }],
+    // The kind added since the Flutter app (MM-586's photo estimate) has no Dart words to match.
+    [
+      'quantitySource',
+      { ...all(QuantitySource.values.filter((source) => source !== 'photoEstimate'), quantitySourceLabel), quickAdd: 'Estimate' },
+    ],
     ['detailLevel', all(DetailLevel.values, detailLevelLabel)],
     ['detailLevelDescription', all(DetailLevel.values, detailLevelDescription)],
     ['muscleGroup', all(MuscleGroup.values, muscleGroupLabel)],

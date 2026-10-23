@@ -99,7 +99,11 @@ CREATE TABLE "food_entries" (
   "preparation" TEXT NULL,
   "conversion_kind" TEXT NULL,
   "conversion_factor" REAL NULL CHECK("conversion_factor" IS NULL OR "conversion_factor" > 0.0),
-  "eaten_at_minute" INTEGER NULL CHECK ("eaten_at_minute" IS NULL OR "eaten_at_minute" BETWEEN 0 AND 1439)
+  "eaten_at_minute" INTEGER NULL CHECK ("eaten_at_minute" IS NULL OR "eaten_at_minute" BETWEEN 0 AND 1439),
+  "logged_meal_key" TEXT NULL,
+  "logged_meal_name" TEXT NULL CHECK (("logged_meal_key" IS NULL) = ("logged_meal_name" IS NULL)),
+  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN ('cited', 'matched', 'estimated', 'yours')),
+  "evidence_citation" TEXT NULL
 );
 CREATE INDEX "food_entries_epoch_day" ON "food_entries" ("epoch_day");
 CREATE TABLE "day_marks" (
