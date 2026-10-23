@@ -2493,7 +2493,7 @@
 }
 .mm-ridge[data-away='true'] .mm-ridge-alien {
   pointer-events: none;
-  animation: mm-alien-board var(--motion-slow) ease-in forwards;
+  animation: mm-alien-board var(--motion-slow) ease-in var(--motion-slow) forwards;
 }
 @keyframes mm-alien-board {
   to {
@@ -2514,6 +2514,35 @@
 .mm-ridge[data-away='true'] .mm-ridge-ufo {
   visibility: visible;
   animation: mm-ufo-leave var(--motion-abduct) ease-in forwards;
+}
+/* The beam: a pale cone from the saucer down over the alien, lit while it boards and out as the UFO leaves. */
+.mm-ridge-ufo::after {
+  content: '';
+  position: absolute;
+  top: 19px;
+  left: 4px;
+  width: 36px;
+  height: 32px;
+  background: linear-gradient(color-mix(in srgb, var(--ember) 55%, transparent), color-mix(in srgb, var(--ember) 8%, transparent));
+  clip-path: polygon(36% 0, 64% 0, 100% 100%, 0 100%);
+  opacity: 0;
+}
+.mm-ridge[data-away='true'] .mm-ridge-ufo::after {
+  animation: mm-ufo-beam var(--motion-abduct) ease-out forwards;
+}
+@keyframes mm-ufo-beam {
+  0%,
+  12% {
+    opacity: 0;
+  }
+  18%,
+  45% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
 }
 @keyframes mm-ufo-leave {
   0% {

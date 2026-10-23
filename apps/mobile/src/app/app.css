@@ -51,12 +51,21 @@
   padding: var(--space-24);
 }
 /* Martian's pages end on ground (MM-558): the ridge (MartianRidge) is the body's last child, edge to edge, pushed to
-   the bottom on a short page. */
+   the bottom on a short page. The body drops its bottom padding so the ridge meets the navigation bar: a negative
+   margin over the padding left a strip of canvas between them on the iPhone (MM-577). */
+.theme-martian .app-body {
+  padding-bottom: 0;
+}
 .app-body > .mm-ridge {
-  margin: auto calc(-1 * var(--space-16)) calc(-1 * var(--space-24));
+  margin: auto calc(-1 * var(--space-16)) 0;
 }
 .app-body-roomy > .mm-ridge {
-  margin: auto calc(-1 * var(--space-24)) calc(-1 * var(--space-24));
+  margin: auto calc(-1 * var(--space-24)) 0;
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .app-body {
+    padding-bottom: var(--space-24);
+  }
 }
 .app-body-barless {
   padding-top: calc(var(--space-24) + env(safe-area-inset-top));
