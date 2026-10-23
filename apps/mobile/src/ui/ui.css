@@ -2568,8 +2568,14 @@
     opacity: 1;
     transform: translate(0, -4px) rotate(-4deg);
   }
-  100% {
+  60% {
     opacity: 1;
+    transform: translate(18px, -30vh) rotate(-8deg);
+  }
+  /* Gone by the end of the flight (MM-580): kept at its last frame for the five seconds the alien is away, a UFO still
+     drawn there sat in the page, over the app bar, when the person scrolled back up. */
+  100% {
+    opacity: 0;
     transform: translate(48px, -100vh) rotate(-12deg);
   }
 }
