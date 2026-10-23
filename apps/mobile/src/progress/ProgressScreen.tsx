@@ -1,5 +1,6 @@
 import { usePaceInWords } from '../coach/usePaceInWords';
 import { useEffect, useRef, useState } from 'react';
+import { ChartPlaceholder } from '../charts/ChartPlaceholder';
 import { TrendChart } from '../charts/TrendChart';
 import { WaistChart } from '../charts/WaistChart';
 import { TrendStats } from '../charts/TrendStats';
@@ -137,7 +138,8 @@ export function ProgressScreen() {
             // Weighed, and the trend still being worked out (MM-343).
             <MmSpinner />
           ) : last === undefined ? (
-            <p className="app-text">No trend yet.</p>
+            // Nothing to draw: the chart's frame says what starts it (MM-578).
+            <ChartPlaceholder tall text="No trend yet. Your first weigh-in starts it." />
           ) : fmt.weightHidden ? (
             // No figure and no chart with the weight hidden: the pace in words against the plan's (MM-118).
             <>
@@ -210,7 +212,19 @@ export function ProgressScreen() {
           entries={waist.length}
           recordedToday={todaysWaist === undefined ? undefined : waistAmount(todaysWaist.waistCm, fmt)}
           chart={
-            latestWaist === undefined ? undefined : (
+            latestWaist === undefined ? (
+              // Before the first measurement, the chart's place says what it will show (MM-578).
+              <MmSurface>
+                <div className="progress-waist-chart">
+                  <h3 className="progress-waist-chart-title">Waist over time</h3>
+                  <ChartPlaceholder
+                    tall
+                    text="No measurements yet. Each one is a dot here; the line through them starts from the third."
+                    count={{ done: 0, of: 3, unit: 'measurements' }}
+                  />
+                </div>
+              </MmSurface>
+            ) : (
               <MmSurface>
                 <div className="progress-waist-chart">
                   <div className="progress-hero-head">

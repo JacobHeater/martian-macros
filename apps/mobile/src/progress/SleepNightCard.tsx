@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import { ChartPlaceholder } from '../charts/ChartPlaceholder';
+import { NightsChart } from '../charts/NightsChart';
 import type { CalendarDate } from '../domain/CalendarDate';
 import { SleepNight } from '../domain/SleepNight';
 import { durationFieldsOf } from '../format/durationFieldsOf';
@@ -29,7 +31,8 @@ const nightsShown = 14;
  * minutes, with Save as a quiet action beside the note, as the waist's is.
  * A night is kept against the morning it ended on. A night read from the
  * health platform shows here and is kept unless the person types one for
- * the same morning. Hours only: no score.
+ * the same morning. Hours only: no score. The fortnight is drawn as bars
+ * above the entry, or said to be empty (MM-578).
  */
 export function SleepNightCard() {
   const { services, state } = useApp();
@@ -105,6 +108,28 @@ export function SleepNightCard() {
         Hours asleep, not hours in bed. Each night goes under the morning it ended, so last night is the one that ended
         today.
       </p>
+
+      {recorded === 0 ? (
+        <ChartPlaceholder
+          text={`No nights recorded in the last ${nightsShown}. Each night you type, or that ${platform} has, is a bar here.`}
+          count={{ done: 0, of: nightsShown, unit: 'nights' }}
+        />
+      ) : (
+        <NightsChart
+          minutes={new Map(recent.flatMap((date) => (byDay.has(date) ? [[date, (byDay.get(date) as SleepNight).minutesAsleep] as const] : [])))}
+          today={today}
+          nights={nightsShown}
+          picked={picked}
+          label={
+            `Hours asleep, the last ${nightsShown} nights: ${recorded} recorded. ` +
+            recent
+              .filter((date) => byDay.has(date))
+              .map((date) => `${label(date)}, ${sleepDurationText((byDay.get(date) as SleepNight).minutesAsleep)}`)
+              .join('; ') +
+            '.'
+          }
+        />
+      )}
 
       <MmListGroup>
         <MmListRow

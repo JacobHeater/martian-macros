@@ -761,6 +761,7 @@
           "tickets": [
             "MM-118",
             "MM-156",
+            "MM-578",
             "MM-34",
             "MM-501",
             "MM-502",
@@ -2336,6 +2337,7 @@
           "MM-560",
           "MM-502",
           "MM-156",
+          "MM-578",
           "MM-501",
           "MM-118"
         ],
@@ -2389,7 +2391,8 @@
           "step": 6,
           "title": "More measurement sites (generic measurement table)",
           "tickets": [
-            "MM-156"
+            "MM-156",
+            "MM-578"
           ],
           "milestone": "M4"
         },

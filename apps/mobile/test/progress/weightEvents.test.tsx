@@ -44,7 +44,7 @@ it('rows say the event and its day in words, newest first, each with its icon', 
 it('with none, the section is one sentence', async () => {
   const section = await openProgress();
   expect(section.querySelectorAll('.mm-list-row')).toHaveLength(0);
-  expect(within(section).getByText(/^Note illness, travel/)).toBeInTheDocument();
+  expect(within(section).getByText(/^No weight events yet\. Note illness, travel/)).toBeInTheDocument();
 });
 
 it('the sheet starts with no event chosen and cannot save until one is', async () => {
