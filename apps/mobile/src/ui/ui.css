@@ -2164,6 +2164,13 @@
 .mm-section-flush .mm-section-body {
   padding-left: 0;
 }
+/* A flush body is not indented, so nothing in it is pulled back under the icon: it would hang off the screen (MM-583). */
+.mm-section-flush > .mm-section-body > .mm-list-group,
+.mm-section-flush > .mm-section-body > .mm-surface,
+.mm-section-flush > .mm-section-body > [role='alert'],
+.mm-section-flush > .mm-section-body > .mm-section-body-flush {
+  margin-left: 0;
+}
 .mm-section-body[hidden] {
   display: none;
 }
