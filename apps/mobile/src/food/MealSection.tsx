@@ -86,7 +86,10 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   };
 
   return (
+    // Each meal is a card, as the hero is, with its rows on the header's columns (MM-569).
     <MmSection
+      framed
+      flush
       icon={mealIcon(meal)}
       title={label}
       summary={

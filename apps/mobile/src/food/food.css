@@ -125,7 +125,9 @@
   color: var(--text3);
 }
 .food-entry-kcal {
-  font: var(--type-heading);
+  font: var(--type-body);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 .food-entry-open {
   flex: 1;
@@ -147,10 +149,17 @@
   align-items: center;
   border-top: 1px solid var(--outline);
 }
+/* As wide as the meal's mark, so a row's icon stands under it and its words under the meal's title (MM-569). */
 .food-entry-method {
   display: grid;
   flex: none;
+  place-items: center;
+  width: 24px;
   color: var(--text2);
+}
+/* The coach's line under a food keeps the same columns: its bulb under the row's icon, its words under the name. */
+.mm-section-flush .coach-inline-insight {
+  --note-icon: 24px;
 }
 .food-complete-row {
   margin-top: var(--space-12);
