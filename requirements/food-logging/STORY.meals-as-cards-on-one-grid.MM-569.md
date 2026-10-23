@@ -22,7 +22,9 @@ were set in the heading size, louder than the food's name.
   same columns. No second indent.
 - **A row's calories are body size, semibold**, with tabular figures: a figure that sits beside the name
   rather than over it.
-- A row that swipes covers the card in the card's own colour.
+- **A row has no ground of its own at rest** (the owner, 2026-10-22: "the conflicting box bgs"): each row
+  drew a flat box over the card's sheen. A row now shows the card through it; only while it is dragged does it
+  take the card's colour, to slide over the delete behind it, which is not drawn until then.
 
 ## Acceptance Criteria
 ```gherkin
