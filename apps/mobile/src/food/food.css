@@ -1,14 +1,36 @@
+/* The hero's head (MM-571): what was eaten, and what is left or over beside it. */
+.food-hero-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-12);
+  margin-bottom: var(--space-12);
+}
+.food-hero-eaten,
+.food-hero-delta {
+  display: flex;
+  flex-direction: column;
+}
+.food-hero-delta {
+  align-items: flex-end;
+  text-align: end;
+}
 .food-hero-figure {
   display: block;
   margin: 0;
   font: var(--type-figure-xl);
-  text-align: center;
+}
+.food-hero-delta-figure {
+  font: var(--type-title);
 }
 .food-hero-caption {
   display: block;
   margin: 0;
   color: var(--text2);
-  text-align: center;
+}
+.food-hero-story {
+  margin: var(--space-12) 0 0;
+  font: var(--type-body);
 }
 .food-hero-macros {
   display: flex;
