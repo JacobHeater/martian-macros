@@ -41,8 +41,8 @@ function snapshot(): CoachSnapshot {
   return result as CoachSnapshot;
 }
 
-const recalculate = (history: ReturnType<typeof targetsFrom>[]) =>
-  nextTargets({ setup, snapshot: snapshot(), history, today, recalculate: true });
+const recalculate = (history: ReturnType<typeof targetsFrom>[], forSetup: UserSetup = setup) =>
+  nextTargets({ setup: forSetup, snapshot: snapshot(), history, today, recalculate: true });
 
 it('recalculates at once, between check-ins, without the weekly step limit', () => {
   // Targets three days old and far under what today's figures give: no check-in is due.
@@ -70,10 +70,21 @@ it('leaves a day that already has new targets, a running break and the first ste
   expect(recalculate([targetsFrom(today, { kcal: 1500 })])).toBeUndefined();
   const onBreak = new Set<TargetFlag>(['requestedBreak']);
   expect(recalculate([targetsFrom(today.addDays(-3), { kcal: 2700, weeklyRateFraction: 0, flags: onBreak })])).toBeUndefined();
+  // Easing in is the first step out of a deficit, so the goal is maintenance (MM-573).
   const easing = new Set<TargetFlag>(['easingIn']);
-  expect(
-    recalculate([targetsFrom(today.addDays(-3), { kcal: 2400, weeklyRateFraction: 0, mode: 'maintenance', flags: easing })]),
-  ).toBeUndefined();
+  const easingRecord = targetsFrom(today.addDays(-3), { kcal: 2400, weeklyRateFraction: 0, mode: 'maintenance', flags: easing });
+  expect(recalculate([easingRecord], setup.copyWith({ goalMode: 'maintenance' }))).toBeUndefined();
+});
+
+it('a goal changed back during the first step out of a deficit applies at once, as without a recalculation (MM-573)', () => {
+  const easing = new Set<TargetFlag>(['easingIn']);
+  const history = [targetsFrom(today.addDays(-3), { kcal: 2400, weeklyRateFraction: 0, mode: 'maintenance', flags: easing })];
+  const reasons = (next: ReturnType<typeof recalculate>) => next?.explanation?.lines.map((line) => line.reason) ?? [];
+  expect(reasons(nextTargets({ setup, snapshot: snapshot(), history, today }))).toContain('goalChange');
+  const next = recalculate(history);
+  expect(next?.effectiveFrom).toBe(today);
+  expect(reasons(next)).toContain('goalChange');
+  expect(reasons(next)).not.toContain('recalculation');
 });
 
 const weighedOn = (...daysAgo: number[]): WeightObservation[] =>
