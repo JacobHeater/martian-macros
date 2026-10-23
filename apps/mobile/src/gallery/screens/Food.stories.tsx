@@ -163,6 +163,27 @@ export const EditFood = screenStory({
   },
 });
 
+/** MM-570: a food typed for today starts at the time it is now, and the row opens the clock to change it. */
+export const AddFoodTimeEaten = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Time eaten',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Enter manually')(canvas);
+    await press(/^Time eaten/)(canvas);
+  },
+});
+
+/** MM-570: an entry logged before times were kept says its time eaten is not set, and nothing is invented. */
+export const EditFoodTimeNotSet = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Not set',
+  open: async ({ services, overlays, today }) => {
+    const [entry] = await valueOf(services.food.watchFood(today));
+    if (entry !== undefined) void showAddFoodSheet(overlays, today, { entry });
+  },
+});
+
 /** Yesterday's food, opened on the Food screen, at Full detail with the Micros picture (MM-310). */
 const yesterdaysFood = ({ state, today }: StoryStage) => {
   state.homeTab.put('food');

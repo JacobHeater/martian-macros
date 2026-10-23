@@ -45,6 +45,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   23: '0c17338a660cc40ffe94ea47e22229acbfd0c31414dbdb0f67a17c5ec2ae3116',
   // MM-118: the weight display, chosen and offered.
   24: '2306c0f9022c0dede28dacfa23a8192a9f8d75d74d684156fd059e0e7a748e25',
+  // MM-570: the minute of its day a food was eaten, and the food log indexed by day.
+  25: 'd5504dfc8b5206f93459aae1253b099f4440f0e293c46fe6b9f17a193a66d579',
 };
 
 it('the schema is the one recorded for its version', () => {

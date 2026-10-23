@@ -19,7 +19,9 @@ import { MmButton } from '../../ui/MmButton';
 import { MmChoiceChip } from '../../ui/MmChoiceChip';
 import { MmTextField } from '../../ui/MmTextField';
 import { Notice } from '../../ui/Notice';
+import { eatenAtWhenLogged } from '../eatenAtWhenLogged';
 import { MealChips } from '../MealChips';
+import { TimeEatenRow } from '../TimeEatenRow';
 import '../food.css';
 
 interface EstimateMealStepProps {
@@ -47,6 +49,8 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
   const [size, setSize] = useState<MealSize>(initialSize);
   const [kind, setKind] = useState<MealKind>('balanced');
   const [meal, setMeal] = useState(firstMeal);
+  // Logged for today, it starts at now; for another day, it has no time until one is given (MM-570).
+  const [eatenAt, setEatenAt] = useState<number | undefined>(() => eatenAtWhenLogged(day, services.clock));
   const totals = maintenance === undefined ? undefined : estimateMeal(size, kind, { maintenanceKcal: maintenance });
 
   const log = async () => {
@@ -67,6 +71,7 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
         fatG: totals.fatG,
         source: 'quickAdd',
         portion: { method: 'quickAdd', basis: 'enteredTotals' },
+        eatenAt,
       }),
     );
     onDone();
@@ -147,6 +152,7 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
       <MmTextField label="Name (optional)" hint="Thai place, usual" value={name} onChange={setName} />
       <div className="app-gap" />
       <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <div className="app-gap" />
       <MmButton label="Log the estimate" expand onPress={() => void log()} describedBy={totals === undefined ? undefined : `${ids}-logs`} />
       <MmButton label="Back" kind="text" onPress={onBack} />
