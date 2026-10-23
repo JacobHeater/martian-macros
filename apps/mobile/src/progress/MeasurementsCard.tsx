@@ -1,3 +1,5 @@
+import { ChartPlaceholder } from '../charts/ChartPlaceholder';
+import { MiniTrend } from '../charts/MiniTrend';
 import type { LimbSide } from '../domain/measurements/LimbSide';
 import { MeasurementSite } from '../domain/measurements/MeasurementSite';
 import { leanGainPairOf } from '../engine/leanGainPairOf';
@@ -24,12 +26,18 @@ import { MeasurementSitesScreen } from './MeasurementSitesScreen';
 import { SiteHistoryScreen } from './SiteHistoryScreen';
 import './progress.css';
 
+/** How many of a site's latest measurements its row's line draws. */
+const measurementsDrawn = 8;
+
 /**
  * The sites beyond the waist (MM-156), a section under the waist's (the
  * sibling `WaistEntryCard`, MM-257): the suggested sites offered once, each
  * measured site's line opening its chart, what limbs did beside the waist
  * as two facts, the measuring session and the choice of sites. In a lean
- * gain, what limbs and waist together are consistent with.
+ * gain, what limbs and waist together are consistent with. Each measured
+ * site's row carries a small line of its latest measurements; before any
+ * site beyond the waist is measured, the section says what starts them
+ * (MM-578).
  */
 export function MeasurementsCard({ fmt }: { fmt: Fmt }) {
   const { services, state } = useApp();
@@ -49,6 +57,27 @@ export function MeasurementsCard({ fmt }: { fmt: Fmt }) {
         eatingDisorderHistory: setup.screening.eatingDisorderHistory,
         measured: settings.sites,
       });
+  const valuesOf = (site: MeasurementSite) =>
+    measurements
+      .filter((o) => o.site === site)
+      .sort((a, b) => a.date.compareTo(b.date))
+      .slice(-measurementsDrawn)
+      .map((o) => o.valueCm);
+  /** The row's small line, from two measurements. */
+  const line = (site: MeasurementSite) => {
+    const values = valuesOf(site);
+    if (values.length < 2) return undefined;
+    return (
+      <MiniTrend
+        values={values}
+        min={Math.min(...values)}
+        max={Math.max(...values)}
+        slots={measurementsDrawn}
+        label={`${siteLabel(site, settings.limbSide)} over the last ${values.length} measurements`}
+      />
+    );
+  };
+  const anyMeasured = sites.some((site) => valuesOf(site).length > 0);
   const facts = limbFactsOf({ measurements, sites: settings.sites, asOf: today });
   const pair = setup.goalMode === 'leanGain' ? leanGainPairOf(facts) : undefined;
 
@@ -92,6 +121,15 @@ export function MeasurementsCard({ fmt }: { fmt: Fmt }) {
           }
         />
       )}
+      {anyMeasured ? null : (
+        <ChartPlaceholder
+          text={
+            sites.length === 0
+              ? 'No site beyond the waist yet. Choose sites, then Measure; each one gets a line here.'
+              : 'Not measured yet. Measure, and each site gets a line here from its second measurement.'
+          }
+        />
+      )}
       {/* The measured sites, then the choice of sites as the group's last row (MM-156). */}
       <MmListGroup>
         {sites.map((site) => (
@@ -99,6 +137,7 @@ export function MeasurementsCard({ fmt }: { fmt: Fmt }) {
             key={site}
             title={siteLabel(site, settings.limbSide)}
             subtitle={siteSummary(measurements, site, fmt, today)}
+            trailing={line(site)}
             opens
             onPress={() => void navigator.push(() => <SiteHistoryScreen site={site} />)}
           />

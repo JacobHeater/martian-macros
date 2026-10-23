@@ -17,5 +17,5 @@ it('a trend still being worked out does not ask for a weigh-in', async () => {
   renderApp(repos, today, { change: waitingRead('weightEvents', 'watchWeightEvents') });
   await openTab('Progress');
   expect(await screen.findByText('Weight trend')).toBeInTheDocument();
-  expect(screen.queryByText('No trend yet.')).not.toBeInTheDocument();
+  expect(screen.queryByText(/^No trend yet\./)).not.toBeInTheDocument();
 });

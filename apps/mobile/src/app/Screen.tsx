@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { MartianRidge } from '../ui/MartianRidge';
 import { MmAppBar } from '../ui/MmAppBar';
 import { BackButton } from './BackButton';
 import './app.css';
@@ -21,6 +22,7 @@ export function Screen({ title, actions, roomy = false, footer, children }: Scre
       {title === undefined ? null : <MmAppBar title={title} leading={<BackButton />} actions={actions} />}
       <main className={`app-body${roomy ? ' app-body-roomy' : ''}${title === undefined ? ' app-body-barless' : ''}`}>
         {children}
+        <MartianRidge />
       </main>
       {footer}
     </div>

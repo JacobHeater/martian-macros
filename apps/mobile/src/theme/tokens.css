@@ -185,6 +185,8 @@
   --motion-pour: 1200ms;
   /* The ridge's alien, rising, looking about and ducking (owner): a slow idle loop, stopped under reduced motion. */
   --motion-idle: 9000ms;
+  /* The UFO that takes the alien up and off the page when it is tapped (MM-577). */
+  --motion-abduct: 1600ms;
 
   /* Type roles (MmType), in rem so text follows the phone's text size:
      size / line height, at 16px to the rem. */
@@ -211,5 +213,6 @@
     --motion-turn: 4000ms;
     --motion-pour: 0ms;
     --motion-idle: 0ms;
+    --motion-abduct: 0ms;
   }
 }

@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { HomeDestination } from '../state/HomeDestination';
+import { MartianRidge } from '../ui/MartianRidge';
 import { MmAppBar } from '../ui/MmAppBar';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmNavigationBar } from '../ui/MmNavigationBar';
@@ -78,6 +79,7 @@ export function HomeShell() {
         ) : (
           <CoachScreen />
         )}
+        <MartianRidge />
       </main>
       <MmNavigationBar
         destinations={destinations}
