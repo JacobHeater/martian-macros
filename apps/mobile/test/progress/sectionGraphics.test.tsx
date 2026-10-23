@@ -54,7 +54,7 @@ it('with no waist measured, the chart’s place says the line starts from the th
 it('weight events in the trend’s range are dots on its days, named aloud', async () => {
   await repos.weights.saveWeight(today, 82);
   await repos.weightEvents.saveWeightEvent({ date: today.addDays(-5), type: 'travel' });
-  const events = await section('Weight events');
+  const events = await open('Weight events');
   const track = await within(events).findByRole('img', { name: /^Weight events over the last 30 days: Travel, / });
   expect(track.querySelectorAll('.chart-track-mark')).toHaveLength(1);
 });
@@ -62,7 +62,7 @@ it('weight events in the trend’s range are dots on its days, named aloud', asy
 it('an event older than the trend’s range is listed, and the line says none is in range', async () => {
   await repos.weights.saveWeight(today, 82);
   await repos.weightEvents.saveWeightEvent({ date: today.addDays(-60), type: 'travel' });
-  const events = await section('Weight events');
+  const events = await open('Weight events');
   expect(await within(events).findByText(/^None in the last 30 days/)).toBeInTheDocument();
   expect(within(events).getByText('Travel')).toBeInTheDocument();
 });

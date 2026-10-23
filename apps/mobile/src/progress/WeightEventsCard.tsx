@@ -25,7 +25,8 @@ const same = (a: WeightEvent, b: WeightEvent) => a.date === b.date && a.type ===
  * section with the add action in its header and one row per event, newest
  * first, each with its icon and what it does to the trend (MM-257). Above
  * the rows, the trend chart's days as a line with a dot on each event's, or
- * what the line waits for (MM-578).
+ * what the line waits for (MM-578). Folded to a line of how many fall in the
+ * trend's range, beside its add action (MM-578).
  */
 export function WeightEventsCard() {
   const { services, state } = useApp();
@@ -112,10 +113,26 @@ export function WeightEventsCard() {
     );
   };
 
+  // Folded to a line once the events are read (the owner, 2026-10-22, MM-578), as Sleep and Waist are; while they are
+  // being read, or could not be, the section stays open so what it says is seen.
+  let summary: string | undefined;
+  if (events.ready) {
+    const fromOnboarding = onboardingCreatine(events.value, setup);
+    const known = [...events.value, ...(fromOnboarding === undefined ? [] : [fromOnboarding])];
+    const shown = known.filter((event) => !event.date.isBefore(today.addDays(1 - rangeDays))).length;
+    if (known.length === 0) summary = 'None noted yet.';
+    else if (shown === 0) summary = `None in the last ${rangeDays} days; ${known.length} earlier.`;
+    else summary = `${shown} in the last ${rangeDays} days.`;
+  }
+
   return (
     <MmSection
       icon="calendar"
       title="Weight events"
+      summary={summary}
+      collapsible={events.ready}
+      initiallyExpanded={false}
+      remember="progress.weight-events"
       trailing={
         <MmIconButton
           icon="plus"

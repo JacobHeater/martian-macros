@@ -343,7 +343,9 @@
   color: var(--text2);
 }
 .chart-placeholder-count {
-  margin: var(--space-4) 0 0;
+  /* In line with the words above it, past the icon. */
+  margin: var(--space-4) 0 0 calc(20px + var(--space-8));
+  text-align: start;
   color: var(--text2);
   font: var(--type-caption);
 }
