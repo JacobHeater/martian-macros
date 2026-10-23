@@ -105,7 +105,7 @@ it('the text is found', () => {
   expect(all.length).toBeGreaterThan(1000);
   // Both kinds are found: a quoted sentence, and words between tags.
   expect(all.some(([, text]) => text === 'Your first targets are worked out from your first weigh-in.')).toBe(true);
-  expect(all.some(([, text]) => text.startsWith('Partial days are left out of your metabolism estimate'))).toBe(true);
+  expect(all.some(([, text]) => text.endsWith('Your goal stays as it is unless you change it.'))).toBe(true);
 });
 
 // QA-6: a lower-case phrase is text; only a name with no space, or a class list, is passed over.

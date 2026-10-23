@@ -69,9 +69,16 @@ it('a past day says nothing about today, in the headings or the disclosure', asy
   await screen.findByText('Oats');
   expect(screen.getByRole('heading', { level: 1, name: 'Yesterday' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: /today/i })).not.toBeInTheDocument();
-  // "Copy breakfast to today" rightly names today; the day's own disclosure must not (the UX guard's B1).
-  expect(screen.getByRole('button', { name: /^More about this day/ })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /^More about today/ })).not.toBeInTheDocument();
+});
+
+// MM-574: "More about this day" held two paragraphs explaining the app's own arithmetic; it is gone.
+it('the Food screen has no "More about this day" fold', async () => {
+  await repos.food.addFood(foodOn(today, { name: 'Oats', meal: 'breakfast', kcal: 300, proteinG: 10, carbsG: 50, fatG: 6 }));
+  await openFood();
+  await screen.findByText('Oats');
+  expect(screen.queryByRole('button', { name: /^More about/ })).not.toBeInTheDocument();
+  expect(screen.queryByText(/Partial days are left out of your metabolism estimate/)).not.toBeInTheDocument();
 });
 
 // MM-389, the product designer's PD-1: a fold left closed must not hide the first food of a meal that had none.

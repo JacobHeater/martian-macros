@@ -9,7 +9,6 @@ import { useCell } from '../app/useCell';
 import { useHeldFailure } from '../app/useHeldFailure';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
-import { MmDisclosure } from '../ui/MmDisclosure';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { AlcoholLine } from './AlcoholLine';
@@ -111,15 +110,6 @@ export function FoodScreen() {
             <FoodDayGradeRow entries={entries} />
           </div>
           {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
-          <MmDisclosure title="More about this day" remember="food.more">
-            <p className="app-caption">
-              Partial days are left out of your metabolism estimate instead of being read as under-eating.
-            </p>
-            <p className="app-caption">
-              The Split picture counts protein and carbs at 4 kcal a gram and fat at 9. Alcohol and other calorie
-              differences are not part of it.
-            </p>
-          </MmDisclosure>
         </>
       )}
     </>
