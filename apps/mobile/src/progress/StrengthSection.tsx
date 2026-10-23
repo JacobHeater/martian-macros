@@ -1,3 +1,6 @@
+import { ChartPlaceholder } from '../charts/ChartPlaceholder';
+import { MiniTrend } from '../charts/MiniTrend';
+import type { StrengthTrend } from '../engine/StrengthTrend';
 import { Fmt } from '../format/Fmt';
 import { liftSummary } from '../format/liftSummary';
 import { Loadable } from '../state/Loadable';
@@ -12,19 +15,26 @@ import { ScreenLoading } from '../ui/ScreenLoading';
 import { StrengthHistoryScreen } from './StrengthHistoryScreen';
 import { StrengthLiftsScreen } from './StrengthLiftsScreen';
 
+/** How many of a lift's latest sessions its row's line draws. */
+const sessionsDrawn = 8;
+
 /**
  * The most-trained lifts and how their estimated strength has moved, with
  * the way to every lift's history. A section (MM-257): open when there are
  * recent lifts to show, folded to one line when there are none. Each lift is
- * a row that opens its history, where its chart lives (MM-344, rule 4).
+ * a row that opens its history, where its chart lives (MM-344, rule 4), and
+ * carries a small line of its last sessions' estimates; with none to show,
+ * the section says what starts them (MM-578).
  */
 export function StrengthSection() {
   const { state } = useApp();
   const navigator = useNavigator();
   const trends = useCell(state.strengthTrends);
   const setup = useLoaded(state.setup);
+  const weightDisplay = useCell(state.weightDisplay);
   if (setup === undefined) return null;
   const fmt = new Fmt(setup.unitSystem);
+  const weightHidden = weightDisplay === 'hidden';
   if (Loadable.hasFailed(trends)) {
     return (
       <MmSection icon="train" title="Strength trends">
@@ -39,6 +49,20 @@ export function StrengthSection() {
       </MmSection>
     );
   }
+  /** The row's small line: the last sessions' smoothed estimates, none for a bodyweight lift with the weight hidden (MM-118). */
+  const line = (trend: StrengthTrend) => {
+    const values = trend.points.slice(-sessionsDrawn).map((point) => point.trendKg);
+    if (values.length < 2 || (weightHidden && trend.exercise?.load === 'bodyweight')) return undefined;
+    return (
+      <MiniTrend
+        values={values}
+        min={Math.min(...values)}
+        max={Math.max(...values)}
+        slots={sessionsDrawn}
+        label={`Estimated max over the last ${values.length} sessions`}
+      />
+    );
+  };
   const all = trends.value;
   const recent = all.filter((trend) => trend.recentSessions > 0);
   let summary: string;
@@ -47,8 +71,13 @@ export function StrengthSection() {
   else summary = `${recent.length === 1 ? '1 lift' : `${recent.length} lifts`} over the last 90 days.`;
   return (
     <MmSection icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
-      {all.length === 0 ? null : (
+      {all.length === 0 ? (
+        <ChartPlaceholder text="No strength history yet. Finish a workout in Train; each lift you train gets a line here." />
+      ) : (
         <>
+          {recent.length === 0 ? (
+            <ChartPlaceholder text="No qualifying sessions in the last 90 days. Earlier sessions are in the lift histories." />
+          ) : null}
           <>
             {recent.slice(0, 4).map((trend) => (
               <MmListRow
@@ -57,6 +86,7 @@ export function StrengthSection() {
                 leadingIcon="trend"
                 title={trend.name}
                 subtitle={liftSummary(trend, fmt)}
+                trailing={line(trend)}
                 opens
                 onPress={() => void navigator.push(() => <StrengthHistoryScreen exerciseId={trend.exerciseId} />)}
               />

@@ -124,7 +124,7 @@ const setUpOnly: StoryScenario = async (repos, today) => {
 /** MM-321: no weigh-in yet: the trend waits for one. */
 export const ProgressNoWeighIn = screenStory({
   covers: ['ProgressScreen'],
-  shows: 'No trend yet.',
+  shows: /^No trend yet\. Your first weigh-in starts it/,
   scenario: setUpOnly,
   open: onProgress,
 });
@@ -135,6 +135,71 @@ export const ProgressFirstDay = screenStory({
   shows: 'A trend needs more weigh-ins.',
   scenario: firstDayScenario,
   open: onProgress,
+});
+
+// ---- MM-578: every section's graphic says plainly what it waits for ----
+
+/** MM-578: set up, nothing measured: the waist chart's place says the dots start with the first and the line from the third. */
+export const ProgressWaistChartEmpty = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^No measurements yet\. Each one is a dot here/,
+  scenario: setUpOnly,
+  open: onProgress,
+  walk: pressNamed(/^Waist/),
+});
+
+/** MM-578: no workout finished: Strength trends, opened, says what starts its lines. */
+export const ProgressStrengthEmpty = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^No strength history yet\. Finish a workout in Train/,
+  scenario: setUpOnly,
+  open: onProgress,
+  walk: pressNamed(/^Strength trends/),
+});
+
+/** MM-578: a weight event two months back: the trend's 30 days hold none, and the row is still listed. */
+export const ProgressWeightEventsOutOfRange = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^None in the last 30 days, the trend chart’s range\./,
+  scenario: async (repos, today) => {
+    await firstDayScenario(repos, today);
+    await repos.weightEvents.saveWeightEvent({ date: today.addDays(-60), type: 'travel' });
+  },
+  open: onProgress,
+});
+
+/** MM-578: a female profile with no period day marked: the track's place says what a marked day will show. */
+export const PeriodDaysNoneMarked = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^No period days marked yet\. Each one is a dot/,
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ sex: 'female', onboardedOn: today.addDays(-20), healthCheckConfirmedOn: today }));
+    await repos.weights.saveWeight(today, 64);
+  },
+  open: onProgress,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('heading', { name: 'Period days' }));
+  },
+});
+
+/** MM-578: six weeks of recomposition on Progress: the signal's three parts, each seen, above its words. */
+export const ProgressRecompSignal = screenStory({
+  covers: ['ProgressScreen'],
+  shows: 'Trend weight flat',
+  // As MM-32's test: six weeks flat, the waist down 2 cm, squat and row up each week.
+  scenario: async (repos, today) => {
+    await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-60), goalMode: 'recomp', healthCheckConfirmedOn: today }));
+    for (let d = 42; d >= 0; d--) await repos.weights.saveWeight(today.addDays(-d), 82 + (d % 2 === 0 ? 0.2 : -0.2));
+    for (const [ago, cm] of [[30, 92], [24, 92], [10, 90], [3, 90]] as const) await repos.waist.saveWaist(today.addDays(-ago), cm);
+    for (let week = 5; week >= 0; week--) {
+      const more = (5 - week) * 2.5;
+      await repos.workouts.saveWorkout(storyWorkout(today.addDays(-1 - week * 7), [['back-squat', 6, 100 + more], ['barbell-row', 6, 60 + more]]));
+    }
+  },
+  open: onProgress,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByText('Trend weight flat', {}, { timeout: 5000 }));
+  },
 });
 
 /** MM-321: the strength trends could not be read. */
@@ -253,12 +318,13 @@ export const ProgressAtWaist = screenStory({
   },
 });
 
-/** MM-321: lifts logged, none of them in the last 90 days. */
+/** MM-321: lifts logged, none of them in the last 90 days; opened, no line to draw, said in the lines' place (MM-578). */
 export const ProgressNoRecentLifts = screenStory({
   covers: ['ProgressScreen'],
   shows: /^No qualifying sessions in the last 90 days/,
   scenario: oldLiftsScenario,
   open: onProgress,
+  walk: pressNamed(/^Strength trends/),
 });
 
 /** MM-321: a lift whose sets never qualify for a strength estimate (25 reps). */
