@@ -18,6 +18,7 @@ const said = (minuteOfDay: number) => clockTimeText(new Date(2000, 0, 1, Math.tr
  * When the food was eaten (MM-570), laid out as Settings' reminder time is
  * (rule 9): one row with the time, or "Not set", that opens the design
  * system's clock to the minute. A time can be changed, never cleared.
+ * Flush with the sheet's edge, as the chips above it are (MM-576).
  */
 export function TimeEatenRow({ eatenAt, meal, onChange }: TimeEatenRowProps) {
   const overlays = useOverlays();
@@ -32,6 +33,7 @@ export function TimeEatenRow({ eatenAt, meal, onChange }: TimeEatenRowProps) {
   return (
     <MmListRow
       dense
+      flush
       leadingIcon="timer"
       title="Time eaten"
       subtitle={eatenAt === undefined ? 'Not set' : said(eatenAt)}

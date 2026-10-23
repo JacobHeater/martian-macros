@@ -732,6 +732,10 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    */
   const formFields = () => (
     <>
+      {/* When it was eaten comes first, before what and how much (MM-576). */}
+      <div className="app-gap-small" />
+      <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <div className="app-gap-small" />
       <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
       {calc === undefined ? typedFields() : calculatedFields(calc)}
@@ -754,9 +758,6 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           />
         </>
       ) : null}
-      <div className="app-gap" />
-      <MealChips meal={meal} onChange={setMeal} />
-      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       {/* What will be recorded, in every state the action is enabled, and before it is (MM-218): one wording across the sheet. */}
       {totals !== undefined ? (
         <p id={`${ids}-logs`} className="app-subhead food-totals" data-testid="logged-totals">
