@@ -2422,3 +2422,125 @@
   user-select: none;
   -webkit-user-drag: none;
 }
+
+/* The ground a Martian page ends on (MM-558): a faint violet ridge after the last of the content, seen only once
+   everything is read, with a little green alien behind its tallest peak (owner). The ridge is drawn opaque (the accent
+   line at 16% over the canvas) and over the alien so the alien hides behind it. Every 9 s (--motion-idle) the alien
+   rises, looks about and blinks, then ducks; still, peeking, with less motion. Tap it and a UFO, the alien in its dome,
+   flies up and off the page (MM-577); it is back five seconds later. Only the alien takes a tap. */
+.mm-ridge {
+  display: none;
+}
+.theme-martian .mm-ridge {
+  --mm-ridge: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 56' preserveAspectRatio='none'%3E%3Cpath fill='%231f153f' d='M0 56V46L22 40L38 44L60 30L74 38L96 34L118 42L140 36L156 24L170 34L196 40L220 32L240 38L262 28L280 36L304 42L326 34L344 40L360 36V56Z'/%3E%3C/svg%3E");
+  --mm-alien: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 26'%3E%3Cg stroke='%2376e83a' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M10 7L8 2M18 7L20 2'/%3E%3C/g%3E%3Cg fill='%2376e83a'%3E%3Ccircle cx='8' cy='1.8' r='1.4'/%3E%3Ccircle cx='20' cy='1.8' r='1.4'/%3E%3Cellipse cx='14' cy='14' rx='9' ry='8'/%3E%3C/g%3E%3Cg fill='%230a081b'%3E%3Cellipse cx='10.3' cy='13.6' rx='2.7' ry='1.7' transform='rotate(20 10.3 13.6)'/%3E%3Cellipse cx='17.7' cy='13.6' rx='2.7' ry='1.7' transform='rotate(-20 17.7 13.6)'/%3E%3C/g%3E%3C/svg%3E");
+  --mm-alien-blink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 26'%3E%3Cg stroke='%2376e83a' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M10 7L8 2M18 7L20 2'/%3E%3C/g%3E%3Cg fill='%2376e83a'%3E%3Ccircle cx='8' cy='1.8' r='1.4'/%3E%3Ccircle cx='20' cy='1.8' r='1.4'/%3E%3Cellipse cx='14' cy='14' rx='9' ry='8'/%3E%3C/g%3E%3Cg fill='%230a081b'%3E%3Cellipse cx='10.3' cy='13.6' rx='2.7' ry='0.35' transform='rotate(20 10.3 13.6)'/%3E%3Cellipse cx='17.7' cy='13.6' rx='2.7' ry='0.35' transform='rotate(-20 17.7 13.6)'/%3E%3C/g%3E%3C/svg%3E");
+  --mm-ufo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 22'%3E%3Cpath d='M13 13a9 9 0 0 1 18 0Z' fill='%2345e9f2' fill-opacity='.35'/%3E%3Cellipse cx='22' cy='10' rx='3.4' ry='3' fill='%2376e83a'/%3E%3Cpath d='M13 13a9 9 0 0 1 18 0' fill='none' stroke='%2345e9f2' stroke-width='1'/%3E%3Cellipse cx='22' cy='15' rx='21' ry='6' fill='%238a5cff'/%3E%3Cellipse cx='22' cy='13.4' rx='16' ry='2.2' fill='%23b762ff'/%3E%3Cg fill='%23e8ff1a'%3E%3Ccircle cx='9' cy='16' r='1.6'/%3E%3Ccircle cx='22' cy='17.6' r='1.6'/%3E%3Ccircle cx='35' cy='16' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  --mm-alien-left: calc(156 / 360 * (100% - 28px));
+  display: block;
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  height: 56px;
+  pointer-events: none;
+}
+.theme-martian .mm-ridge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--mm-ridge) bottom / 100% 100% no-repeat;
+}
+.mm-ridge-alien {
+  position: absolute;
+  top: 6px;
+  left: var(--mm-alien-left);
+  width: 28px;
+  height: 26px;
+  background: var(--mm-alien) center / 100% 100% no-repeat;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: mm-alien-peek var(--motion-idle) ease-in-out infinite;
+}
+/* A finger-sized target around a 28 px alien. */
+.mm-ridge-alien::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+@keyframes mm-alien-peek {
+  0%,
+  78%,
+  100% {
+    transform: translate(0, 26px);
+  }
+  14%,
+  64% {
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(-3px, 1px);
+  }
+  46% {
+    transform: translate(3px, 1px);
+  }
+  37%,
+  39.5% {
+    background-image: var(--mm-alien);
+  }
+  38% {
+    background-image: var(--mm-alien-blink);
+  }
+}
+.mm-ridge[data-away='true'] .mm-ridge-alien {
+  pointer-events: none;
+  animation: mm-alien-board var(--motion-slow) ease-in forwards;
+}
+@keyframes mm-alien-board {
+  to {
+    opacity: 0;
+    transform: translate(0, -12px) scale(0.3);
+  }
+}
+.mm-ridge-ufo {
+  position: absolute;
+  z-index: 1;
+  top: -16px;
+  left: calc(var(--mm-alien-left) - 8px);
+  width: 44px;
+  height: 22px;
+  background: var(--mm-ufo) center / 100% 100% no-repeat;
+  visibility: hidden;
+}
+.mm-ridge[data-away='true'] .mm-ridge-ufo {
+  visibility: visible;
+  animation: mm-ufo-leave var(--motion-abduct) ease-in forwards;
+}
+@keyframes mm-ufo-leave {
+  0% {
+    opacity: 0;
+    transform: translate(0, -12px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(0, -4px) rotate(-4deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(48px, -100vh) rotate(-12deg);
+  }
+}
+/* Still, the alien peeks without moving; a tap only sends it away and back, as the zeroed tokens jump to the end. */
+@media (prefers-reduced-motion: reduce) {
+  .mm-ridge[data-away='false'] .mm-ridge-alien {
+    animation: none;
+  }
+}
+@media (prefers-contrast: more), (forced-colors: active) {
+  .theme-martian .mm-ridge {
+    display: none;
+  }
+}
