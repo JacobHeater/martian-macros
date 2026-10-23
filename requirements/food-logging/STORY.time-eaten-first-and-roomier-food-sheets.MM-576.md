@@ -23,15 +23,18 @@ Choices I made without asking (say if any is wrong):
   step (`EstimateMealStep`), every place a food is logged.
 - **The row is flush with the sheet's edge** (`MmListRow`'s `flush`), so its icon lines up with the chips and fields above it
   rather than sitting 16 px in.
-- **The sheet's margins grow**, in `food.css`, for every sheet that uses `food-sheet` (add and edit food, amount, estimate, scan, saved foods,
-  custom food, recipe, water, easy to miss): the sides and foot from 16 px to 24 px; a labelled group ("Macro split", "How big was it?" and the like) from 12 px
-  to 24 px above it; a row of chips from 8 px to 12 px below what it follows; the "Logs …" line (MM-218) from 12 px to 16 px.
+- **The sheet's margins grow**, in `food.css`, for every sheet that uses `food-sheet` (add and edit food, amount, estimate,
+  scan, saved foods, custom food, recipe, water, easy to miss). The owner found 24 px at the sides still too tight on a phone
+  (2026-10-22), so: 32 px at the sides and foot; 20 px above each field; 16 px above each row of chips; 12 px around the
+  "Time eaten" row; 32 px above a labelled group ("Macro split", "How big was it?"); 24 px above the "Logs …" line (MM-218);
+  8 px under a field before its caption. A text action ("Edit nutrition per serving") lines up with the words above it, its
+  padding hanging out, as in a section (`mm-section-body`).
 - The panel pass is skipped: the change was dictated by the owner (apps/mobile/AGENTS.md, "Design").
 
 ## Description
 On every food sheet, the meal chips and the "Time eaten" row stand at the top of the form, under the headline (and on Edit food
 under "Logged on"), before the food's name, amount and numbers. The "Logs …" line and the action follow the numbers directly.
-The sheets have 24 px at the sides and a clearer break before each labelled group.
+The sheets have 32 px at the sides and a clear break between every field, row of chips and group.
 
 ## Acceptance Criteria
 ```gherkin
@@ -45,7 +48,7 @@ Scenario: The same order where a food is logged from search or estimated
 
 Scenario: Margins
   Given any food sheet
-  Then its content stands 24 px from the sheet's sides
+  Then its content stands 32 px from the sheet's sides
   And the "Time eaten" row lines up with the fields above it
 ```
 
