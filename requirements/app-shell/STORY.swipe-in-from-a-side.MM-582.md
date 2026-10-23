@@ -1,5 +1,5 @@
 ---
-id: MM-578
+id: MM-582
 status: done
 component: app-shell
 related: [MM-90, MM-232, MM-286]

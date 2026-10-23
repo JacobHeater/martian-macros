@@ -24,7 +24,7 @@ interface Swipe {
 }
 
 /**
- * A swipe in from a side of the screen (MM-578). While it moves, `target`
+ * A swipe in from a side of the screen (MM-582). While it moves, `target`
  * follows the finger (`data-edge-swipe` and `--mm-edge-swipe`). Let go far
  * or fast enough and `onSwipe` is told the side it came from; otherwise
  * `target` springs back. A side `canSwipeFrom` refuses never starts. The
