@@ -101,6 +101,10 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
       ) : null}
       {maintenance === undefined ? null : (
       <>
+      {/* When it was eaten comes first, before what and how much (MM-576). */}
+      <div className="app-gap-small" />
+      <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <p className="food-label food-label-spaced">How big was it?</p>
       {(
         <div className="app-row" role="group" aria-label="How big was it?">
@@ -150,9 +154,6 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
       )}
       <div className="app-gap" />
       <MmTextField label="Name (optional)" hint="Thai place, usual" value={name} onChange={setName} />
-      <div className="app-gap" />
-      <MealChips meal={meal} onChange={setMeal} />
-      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <div className="app-gap" />
       <MmButton label="Log the estimate" expand onPress={() => void log()} describedBy={totals === undefined ? undefined : `${ids}-logs`} />
       <MmButton label="Back" kind="text" onPress={onBack} />

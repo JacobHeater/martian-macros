@@ -302,6 +302,10 @@ export function FoodAmountStep({
         <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</span>
       </div>
       <div className="app-gap" />
+      {/* When it was eaten comes first, before what and how much (MM-576). */}
+      <MealChips meal={meal} onChange={setMeal} />
+      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
+      <div className="app-gap" />
       <div className="app-row" role="group" aria-label="Amount in">
         {choices.map((c) => (
           <MmChoiceChip key={choiceLabel(c)} label={choiceLabel(c)} selected={c === choice} onSelect={() => pick(c)} />
@@ -400,9 +404,6 @@ export function FoodAmountStep({
           />
         </>
       )}
-      <div className="app-gap" />
-      <MealChips meal={meal} onChange={setMeal} />
-      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
       <div className="app-gap" />
       <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
       {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}
