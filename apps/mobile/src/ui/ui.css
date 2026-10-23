@@ -2154,6 +2154,14 @@
   display: grid;
   color: var(--text3);
 }
+/* A header's chevron ends at the column's edge, as the rows and charts under it do: the glyph's own side bearing
+   hangs out (20 px chevron 7 px, 16 px fold chevron 4 px), so the fold and the opens chevrons line up (MM-583). */
+.mm-section-head-body > .mm-section-opens {
+  margin-inline-end: -7px;
+}
+.mm-section-head-body > .mm-disclosure-chevron {
+  margin-inline-end: -4px;
+}
 .mm-section-body {
   padding-left: calc(24px + var(--space-12));
 }
@@ -2161,8 +2169,17 @@
 .mm-section-meter {
   padding: var(--space-4) 0 var(--space-12);
 }
-.mm-section-flush .mm-section-body {
+/* Its own body only: a section inside a flush one keeps its indent, or its rows and charts slid under its icon and off
+   the screen (MM-583). */
+.mm-section-flush > .mm-section-body {
   padding-left: 0;
+}
+/* A flush body is not indented, so nothing in it is pulled back under the icon: it would hang off the screen (MM-583). */
+.mm-section-flush > .mm-section-body > .mm-list-group,
+.mm-section-flush > .mm-section-body > .mm-surface,
+.mm-section-flush > .mm-section-body > [role='alert'],
+.mm-section-flush > .mm-section-body > .mm-section-body-flush {
+  margin-left: 0;
 }
 .mm-section-body[hidden] {
   display: none;
