@@ -198,15 +198,31 @@
 .food-easy-to-miss-confirm {
   margin-top: var(--space-16);
 }
-/* Room to breathe on a sheet (MM-576): the screen's edge and more, and a clear break before each labelled group. */
+/* Room to breathe on a sheet (MM-576): 32 px from its sides, and a clear break between every field, row of chips and group. */
 .food-sheet {
-  padding: var(--space-4) var(--space-24) var(--space-24);
+  padding: var(--space-8) var(--space-32) var(--space-32);
+}
+.food-sheet > .mm-field,
+.food-sheet > .food-fields,
+.food-sheet > .food-extra-fields {
+  margin-top: var(--space-20);
+}
+.food-sheet > .app-row {
+  margin-top: var(--space-16);
+}
+.food-sheet > .mm-list-row {
+  margin-block: var(--space-12) var(--space-4);
+}
+/* A text action's label lines up with the words above it: its tap area keeps its padding, which hangs out. */
+.food-sheet > .mm-button-text:not(.mm-button-expand) {
+  margin-top: var(--space-8);
+  margin-inline-start: calc(-1 * var(--space-12));
 }
 .food-label-spaced {
-  margin-top: var(--space-24);
+  margin-top: var(--space-32);
 }
 .food-chips {
-  margin-top: var(--space-12);
+  margin-top: var(--space-16);
 }
 .food-fields {
   display: flex;
@@ -220,7 +236,7 @@
   flex: 1.5;
 }
 .food-totals {
-  margin: var(--space-16) 0 0;
+  margin: var(--space-24) 0 0;
 }
 .food-ingredient-adder {
   margin-top: var(--space-12);
@@ -254,7 +270,7 @@
 /* What keeps an action off, under the totals (MM-220); the numbers an edited entry rests on (MM-221). */
 .food-still-needed,
 .food-reference-line {
-  margin: var(--space-4) 0 0;
+  margin: var(--space-8) 0 0;
 }
 .food-online-searching {
   align-items: center;
