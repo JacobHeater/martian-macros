@@ -29,7 +29,8 @@ export function intakeDayFrom(
     if (e.source === 'weighed') weighed += e.kcal;
     if (e.source === 'palm' || e.source === 'cuppedHand' || e.source === 'thumb') hand += e.kcal;
     if (e.source === 'palm') palmProtein += e.proteinG;
-    if (e.source === 'quickAdd') estimated += e.kcal;
+    // A meal analysed from a photo is a style of estimating too (MM-586), whatever its numbers cite.
+    if (e.source === 'quickAdd' || e.source === 'photoEstimate') estimated += e.kcal;
   }
   return new IntakeDay({
     date,

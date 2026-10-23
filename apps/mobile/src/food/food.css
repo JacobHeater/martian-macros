@@ -276,3 +276,27 @@
   align-items: center;
   gap: var(--space-8);
 }
+
+/* What is wrong with a food of an analysed meal, in words under it (MM-586). */
+.food-item-problem {
+  color: var(--caution);
+}
+/* A meal's foods and its own actions on a sheet (MM-586, MM-587). */
+.food-meal-steps {
+  margin: var(--space-12) 0 0;
+  padding-inline-start: var(--space-20);
+  font: var(--type-body);
+}
+.food-meal-steps > li + li {
+  margin-top: var(--space-8);
+}
+/* A meal's grade on its own row, the letter after its label, 12 px under the totals (MM-587). */
+.food-meal-grade {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  margin-top: var(--space-12);
+}
+.food-meal-grade > .food-label {
+  margin: 0;
+}

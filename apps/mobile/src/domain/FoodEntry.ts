@@ -1,5 +1,7 @@
 import { ArgumentError } from '../lang/ArgumentError';
 import type { CalendarDate } from './CalendarDate';
+import type { FoodEvidence } from './food/meal/FoodEvidence';
+import type { LoggedMealTag } from './food/meal/LoggedMealTag';
 import { Micronutrients } from './food/micros/Micronutrients';
 import type { Portion } from './food/portion/Portion';
 import type { Meal } from './Meal';
@@ -23,6 +25,8 @@ interface FoodEntryInit {
   /** Sodium may be given here or as `sodiumMg`; `sodiumMg` wins. */
   micros?: Micronutrients | undefined;
   eatenAt?: number | undefined;
+  loggedMeal?: LoggedMealTag | undefined;
+  evidence?: FoodEvidence | undefined;
 }
 
 /** One logged food item. */
@@ -69,6 +73,18 @@ export class FoodEntry {
    */
   readonly eatenAt: number | undefined;
 
+  /**
+   * The meal this food is one of (MM-587), when it was logged as part of
+   * one; undefined for a food logged on its own.
+   */
+  readonly loggedMeal: LoggedMealTag | undefined;
+
+  /**
+   * Where its numbers came from, for a food of an analysed meal (MM-586);
+   * undefined for every other food, whose method and source say it.
+   */
+  readonly evidence: FoodEvidence | undefined;
+
   constructor(init: FoodEntryInit) {
     this.id = init.id;
     this.date = init.date;
@@ -91,6 +107,36 @@ export class FoodEntry {
       throw new ArgumentError('A food is eaten at a whole minute of its day, from 0 to 1439.');
     }
     this.eatenAt = eatenAt;
+    this.loggedMeal = init.loggedMeal;
+    this.evidence = init.evidence;
+  }
+
+  /**
+   * The same food with `changes` (MM-587): a meal's foods moved, renamed or
+   * logged again. New micronutrients bring their own sodium.
+   */
+  copyWith(changes: Partial<FoodEntryInit>): FoodEntry {
+    return new FoodEntry({
+      id: this.id,
+      date: this.date,
+      meal: this.meal,
+      name: this.name,
+      kcal: this.kcal,
+      proteinG: this.proteinG,
+      carbsG: this.carbsG,
+      fatG: this.fatG,
+      source: this.source,
+      portion: this.portion,
+      fiberG: this.fiberG,
+      sugarAlcoholsG: this.sugarAlcoholsG,
+      alcoholG: this.alcoholG,
+      micros: this.micros,
+      eatenAt: this.eatenAt,
+      loggedMeal: this.loggedMeal,
+      evidence: this.evidence,
+      ...changes,
+      sodiumMg: 'sodiumMg' in changes ? changes.sodiumMg : changes.micros === undefined ? this.sodiumMg : undefined,
+    });
   }
 
   /** Energy from alcohol at 7 kcal per gram, or 0 when none is known (MM-127). */

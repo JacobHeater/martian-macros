@@ -2575,7 +2575,16 @@
         ],
         "remaining": [
           "MM-37",
-          "MM-305"
+          "MM-305",
+          "MM-586",
+          "MM-587",
+          "MM-589",
+          "MM-590",
+          "MM-591",
+          "MM-594",
+          "MM-588",
+          "MM-592",
+          "MM-593"
         ]
       },
       "sequence": [
@@ -2766,6 +2775,27 @@
             "MM-456"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 15,
+          "title": "AI meal analysis (the owner, 2026-10-22): a prompt copied to the person's own assistant, its answer pasted back as one meal of several foods, each saying where its numbers came from (MM-586); the meal as one row that opens to its foods (MM-587); then the slot named MealSlot in code (MM-588)",
+          "tickets": [
+            "MM-586",
+            "MM-587",
+            "MM-589",
+            "MM-590",
+            "MM-591",
+            "MM-594",
+            "MM-588"
+          ]
+        },
+        {
+          "step": 16,
+          "title": "The day stepper draws no arrow to a day it cannot go to, and no control's words can be selected (the owner, 2026-10-22, MM-592, MM-593)",
+          "tickets": [
+            "MM-592",
+            "MM-593"
+          ]
         }
       ],
       "gate": {

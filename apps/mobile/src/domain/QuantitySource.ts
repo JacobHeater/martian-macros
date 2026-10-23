@@ -6,6 +6,12 @@ const relativeSigmas = {
   cuppedHand: 0.3,
   thumb: 0.4,
   quickAdd: 0.4,
+  /**
+   * An item of a meal analysed by the person's own AI assistant from a photo
+   * (MM-586): the grams are judged from the photo even when the numbers per
+   * 100 g are cited, so between a palm and an estimate.
+   */
+  photoEstimate: 0.3,
 } as const;
 
 /**

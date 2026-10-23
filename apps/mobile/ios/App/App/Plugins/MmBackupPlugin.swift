@@ -12,7 +12,8 @@ import UniformTypeIdentifiers
 /// hands an https address to the phone's browser (MM-454): the browser
 /// fetches the page, the app nothing. It keeps the progress photos private
 /// (MM-157): the phone's own lock is asked before they show, and while they
-/// do the app switcher shows a blank screen in their place.
+/// do the app switcher shows a blank screen in their place. It reads and
+/// writes the clipboard (MM-590); iOS asks the person before a paste.
 @objc(MmBackupPlugin)
 public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "MmBackupPlugin"
@@ -26,6 +27,8 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "openInBrowser", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "unlock", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "protectScreen", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "readClipboard", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "writeClipboard", returnType: CAPPluginReturnPromise),
     ]
 
     private var picker: PickDelegate?
@@ -115,6 +118,24 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
                     call.reject("The browser could not be opened.")
                 }
             }
+        }
+    }
+
+    @objc func readClipboard(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            if let text = UIPasteboard.general.string {
+                call.resolve(["text": text])
+            } else {
+                call.resolve([:])
+            }
+        }
+    }
+
+    @objc func writeClipboard(_ call: CAPPluginCall) {
+        guard let text = call.getString("text") else { return call.reject("writeClipboard needs the text.") }
+        DispatchQueue.main.async {
+            UIPasteboard.general.string = text
+            call.resolve()
         }
     }
 

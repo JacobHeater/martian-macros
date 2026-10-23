@@ -459,5 +459,44 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
         after: ['Oats', 'Eggs'],
       });
     });
+
+    const ofMeal = (date: CalendarDate, name: string, key: string, mealName: string) =>
+      entry(date, name).copyWith({
+        source: 'photoEstimate',
+        loggedMeal: { key, name: mealName },
+        evidence: { kind: 'cited', citation: `USDA FDC ${name}` },
+      });
+
+    it('MM-586, MM-587: a food of a meal keeps its meal and where its numbers came from; an update changes them', async () => {
+      const a = await repo.addFood(ofMeal(d1, 'Rice', 'k1', 'Taco night'));
+      await repo.addFood(entry(d1, 'Oats'));
+      const read = async () => new Map((await first(repo.watchFood(d1))).map((e) => [e.name, e] as const));
+      expect(found(await read(), 'Rice').loggedMeal).toEqual({ key: 'k1', name: 'Taco night' });
+      expect(found(await read(), 'Rice').evidence).toEqual({ kind: 'cited', citation: 'USDA FDC Rice' });
+      expect(found(await read(), 'Rice').source).toBe('photoEstimate');
+      expect(found(await read(), 'Oats').loggedMeal, 'a food on its own is in no meal').toBeUndefined();
+      expect(found(await read(), 'Oats').evidence).toBeUndefined();
+      const rice = found(await read(), 'Rice');
+      await repo.updateFood(rice.copyWith({ id: a, loggedMeal: { key: 'k1', name: 'Tacos' }, evidence: { kind: 'yours' } }));
+      expect(found(await read(), 'Rice').loggedMeal?.name).toBe('Tacos');
+      expect(found(await read(), 'Rice').evidence).toEqual({ kind: 'yours', citation: undefined });
+    });
+
+    it('MM-587: recent foods leave out the foods of a meal, and recent meals give each meal once, as last logged', async () => {
+      await repo.addFood(ofMeal(d1, 'Rice', 'k1', 'Taco night'));
+      await repo.addFood(ofMeal(d1, 'Beans', 'k1', 'Taco night'));
+      await repo.addFood(entry(d1, 'Oats'));
+      await repo.addFood(ofMeal(d2, 'Rice', 'k2', 'taco night'));
+      await repo.addFood(ofMeal(d2, 'Salsa', 'k2', 'taco night'));
+      await repo.addFood(ofMeal(d2, 'Toast', 'k3', 'Breakfast plate'));
+      expect((await first(repo.watchRecentFoods())).map((e) => e.name)).toEqual(['Oats']);
+      const meals = await first(repo.watchRecentMeals());
+      expect(meals.map((m) => [m.key, m.name, m.items.map((i) => i.name)])).toEqual([
+        ['k3', 'Breakfast plate', ['Toast']],
+        ['k2', 'taco night', ['Rice', 'Salsa']],
+      ]);
+      expect(meals[1]?.date).toEqual(d2);
+      expect((await first(repo.watchRecentMeals({ limit: 1 }))).map((m) => m.key)).toEqual(['k3']);
+    });
   });
 }

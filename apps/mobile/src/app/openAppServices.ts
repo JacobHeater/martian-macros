@@ -52,6 +52,8 @@ import { RenewingEraser } from '../healthWrite/RenewingEraser';
 import { RenewingRestorer } from '../healthWrite/RenewingRestorer';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
+import { NativeClipboard } from '../platform/NativeClipboard';
+import { NavigatorClipboard } from '../platform/NavigatorClipboard';
 import { WindowExternalLinks } from '../platform/WindowExternalLinks';
 import { mmDb } from '../sql/native/mmDb';
 import { NativeSqlDatabase } from '../sql/native/NativeSqlDatabase';
@@ -164,6 +166,8 @@ export async function openAppServices(): Promise<AppServices> {
     restSignal: new VibratingRestSignal(),
     // A link the person presses opens in the phone's browser (MM-454); in a browser, in a new tab.
     externalLinks: native ? new NativeExternalLinks(mmBackup) : new WindowExternalLinks(),
+    // The phone's clipboard through the shell, since Android's WebView cannot read it (MM-590); in a browser, the page's.
+    clipboard: native ? new NativeClipboard(mmBackup) : new NavigatorClipboard(),
     reminderScheduler: native
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),

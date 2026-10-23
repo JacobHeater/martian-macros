@@ -9,6 +9,7 @@ const icons: Readonly<Record<QuantitySource, MmIconName>> = {
   cuppedHand: 'hand',
   thumb: 'hand',
   quickAdd: 'estimate',
+  photoEstimate: 'camera',
 };
 
 /** The icon for how a logged quantity was measured (MM-255), always drawn beside its word. */

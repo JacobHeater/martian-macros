@@ -351,4 +351,19 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('CREATE INDEX "food_entries_epoch_day" ON "food_entries" ("epoch_day")');
     },
   ],
+  // 25 to 26 (MM-586, MM-587): the meal a food was logged as one of, by key and name, and where an analysed meal's
+  // food got its numbers; none for what is already logged.
+  [
+    25,
+    async (db) => {
+      await db.execute('ALTER TABLE food_entries ADD COLUMN logged_meal_key TEXT NULL');
+      await db.execute(
+        'ALTER TABLE food_entries ADD COLUMN logged_meal_name TEXT NULL CHECK ((logged_meal_key IS NULL) = (logged_meal_name IS NULL))',
+      );
+      await db.execute(
+        "ALTER TABLE food_entries ADD COLUMN evidence_kind TEXT NULL CHECK (evidence_kind IS NULL OR evidence_kind IN ('cited', 'matched', 'estimated', 'yours'))",
+      );
+      await db.execute('ALTER TABLE food_entries ADD COLUMN evidence_citation TEXT NULL');
+    },
+  ],
 ]);

@@ -1,4 +1,5 @@
 import type { Clock } from '../domain/integration/Clock';
+import type { Clipboard } from '../domain/integration/Clipboard';
 import type { ExternalLinks } from '../domain/integration/ExternalLinks';
 import type { Platform } from '../domain/integration/Platform';
 import type { ReminderScheduler } from '../domain/integration/ReminderScheduler';
@@ -197,4 +198,7 @@ export interface AppServices {
 
   /** The phone's browser, handed an address when the person presses a link (MM-454). The app fetches nothing itself. */
   readonly externalLinks: ExternalLinks;
+
+  /** The phone's clipboard: a prompt copied out to the person's own AI assistant and its answer pasted back (MM-586). */
+  readonly clipboard: Clipboard;
 }

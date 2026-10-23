@@ -32,6 +32,8 @@ interface EstimateMealStepProps {
   onDone: () => void;
   /** The typed form, offered when there is nothing to estimate from yet (MM-220). */
   onManual: () => void;
+  /** AI meal analysis (MM-586), offered first. */
+  onAnalyze: () => void;
   initialSize?: MealSize;
 }
 
@@ -40,7 +42,7 @@ interface EstimateMealStepProps {
  * (MM-150). It makes an ordinary entry measured by estimate, with the
  * uncertainty that carries.
  */
-export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManual, initialSize = 'regular' }: EstimateMealStepProps) {
+export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManual, onAnalyze, initialSize = 'regular' }: EstimateMealStepProps) {
   const ids = useId();
   const { services, state } = useApp();
   const maintenance = useCell(state.coach)?.tdee.kcal;
@@ -84,6 +86,10 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
         For a restaurant, a friend’s cooking or a buffet. Restaurant meals usually have more than they look. A rough
         entry beats a missing one.
       </p>
+      {/* Photos analysed by the person's own AI come first (MM-586); the hand estimate stays below. */}
+      <div className="app-gap-small" />
+      <MmButton label="AI meal analysis" kind="secondary" icon="camera" expand onPress={onAnalyze} />
+      <p className="app-caption">Copy a prompt to your own AI assistant with photos of your meal, and paste its answer back.</p>
       {maintenance === undefined ? (
         // Nothing to estimate from yet: the one thing that can be done is offered, and the rest is not drawn (MM-220).
         <>

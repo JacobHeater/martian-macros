@@ -113,12 +113,17 @@ should read this list as closely as any feature.
 - **Was to reopen if:** The food sources' coverage is measured and found
   adequate. The first pack built with MM-307 measures it.
 
-### No calorie or macro estimation from a meal photo
+### No calorie or macro estimation from a meal photo by the app
 
 - **Why:** Portion size from a photo has a large and unvalidated error, and
   the app's estimates are only as good as the intake it is given.
 - **Detail:** MM-44
 - **Reopen if:** An on-device method's error is measured and acceptable.
+- **Amended by the product owner (2026-10-22, MM-586):** the person may
+  analyse a meal with their own AI assistant, outside the app, and paste its
+  answer back. The app still estimates nothing from a photo and never sees
+  one; every imported number says where it came from and is reviewed before
+  it is logged.
 
 ## Body and measurement
 

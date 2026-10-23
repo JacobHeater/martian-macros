@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { HealthIntakeWriter } from '../healthIngest/HealthIntakeWriter';
@@ -33,6 +34,10 @@ export class MirroredFoodLog implements FoodRepository {
 
   watchRecentFoods(options?: { limit?: number }): Watched<FoodEntry[]> {
     return this.log.watchRecentFoods(options);
+  }
+
+  watchRecentMeals(options?: { limit?: number }): Watched<LoggedMeal[]> {
+    return this.log.watchRecentMeals(options);
   }
 
   lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {

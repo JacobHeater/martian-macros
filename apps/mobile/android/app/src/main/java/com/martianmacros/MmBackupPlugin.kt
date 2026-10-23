@@ -2,6 +2,8 @@ package com.martianmacros
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -29,7 +31,8 @@ import java.util.concurrent.Executors
  * hands an https address to the phone's browser (MM-454): the browser
  * fetches the page, the app nothing. It keeps the progress photos private
  * (MM-157): the phone's own lock is asked before they show, and the window
- * is kept out of the app switcher and screenshots while they do.
+ * is kept out of the app switcher and screenshots while they do. It reads
+ * and writes the clipboard (MM-590), which the WebView cannot read.
  */
 @CapacitorPlugin(name = "MmBackup")
 class MmBackupPlugin : Plugin() {
@@ -131,6 +134,27 @@ class MmBackupPlugin : Plugin() {
             call.resolve()
         } catch (error: ActivityNotFoundException) {
             call.reject("No browser is installed.")
+        }
+    }
+
+    /** The clipboard's text (MM-590), read on the main thread while the app has focus, as Android 10 requires. */
+    @PluginMethod
+    fun readClipboard(call: PluginCall) {
+        activity.runOnUiThread {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = clipboard.primaryClip
+            val text = if (clip == null || clip.itemCount == 0) null else clip.getItemAt(0).coerceToText(context)?.toString()
+            call.resolve(if (text == null) JSObject() else JSObject().put("text", text))
+        }
+    }
+
+    @PluginMethod
+    fun writeClipboard(call: PluginCall) {
+        val text = call.getString("text") ?: return call.reject("writeClipboard needs the text.")
+        activity.runOnUiThread {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("Martian Macros", text))
+            call.resolve()
         }
     }
 
