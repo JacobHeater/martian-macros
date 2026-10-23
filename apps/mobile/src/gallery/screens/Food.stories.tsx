@@ -176,6 +176,32 @@ export const Micros = screenStory({
   open: yesterdaysFood,
 });
 
+/** MM-561: a nutrient's row opened to the foods that add the most of it, most first. */
+export const MicrosTopFoods = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Also on the label',
+  scenario: demoWith({ detail: 'full', picture: 'micros' }),
+  open: yesterdaysFood,
+  walk: press(/^Sodium/),
+});
+
+/** MM-562: a macro pressed in the Grams picture: its top five foods, each with its meal as a chip. */
+export const MacroTopFoods = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  open: yesterdaysFood,
+  walk: press(/^Protein/),
+});
+
+/** MM-562: the same from the split's legend; the ring has no caption under it. */
+export const SplitTopFoods = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Breakfast',
+  scenario: demoWith({ detail: 'standard', picture: 'donut' }),
+  open: yesterdaysFood,
+  walk: press(/^Fat/),
+});
+
 /** MM-310: today so far, one food logged. */
 export const MicrosToday = screenStory({
   covers: ['FoodScreen'],
@@ -1253,10 +1279,10 @@ export const AddFoodAmountRememberedRaw = screenStory({
   walk: press(/^White rice, cooked/),
 });
 
-/** MM-167, MM-151: the row of a food weighed raw says so: "200 g raw · calculated from 365 kcal per 100 g". */
+/** MM-151, MM-564: the row of a food weighed raw says so: "200 g raw". */
 export const FoodWeighedRaw = screenStory({
   covers: ['FoodScreen'],
-  shows: /200 g raw · calculated from 365 kcal per 100 g/,
+  shows: /^200 g raw$/,
   scenario: withRawRiceWeighed,
   open: ({ state, today }) => {
     state.homeTab.put('food');
@@ -1264,10 +1290,10 @@ export const FoodWeighedRaw = screenStory({
   },
 });
 
-/** MM-151, MM-167: a packaged food's row says "as packaged" after its serving (the panel's PD-3). */
+/** MM-564: a packaged food's row says its serving and weight only; "as packaged" and the basis are in its editor. */
 export const FoodAsPackaged = screenStory({
   covers: ['FoodScreen'],
-  shows: /1 × 1 bar \(60 g\), as packaged · calculated from 380 kcal per 100 g/,
+  shows: /^1 × 1 bar · 60 g$/,
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
     await repos.food.addFood(

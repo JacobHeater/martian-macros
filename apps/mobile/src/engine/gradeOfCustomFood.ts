@@ -22,6 +22,7 @@ export function gradeOfCustomFood(food: CustomFood): FoodGradeValue {
   return gradeOfNutrition({
     kcal: food.perServing.kcal * scale,
     proteinG: food.perServing.proteinG * scale,
+    carbsG: food.perServing.carbsG * scale,
     fiberG: per100(food.fiberG),
     sodiumMg: per100(food.micros.of('sodium')),
     sugarsG: per100(food.micros.of('sugars')),

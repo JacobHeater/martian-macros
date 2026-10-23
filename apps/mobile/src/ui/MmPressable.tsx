@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { MmAnchor } from './MmAnchor';
 import './ui.css';
 
 interface MmPressableProps {
@@ -9,7 +10,8 @@ interface MmPressableProps {
   controls?: string | undefined;
   /** The ids of what says more about it, read after its name. */
   describedBy?: string | undefined;
-  onPress: () => void;
+  /** Given the pressed content's edges, for what opens beside it (MM-562). */
+  onPress: (anchor: MmAnchor) => void;
   children: ReactNode;
 }
 
@@ -28,7 +30,7 @@ export function MmPressable({ label, expanded, controls, describedBy, onPress, c
       aria-expanded={expanded}
       aria-controls={controls}
       aria-describedby={describedBy}
-      onClick={onPress}
+      onClick={(event) => onPress(event.currentTarget.getBoundingClientRect())}
     >
       {children}
     </button>

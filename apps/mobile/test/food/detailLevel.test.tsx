@@ -52,13 +52,13 @@ it('Standard shows the macros and no extras', async () => {
   expect(document.querySelector('.food-entry-extras')).toBeNull();
 });
 
-it('Full reveals what was stored all along', async () => {
+// MM-564: the row keeps to its name, macros and amount at every level; the other lines are in the editor and in Micros.
+it('Full keeps the row to name, macros and amount', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  const extras = await screen.findByText(/Fiber 16 g/);
-  // Net is the entry's own figure, so the line gives the total (MM-396, the designer's PD-1).
-  expect(extras).toHaveTextContent('Total carbs 40 g');
-  expect(extras).toHaveTextContent('Sodium 4 mg');
+  expect(screen.getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
+  expect(screen.queryByText(/Fiber 16 g/)).not.toBeInTheDocument();
+  expect(document.querySelector('.food-entry-extras')).toBeNull();
 });
 
 it('Simple hides carbohydrate and fat, not the data', async () => {
@@ -154,10 +154,6 @@ it('Full: the typed form takes fiber, sugars, saturated fat and sodium, stores t
   expect(granola?.sodiumMg).toBe(150);
   expect(granola?.micros.of('sugars')).toBe(18);
   expect(granola?.micros.of('saturatedFat')).toBe(2);
-  const extras = await screen.findByText(/Sugars 18 g/);
-  expect(extras).toHaveTextContent('Fiber 6 g');
-  expect(extras).toHaveTextContent('Saturated fat 2 g');
-  expect(extras).toHaveTextContent('Sodium 150 mg');
 });
 
 it('Full: two label servings multiply the other lines too, and an edit brings them back per serving', async () => {
@@ -181,8 +177,8 @@ it('Full: two label servings multiply the other lines too, and an edit brings th
   expect(within(sheet).getByRole<HTMLInputElement>('textbox', { name: 'Sugars g' }).value).toBe('9');
 });
 
-// MM-49: sugars and saturated fat from a format 3 pack show at Full, stored all along.
-it('Full shows the sugars and saturated fat an entry carries; Standard does not', async () => {
+// MM-49: sugars and saturated fat from a format 3 pack are stored all along; since MM-564 the row does not list them.
+it('the sugars and saturated fat an entry carries are kept, and the row stays short at every level', async () => {
   await repos.food.addFood(
     new FoodEntry({
       id: 0,
@@ -200,8 +196,11 @@ it('Full shows the sugars and saturated fat an entry carries; Standard does not'
   await openFood();
   expect(screen.queryByText(/Sugars 15 g/)).not.toBeInTheDocument();
   await repos.preferences.saveDetailLevel('full');
-  const extras = await screen.findByText(/Sugars 15 g/);
-  expect(extras).toHaveTextContent('Saturated fat 3 g');
+  await screen.findByText('Yogurt');
+  expect(screen.queryByText(/Sugars 15 g/)).not.toBeInTheDocument();
+  const yogurt = (await first(repos.food.watchFood(today))).find((e) => e.name === 'Yogurt');
+  expect(yogurt?.micros.of('sugars')).toBe(15);
+  expect(yogurt?.micros.of('saturatedFat')).toBe(3);
 });
 
 // MM-428: at Simple the form must not warn about macros it does not ask for, nor derive calories from protein alone.
@@ -223,10 +222,10 @@ it('MM-428: at Simple no calorie caution fires, no figure comes from macros, and
   expect(within(sheet).getByRole<HTMLButtonElement>('button', { name: 'Log it' }).disabled).toBe(false);
 });
 
-// MM-429: a row's press is described by its lines, so a reader hears the macros and the portion, not only "Edit".
+// MM-429: a row's press is described by its lines, so a reader hears the macros and how it was measured, not only "Edit".
 it('MM-429: the row is described by its lines for a screen reader', async () => {
   await openFood();
   const row = screen.getByRole('button', { name: 'Edit Lentils' });
   expect(row).toHaveAccessibleDescription(/P 18 · C 24 · F 1/);
-  expect(row).toHaveAccessibleDescription(/Weighed · amount not recorded/);
+  expect(row).toHaveAccessibleDescription(/Weighed/);
 });

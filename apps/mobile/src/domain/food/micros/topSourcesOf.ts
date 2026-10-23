@@ -1,4 +1,5 @@
 import type { FoodEntry } from '../../FoodEntry';
+import { rankedSources } from '../rankedSources';
 import type { Micronutrient } from './Micronutrient';
 import type { MicronutrientSource } from './MicronutrientSource';
 
@@ -9,14 +10,8 @@ import type { MicronutrientSource } from './MicronutrientSource';
  * tie keeps the order the foods were logged in.
  */
 export function topSourcesOf(entries: readonly FoodEntry[], nutrient: Micronutrient, count = 5): MicronutrientSource[] {
-  const byName = new Map<string, number>();
-  for (const entry of entries) {
-    const amount = entry.micros.of(nutrient);
-    if (amount === undefined || amount <= 0) continue;
-    byName.set(entry.name, (byName.get(entry.name) ?? 0) + amount);
-  }
-  return [...byName]
-    .map(([name, amount]) => ({ name, amount }))
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, count);
+  return rankedSources(entries, (entry) => entry.micros.of(nutrient), (entry) => entry.name, count).map(({ entry, amount }) => ({
+    name: entry.name,
+    amount,
+  }));
 }

@@ -16,4 +16,5 @@ export type OverlayKind =
   | 'snackUndo'
   | 'menu'
   | 'menuButton'
-  | 'popover';
+  | 'popover'
+  | 'popoverRows';

@@ -1,4 +1,5 @@
 const labels = {
+  fiber: 'fiber',
   sugars: 'sugars',
   saturatedFat: 'saturated fat',
   micronutrients: 'vitamins and minerals',

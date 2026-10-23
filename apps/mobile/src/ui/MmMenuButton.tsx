@@ -24,6 +24,11 @@ export function MmMenuButton<T>({ icon, label, items, onSelect }: MmMenuButtonPr
   const [open, setOpen] = useState(false);
 
   const show = async () => {
+    // A second press closes it: the button toggles, as its expanded state says (MM-565).
+    if (open) {
+      overlays.closeTop();
+      return;
+    }
     const rect = anchor.current?.getBoundingClientRect() ?? { top: 0, right: 0, bottom: 0, left: 0 };
     setOpen(true);
     const chosen = await overlays.menu({ label, items, anchor: rect });
