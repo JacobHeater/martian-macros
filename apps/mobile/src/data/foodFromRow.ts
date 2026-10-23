@@ -2,7 +2,7 @@ import { FoodEntry } from '../domain/FoodEntry';
 import { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
 import type { SqlRow } from '../sql/SqlRow';
-import { day, integer, named, number, optionalNumber, text } from './columns';
+import { day, integer, named, number, optionalInteger, optionalNumber, text } from './columns';
 import { microsFromRow } from './microsFromRow';
 import { portionFromRow } from './portionFromRow';
 
@@ -24,5 +24,6 @@ export function foodFromRow(r: SqlRow): FoodEntry {
     sodiumMg: optionalNumber(r, 'sodium_mg'),
     alcoholG: optionalNumber(r, 'alcohol_g'),
     micros: microsFromRow(r),
+    eatenAt: optionalInteger(r, 'eaten_at_minute'),
   });
 }

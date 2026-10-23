@@ -5,7 +5,7 @@ import type { Meal } from '../domain/Meal';
 /**
  * Fresh copies of `entries` on `day`, for logging again (MM-47). Each keeps
  * its meal unless `meal` is given. They are ordinary new entries (id 0), so
- * editing a copy never touches the original.
+ * editing a copy never touches the original. A copy has no time eaten.
  */
 export function entriesCopiedTo(
   day: CalendarDate,
@@ -30,6 +30,8 @@ export function entriesCopiedTo(
         sodiumMg: e.sodiumMg,
         alcoholG: e.alcoholG,
         micros: e.micros,
+        // When the original was eaten says nothing about when the copy was (MM-570): it has no time until one is given.
+        eatenAt: undefined,
       }),
   );
 }

@@ -15,6 +15,7 @@ export function foodOn(
     fatG = 70,
     sodiumMg,
     micros,
+    eatenAt,
   }: {
     name?: string;
     meal?: Meal;
@@ -24,7 +25,9 @@ export function foodOn(
     fatG?: number;
     sodiumMg?: number;
     micros?: Micronutrients;
+    /** Minutes after midnight of `date` it was eaten at (MM-570); none by default. */
+    eatenAt?: number;
   } = {},
 ): FoodEntry {
-  return new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source: 'weighed', sodiumMg, micros });
+  return new FoodEntry({ id: 0, date, meal, name, kcal, proteinG, carbsG, fatG, source: 'weighed', sodiumMg, micros, eatenAt });
 }
