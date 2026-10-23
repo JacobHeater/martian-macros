@@ -71,7 +71,13 @@ export function NavigatorHost({ children }: { children: ReactNode }) {
       {stack.map((pushed, i) => {
         const onTop = i === stack.length - 1;
         return (
-          <div key={pushed.id} ref={onTop ? top : undefined} className="app-layer" hidden={!onTop} {...(onTop ? swipeBack : {})}>
+          <div
+            key={pushed.id}
+            ref={onTop ? top : undefined}
+            className="app-layer"
+            hidden={!onTop}
+            {...(onTop ? swipeBack : {})}
+          >
             <CloseScreenContext.Provider value={pushed.close}>{pushed.node}</CloseScreenContext.Provider>
           </div>
         );
