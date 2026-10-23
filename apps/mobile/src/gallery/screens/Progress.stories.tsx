@@ -166,6 +166,7 @@ export const ProgressWeightEventsOutOfRange = screenStory({
     await repos.weightEvents.saveWeightEvent({ date: today.addDays(-60), type: 'travel' });
   },
   open: onProgress,
+  walk: pressNamed(/^Weight events/),
 });
 
 /** MM-578: a female profile with no period day marked: the track's place says what a marked day will show. */
@@ -259,12 +260,22 @@ const withWeightEvents: StoryScenario = async (repos, today) => {
   await repos.weightEvents.saveWeightEvent({ date: today.addDays(-3), type: 'largeOrSaltyMeal' });
 };
 
-/** MM-321: weight events listed, the one from onboarding marked, the others deletable. */
+/** MM-321: weight events listed, the one from onboarding marked, the others deletable; opened from its line (MM-578), the trend's days with a dot on each event's. */
 export const ProgressWeightEvents = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Onboarding',
   scenario: withWeightEvents,
   open: onProgress,
+  walk: pressNamed(/^Weight events/),
+});
+
+/** MM-578: no weight event noted: folded to "None noted yet."; opened, the track's place says what an event will show. */
+export const ProgressWeightEventsNone = screenStory({
+  covers: ['ProgressScreen'],
+  shows: /^No weight events yet\. Note illness, travel/,
+  scenario: setUpOnly,
+  open: onProgress,
+  walk: pressNamed(/^Weight events/),
 });
 
 /** MM-321: "Add a weight event" opens its sheet from Progress. */

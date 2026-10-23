@@ -2,7 +2,7 @@
 id: MM-578
 status: done
 component: body-measurements
-related: [MM-257, MM-155, MM-156, MM-250, MM-20, MM-136, MM-32, MM-344, MM-118]
+related: [MM-579, MM-257, MM-155, MM-156, MM-250, MM-20, MM-136, MM-32, MM-344, MM-118]
 ---
 
 # Story: Every Progress section has a graphic, and says plainly when it has nothing to draw
@@ -25,7 +25,10 @@ Choices I made without asking (say if any is wrong):
 - **Per section:**
   - Weight trend (hero): unchanged with data; with no weigh-in, the placeholder at the chart's height: "No trend yet. Your
     first weigh-in starts it."
-  - Weight events: the trend chart's days (its 30 or 90) as a line, a tick a week, a caution dot on each event's day
+  - Weight events (the owner, 2026-10-22: "where is the chevron"): **folds to a line** like Sleep and Waist, beside its
+    add action: "None noted yet.", "N in the last 30 days." or "None in the last 30 days; N earlier." It stays open while
+    the events are read or could not be. Remembered across visits.
+  - Weight events, opened: the trend chart's days (its 30 or 90) as a line, a tick a week, a caution dot on each event's day
     (`DayTrack`). None at all: the placeholder with what to note. Events only older than the range: "None in the last N
     days", and the rows stay.
   - Period days: the same line, each flow day a dot and the stretch the trend widens for shaded, as the trend chart shades

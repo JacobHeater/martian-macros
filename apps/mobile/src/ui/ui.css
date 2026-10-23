@@ -2157,11 +2157,14 @@
 .mm-section-body[hidden] {
   display: none;
 }
-/* A list group, a surface or a failed read's notice inside a section runs the column's width (MM-344). */
+/* A list group, a surface or a failed read's notice inside a section runs the column's width (MM-344). Its width is
+   left to fill the row: a surface's own 100% is the indented body's, which stopped it 36 px short of the edge
+   (MM-579). */
 .mm-section-body > .mm-list-group,
 .mm-section-body > .mm-surface,
 .mm-section-body > [role='alert'],
 .mm-section-body-flush {
+  width: auto;
   margin-left: calc(-1 * (24px + var(--space-12)));
 }
 
