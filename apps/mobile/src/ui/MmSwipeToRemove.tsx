@@ -31,7 +31,7 @@ export function MmSwipeToRemove({ children, onRemove }: MmSwipeToRemoveProps) {
   return (
     <div
       className={`mm-swipe${offset === 0 ? '' : ' mm-swipe-moving'}`}
-      // Its own sideways drag wins over a swipe in from the side (MM-578).
+      // Its own sideways drag wins over a swipe in from the side (MM-582).
       data-drags-sideways=""
       onPointerDown={(event) => {
         from.current = event.clientX;

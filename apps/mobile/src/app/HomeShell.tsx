@@ -25,7 +25,7 @@ import './app.css';
 /**
  * The frame every destination sits in (MM-90, MM-99): its name and the way
  * to Settings above, the five destinations below. A swipe in from the right
- * goes to the next destination, from the left to the one before (MM-578).
+ * goes to the next destination, from the left to the one before (MM-582).
  */
 export function HomeShell() {
   const { state } = useApp();

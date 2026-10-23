@@ -1794,7 +1794,7 @@
   background: var(--canvas);
 }
 
-/* A swipe in from a side of the screen (MM-578, useEdgeSwipe): what it moves follows the finger, and springs back
+/* A swipe in from a side of the screen (MM-582, useEdgeSwipe): what it moves follows the finger, and springs back
    when let go short. Only while it moves does it take a transform, so nothing fixed inside it is placed otherwise. */
 [data-edge-swipe='moving'] {
   transform: translateX(var(--mm-edge-swipe, 0));

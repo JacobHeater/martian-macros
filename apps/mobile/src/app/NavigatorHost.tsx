@@ -15,7 +15,7 @@ interface Pushed {
  * Shows `children`, and over them whatever screens have been pushed. A
  * screen that is covered stays alive, hidden, so it is as it was left when
  * the one over it closes. A swipe in from either side closes the one on top
- * (MM-578).
+ * (MM-582).
  */
 export function NavigatorHost({ children }: { children: ReactNode }) {
   const [stack, setStack] = useState<readonly Pushed[]>([]);

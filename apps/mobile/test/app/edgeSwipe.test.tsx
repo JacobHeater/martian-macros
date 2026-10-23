@@ -10,7 +10,7 @@ import { MmOverlays } from '../../src/ui/MmOverlays';
 import { renderApp } from '../support/renderApp';
 
 /**
- * MM-578: a swipe in from a side of the screen goes back on a pushed screen,
+ * MM-582: a swipe in from a side of the screen goes back on a pushed screen,
  * and between the destinations at home. jsdom's window is 1024 wide.
  */
 const right = window.innerWidth - 4;
