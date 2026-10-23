@@ -40,6 +40,14 @@ describe('the Martian ridge', () => {
     expect(css).toMatch(/\.app-body > \.mm-ridge \{\n  margin: auto calc\(-1 \* var\(--space-16\)\) 0;/);
   });
 
+  it('clips the ducked alien at the ridge, so the page cannot scroll past it', () => {
+    const { container } = render(<MartianRidge />);
+    expect(container.querySelector('.mm-ridge-pit > .mm-ridge-alien')).not.toBeNull();
+    const pit = /\.mm-ridge-pit \{([^}]*)\}/.exec(readFileSync('src/ui/ui.css', 'utf8'))?.[1] ?? '';
+    expect(pit).toMatch(/overflow: hidden/);
+    expect(pit).toMatch(/inset: -16px 0 0;/);
+  });
+
   it('flies the UFO for a motion token, so it stops under reduced motion', () => {
     const css = readFileSync('src/ui/ui.css', 'utf8');
     expect(css).toMatch(/animation: mm-ufo-leave var\(--motion-abduct\)/);

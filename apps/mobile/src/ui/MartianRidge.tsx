@@ -19,7 +19,9 @@ export function MartianRidge() {
   }, [away]);
   return (
     <div className="mm-ridge" aria-hidden="true" data-away={away}>
-      <span className="mm-ridge-alien" onClick={() => setAway(true)} />
+      <span className="mm-ridge-pit">
+        <span className="mm-ridge-alien" onClick={() => setAway(true)} />
+      </span>
       <span className="mm-ridge-ufo" />
     </div>
   );

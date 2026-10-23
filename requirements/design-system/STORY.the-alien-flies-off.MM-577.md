@@ -24,11 +24,13 @@ The alien comes back 5 seconds later."
   takes a tap; the ridge and the UFO let presses through.
 - The ridge meets the navigation bar with no canvas between (owner, 2026-10-22, on the iPhone): in Martian the body
   has no bottom padding and the ridge no negative bottom margin; with more contrast, where the ridge is not drawn,
-  the padding is back.
+  the padding is back. The strip the owner still saw was 10 px: the ducked alien and its tap area hung below the
+  ridge, and WebKit let the page scroll that far. The alien sits in a pit that clips at the ridge's bottom edge.
 - Under reduced motion the alien simply goes and comes back five seconds later; nothing flies.
 
 ## Acceptance Criteria
 - [x] Tapping the alien sends it away with the UFO, and it is back five seconds later (`test/ui/martianRidge.test.tsx`).
 - [x] The ridge is hidden from assistive technology, and every page body ends with it (`test/ui/martianRidge.test.tsx`).
-- [x] Nothing follows the ridge: the Martian body has no bottom padding (`test/ui/martianRidge.test.tsx`).
+- [x] Nothing follows the ridge: the Martian body has no bottom padding, and the alien is clipped at the ridge's
+  bottom edge (`test/ui/martianRidge.test.tsx`).
 - [x] The UFO's flight takes its duration from a motion token zeroed under reduced motion (`test/ui/reducedMotion.test.ts`).
