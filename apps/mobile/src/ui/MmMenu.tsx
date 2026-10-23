@@ -21,7 +21,9 @@ const edgePx = 16;
  * A short menu of actions, drawn by the overlay host at the trigger's
  * anchor so no ancestor can clip it (MM-268). It opens with focus on its
  * first item, the arrows move between items, Escape, Tab and a press
- * outside close it, and focus returns to the trigger.
+ * outside close it, and focus returns to the trigger. A press outside is
+ * taken whole by the scrim, so it never also lands on what is under it,
+ * the trigger included (MM-565).
  */
 export function MmMenu<T>({ label, items, anchor, onDone }: MmMenuProps<T>) {
   const list = useRef<HTMLDivElement>(null);
@@ -63,7 +65,7 @@ export function MmMenu<T>({ label, items, anchor, onDone }: MmMenuProps<T>) {
 
   return (
     <>
-      <div className="mm-menu-scrim" onPointerDown={() => onDone(undefined)} />
+      <div className="mm-menu-scrim" onClick={() => onDone(undefined)} />
       <div ref={list} className="mm-menu-list" role="menu" aria-label={label} style={place} onKeyDown={onKeyDown}>
         {items.map((item) => (
           <MmMenuItemRow key={item.label} label={item.label} onSelect={() => onDone(item)} />

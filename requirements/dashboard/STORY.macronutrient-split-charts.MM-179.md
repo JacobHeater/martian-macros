@@ -26,6 +26,7 @@ Panel review of PR #285 (2026-10-21):
 - The switch's group is named "Macro picture" (UX-4).
 - Inside the hero the split keeps one line, "Share of calories from each",
   in its empty state too so the hero does not grow with the first food (UX-3).
+  Withdrawn by the owner on 2026-10-22 as cruft (MM-562): the hero's split has no caption.
 - A choice that could not be saved is said in a snack: "Could not keep that
   choice." (UX-5).
 

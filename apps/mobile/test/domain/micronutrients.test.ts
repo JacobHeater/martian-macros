@@ -3,6 +3,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { microsDayOf } from '../../src/domain/food/micros/microsDayOf';
 import { referenceAmount } from '../../src/domain/food/micros/referenceAmount';
+import { topSourcesOf } from '../../src/domain/food/micros/topSourcesOf';
 import { ReferenceWithheld } from '../../src/domain/food/micros/ReferenceWithheld';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { Profile } from '../../src/domain/Profile';
@@ -80,6 +81,34 @@ it('a food stating 0 counts as stating it; a food stating nothing adds nothing a
   expect(of('sodium')).toMatchObject({ known: 100, stated: 1 });
   expect(of('sodium')?.over(99)).toBe(true);
   expect(of('sodium')?.over(100)).toBe(false);
+});
+
+it('MM-561: the top sources are the five foods adding the most, most first, one row per food name', () => {
+  const named = (name: string, iron: number | undefined) =>
+    new FoodEntry({ id: 0, date: today, meal: 'lunch', name, kcal: 100, proteinG: 1, carbsG: 1, fatG: 1, source: 'weighed',
+      micros: iron === undefined ? Micronutrients.none : new Micronutrients({ iron }) });
+  const sources = topSourcesOf(
+    [
+      named('Spinach', 3),
+      named('Lentils', 6.6),
+      named('Toast', 1),
+      named('Spinach', 4),
+      named('Beef', 2.5),
+      named('Egg', 0.9),
+      named('Rice', 0.8),
+      named('Apple', 0),
+      named('Coffee', undefined),
+    ],
+    'iron',
+  );
+  expect(sources).toEqual([
+    { name: 'Spinach', amount: 7 },
+    { name: 'Lentils', amount: 6.6 },
+    { name: 'Beef', amount: 2.5 },
+    { name: 'Toast', amount: 1 },
+    { name: 'Egg', amount: 0.9 },
+  ]);
+  expect(topSourcesOf([named('Apple', 0), named('Coffee', undefined)], 'iron')).toEqual([]);
 });
 
 it('an entry keeps sodium in one place, its field winning', () => {

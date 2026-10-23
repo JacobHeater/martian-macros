@@ -10,6 +10,7 @@ import { foodSourceLabel } from '../../src/format/foodSourceLabel';
 import { importedWeighInText } from '../../src/format/importedWeighInText';
 import { loggingStreakText } from '../../src/format/loggingStreakText';
 import { personalRecordText } from '../../src/format/personalRecordText';
+import { portionAmount } from '../../src/format/portionAmount';
 import { portionSummary } from '../../src/format/portionSummary';
 import { progressionSettingsText } from '../../src/format/progressionSettingsText';
 import { progressionText } from '../../src/format/progressionText';
@@ -184,6 +185,19 @@ describe('what was eaten', () => {
         entry({ method: 'palm', basis: 'calculated', quantity: 1, unit: 'palm', reference: per100g, impliedGrams: 99.6 }),
       ),
     ).toBe('1 palm (100 g) · estimated');
+  });
+
+  // MM-564: a row says what was eaten in a few words; a serving named with its weight says it once.
+  it('the row says the amount and its weight, once', () => {
+    expect(portionAmount(entry())).toBeUndefined();
+    expect(portionAmount(entry({ method: 'labelServing', basis: 'calculated', quantity: 1.5, unit: 'serving', reference: perServing }))).toBe(
+      '1.5 × 1 bar · 60 g',
+    );
+    const tbsp = { ...perServing, servingDescription: '1 tbsp (20 g)', servingGrams: 20 };
+    expect(portionAmount(entry({ method: 'labelServing', basis: 'calculated', quantity: 1, unit: 'serving', reference: tbsp }))).toBe(
+      '1 × 1 tbsp · 20 g',
+    );
+    expect(portionAmount(entry({ method: 'weighed', basis: 'calculated', quantity: 80, unit: 'gram', reference: per100g }))).toBe('80 g');
   });
 
   it('the extra nutrients are only the ones the source stated', () => {

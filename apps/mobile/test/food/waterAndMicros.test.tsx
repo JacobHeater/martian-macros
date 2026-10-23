@@ -81,6 +81,26 @@ it('a reference is drawn as a marker, with what it means said once', async () =>
   expect(screen.getByText(/^Reference: a daily amount for a healthy man of your age, as an average over many days/)).toBeInTheDocument();
 });
 
+it('MM-561: pressing a nutrient lists the foods that add the most of it, most first', async () => {
+  await fullDetailWithMicros();
+  for (const [name, iron] of [['Toast', 1], ['Lentils', 6.6], ['Spinach', 3]] as const) {
+    await repos.food.addFood(foodOn(today, { name, kcal: 100, proteinG: 1, carbsG: 1, fatG: 1, micros: new Micronutrients({ iron }) }));
+  }
+  renderApp(repos, today);
+  await openTab('Food');
+  const row = await screen.findByRole('button', { name: /^Iron, 11 milligrams/ });
+  expect(row).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.queryByRole('list', { name: 'Top foods for Iron' })).not.toBeInTheDocument();
+  await userEvent.click(row);
+  expect(row).toHaveAttribute('aria-expanded', 'true');
+  const list = screen.getByRole('list', { name: 'Top foods for Iron' });
+  expect(within(list).getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+    'Lentils, 7 milligramsLentils7 mg',
+    'Spinach, 3 milligramsSpinach3 mg',
+    'Toast, 1 milligramsToast1 mg',
+  ]);
+});
+
 it('pregnant: no reference marker, and the care-team line', async () => {
   await fullDetailWithMicros();
   await repos.setup.saveSetup(

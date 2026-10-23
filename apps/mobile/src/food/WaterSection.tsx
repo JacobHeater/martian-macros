@@ -103,7 +103,10 @@ export function WaterSection({ day }: { day: CalendarDate }) {
   else summary = `${waterAmount(total, units)} of ${waterAmount(goal, units)} · ${glassesLabel(glasses.drunk, glasses.of)}`;
 
   return (
+    // A card like each meal's (MM-569).
     <MmSection
+      framed
+      flush
       icon="water"
       title="Water"
       summary={summary}

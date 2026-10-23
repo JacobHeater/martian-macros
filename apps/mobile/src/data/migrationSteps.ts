@@ -340,4 +340,15 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 24 to 25 (MM-570): the minute of its day a food was eaten, none for what is already logged; and the food log
+  // indexed by day, for reading a run of days.
+  [
+    24,
+    async (db) => {
+      await db.execute(
+        'ALTER TABLE food_entries ADD COLUMN eaten_at_minute INTEGER NULL CHECK (eaten_at_minute IS NULL OR eaten_at_minute BETWEEN 0 AND 1439)',
+      );
+      await db.execute('CREATE INDEX "food_entries_epoch_day" ON "food_entries" ("epoch_day")');
+    },
+  ],
 ]);

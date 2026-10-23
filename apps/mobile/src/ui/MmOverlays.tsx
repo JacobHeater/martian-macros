@@ -149,9 +149,9 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         return ask((finish) => <MmClockTimeDialog title={title} initialMs={initialMs} refuse={refuse} onDone={finish} />);
       },
 
-      sheet(label, content) {
+      sheet(label, content, options) {
         return ask((finish) => (
-          <MmSheet label={label} onDismiss={() => finish(undefined)}>
+          <MmSheet label={label} size={options?.size} onDismiss={() => finish(undefined)}>
             {content(finish)}
           </MmSheet>
         ));
@@ -161,9 +161,9 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         return ask((finish) => <MmMenu label={label} items={items} anchor={anchor} onDone={finish} />);
       },
 
-      async popover({ title, message, anchor, label }) {
+      async popover({ title, message, rows, anchor, label }) {
         await ask<never>((finish) => (
-          <MmPopover title={title} message={message} anchor={anchor} label={label} onDone={() => finish(undefined)} />
+          <MmPopover title={title} message={message} rows={rows} anchor={anchor} label={label} onDone={() => finish(undefined)} />
         ));
       },
 

@@ -99,9 +99,11 @@ it('the detail of nutrition shown can be changed, and says what each shows', asy
   expect(settings.getByText(/^Full: .*Changes what is shown, never what is stored\./)).toBeInTheDocument();
 });
 
-it('the easy-to-miss line can be turned off', async () => {
+// MM-575: the check asked as a day is marked complete can be turned off, and its row says what it does.
+it('the easy-to-miss check can be turned off', async () => {
   const settings = await open();
-  await userEvent.click(settings.getByRole('switch', { name: /Easy-to-miss reminder/ }));
+  expect(settings.getByText(/^Before a day is marked complete, asks about cooking oil/)).toBeInTheDocument();
+  await userEvent.click(settings.getByRole('switch', { name: /Easy-to-miss check/ }));
   await expect.poll(async () => (await first(repos.preferences.watchEasyToMiss())).enabled).toBe(false);
 });
 

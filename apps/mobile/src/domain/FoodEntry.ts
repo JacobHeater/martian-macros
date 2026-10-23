@@ -1,3 +1,4 @@
+import { ArgumentError } from '../lang/ArgumentError';
 import type { CalendarDate } from './CalendarDate';
 import { Micronutrients } from './food/micros/Micronutrients';
 import type { Portion } from './food/portion/Portion';
@@ -21,6 +22,7 @@ interface FoodEntryInit {
   alcoholG?: number | undefined;
   /** Sodium may be given here or as `sodiumMg`; `sodiumMg` wins. */
   micros?: Micronutrients | undefined;
+  eatenAt?: number | undefined;
 }
 
 /** One logged food item. */
@@ -59,6 +61,14 @@ export class FoodEntry {
    */
   readonly micros: Micronutrients;
 
+  /**
+   * When it was eaten (MM-570): minutes after local midnight of the entry's
+   * own `date`, 0 to 1439. Undefined when not known (an entry logged for an
+   * earlier day, copied from another day, or logged before times were
+   * recorded), and nothing is invented for it.
+   */
+  readonly eatenAt: number | undefined;
+
   constructor(init: FoodEntryInit) {
     this.id = init.id;
     this.date = init.date;
@@ -76,6 +86,11 @@ export class FoodEntry {
     this.sodiumMg = init.sodiumMg ?? micros.of('sodium');
     this.micros = micros.with('sodium', this.sodiumMg);
     this.alcoholG = init.alcoholG;
+    const eatenAt = init.eatenAt;
+    if (eatenAt !== undefined && !(Number.isInteger(eatenAt) && eatenAt >= 0 && eatenAt < 24 * 60)) {
+      throw new ArgumentError('A food is eaten at a whole minute of its day, from 0 to 1439.');
+    }
+    this.eatenAt = eatenAt;
   }
 
   /** Energy from alcohol at 7 kcal per gram, or 0 when none is known (MM-127). */

@@ -56,10 +56,11 @@ it('a meal with food still folds', async () => {
   expect(within(region).getByRole('button', { name: /^Breakfast/ })).toHaveAttribute('aria-expanded', 'true');
 });
 
-it('on Food the calorie figure is spoken once, by its text, not again by the arc', async () => {
+// MM-389, MM-571: the figure is spoken once, by its text; the chart says the running total, not the figure again.
+it('on Food the calorie figure is spoken once, by its text, and the chart speaks the running total', async () => {
   await openFood();
-  expect(document.querySelector('.mm-horizon')).toHaveAttribute('aria-hidden', 'true');
-  expect(screen.queryByRole('img', { name: /kcal left of/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('img', { name: /^Running total: / })).toBeInTheDocument();
+  expect(screen.queryByRole('img', { name: /left of/ })).not.toBeInTheDocument();
 });
 
 it('a past day says nothing about today, in the headings or the disclosure', async () => {
@@ -69,9 +70,16 @@ it('a past day says nothing about today, in the headings or the disclosure', asy
   await screen.findByText('Oats');
   expect(screen.getByRole('heading', { level: 1, name: 'Yesterday' })).toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: /today/i })).not.toBeInTheDocument();
-  // "Copy breakfast to today" rightly names today; the day's own disclosure must not (the UX guard's B1).
-  expect(screen.getByRole('button', { name: /^More about this day/ })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /^More about today/ })).not.toBeInTheDocument();
+});
+
+// MM-574: "More about this day" held two paragraphs explaining the app's own arithmetic; it is gone.
+it('the Food screen has no "More about this day" fold', async () => {
+  await repos.food.addFood(foodOn(today, { name: 'Oats', meal: 'breakfast', kcal: 300, proteinG: 10, carbsG: 50, fatG: 6 }));
+  await openFood();
+  await screen.findByText('Oats');
+  expect(screen.queryByRole('button', { name: /^More about/ })).not.toBeInTheDocument();
+  expect(screen.queryByText(/Partial days are left out of your metabolism estimate/)).not.toBeInTheDocument();
 });
 
 // MM-389, the product designer's PD-1: a fold left closed must not hide the first food of a meal that had none.
