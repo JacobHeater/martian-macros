@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import { distinctByName } from '../domain/food/meal/distinctByName';
 import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -13,6 +14,9 @@ import { portionValues } from './portionValues';
 import { insert } from './insert';
 import { update } from './update';
 import type { Values } from './Values';
+
+/** A LIKE pattern for names holding `query`, its own % and _ taken literally (MM-596). SQLite's LIKE ignores ASCII case. */
+const containing = (query: string) => `%${query.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 
 const valuesOf = (entry: FoodEntry): Values => ({
   epoch_day: entry.date.epochDay,
@@ -110,5 +114,19 @@ export class SqlFoodRepository implements FoodRepository {
         limit,
       ),
     );
+  }
+
+  async searchLoggedFoods(query: string, { limit = 25 }: { limit?: number } = {}): Promise<FoodEntry[]> {
+    const rows = await this.db.read((db) =>
+      db.select("SELECT * FROM food_entries WHERE name LIKE ? ESCAPE '\\' ORDER BY id DESC", [containing(query)]),
+    );
+    return distinctByName(rows.map(foodFromRow), limit);
+  }
+
+  async searchLoggedMeals(query: string, { limit = 10 }: { limit?: number } = {}): Promise<LoggedMeal[]> {
+    const rows = await this.db.read((db) =>
+      db.select("SELECT * FROM food_entries WHERE logged_meal_name LIKE ? ESCAPE '\\' ORDER BY id DESC", [containing(query)]),
+    );
+    return recentMealsIn(rows.map(foodFromRow), limit);
   }
 }

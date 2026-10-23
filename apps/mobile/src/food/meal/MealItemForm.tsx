@@ -48,7 +48,8 @@ function valueOf(item: MealItemDraft, field: Field): number | undefined {
 
 /**
  * Changes one food of a meal, or adds one (MM-586, MM-587), under its row
- * as a recipe line's weight is changed (MM-456). Changing the grams scales
+ * as a recipe line's weight is changed (MM-456), with its usual portion
+ * (MM-595), the amount eaten when none is given. Changing the grams scales
  * every number the person has not typed, so the food stays the same and
  * only the amount changes. A number typed makes the food the person's own.
  * "Look up" takes the numbers of the food in the app's packs that the name
@@ -60,6 +61,9 @@ export function MealItemForm({ item, onSave, onCancel, requireComplete = false }
   const [base, setBase] = useState<MealItemDraft>(item ?? blank);
   const [name, setName] = useState(base.name);
   const [grams, setGrams] = useState(base.grams === undefined ? '' : editableNumber(base.grams));
+  // A reasonable serving of it on its own (MM-595): kept with the food, to log it again.
+  const [usual, setUsual] = useState(base.usualPortion?.description ?? '');
+  const [usualGrams, setUsualGrams] = useState(base.usualPortion === undefined ? '' : editableNumber(base.usualPortion.grams));
   const [typed, setTyped] = useState<Partial<Record<Field, string>>>({});
   const [lookupNote, setLookupNote] = useState<string>();
   const [refused, setRefused] = useState<readonly string[]>([]);
@@ -106,10 +110,18 @@ export function MealItemForm({ item, onSave, onCancel, requireComplete = false }
 
   const save = () => {
     const ownNumbers = item === undefined || Object.keys(typed).length > 0;
+    const usualNow = parseNumber(usualGrams);
     const changed: MealItemDraft = {
       ...base,
       name: name.trim(),
       grams: gramsNow,
+      // Left empty, the usual portion is what was eaten.
+      usualPortion:
+        usual.trim() !== '' && usualNow !== undefined
+          ? { description: usual.trim(), grams: usualNow }
+          : gramsNow === undefined
+            ? undefined
+            : { description: `${editableNumber(gramsNow)} g`, grams: gramsNow },
       kcal: numberOf('kcal'),
       proteinG: numberOf('protein'),
       carbsG: numberOf('carbs'),
@@ -133,6 +145,10 @@ export function MealItemForm({ item, onSave, onCancel, requireComplete = false }
       <div className="food-fields">
         <MmTextField label="Grams eaten" kind="number" dense value={grams} onChange={setGrams} />
         {field('kcal', 'Calories')}
+      </div>
+      <div className="food-fields">
+        <MmTextField label="Usual portion" hint="1 cup" dense value={usual} onChange={setUsual} />
+        <MmTextField label="Its grams" kind="number" dense value={usualGrams} onChange={setUsualGrams} />
       </div>
       <div className="food-extra-fields">
         {field('protein', 'Protein g')}

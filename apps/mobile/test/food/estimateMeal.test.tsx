@@ -88,8 +88,9 @@ it('an estimated meal in recents keeps its estimated mark', async () => {
   expect(within(sheet).getByRole('button', { name: /^Thai place, usual.*· estimated/ })).toBeInTheDocument();
   expect(within(sheet).getByRole('button', { name: /^Thai curry, weighed/ })).toBeInTheDocument();
   await typeIn(sheet, 'Search foods', 'thai');
-  expect(within(sheet).getByText('Your recent food · estimated · 900 kcal')).toBeInTheDocument();
-  expect(within(sheet).getByText('Your recent food · 600 kcal')).toBeInTheDocument();
+  // Found in the whole log (MM-596), still marked.
+  expect(await within(sheet).findByText('From your log · estimated · 900 kcal')).toBeInTheDocument();
+  expect(within(sheet).getByText('From your log · 600 kcal')).toBeInTheDocument();
   await userEvent.click(within(sheet).getByRole('button', { name: /^Thai place, usual/ }));
   // Refilled as estimated totals, in one tap, with Log it ready.
   expect(within(sheet).getByRole('button', { name: 'Estimated totals', pressed: true })).toBeInTheDocument();

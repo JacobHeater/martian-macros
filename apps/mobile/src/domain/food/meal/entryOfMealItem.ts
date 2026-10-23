@@ -37,7 +37,13 @@ export function entryOfMealItem(
       basis: 'calculated',
       quantity: grams,
       unit: 'gram',
-      reference: { basis: 'per100g', nutrition: totals.times(100 / grams) },
+      // The usual portion is the food's serving (MM-595), so logging it again from the log offers it.
+      reference: {
+        basis: 'per100g',
+        nutrition: totals.times(100 / grams),
+        servingDescription: item.usualPortion?.description,
+        servingGrams: item.usualPortion?.grams,
+      },
     },
     fiberG: item.fiberG,
     micros: item.micros,

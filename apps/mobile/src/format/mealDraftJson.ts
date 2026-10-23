@@ -20,6 +20,7 @@ function itemJson(item: MealItemDraft): Record<string, unknown> {
     name: item.name,
     lookup: item.lookup,
     grams: rounded(item.grams),
+    usual_portion: item.usualPortion === undefined ? undefined : { description: item.usualPortion.description, grams: rounded(item.usualPortion.grams) },
     kcal: rounded(item.kcal),
     protein_g: rounded(item.proteinG),
     carbs_g: rounded(item.carbsG),

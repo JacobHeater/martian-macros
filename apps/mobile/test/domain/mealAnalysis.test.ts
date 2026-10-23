@@ -36,6 +36,7 @@ const read = (text: string): MealDraft => {
 const item = (changes: Partial<MealItemDraft> = {}): MealItemDraft => ({
   name: 'Rice',
   grams: 200,
+  usualPortion: { description: '1 cup', grams: 158 },
   kcal: 260,
   proteinG: 5.4,
   carbsG: 57,
@@ -55,6 +56,8 @@ describe('reading an answer', () => {
     expect(draft.items.map((i) => i.name)).toEqual(['Grilled chicken breast', 'White rice', 'Steamed broccoli']);
     const [chicken] = draft.items;
     expect(chicken).toMatchObject({ lookup: 'chicken breast roasted', grams: 150, kcal: 248, proteinG: 46.5, carbsG: 0, fatG: 5.4, fiberG: 0 });
+    expect(chicken?.usualPortion, 'MM-595').toEqual({ description: '1 breast', grams: 172 });
+    expect(read('{"items": [{"usual_portion": {"description": "1 cup"}}]}').items[0]?.usualPortion, 'no grams: not given').toBeUndefined();
     expect(chicken?.micros.of('sodium')).toBe(111);
     expect(chicken?.micros.of('saturatedFat')).toBe(1.5);
     expect(chicken?.micros.of('potassium'), 'an optional micronutrient is kept').toBe(384);
@@ -117,6 +120,8 @@ describe('the prompt', () => {
     expect(mealAnalysisPrompt).toMatch(/What should this meal be called\? \(Required/);
     expect(mealAnalysisPrompt).toMatch(/How much of what is shown did I actually eat\?/);
     expect(mealAnalysisPrompt).toMatch(/from a brand or a restaurant/);
+    expect(mealAnalysisPrompt, 'MM-595').toMatch(/Every item must have name, lookup, grams, usual_portion,/);
+    expect(mealAnalysisPrompt).toMatch(/"usual_portion" is one reasonable serving of that food on its own/);
     expect(mealAnalysisPrompt, 'MM-594').toMatch(/When did I eat it\? \(The day and the time/);
     expect(mealAnalysisPrompt).toMatch(/If I leave question 4 blank, leave "eaten_at" out and don't ask again/);
     expect(mealAnalysisPrompt).toMatch(/never guess a date/);
@@ -193,6 +198,11 @@ describe('what is wrong with a food', () => {
     ]);
   });
 
+  it('MM-595: a food with no usual portion, or one no serving weighs', () => {
+    expect(mealItemProblems(item({ usualPortion: undefined }))).toEqual(['Missing its usual portion (a reasonable serving of it on its own, and its grams).']);
+    expect(mealItemProblems(item({ usualPortion: { description: '1 pot', grams: 0 } }))[0]).toMatch(/^A usual portion of 0 g is not plausible/);
+  });
+
   it('a number below zero, no name, and an amount no one food weighs', () => {
     expect(mealItemProblems(item({ fatG: -1 }))).toContain('Below zero: fat.');
     expect(mealItemProblems(item({ name: ' ' }))).toContain('It has no name.');
@@ -212,6 +222,8 @@ describe('logged as a meal', () => {
     expect(entry).toMatchObject({ name: 'Rice', kcal: 260, source: 'photoEstimate', meal: 'dinner', eatenAt: 19 * 60, loggedMeal: tag });
     expect(entry.portion).toMatchObject({ method: 'photoEstimate', basis: 'calculated', quantity: 200, unit: 'gram' });
     expect(entry.portion?.reference?.nutrition.kcal).toBe(130);
+    // MM-595: the usual portion is the food's serving, whatever was eaten of it.
+    expect(entry.portion?.reference).toMatchObject({ servingDescription: '1 cup', servingGrams: 158 });
     expect(entry.evidence?.kind).toBe('cited');
     expect(entry.micros.of('sugars')).toBe(0.1);
     expect(gradeOfFoodEntry(entry)).toEqual(gradeOfMealItem(item()));
@@ -223,7 +235,14 @@ describe('logged as a meal', () => {
 
   it('a logged food read back as an item keeps its grams, numbers and source', () => {
     const entry = entryOfMealItem(item(), { date: day, meal: 'dinner', eatenAt: undefined, loggedMeal: tag });
-    expect(mealItemOfEntry(entry)).toMatchObject({ name: 'Rice', grams: 200, kcal: 260, fiberG: 0.8, evidence: item().evidence });
+    expect(mealItemOfEntry(entry)).toMatchObject({
+      name: 'Rice',
+      grams: 200,
+      usualPortion: { description: '1 cup', grams: 158 },
+      kcal: 260,
+      fiberG: 0.8,
+      evidence: item().evidence,
+    });
   });
 
   it('changing the grams scales every number and keeps where they came from', () => {
@@ -313,8 +332,8 @@ describe('fixes for the assistant', () => {
     expect(again.name).toBe(draft.name);
     expect(again.eatenAt).toBe(19 * 60 + 15);
     expect(again.eatenOn).toEqual(draft.eatenOn);
-    expect(again.items.map((i) => [i.name, i.grams, i.kcal, i.micros.of('sodium'), i.evidence.kind])).toEqual(
-      draft.items.map((i) => [i.name, i.grams, i.kcal, i.micros.of('sodium'), i.evidence.kind]),
+    expect(again.items.map((i) => [i.name, i.grams, i.usualPortion, i.kcal, i.micros.of('sodium'), i.evidence.kind])).toEqual(
+      draft.items.map((i) => [i.name, i.grams, i.usualPortion, i.kcal, i.micros.of('sodium'), i.evidence.kind]),
     );
   });
 });

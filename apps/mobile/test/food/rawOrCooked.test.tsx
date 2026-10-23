@@ -37,7 +37,7 @@ beforeEach(async () => {
 async function search(sheet: HTMLElement, query: string, name: RegExp): Promise<void> {
   await typeIn(sheet, 'Search foods', query);
   const results = await within(sheet).findAllByRole('button', { name });
-  const fromPack = results.find((result) => !/Your recent food/.test(result.textContent ?? '')) ?? results[0];
+  const fromPack = results.find((result) => !/Your recent food|From your log/.test(result.textContent ?? '')) ?? results[0];
   await userEvent.click(fromPack as HTMLElement);
   await within(sheet).findByRole('button', { name: 'Log it' });
 }

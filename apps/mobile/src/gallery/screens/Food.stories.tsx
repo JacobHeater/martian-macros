@@ -580,10 +580,10 @@ const withOwnFoods: StoryScenario = async (repos, today) => {
   );
 };
 
-/** MM-321: a search that matches the person's own food and a recent one, above the pack's. */
+/** MM-321, MM-596: a search that matches the person's own food and one from their log, above the pack's. */
 export const AddFoodOwnAndRecent = screenStory({
   covers: ['AddFoodSheet'],
-  shows: /^Your recent food/,
+  shows: /^From your log/,
   scenario: withOwnFoods,
   open: addFood,
   walk: async (canvas) => {
@@ -1407,10 +1407,10 @@ export const FoodFullLabelLines = screenStory({
   open: ({ state }) => state.homeTab.put('food'),
 });
 
-/** MM-150: an estimated meal found again among recent foods keeps its mark. */
+/** MM-150, MM-596: an estimated meal found again in the log keeps its mark. */
 export const AddFoodRecentEstimate = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'Your recent food · estimated · 900 kcal',
+  shows: 'From your log · estimated · 900 kcal',
   scenario: async (repos, today) => {
     await new DemoSeed(today).replace(repos);
     await repos.food.addFood(

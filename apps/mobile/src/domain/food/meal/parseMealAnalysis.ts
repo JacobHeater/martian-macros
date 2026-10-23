@@ -6,6 +6,7 @@ import { mealAnalysisFormatName, mealAnalysisFormatVersion } from './mealAnalysi
 import { eatenWhenIn } from './eatenWhenIn';
 import type { MealAnalysisReading } from './MealAnalysisReading';
 import type { MealItemDraft } from './MealItemDraft';
+import type { UsualPortion } from './UsualPortion';
 
 type Json = Record<string, unknown>;
 
@@ -46,6 +47,14 @@ function evidenceOf(source: unknown): FoodEvidence {
   return { kind: verified && isSpecificCitation(citation) ? 'cited' : 'estimated', citation };
 }
 
+/** A usual portion as `{ "description": "1 tbsp", "grams": 15 }`; what is not both is not given. */
+function usualPortionOf(value: unknown): UsualPortion | undefined {
+  if (!isObject(value)) return undefined;
+  const description = textOf(value['description']);
+  const grams = numberOf(value['grams']);
+  return description === undefined || grams === undefined ? undefined : { description, grams };
+}
+
 function itemOf(value: unknown, at: number): MealItemDraft {
   const item = isObject(value) ? value : {};
   const micros: Partial<Record<Micronutrient, number>> = {};
@@ -57,6 +66,7 @@ function itemOf(value: unknown, at: number): MealItemDraft {
     name: textOf(item['name']) ?? `Food ${at + 1}`,
     lookup: textOf(item['lookup']),
     grams: numberOf(item['grams']),
+    usualPortion: usualPortionOf(item['usual_portion']),
     kcal: numberOf(item['kcal']),
     proteinG: numberOf(item['protein_g']),
     carbsG: numberOf(item['carbs_g']),

@@ -498,5 +498,35 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       expect(meals[1]?.date).toEqual(d2);
       expect((await first(repo.watchRecentMeals({ limit: 1 }))).map((m) => m.key)).toEqual(['k3']);
     });
+
+    it('MM-596: every food ever logged is found by any part of its name, ignoring case, once, as last logged', async () => {
+      await repo.addFood(entry(d1, 'Tonkatsu sauce', { kcal: 38 }));
+      for (let i = 0; i < 30; i++) await repo.addFood(entry(d1, `Filler ${i}`));
+      await repo.addFood(ofMeal(d2, 'Japanese mayonnaise', 'k1', 'Katsu plate'));
+      await repo.addFood(entry(d2, 'tonkatsu SAUCE', { kcal: 40 }));
+      const found = await repo.searchLoggedFoods('katsu');
+      expect(found.map((e) => e.name)).toEqual(['tonkatsu SAUCE']);
+      expect(found[0]?.kcal, 'as last logged').toBe(40);
+      expect((await repo.searchLoggedFoods('mayo')).map((e) => e.name), 'a food of a meal too').toEqual(['Japanese mayonnaise']);
+      expect((await repo.searchLoggedFoods('FILLER', { limit: 3 })).map((e) => e.name)).toEqual(['Filler 29', 'Filler 28', 'Filler 27']);
+      expect(await repo.searchLoggedFoods('nothing like it')).toEqual([]);
+    });
+
+    it('MM-596: a % or _ in what is searched for is taken as itself', async () => {
+      await repo.addFood(entry(d1, 'Milk 2% fat'));
+      await repo.addFood(entry(d1, 'Milk 20 fat'));
+      expect((await repo.searchLoggedFoods('2%')).map((e) => e.name)).toEqual(['Milk 2% fat']);
+      expect(await repo.searchLoggedFoods('k_2')).toEqual([]);
+    });
+
+    it('MM-596: every meal ever logged is found by its name, once, as last logged', async () => {
+      await repo.addFood(ofMeal(d1, 'Rice', 'k1', 'Katsu plate'));
+      await repo.addFood(ofMeal(d1, 'Cabbage', 'k1', 'Katsu plate'));
+      await repo.addFood(ofMeal(d2, 'Rice', 'k2', 'katsu PLATE'));
+      await repo.addFood(ofMeal(d2, 'Toast', 'k3', 'Breakfast'));
+      const meals = await repo.searchLoggedMeals('katsu');
+      expect(meals.map((m) => [m.key, m.items.map((i) => i.name)])).toEqual([['k2', ['Rice']]]);
+      expect(await repo.searchLoggedMeals('lunch')).toEqual([]);
+    });
   });
 }
