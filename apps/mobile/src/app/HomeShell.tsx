@@ -3,6 +3,8 @@ import { HomeDestination } from '../state/HomeDestination';
 import { MmAppBar } from '../ui/MmAppBar';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmNavigationBar } from '../ui/MmNavigationBar';
+import type { EdgeSide } from '../ui/EdgeSide';
+import { useEdgeSwipe } from '../ui/useEdgeSwipe';
 import { CoachScreen } from '../coach/CoachScreen';
 import { useTargetChangeSummaries } from '../coach/useTargetChangeSummaries';
 import { DashboardScreen } from '../dashboard/DashboardScreen';
@@ -22,7 +24,8 @@ import './app.css';
 
 /**
  * The frame every destination sits in (MM-90, MM-99): its name and the way
- * to Settings above, the five destinations below.
+ * to Settings above, the five destinations below. A swipe in from the right
+ * goes to the next destination, from the left to the one before (MM-578).
  */
 export function HomeShell() {
   const { state } = useApp();
@@ -34,8 +37,22 @@ export function HomeShell() {
   // A destination keeps its scroll position across a visit elsewhere (MM-286).
   const body = useRef<HTMLElement>(null);
   const scroll = useKeptScroll(body, current, state.destinationScroll);
+  const select = (id: HomeDestination) => {
+    scroll.leave(current);
+    state.homeTab.put(id);
+  };
+  const at = destinations.findIndex((destination) => destination.id === current);
+  const beside = (side: EdgeSide) => destinations[side === 'right' ? at + 1 : at - 1];
+  const swipe = useEdgeSwipe(
+    body,
+    (side) => beside(side) !== undefined,
+    (side) => {
+      const next = beside(side);
+      if (next !== undefined) select(next.id);
+    },
+  );
   return (
-    <div className="app-frame">
+    <div className="app-frame" {...swipe}>
       <MmAppBar
         // On Food the heading is the day shown, as its stepper says (MM-390).
         title={current === 'food' ? Fmt.day(shownDay, today) : HomeDestination.label(current)}
@@ -65,10 +82,7 @@ export function HomeShell() {
       <MmNavigationBar
         destinations={destinations}
         current={current}
-        onSelect={(id) => {
-          scroll.leave(current);
-          state.homeTab.put(id);
-        }}
+        onSelect={select}
       />
     </div>
   );
