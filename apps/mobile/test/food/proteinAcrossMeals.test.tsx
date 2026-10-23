@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Meal } from '../../src/domain/Meal';
@@ -40,6 +41,19 @@ it('at Full, a lunch with 30 g carries the marker', async () => {
   await openFood();
   expect(await screen.findByText(/30 g protein/)).toBeInTheDocument();
   expect(marker('Lunch')).not.toBeNull();
+});
+
+it('the marker, pressed, says what it means and what earns it (MM-597)', async () => {
+  await repos.preferences.saveDetailLevel('full');
+  await openFood();
+  await screen.findByText(/30 g protein/);
+  const lunch = marker('Lunch');
+  if (!(lunch instanceof HTMLElement)) throw new Error('no marker on lunch');
+  await userEvent.click(lunch);
+  const said = await screen.findByRole('dialog', { name: 'A solid serving of protein' });
+  expect(said).toHaveTextContent(/30 g of protein in this meal; \d+ g or more earns the mark/);
+  expect(said).toHaveTextContent('Your daily total matters much more.');
+  expect(screen.getByRole('button', { name: 'Lunch', expanded: true }), 'pressing the marker does not fold lunch').toBeInTheDocument();
 });
 
 it('a meal without it shows nothing in its place', async () => {

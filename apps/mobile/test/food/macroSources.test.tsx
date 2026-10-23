@@ -60,8 +60,9 @@ it('MM-562: the split offers the same, from each macro of its legend', async () 
   expect(screen.queryByText('Share of calories from each')).not.toBeInTheDocument();
 });
 
-it('MM-563: a meal says its calories and every macro', async () => {
+it('MM-563: a meal says its calories and every macro, the macros on a line under the calories (MM-597)', async () => {
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByText('400 kcal · P 16 · C 31 · F 12')).toBeInTheDocument();
+  const macros = await screen.findByText('P 16 · C 31 · F 12');
+  expect(macros.previousElementSibling).toHaveTextContent(/^400 kcal$/);
 });

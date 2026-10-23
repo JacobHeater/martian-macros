@@ -24,6 +24,13 @@ interface MmSectionProps {
   /** One line under the title: the section's state in words, read whether it is open or not. */
   summary?: ReactNode;
   /**
+   * The fold's arrow beside the title rather than at the header's end, so the summary has the width up to the
+   * header's actions and a header with several of them does not wrap it (Food's meals, MM-597). The fold's
+   * button is then the title and its arrow, stretched over the header, and the summary sits beside it, so it
+   * may hold a control of its own (the protein marker).
+   */
+  foldBesideTitle?: boolean;
+  /**
    * A graphic of the summary (MM-326) under the header, across the
    * section; it stays when the section folds, as the summary does, and is
    * drawn anew each time the section opens, so a bar fills again.
@@ -59,6 +66,7 @@ export function MmSection({
   framed = false,
   flush = false,
   summary,
+  foldBesideTitle = false,
   meter,
   trailing,
   collapsible = false,
@@ -86,16 +94,37 @@ export function MmSection({
   const open = !collapsible || expanded;
   // A header that opens or folds is a button inside the heading, so the heading stays one (MM-335, MM-399).
   const Title = onPress === undefined && !collapsible ? 'h2' : 'span';
+  const chevron = (
+    <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
+      <MmIcon name="chevronDown" size={16} />
+    </span>
+  );
+  const besideTitle = collapsible && onPress === undefined && foldBesideTitle;
+  const titled = (
+    <Title className="mm-section-title" id={`${id}-title`}>
+      {title}
+    </Title>
+  );
+  const summaryLine =
+    summary === undefined ? null : (
+      <span className="mm-section-summary" id={`${id}-summary`}>
+        {summary}
+      </span>
+    );
   const words = (
     <span className="mm-section-words">
-      <Title className="mm-section-title" id={`${id}-title`}>
-        {title}
-      </Title>
-      {summary === undefined ? null : (
-        <span className="mm-section-summary" id={`${id}-summary`}>
-          {summary}
-        </span>
+      {besideTitle ? (
+        // Named by the title, described by the summary; pressed anywhere on the header, as the whole header is.
+        <MmPressable expanded={expanded} controls={`${id}-body`} describedBy={summaryLine === null ? undefined : `${id}-summary`} onPress={toggle}>
+          <span className="mm-section-title-line">
+            {titled}
+            {chevron}
+          </span>
+        </MmPressable>
+      ) : (
+        titled
       )}
+      {summaryLine}
       {onPress === undefined || opens === undefined ? null : (
         <span className="mm-visually-hidden" id={`${id}-opens`}>
           {opens}
@@ -133,6 +162,12 @@ export function MmSection({
         </MmPressable>
       </h2>
     );
+  } else if (besideTitle) {
+    header = (
+      <h2 className="mm-section-heading mm-section-heading-stretched" aria-labelledby={`${id}-title`}>
+        <span className="mm-section-head-body">{head}</span>
+      </h2>
+    );
   } else if (collapsible) {
     header = (
       // Named by its title alone, as the plain heading is; the button inside also carries the summary.
@@ -140,9 +175,7 @@ export function MmSection({
         <MmPressable expanded={expanded} controls={`${id}-body`} onPress={toggle}>
           <span className="mm-section-head-body">
             {head}
-            <span className={`mm-disclosure-chevron${expanded ? ' mm-disclosure-chevron-open' : ''}`}>
-              <MmIcon name="chevronDown" size={16} />
-            </span>
+            {chevron}
           </span>
         </MmPressable>
       </h2>

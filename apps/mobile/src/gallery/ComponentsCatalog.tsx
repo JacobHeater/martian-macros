@@ -159,6 +159,17 @@ export function ComponentsCatalog() {
       <MmSection icon="calendar" title="Weight events" summary="2 this month" trailing={<MmIconButton icon="plus" kind="add" label="Add a weight event" onPress={nothing} />}>
         <MmListRow title="Travel" subtitle="Yesterday · Scale noise widened around this event." leadingIcon="travel" />
       </MmSection>
+      <MmSection
+        icon="food"
+        title="Dinner"
+        summary="584 kcal · P 37 · C 74 · F 15"
+        foldBesideTitle
+        collapsible
+        initiallyExpanded={false}
+        trailing={<MmIconButton icon="plus" kind="add" label="Add food to dinner" onPress={nothing} />}
+      >
+        <p style={{ margin: 0, color: 'var(--text2)' }}>The fold's arrow beside the title, the summary up to the actions.</p>
+      </MmSection>
       <MmSection icon="tape" title="Waist" summary="Latest: 34.2 in on Oct 5." collapsible initiallyExpanded={false}>
         <p style={{ margin: 0, color: 'var(--text2)' }}>Three fields and Save, once opened.</p>
       </MmSection>

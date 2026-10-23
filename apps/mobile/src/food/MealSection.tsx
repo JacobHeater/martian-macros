@@ -9,13 +9,14 @@ import { foodLogRows } from '../domain/food/meal/foodLogRows';
 import { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import type { Meal } from '../domain/Meal';
 import { mealHasSolidProtein } from '../engine/mealHasSolidProtein';
+import { ProteinSpreadRule } from '../engine/ProteinSpreadRule';
+import { SafetyBounds } from '../engine/SafetyBounds';
 import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { MmIcon } from '../ui/MmIcon';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmPressable } from '../ui/MmPressable';
@@ -30,6 +31,8 @@ import { FoodGrade } from './FoodGrade';
 import { LoggedMealRow } from './meal/LoggedMealRow';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
+import { showMealSplitSheet } from './showMealSplitSheet';
+import { SolidProteinMarker } from './SolidProteinMarker';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
@@ -45,7 +48,8 @@ interface MealSectionProps {
  * entries still shows its header, so every meal is an add target and the
  * list never jumps. The header opens and closes the entries; its actions
  * are beside it, not inside it, so pressing one never toggles the meal.
- * Swiping an entry away is an accelerator for deleting it.
+ * Swiping an entry away is an accelerator for deleting it. The header's
+ * menu opens the macro split of everything in the meal (MM-597).
  */
 export function MealSection({ meal, day, entries }: MealSectionProps) {
   const { services, state } = useApp();
@@ -72,6 +76,11 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
     weightKg !== undefined &&
     hand !== undefined &&
     mealHasSolidProtein({ proteinG: protein, weightKg, heightCm: hand.heightCm });
+  // The least protein that earns the marker, said when it is pressed (MM-597).
+  const markerG =
+    weightKg === undefined || hand === undefined
+      ? undefined
+      : ProteinSpreadRule.markerGPerKg * SafetyBounds.referenceWeightKg({ weightKg, heightCm: hand.heightCm });
   const label = mealLabel(meal);
   // Grades (MM-370) and the coach's lines (MM-362): none in the app until they are built.
   const preview = useInsightPreview();
@@ -97,16 +106,18 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
       title={label}
       summary={
         entries.length === 0 ? undefined : (
-          <span className="food-meal-total">
-            {`${Fmt.kcal(total)} · ${macros}`}
-            {solid ? (
-              <span className="food-meal-marker" role="img" aria-label="A solid serving of protein">
-                <MmIcon name="checkCircle" size={16} />
-              </span>
-            ) : null}
+          // Calories over macros, each line flush left, so neither wraps beside the header's actions (MM-597).
+          <span className="food-meal-summary">
+            <span>{Fmt.kcal(total)}</span>
+            <span className="food-meal-total">
+              {macros}
+              {solid && markerG !== undefined ? <SolidProteinMarker proteinG={protein} thresholdG={markerG} /> : null}
+            </span>
           </span>
         )
       }
+      // The arrow beside the title, so the grade, add and menu leave the summary its line (MM-597).
+      foldBesideTitle
       // An empty meal has nothing to fold, so it draws no fold (MM-389).
       collapsible={entries.length > 0}
       maintainState
@@ -127,6 +138,14 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
             label={`Add food to ${label.toLowerCase()}`}
             onPress={() => void showAddFoodSheet(overlays, day, { meal })}
           />
+          {entries.length === 0 ? null : (
+            <MmMenuButton<'split'>
+              icon="more"
+              label={`Options for ${label.toLowerCase()}`}
+              items={[{ value: 'split', label: 'Macro split' }]}
+              onSelect={() => void showMealSplitSheet(overlays, day, meal, entries)}
+            />
+          )}
         </>
       }
     >

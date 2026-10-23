@@ -2156,6 +2156,54 @@
   margin: 0;
   font: var(--type-heading);
 }
+/* The fold's arrow just after the title, leaving the summary the width up to the header's actions (MM-597). */
+.mm-section-title-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-width: 0;
+}
+/* The fold's button is the title line, stretched over the header: ::after takes the press anywhere on it,
+   ::before draws the press and the focus beneath the words. The summary lies above, letting presses through
+   but to its own controls (MM-597). */
+.mm-section-heading-stretched {
+  position: relative;
+  isolation: isolate;
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable::before,
+.mm-section-heading-stretched .mm-section-words > .mm-pressable::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: '';
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable::before {
+  z-index: -1;
+  transition: background var(--motion-fast);
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable:active,
+.mm-pressed .mm-section-heading-stretched .mm-section-words > .mm-pressable {
+  background: none;
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable:active::before,
+.mm-pressed .mm-section-heading-stretched .mm-section-words > .mm-pressable::before {
+  background: var(--selected);
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable:focus-visible {
+  outline: none;
+}
+.mm-section-heading-stretched .mm-section-words > .mm-pressable:focus-visible::after {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+.mm-section-heading-stretched .mm-section-summary {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.mm-section-heading-stretched .mm-section-summary button {
+  pointer-events: auto;
+}
 .mm-section-summary {
   color: var(--text2);
   font: var(--type-caption);

@@ -7,6 +7,7 @@ import { LoggedMeal } from '../../src/domain/food/meal/LoggedMeal';
 import type { MealItemDraft } from '../../src/domain/food/meal/MealItemDraft';
 import { parseMealAnalysis } from '../../src/domain/food/meal/parseMealAnalysis';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
+import { FoodEntry } from '../../src/domain/FoodEntry';
 import type { Meal } from '../../src/domain/Meal';
 import { gradeOfFoodEntry } from '../../src/engine/gradeOfFoodEntry';
 import { gradeOfMeal } from '../../src/engine/gradeOfMeal';
@@ -14,6 +15,8 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { entriesCopiedTo } from '../../src/food/entriesCopiedTo';
 import { gradeOfLoggedMeal } from '../../src/food/meal/gradeOfLoggedMeal';
+import { Fmt } from '../../src/format/Fmt';
+import { toStringAsFixed } from '../../src/lang/toStringAsFixed';
 import { cleanMealAnswer } from '../../src/gallery/screens/storyMealAnswers';
 import { openAddFood, press, typeIn } from '../support/addFood';
 import { first } from '../support/first';
@@ -61,7 +64,7 @@ it('a meal is one row in its slot, with its foods counted, and the slot’s tota
   expect(within(row).getByText(/^Meal · 3 foods · P /)).toBeInTheDocument();
   expect(within(row).getByText('522')).toBeInTheDocument();
   expect(screen.queryByText('White rice'), 'the foods are not rows of their own').toBeNull();
-  expect(screen.getByText(/^522 kcal · /)).toBeInTheDocument();
+  expect(within(screen.getByRole('region', { name: 'Dinner' })).getByText('522 kcal')).toBeInTheDocument();
 });
 
 it('the row’s menu offers View meal and Delete', async () => {
@@ -85,6 +88,44 @@ it('View meal shows each food with where its numbers came from', async () => {
   // The grade on a row of its own, said what it is; the sheet's ✕ closes it, with no second Close beside Delete meal.
   expect(within(sheet).getByText('Meal grade')).toBeInTheDocument();
   expect(within(sheet).queryByRole('button', { name: 'Close' })).toBeNull();
+});
+
+it('View meal shows the meal’s macro split, drawn again from the foods that remain when one is removed (MM-597)', async () => {
+  await logChickenAndRice();
+  const sheet = await viewMeal();
+  expect(within(sheet).getByText('Macro split')).toBeInTheDocument();
+  const ring = within(sheet).getByRole('img', { name: /^Logged macronutrient energy split\. / });
+  const before = ring.getAttribute('aria-label') ?? '';
+  expect(before).toMatch(/Protein: .+ · .+%\. Carbs: .+ · .+%\. Fat: .+ · .+%\.$/);
+  await press(sheet, 'More actions for White rice');
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+  await expect
+    .poll(() => within(sheet).getByRole('img', { name: /^Logged macronutrient energy split\. / }).getAttribute('aria-label'))
+    .not.toBe(before);
+});
+
+it('a slot’s menu opens the macro split of everything in it, its meal’s foods and its own (MM-597)', async () => {
+  await logChickenAndRice();
+  await repos.food.addFood(
+    new FoodEntry({ id: 0, date: today, meal: 'dinner', name: 'Olive oil', kcal: 120, proteinG: 0, carbsG: 0, fatG: 14, source: 'labelServing' }),
+  );
+  renderApp(repos, today);
+  await openTab('Food');
+  const options = await screen.findByRole('button', { name: 'Options for dinner' });
+  // The fold is the title and its arrow, described by the summary beside it (MM-597).
+  const fold = screen.getByRole('button', { name: 'Dinner', expanded: true });
+  expect(fold).toHaveAccessibleDescription(/^642 kcal/);
+  expect(fold.querySelector('.mm-section-title-line .mm-disclosure-chevron')).not.toBeNull();
+  expect(screen.queryByRole('button', { name: 'Options for breakfast' }), 'an empty slot has no menu').toBeNull();
+  await userEvent.click(options);
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Macro split' }));
+  const sheet = await screen.findByRole('dialog', { name: 'Macro split' });
+  expect(within(sheet).getByRole('heading', { name: 'Dinner' })).toBeInTheDocument();
+  const ring = within(sheet).getByRole('img', { name: /^Logged macronutrient energy split\. / });
+  const meal = new LoggedMeal((await logged()).filter((entry) => entry.loggedMeal !== undefined));
+  const fat = meal.fatG + 14;
+  const energy = meal.proteinG * 4 + meal.carbsG * 4 + fat * 9;
+  expect(ring.getAttribute('aria-label')).toContain(`Fat: ${Fmt.grams(fat)} · ${toStringAsFixed((100 * fat * 9) / energy, 1)}%`);
 });
 
 it('a food’s grams changed in View meal halves its numbers, and the meal follows', async () => {
