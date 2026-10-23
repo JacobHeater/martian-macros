@@ -1,6 +1,7 @@
 import type { Meta } from '@storybook/react-vite';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
+import { showEasyToMissSheet } from '../../food/showEasyToMissSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { Micronutrients } from '../../domain/food/micros/Micronutrients';
@@ -1460,4 +1461,14 @@ export const FoodNotOnWeightLossMedication = screenStory({
   shows: /^kcal left of 2,100/,
   scenario: weightLossMedicationScenario({ ticked: false }),
   open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-575: marking a day complete asks about the easy-to-miss foods first; only "nothing missed" marks it. */
+export const EasyToMissCheck = screenStory({
+  covers: ['EasyToMissSheet'],
+  shows: 'Anything easy to miss?',
+  open: ({ overlays, state }) => {
+    state.homeTab.put('food');
+    void showEasyToMissSheet(overlays);
+  },
 });

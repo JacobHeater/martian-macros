@@ -173,8 +173,8 @@
   display: grid;
   color: var(--text2);
 }
-.food-easy-to-miss {
-  margin-bottom: var(--space-8);
+.food-easy-to-miss-confirm {
+  margin-top: var(--space-16);
 }
 .food-sheet {
   padding: var(--space-4) var(--space-16) var(--space-16);

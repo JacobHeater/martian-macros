@@ -15,7 +15,6 @@ import { AlcoholLine } from './AlcoholLine';
 import { CalorieHero } from './CalorieHero';
 import { LabelAccuracyNote } from './LabelAccuracyNote';
 import { copyEntries } from './copyEntries';
-import { EasyToMissLine } from './EasyToMissLine';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
@@ -28,8 +27,8 @@ import './food.css';
 /**
  * The day's hero and its meals, in tiers (MM-255): the hero with its macro
  * picture, the lines that carry a message for today, the meals as sections,
- * the completeness row after the last meal, and how the day is counted one
- * tap down. The day header lives in the app bar, and the add action floats
+ * the completeness row after the last meal, which asks about the
+ * easy-to-miss foods as the day is marked complete (MM-575). The day header lives in the app bar, and the add action floats
  * over the screen.
  */
 export function FoodScreen() {
@@ -47,7 +46,6 @@ export function FoodScreen() {
   const shapeLimits = useCell(state.targetShapeLimits);
   const setup = useLoaded(state.setup);
   const guide = useCell(state.maintenanceGuide);
-  const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
 
   // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
   const pausesFailed = pausesRead.failed;
@@ -109,7 +107,6 @@ export function FoodScreen() {
             <FoodCompletenessRow day={day} entries={entries} />
             <FoodDayGradeRow entries={entries} />
           </div>
-          {completeness === 'complete' ? <EasyToMissLine day={day} /> : null}
         </>
       )}
     </>
