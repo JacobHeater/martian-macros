@@ -2444,6 +2444,11 @@
   position: relative;
   isolation: isolate;
   flex: none;
+  /* Clear ground above the ridge (MM-581): on a long page its auto margin is nothing, and the alien's tap area reached
+     over the last row, so a tap meant for it could press the row or button above. A transparent border, not padding,
+     so the alien, the UFO and the ridge, placed inside it, keep their places; it lets presses through as the rest. */
+  box-sizing: content-box;
+  border-top: 24px solid transparent;
   height: 56px;
   pointer-events: none;
 }

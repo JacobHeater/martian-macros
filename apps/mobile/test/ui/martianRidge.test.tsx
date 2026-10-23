@@ -54,6 +54,20 @@ describe('the Martian ridge', () => {
     expect(readFileSync('src/theme/tokens.css', 'utf8')).toMatch(/--motion-abduct: 0ms;/);
   });
 
+  // MM-581: on a long page the ridge sat right under the last row, and the alien's tap area (8 px around it) reached
+  // over that row, so a tap on the alien could press it.
+  it('MM-581: clear ground above the ridge keeps the alien’s tap area off the row above', () => {
+    const css = readFileSync('src/ui/ui.css', 'utf8');
+    const ridge = /\.theme-martian \.mm-ridge \{([\s\S]*?)\n\}/.exec(css)?.[1] ?? '';
+    const clearance = Number(/border-top: (\d+)px solid transparent;/.exec(ridge)?.[1] ?? 0);
+    expect(ridge).toMatch(/box-sizing: content-box;/);
+    // The highest point of the tap area: the pit's top, the alien's top in it, less the area's reach.
+    const pitTop = Number(/\.mm-ridge-pit \{[^}]*inset: (-?\d+)px/.exec(css)?.[1]);
+    const alienTop = Number(/\.mm-ridge-alien \{[^}]*top: (\d+)px/.exec(css)?.[1]);
+    const reach = Number(/\.mm-ridge-alien::before \{[^}]*inset: -(\d+)px/.exec(css)?.[1]);
+    expect(clearance + pitTop + alienTop - reach).toBeGreaterThanOrEqual(16);
+  });
+
   // MM-580: the flight ended fully drawn and was held there (`forwards`) until the alien came back, so scrolling up
   // found the UFO parked in the page.
   it('MM-580: the UFO has faded out by the end of its flight, so it is never left in the page', () => {
