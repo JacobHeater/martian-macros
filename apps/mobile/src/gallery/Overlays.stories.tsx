@@ -72,6 +72,9 @@ export const MenuKeyboard: Story = {
 /** MM-370: a short explanation drawn at its trigger, as a menu is, with "Got it". */
 export const Popover: Story = { args: { kind: 'popover' }, parameters: { shows: 'Can’t be graded' } };
 
+/** MM-562: a popover that lists, each line with its figure and a chip (a macro's top foods). */
+export const PopoverRows: Story = { args: { kind: 'popoverRows' }, parameters: { shows: 'Chicken breast' } };
+
 /** MM-321: the date picker's year list open, the shown year chosen. */
 export const PickersYears: Story = {
   args: { kind: 'pickers' },

@@ -45,11 +45,11 @@ it('each split sector uses the colour token of its macro bar', () => {
   }
 });
 
-it('MM-179: inside the hero the split keeps one line saying what its shares are of, empty or not', () => {
+it('MM-562: inside the hero the split has no caption line, empty or not', () => {
   const empty = render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 0, proteinG: 0, carbsG: 0, fatG: 0 })} compact />);
-  expect(screen.getByText('Share of calories from each')).toBeInTheDocument();
+  expect(screen.queryByText('Share of calories from each')).toBeNull();
   empty.unmount();
-  render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 566, proteinG: 40, carbsG: 61, fatG: 18 })} compact />);
-  expect(screen.getByText('Share of calories from each')).toBeInTheDocument();
-  expect(screen.queryByText(/kcal\/g/)).toBeNull();
+  const view = render(<MacroSplitChart intake={new IntakeDay({ date: day, kcal: 566, proteinG: 40, carbsG: 61, fatG: 18 })} compact />);
+  expect(screen.queryByText('Share of calories from each')).toBeNull();
+  expect(view.container.querySelector('.chart-caption')).toBeNull();
 });

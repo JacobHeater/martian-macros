@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { MmMenuButton } from '../../src/ui/MmMenuButton';
@@ -58,5 +58,22 @@ describe('the menu button', () => {
     await userEvent.click(screen.getByRole('menuitem', { name: 'Delete' }));
     expect(chosen).toEqual(['delete']);
     expect(document.activeElement).toBe(trigger);
+  });
+
+  // MM-565: pressing the button of an open menu reopened it; the press outside closed it, then landed on the button.
+  it('a second press on the button closes the menu, and a press outside lands on nothing under it', async () => {
+    render(<Menu />);
+    const trigger = screen.getByRole('button', { name: 'More actions' });
+    await userEvent.click(trigger);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    // The phone's sequence: the finger goes down on the scrim over the button, the click arrives at the button.
+    fireEvent.pointerDown(document.querySelector('.mm-menu-scrim')!);
+    fireEvent.click(trigger);
+    await screen.findByRole('button', { name: 'More actions', expanded: false });
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    await userEvent.click(trigger);
+    await userEvent.click(document.querySelector('.mm-menu-scrim')!);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
   });
 });

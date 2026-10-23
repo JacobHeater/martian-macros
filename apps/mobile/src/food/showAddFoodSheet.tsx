@@ -7,7 +7,8 @@ import { AddFoodSheet } from './AddFoodSheet';
 
 /**
  * Opens the add-food sheet for `day`, optionally preselecting a meal, or
- * editing `entry`.
+ * editing `entry`. It is tall, so it keeps its height as results come and
+ * go under the search (MM-566).
  */
 export function showAddFoodSheet(
   overlays: Overlays,
@@ -16,8 +17,10 @@ export function showAddFoodSheet(
 ): Promise<void> {
   const editing = options.entry !== undefined;
   return overlays
-    .sheet<void>(editing ? 'Edit food' : 'Add food', (close) => (
-      <AddFoodSheet day={day} {...options} onDone={() => close()} />
-    ))
+    .sheet<void>(
+      editing ? 'Edit food' : 'Add food',
+      (close) => <AddFoodSheet day={day} {...options} onDone={() => close()} />,
+      { size: 'tall' },
+    )
     .then(() => undefined);
 }

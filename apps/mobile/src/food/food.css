@@ -110,7 +110,12 @@
   min-width: 0;
 }
 .food-entry-name {
+  display: -webkit-box;
+  overflow: hidden;
   font: var(--type-body);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 .food-entry-line {
   color: var(--text2);

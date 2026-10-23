@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { IntakeDay } from '../domain/IntakeDay';
 import { NutritionGoals } from '../domain/NutritionGoals';
+import { rankedSources } from '../domain/food/rankedSources';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { MacroPicture } from '../domain/MacroPicture';
 import { CalorieBand } from '../engine/CalorieBand';
@@ -11,6 +12,7 @@ import { intakeStandingOf } from '../engine/intakeStandingOf';
 import { calorieAimText } from '../format/calorieAimText';
 import { displayTargets } from '../format/displayTargets';
 import { Fmt } from '../format/Fmt';
+import { mealLabel } from '../format/mealLabel';
 import { clamp } from '../lang/clamp';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -18,6 +20,7 @@ import { useLoaded } from '../app/useLoaded';
 import { HorizonArc } from '../ui/HorizonArc';
 import { MacroBar } from '../ui/MacroBar';
 import { MacroKind } from '../ui/MacroKind';
+import type { MmAnchor } from '../ui/MmAnchor';
 import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmListRow } from '../ui/MmListRow';
 import { MmPressable } from '../ui/MmPressable';
@@ -64,7 +67,9 @@ interface CalorieHeroProps {
  * use it, and the arc is always drawn. The macro picture is a switch
  * between grams against target and the split of calories (MM-253, rule 4),
  * remembered per person, never both at once. At Full detail the switch has
- * a third choice on Food, the day's micronutrients (MM-310).
+ * a third choice on Food, the day's micronutrients (MM-310). Pressing a
+ * macro, as a bar or in the split, opens its top five foods with each one's
+ * meal (MM-562).
  *
  * Targets are shown rounded, to the nearest 25 kcal and 5 g, unless the
  * person asked for exact ones; and "on target" is a band, the larger of 5%
@@ -134,21 +139,45 @@ export function CalorieHero({
     fat: intake.fatG,
   };
   const target: Readonly<Record<MacroKind, number | undefined>> = { protein: t?.proteinG, carbs: t?.carbsG, fat: t?.fatG };
+  // The macro whose top foods are open (MM-562).
+  const [picked, setPicked] = useState<MacroKind | undefined>(undefined);
+  const gramsOf = (macro: MacroKind) => (entry: FoodEntry) =>
+    macro === 'protein' ? entry.proteinG : macro === 'fat' ? entry.fatG : netCarbs ? entry.netCarbsG : entry.carbsG;
+  const pick = (macro: MacroKind, anchor: MmAnchor) => {
+    // A second press closes it (MM-565).
+    if (picked !== undefined) {
+      overlays.closeTop();
+      return;
+    }
+    const name = MacroKind.label(macro, { netCarbs });
+    const sources = rankedSources(entries, gramsOf(macro), (entry) => `${entry.meal}|${entry.name}`);
+    setPicked(macro);
+    void overlays
+      .popover({
+        title: name,
+        label: `Top foods for ${name.toLowerCase()}`,
+        message: sources.length === 0 ? `No food logged has ${name.toLowerCase()}.` : undefined,
+        rows: sources.map(({ entry, amount }) => ({ label: entry.name, figures: Fmt.grams(amount), tag: mealLabel(entry.meal) })),
+        anchor,
+      })
+      .then(() => setPicked(undefined));
+  };
   // The split of calories needs all three macros; at Simple detail only the bars are offered.
   const switchable = DetailLevel.showsCarbsAndFat(level);
   // Micros is a choice at Full detail only; remembered below it, the bars are shown.
   const micros = microsOffered && DetailLevel.showsExtras(level);
   const chosen: MacroPicture = !switchable || (picture === 'micros' && !micros) ? 'bars' : picture;
   const bar = (macro: MacroKind) => (
-    <MacroBar
-      key={macro}
-      macro={macro}
-      grams={grams[macro]}
-      target={target[macro]}
-      minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
-      emphasized={macro === 'protein'}
-      netCarbs={netCarbs}
-    />
+    <MmPressable key={macro} expanded={picked === macro} onPress={(anchor) => pick(macro, anchor)}>
+      <MacroBar
+        macro={macro}
+        grams={grams[macro]}
+        target={target[macro]}
+        minimum={macro === 'protein' ? t?.proteinMinimumG : undefined}
+        emphasized={macro === 'protein'}
+        netCarbs={netCarbs}
+      />
+    </MmPressable>
   );
   // Protein leads on a weight-loss medication, above the calories (MM-113); the bars below hold the rest.
   const below = onMedication ? shown.filter((macro) => macro !== 'protein') : shown;
@@ -195,7 +224,7 @@ export function CalorieHero({
         <MicrosPanel entries={entries} setup={setup} today={today} goals={goals} />
       ) : chosen === 'donut' ? (
         <div className="food-hero-split">
-          <MacroSplitChart intake={intake} compact netCarbs={netCarbs} />
+          <MacroSplitChart intake={intake} compact netCarbs={netCarbs} onPick={pick} picked={picked} />
         </div>
       ) : below.length === 0 ? null : (
         <div className="food-hero-macros">{below.map(bar)}</div>

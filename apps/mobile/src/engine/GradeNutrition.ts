@@ -7,6 +7,8 @@ import type { GradeMicronutrient } from './GradeMicronutrient';
 export interface GradeNutrition {
   readonly kcal: number;
   readonly proteinG: number;
+  /** Total carbohydrate; fiber is part of it, so it bounds a fiber that is not stated (MM-567). */
+  readonly carbsG: number | undefined;
   readonly fiberG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly sugarsG: number | undefined;
