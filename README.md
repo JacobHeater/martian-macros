@@ -48,7 +48,7 @@ signing team, see [docs/ios-signing.md](docs/ios-signing.md).
 | `mm food fetch\|build\|package` | Builds the food packs (MM-52); `build` needs DuckDB on PATH |
 | `mm storybook [build]` | The design register: every token, icon, component and screen as built, in a browser (MM-237) |
 | `mm req` | Validates `requirements/` and prints the status board (`list`, `next`, `show MM-42`) |
-| `mm roadmap [--check]` | Writes `roadmap/progress.html`, the progress page |
+| `mm roadmap` | Writes `roadmap/progress.html`, the progress page, locally (not committed) |
 | `mm ci` | Watches pull request checks without waiting (`mm ci help`) |
 | `mm panel [run-dir]` | Validates expert-panel roles, Claude/Copilot adapters, research templates and optionally saved run state |
 | `mm clean` | Removes build outputs |
