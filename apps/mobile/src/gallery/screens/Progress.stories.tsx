@@ -1,6 +1,6 @@
 import type { Meta } from '@storybook/react-vite';
 import { storyWorkout } from './storyWorkout';
-import { userEvent, within } from 'storybook/test';
+import { userEvent, waitFor, within } from 'storybook/test';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { FixturePhotoCamera } from '../../fixtures/FixturePhotoCamera';
@@ -422,7 +422,7 @@ export const SleepNotRecorded = screenStory({
 /** MM-250: nights typed, last night among them: folded to its line; opened, each chip carries its night's hours and last night's fill the fields. */
 export const SleepRecorded = screenStory({
   covers: ['ProgressScreen'],
-  shows: / of the last 14 nights recorded\.$/,
+  shows: / of the last 14 nights recorded\. Tap a night to type or correct it\./,
   open: onProgress,
   walk: pressNamed(/^Sleep/),
 });
@@ -430,11 +430,20 @@ export const SleepRecorded = screenStory({
 /** MM-250: nights read from the watch through Health Connect (MM-320), last night not among them; the night before picked, which says the watch's hours would give way to typed ones. */
 export const SleepFromWatch = screenStory({
   covers: ['ProgressScreen'],
-  shows: /^The night before: 6 h 52 m from Watch\. A night you type is used instead\./,
+  shows: 'The night before: 6 h 52 m from Watch. Type to use yours instead.',
   scenario: noNights,
   device: healthPlatform({ allowed: ['sleep'] }),
   open: onProgress,
-  walk: pressNamed('The night before · 6 h 52 m'),
+  // The night before chosen on the chart, a tap in its column (MM-578).
+  walk: async (canvas) => {
+    const column = await waitFor(() => {
+      const found = canvas.querySelector('[data-ago="1"]');
+      if (found === null) throw new Error('No nights chart yet');
+      return found;
+    }, { timeout: 5000 });
+    reveal(column as HTMLElement);
+    await userEvent.click(column);
+  },
 });
 
 /** MM-250: more than a day typed: refused under the field, and Save waits. */

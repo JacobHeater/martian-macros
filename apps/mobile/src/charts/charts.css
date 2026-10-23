@@ -363,10 +363,33 @@
 }
 /* Nights of sleep: a bar each, an open slot where a night was not recorded, the chosen night strongest. */
 .chart-nights {
-  margin: var(--space-8) 0;
+  margin: var(--space-8) 0 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  border-radius: var(--radius-control);
+}
+.chart-nights:focus-visible {
+  outline: 2px solid var(--ion);
+  outline-offset: 2px;
+}
+/* The chosen night's column, lit behind its bar; the whole column answers a tap. */
+.chart-night-column {
+  fill: color-mix(in srgb, var(--text) 10%, transparent);
+}
+.chart-night-hit {
+  fill: transparent;
+}
+.chart-night-letter.chart-night-picked {
+  fill: var(--chosen);
+  font-weight: 600;
 }
 .chart-night {
-  fill: color-mix(in srgb, var(--info) 70%, transparent);
+  fill: color-mix(in srgb, var(--ion) 40%, transparent);
+}
+/* The seven-night average, in the trend's colour over the muted bars, as the weight trend's line is. */
+.chart-night-trend {
+  color: var(--ion);
+  pointer-events: none;
 }
 .chart-night-missing {
   fill: none;
@@ -375,12 +398,21 @@
   stroke-dasharray: 2 2;
 }
 .chart-night.chart-night-picked {
-  fill: var(--text);
+  fill: var(--chosen);
 }
 .chart-night-missing.chart-night-picked {
-  stroke: var(--text);
+  stroke: var(--chosen);
 }
 /* A lift's or a site's small line, at the end of its row. */
 .chart-row-trend {
   display: block;
+}
+/* A graphic in a section runs the column's width, under the section's icon too, as its list group and surface do
+   (MM-344); only words stay in line with the title. */
+.mm-section-body > .chart-placeholder,
+.mm-section-body > .chart-plot {
+  margin-left: calc(-1 * (24px + var(--space-12)));
+}
+.mm-section-body > .chart-plot {
+  width: calc(100% + 24px + var(--space-12));
 }

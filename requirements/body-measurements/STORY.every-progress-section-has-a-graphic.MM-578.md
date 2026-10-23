@@ -30,9 +30,15 @@ Choices I made without asking (say if any is wrong):
     days", and the rows stay.
   - Period days: the same line, each flow day a dot and the stretch the trend widens for shaded, as the trend chart shades
     it. None marked: the placeholder.
-  - Sleep: the fortnight as bars of hours asleep (`NightsChart`), an open slot for a night not recorded, the chosen night in
-    the strongest neutral. Gridlines every three hours mark no target (no sleep advice, MM-368). None recorded: the
-    placeholder, "0 of 14 nights".
+  - Sleep (the owner, 2026-10-22, on the first cut: "ugly and terribly spaced"; the colours did not follow the theme,
+    it needed a trendline, and the chart sat indented): the fortnight as bars (`NightsChart`) **replaces the fourteen
+    chips**: a tap in a night's column (or the arrow keys, Home, End, as the trend chart's weigh-ins, MM-142) chooses the
+    night to type or correct below. Bars in the palette's trend colour (`--ion`) muted, the chosen night in its "chosen"
+    colour (`--chosen`), a weekday letter under each column; a night not recorded is an open slot. Over the bars, the
+    centred 7-night average of the recorded nights in `--ion`, from three nights, broken where there are fewer.
+    Gridlines every three hours mark no target (no sleep advice, MM-368). The row's line names only the chosen night
+    ("Not recorded yet.", "7 h 5 m from Watch. Type to use yours instead."); the count of the fortnight sits under the
+    chart, with "0 of 14" when none is recorded. The chosen night is said aloud as it changes.
   - Waist: the "Waist over time" surface always shows; before the first measurement it holds the placeholder, "0 of 3
     measurements" (the line starts from the third, MM-155).
   - More measurements: each measured site's row carries a small line of its last eight measurements (`MiniTrend`, as on
@@ -43,6 +49,8 @@ Choices I made without asking (say if any is wrong):
   - Strength trends: each lift's row carries a small line of its last eight sessions' smoothed estimates. A bodyweight lift
     with the weight hidden draws none (MM-118). No workout finished, or none in 90 days: the placeholder. Each lift's own
     chart stays on its history (MM-344, rule 4); the row's line is a glance at it, not a second home.
+- **Graphics run the column's width** in a section, under its icon, as its list group does (MM-344); words stay in line
+  with the title.
 - **Siblings** (MM-318): the new graphics follow the trend and waist charts (tokens, axis type, `role="img"` with a spoken
   summary) and `MiniTrend`; the track's dates are the trend chart's axis dates.
 - The panel pass is skipped: the change was dictated by the owner (apps/mobile/AGENTS.md, "Design").
@@ -73,9 +81,11 @@ Scenario: Events only before the range
 
 Scenario: Sleep
   Given no night recorded in the last 14
-  Then Sleep says so in the bars' place, with "0 of 14 nights"
+  Then Sleep draws 14 open slots and says "0 of 14"
   Given one night recorded
   Then Sleep draws one bar and 13 open slots
+  When a night's column is tapped
+  Then that night is the one typed below
 
 Scenario: Strength and more measurements with nothing yet
   Given no workout finished and no site beyond the waist
