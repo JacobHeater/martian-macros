@@ -1,10 +1,12 @@
 import { Fragment, useState } from 'react';
+import { MacroSplitChart } from '../../charts/MacroSplitChart';
 import type { CalendarDate } from '../../domain/CalendarDate';
 import { entryOfMealItem } from '../../domain/food/meal/entryOfMealItem';
 import { LoggedMeal } from '../../domain/food/meal/LoggedMeal';
 import { mealItemOfEntry } from '../../domain/food/meal/mealItemOfEntry';
 import type { MealItemDraft } from '../../domain/food/meal/MealItemDraft';
 import type { FoodEntry } from '../../domain/FoodEntry';
+import { IntakeDay } from '../../domain/IntakeDay';
 import type { Meal } from '../../domain/Meal';
 import { Fmt } from '../../format/Fmt';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
@@ -16,6 +18,7 @@ import { MmButton } from '../../ui/MmButton';
 import { MmTextField } from '../../ui/MmTextField';
 import { useOverlays } from '../../ui/useOverlays';
 import { MealChips } from '../MealChips';
+import { useNetCarbs } from '../useNetCarbs';
 import { gradeOfLoggedMeal } from './gradeOfLoggedMeal';
 import { MealGradeRow } from './MealGradeRow';
 import { MealItemForm } from './MealItemForm';
@@ -37,13 +40,15 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
  * grade and where its numbers came from, and the meal's totals and grade.
  * Every change is saved as it is made, to the foods themselves: a food
  * changed, removed or added, the meal renamed, or moved to another slot or
- * day. It reads the log, so it shows what is saved.
+ * day. It reads the log, so it shows what is saved, its macro split
+ * included (MM-597).
  */
 export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const today = useCell(state.today);
   const hand = useCell(state.handSize);
+  const netCarbs = useNetCarbs();
   const [day, setDay] = useState(firstDay);
   const entries = useLoaded(state.foodForDay(day));
   const [editing, setEditing] = useState<number | 'new'>();
@@ -120,6 +125,20 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
           `${whole(loggedMeal.fatG)} g fat`}
       </p>
       {grade === undefined ? null : <MealGradeRow grade={grade} subject={loggedMeal.name} />}
+      <p className="food-label food-label-spaced">Macro split</p>
+      <MacroSplitChart
+        netCarbs={netCarbs}
+        intake={
+          new IntakeDay({
+            date: day,
+            kcal: loggedMeal.kcal,
+            proteinG: loggedMeal.proteinG,
+            carbsG: loggedMeal.carbsG,
+            netCarbsG: loggedMeal.netCarbsG,
+            fatG: loggedMeal.fatG,
+          })
+        }
+      />
       <MmTextField label="Meal name" value={name ?? loggedMeal.name} onChange={setName} onBlur={() => void rename()} onSubmit={() => void rename()} />
       <p className="food-label food-label-spaced">{loggedMeal.items.length === 1 ? '1 food' : `${loggedMeal.items.length} foods`}</p>
       {loggedMeal.items.map((entry) => (

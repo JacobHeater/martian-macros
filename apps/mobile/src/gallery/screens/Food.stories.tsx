@@ -109,6 +109,18 @@ export const EntryRemoved = screenStory({
   },
 });
 
+/** MM-597: a slot's menu opens the macro split of everything in it. */
+export const MealSplit = screenStory({
+  covers: ['FoodScreen', 'MealSplitSheet'],
+  shows: 'Macro split',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Macro split' }));
+  },
+});
+
 export const AddFood = screenStory({ covers: ['AddFoodSheet'], shows: 'Search foods', open: addFood });
 
 /** MM-239: the search field with the keyboard in it shows one mark of focus, its box. */

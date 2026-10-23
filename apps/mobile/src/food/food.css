@@ -155,6 +155,11 @@
   flex: 1;
   min-width: 0;
 }
+.food-meal-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 .food-meal-total {
   display: flex;
   align-items: center;
@@ -165,6 +170,14 @@
 .food-meal-marker {
   display: inline-grid;
   color: var(--text3);
+}
+/* The marker's press reaches past its glyph, without moving the line it sits on (MM-597). */
+.food-meal-marker > .mm-pressable {
+  display: grid;
+  width: auto;
+  margin: calc(-1 * var(--space-8));
+  padding: var(--space-8);
+  border-radius: 50%;
 }
 .food-meal-entry {
   display: flex;

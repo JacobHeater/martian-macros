@@ -110,6 +110,8 @@ export function WaterSection({ day }: { day: CalendarDate }) {
       icon="water"
       title="Water"
       summary={summary}
+      // Drawn as the meals' are, so the cards match (MM-597).
+      foldBesideTitle
       meter={
         goal === undefined ? undefined : (
           // The bar belongs to its day: a new day's is drawn anew once its drinks are in (MM-328).
