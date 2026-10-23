@@ -25,6 +25,7 @@ const valuesOf = (entry: FoodEntry): Values => ({
   sugar_alcohols_g: orNull(entry.sugarAlcoholsG),
   sodium_mg: orNull(entry.sodiumMg),
   alcohol_g: orNull(entry.alcoholG),
+  eaten_at_minute: orNull(entry.eatenAt),
   ...microsValues(entry.micros),
   ...portionValues(entry.portion),
 });
@@ -40,6 +41,17 @@ export class SqlFoodRepository implements FoodRepository {
   watchFood(date: CalendarDate): Watched<FoodEntry[]> {
     return this.db.watch(['food_entries'], async (db) =>
       (await db.select('SELECT * FROM food_entries WHERE epoch_day = ? ORDER BY id', [date.epochDay])).map(foodFromRow),
+    );
+  }
+
+  watchFoodBetween(first: CalendarDate, last: CalendarDate): Watched<FoodEntry[]> {
+    return this.db.watch(['food_entries'], async (db) =>
+      (
+        await db.select('SELECT * FROM food_entries WHERE epoch_day BETWEEN ? AND ? ORDER BY epoch_day, id', [
+          first.epochDay,
+          last.epochDay,
+        ])
+      ).map(foodFromRow),
     );
   }
 
