@@ -34,6 +34,8 @@ const food = (
     per100g: {
       kcal: kcal as number,
       proteinG: proteinG as number,
+      // The calibration foods state their fiber; carbs are not needed to bound it.
+      carbsG: undefined,
       fiberG,
       sodiumMg,
       sugarsG,

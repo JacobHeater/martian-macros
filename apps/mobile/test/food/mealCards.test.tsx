@@ -28,4 +28,8 @@ it('each meal and the water are framed cards whose rows run on the header’s co
   expect(declarationsOf('src/food/food.css', '.food-entry-method')).toMatch(/width: 24px/);
   expect(declarationsOf('src/food/food.css', '.food-entry')).toMatch(/gap: var\(--space-12\)/);
   expect(declarationsOf('src/ui/ui.css', '.mm-section-head-body')).toMatch(/gap: var\(--space-12\)/);
+  // The owner, 2026-10-22: each row drew a flat box over the card's sheen. At rest a row has no ground of its own.
+  expect(declarationsOf('src/ui/ui.css', '.mm-swipe-row')).not.toMatch(/background/);
+  const row = document.querySelector('.mm-swipe');
+  expect(row).not.toHaveClass('mm-swipe-moving');
 });

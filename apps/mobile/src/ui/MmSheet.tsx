@@ -11,7 +11,7 @@ interface MmSheetProps {
   /** Called when the sheet is closed without an answer (Close, Escape, a drag down, or a press outside). */
   onDismiss: () => void;
   /** "tall" keeps one height whatever it holds, so it does not jump as its content changes (MM-566). */
-  size?: 'fit' | 'tall';
+  size?: 'fit' | 'tall' | undefined;
 }
 
 /** How far the handle is dragged down before letting go closes the sheet. */

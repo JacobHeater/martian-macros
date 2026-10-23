@@ -1810,11 +1810,18 @@
   background: var(--sunken);
   color: var(--danger);
 }
+/* At rest a row has no ground of its own: it shows what it sits on, card or canvas, sheen and all, and the delete
+   behind it is not drawn. Only while it is dragged does it take a ground, to slide over the delete (MM-569). */
 .mm-swipe-row {
   position: relative;
+}
+.mm-swipe:not(.mm-swipe-moving) > .mm-swipe-behind {
+  visibility: hidden;
+}
+.mm-swipe-moving > .mm-swipe-row {
   background: var(--surface);
 }
-.mm-section .mm-swipe-row {
+.mm-section:not(.mm-section-framed) .mm-swipe-moving > .mm-swipe-row {
   background: var(--canvas);
 }
 
@@ -2146,10 +2153,6 @@
 }
 .mm-section-flush .mm-section-body {
   padding-left: 0;
-}
-/* A row that swipes on a card covers what is behind it in the card's own colour (MM-569). */
-.mm-section-framed .mm-swipe-row {
-  background: var(--surface);
 }
 .mm-section-body[hidden] {
   display: none;
