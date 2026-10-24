@@ -5,7 +5,9 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryClipboard } from '../../src/fixtures/InMemoryClipboard';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { mealAnalysisPrompt } from '../../src/format/mealAnalysisPrompt';
+import { InMemoryMealShare } from '../../src/fixtures/InMemoryMealShare';
+import { InMemoryPhotoLibrary } from '../../src/fixtures/InMemoryPhotoLibrary';
+import { mealAnalysisPromptWith } from '../../src/format/mealAnalysisPromptWith';
 import { cleanMealAnswer, troubledMealAnswer } from '../../src/gallery/screens/storyMealAnswers';
 import type { AppServices } from '../../src/state/AppServices';
 import { openAddFood, press, typeIn } from '../support/addFood';
@@ -18,17 +20,21 @@ import { renderApp } from '../support/renderApp';
 const today = CalendarDate.of(2026, 10, 22);
 let repos: InMemoryRepositories;
 let clipboard: InMemoryClipboard;
+let mealShare: InMemoryMealShare;
+let photoLibrary: InMemoryPhotoLibrary;
 
 beforeEach(async () => {
   repos = new InMemoryRepositories();
   clipboard = new InMemoryClipboard();
+  mealShare = new InMemoryMealShare();
+  photoLibrary = new InMemoryPhotoLibrary();
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-40), healthCheckConfirmedOn: today }));
   await repos.weights.saveWeight(today, 82);
 });
 
 /** Opens Add food for lunch, then the analysis, with `change` made to the app's services. */
 async function open(change: (services: AppServices) => AppServices = (services) => services): Promise<HTMLElement> {
-  renderApp(repos, today, { change: (services) => ({ ...change(services), clipboard }) });
+  renderApp(repos, today, { change: (services) => ({ ...change(services), clipboard, mealShare, photoLibrary }) });
   await openTab('Food');
   const sheet = await openAddFood('lunch');
   await press(sheet, 'AI meal analysis');
@@ -45,6 +51,11 @@ async function paste(sheet: HTMLElement, text: string): Promise<void> {
 
 const logged = async (day = today) => first(repos.food.watchFood(day));
 
+/** The clean answer, eaten at `when` instead, or with no time eaten at all. */
+const eaten = (when: string | undefined) =>
+  cleanMealAnswer.replace('  "eaten_at": "2026-10-22T19:15",\n', when === undefined ? '' : `  "eaten_at": "${when}",\n`);
+
+
 it('MM-598: Back returns to Add food, Estimate no longer offers the analysis, and a search hides it', async () => {
   const sheet = await open();
   await press(sheet, 'Back');
@@ -58,20 +69,94 @@ it('MM-598: Back returns to Add food, Estimate no longer offers the analysis, an
   expect(within(sheet).queryByRole('button', { name: 'AI meal analysis' }), 'Estimate is the hand estimate alone').not.toBeInTheDocument();
 });
 
-it('Add food offers the analysis, and Copy prompt puts the fixed prompt on the clipboard', async () => {
+it('MM-599: the questions come first, and nothing is copied until the meal has a name', async () => {
   const sheet = await open();
+  for (const field of ['Meal name', 'Anything you didn’t eat?', 'Brand or restaurant']) {
+    expect(within(sheet).getByRole('textbox', { name: field })).toBeInTheDocument();
+  }
+  expect(within(sheet).getByRole('group', { name: 'How much did you eat?' })).toBeInTheDocument();
+  expect(within(sheet).getByRole('group', { name: 'Eaten on' })).toHaveTextContent('Today');
   await press(sheet, 'Copy prompt');
-  expect(clipboard.text).toBe(mealAnalysisPrompt);
+  expect(await within(sheet).findByText('The meal needs a name.')).toBeInTheDocument();
+  expect(clipboard.text, 'nothing copied').toBeUndefined();
+});
+
+it('MM-599: with no photos, Copy prompt puts the prompt with the answers on the clipboard, and says the photos follow', async () => {
+  const sheet = await open();
+  await typeIn(sheet, 'Meal name', 'Taco night');
+  await press(sheet, 'Most');
+  await typeIn(sheet, 'Brand or restaurant', 'Chipotle');
+  await press(sheet, 'Copy prompt');
+  const prompt = mealAnalysisPromptWith(
+    { name: 'Taco night', eaten: 'most', notEaten: '', from: 'Chipotle', day: today, eatenAt: 12 * 60, photosAttached: false },
+    today,
+  );
+  expect(clipboard.text).toBe(prompt);
+  expect(prompt).toContain('- The meal is called "Taco night".');
+  expect(prompt).toContain('- I ate most of what is shown.');
+  expect(prompt).toContain('- It is from Chipotle.');
+  expect(prompt).toContain('Use "eaten_at": "2026-10-22T12:00".');
+  expect(prompt).toContain('- Today is Thursday, October 22, 2026.');
+  expect(prompt).toContain('I will send my photos in my next message.');
+  expect(prompt, 'the assistant is not told to ask').not.toContain('Before you answer, ask me');
   expect(await within(sheet).findByRole('button', { name: 'Prompt copied' }), 'the button says so, with a check').toBeInTheDocument();
-  expect(within(sheet).getByText('Copied. Paste it into your assistant with your photos.'), 'and a screen reader hears it').toHaveAttribute('role', 'status');
+  expect(within(sheet).getByText('Copied. Paste it into your assistant, then send your photos.'), 'and a screen reader hears it').toHaveAttribute('role', 'status');
+  expect(mealShare.sent, 'nothing shared without photos').toBeUndefined();
 });
 
 it('a phone that refuses to copy says so', async () => {
   clipboard.refusesWrite = true;
   const sheet = await open();
+  await typeIn(sheet, 'Meal name', 'Taco night');
   await press(sheet, 'Copy prompt');
   expect(await within(sheet).findByText('The phone did not allow copying. Press the button again.')).toBeInTheDocument();
   expect(within(sheet).getByRole('button', { name: 'Copy prompt' }), 'nothing was copied').toBeInTheDocument();
+});
+
+it('MM-599: photos chosen are sent with the prompt in one share, the prompt copied too, and nothing kept once the sheet closes', async () => {
+  const sheet = await open();
+  await typeIn(sheet, 'Meal name', 'Taco night');
+  await press(sheet, 'Choose photos');
+  expect(await within(sheet).findByText('Photos · 2 of 6')).toBeInTheDocument();
+  expect(photoLibrary.asked, 'asked for as many as are left').toEqual([6]);
+  await press(sheet, 'Remove photo 2');
+  expect(within(sheet).getByText('Photos · 1 of 6')).toBeInTheDocument();
+  await press(sheet, 'Send to assistant');
+  expect(await within(sheet).findByRole('button', { name: 'Sent' })).toBeInTheDocument();
+  expect(mealShare.sent?.photos).toHaveLength(1);
+  expect(mealShare.sent?.text).toContain('My photos are attached to this message.');
+  expect(clipboard.text, 'the prompt is on the clipboard too').toBe(mealShare.sent?.text);
+  await userEvent.click(within(sheet).getByRole('button', { name: 'Close' }));
+  await expect.poll(() => mealShare.cleared).toBeGreaterThan(0);
+  expect(mealShare.sent, 'what was handed on is deleted').toBeUndefined();
+});
+
+it('MM-599: a photo taken in the sheet joins the meal', async () => {
+  const sheet = await open();
+  await press(sheet, 'Take a photo');
+  await within(sheet).findByRole('heading', { name: 'Take a photo' });
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Take photo' }));
+  expect(await within(sheet).findByText('1 photo taken.')).toBeInTheDocument();
+  await press(sheet, 'Done');
+  expect(await within(sheet).findByText('Photos · 1 of 6')).toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: 'Send to assistant' })).toBeInTheDocument();
+});
+
+it('MM-599: a phone that cannot share copies the prompt and says to attach the photos in the assistant', async () => {
+  mealShare = new InMemoryMealShare({ available: false });
+  const sheet = await open();
+  await typeIn(sheet, 'Meal name', 'Taco night');
+  await press(sheet, 'Choose photos');
+  expect(await within(sheet).findByText(/^This phone cannot hand photos to another app/)).toBeInTheDocument();
+  await press(sheet, 'Copy prompt');
+  expect(clipboard.text).toContain('I will send my photos in my next message.');
+});
+
+it('MM-599: the day given here is the review’s when the answer has no time', async () => {
+  const sheet = await open();
+  await userEvent.click(within(within(sheet).getByRole('group', { name: 'Eaten on' })).getByRole('button', { name: 'Previous day' }));
+  await paste(sheet, eaten(undefined));
+  expect(within(sheet).getByRole('group', { name: 'Logged on' })).toHaveTextContent('Yesterday');
 });
 
 it('a clean answer is reviewed, and logged to lunch at the time it says as one meal, each food saying where its numbers came from', async () => {
@@ -210,10 +295,6 @@ it('MM-591: a meal that cannot be logged says so, logs nothing, and keeps the re
   expect(within(sheet).getByRole('heading', { name: 'Review the meal' })).toBeInTheDocument();
   expect(await logged()).toEqual([]);
 });
-
-/** The clean answer, eaten at `when` instead, or with no time eaten at all. */
-const eaten = (when: string | undefined) =>
-  cleanMealAnswer.replace('  "eaten_at": "2026-10-22T19:15",\n', when === undefined ? '' : `  "eaten_at": "${when}",\n`);
 
 // MM-594: the day and time the person told the assistant go with the meal; without them, the day opened and now.
 it('MM-594: a meal eaten yesterday is logged on yesterday, at the time the answer says', async () => {

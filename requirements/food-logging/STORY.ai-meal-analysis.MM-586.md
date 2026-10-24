@@ -36,7 +36,9 @@ Made with the product owner (2026-10-22, a question-and-answer session):
 - **The prompt is fixed** and holds nothing about the person (no targets, diet or history), since it goes
   to a third party. It works with any assistant and cannot be edited in the app.
 - **The prompt makes the assistant ask** for the meal's name (required), how much was actually eaten, and
-  the brand or restaurant when there is one.
+  the brand or restaurant when there is one. *Superseded by MM-599 (owner, 2026-10-24): the app asks these
+  itself and puts the answers in the prompt; and the app may hold the photos while it sends them, keeping
+  none.*
 - **The answer is JSON in a code block**, with `"format": "martian-macros-meal"` and `"version": 1`. Not
   YAML: chat apps break indentation on copy, and YAML needs a parser the app does not have.
 - **Every item must carry** name, grams, kcal, protein, carbohydrate, fat, fiber, total sugars, saturated
