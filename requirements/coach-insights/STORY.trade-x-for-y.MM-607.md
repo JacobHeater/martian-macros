@@ -1,6 +1,6 @@
 ---
 id: MM-607
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-608, MM-616, MM-365, MM-126, MM-371, MM-11, MM-114]
 ---
@@ -110,3 +110,51 @@ Scenario: Edits recompute
   "Not for me" on a catalog Y excludes that food from future trades (uncertain; it needs a small store).
 - Rolls 2017: substituting a lower-energy-dense food reduced meal intake while adding alone did not. That is why adding is not
   offered on fat loss over target.
+
+## Progress (2026-10-24)
+The engine's trade is built; wiring it into the analysis (MM-606) and the Coach tab (MM-610) remains. Not run locally; CI
+validates.
+
+- **The function**: `apps/mobile/src/engine/analysis/findTrade.ts` (`findTrade(input: TradeInput): CoachTrade | undefined`)
+  takes the first of `findTrades.ts` (`findTrades(input: TradeInput): CoachTrade[]`, best first, each Y once), so the second
+  for "The numbers behind this" is `findTrades(...)[1]`. It is pure; the output is the shared `CoachTrade`. The figures are in
+  `TradeRule.ts`; the input is `TradeInput.ts`.
+- **X**: a food (by name, trimmed, in lower case) on ≥ 3 distinct days of the span's entries, at its usual portion ≥ 150 kcal,
+  not `quickAdd`, macros explaining ≥ 75% of its calories, not alcohol (≥ 50% of energy), not a protein food (≥ 20%) for a
+  protein or fat trade, not snoozed, and not the top source of a micronutrient averaging under its reference. Its slot is the
+  meal it is most often logged in.
+- **Y**, in order: a food logged in X's slot on ≥ 2 days of the history (`logged`); a saved food or recipe (origin pack
+  `custom`) logged there (`saved`); a catalog food in X's group (`catalog`), when X was logged from the catalog. Within a
+  source, by days of X × gain a time, then the more familiar Y (days logged in the slot), then the better grade.
+- **Matching, harm and safeguards** as in Decisions. Under 18, paused, under-eating, bariatric surgery and an eating-disorder
+  history (in the safeguards or the cautions) give no trade at all.
+- **The catalog**: the narrow `TradeCatalog` (`engine/analysis/TradeCatalog.ts`): `groupOf(origin)` and
+  `candidatesIn(group, { minKcal, maxKcal })`, answered at once, over `TradeCatalogFood` (a food at its default serving).
+  The adapter `apps/mobile/src/state/CatalogTradeCatalog.ts` reads `CatalogSearch`, `CatalogFoodLookup` and
+  `CatalogServingLookup` ahead of time (`CatalogTradeCatalog.load(catalog, entries)`): the group of each catalog food the
+  entries were logged from (`foodById`), then up to 500 foods of each such group (`search('', { group })`), each at its first
+  serving or 100 g, graded per 100 g. The fixture is `apps/mobile/src/fixtures/InMemoryTradeCatalog.ts`.
+- **Tests**: `apps/mobile/test/engine/findTrade.test.ts` (every scenario: own food, catalog, own first and the second
+  behind it, a saved food between, not eat less in disguise, lean gain, a protein food is not X, the fat, calorie and sodium
+  rules, no room no add, no harm to sodium or fiber in change, Y not mostly fat, what is never X, the micronutrient source,
+  every safeguard and the calorie floor, edits recompute); the contract `apps/mobile/test/contracts/tradeCatalogContract.ts`,
+  run on the fixture in `test/fixtures/seamFixtures.test.ts` and on the adapter over a written pack in
+  `test/state/catalogTradeCatalog.test.ts`.
+- **Remains**: MM-606 calls it for its findings in change and sets `CoachFinding.trade`; AppState builds the
+  `CatalogTradeCatalog` from the installed catalog and the history's entries; the sentences and the "holding up" line
+  (MM-610); the "Not for me" exclusion store (Notes) is **not built**; snoozed foods are honored when the caller passes
+  `snoozed`.
+
+Choices made without asking while building (say if any is wrong):
+- **A food is its name**, trimmed and in lower case, as the fiber examples are; its usual portion is the instance at the
+  median of its calories (the lower middle of an even count), so its figures stay one real portion.
+- **Unknown is not harmless**: while sodium (or fiber) is in change and X states it, a Y that does not state it is not offered.
+  A sodium trade needs both foods' sodium.
+- **"A lower grade band"** is the letter (A, B, C, D), compared only when both foods are graded.
+- **"Carbohydrate-lowering"** under insulin or a sulfonylurea is Y with more than 5 g less carbohydrate than X.
+- **"Calorie-lowering"** under pregnancy, breastfeeding, underweight or low body weight is any Y with fewer calories than X;
+  a calorie trade is never offered then.
+- **The calorie floor and the micronutrient references** are given by the caller (`calorieFloorKcal`, `microReferences`);
+  without them that check is not made. The signal ids a trade spares are `sodium` and `fiber` (`TradeRule`).
+- **A catalog Y** whose name matches X or one of the person's own foods in the slot is left out, so the same food is not
+  offered twice. A group lists at most 500 foods, in the order the packs store them.
