@@ -39,6 +39,14 @@ By the product owner, 2026-10-24:
   - The coach says which meal and which food drove the miss, and by how much.
   - It says what the day would have been without it: "Without the General Tso's chicken you'd be 310 kcal over, not 1,054."
 - **Advice for the rest of today.** When the day is already over target, the coach says how to finish it: "You're done for calories. If you eat dinner, under 400 kcal: lean protein and vegetables. No sauce."
+- **Accountability, without profanity.** The owner: "It doesn't need to go so far as insulting everyone and${1}swearing every second word, but … how about just some good old accountability?"
+  - The coach keeps the record and holds the person to it.
+  - It follows up on what it already told them: "Tuesday I told you to skip the General Tso's chicken. It's back: 744 kcal again."
+  - It counts the repeats: "Third day this week over by 500 or more." "Peanut butter again: 9 of the last 14 days."
+  - When advice was taken, it says so: "You skipped the biscuit three days running. That's 1,400 kcal you didn't eat."
+  - This is coach-driven, from the log and the coach's own record of what it said (MM-605's announcement log, plus a record of
+    the 1d advice given). It is not goals the person sets.
+  - No profanity in the app's text.
 - **Swaps may be any food.** Each swap names a concrete replacement, with numbers where they are known.
   - First a food the person logs.
   - Then a catalog food.
@@ -93,6 +101,22 @@ Scenario: Safety holds
 
 Scenario: Never the person
   Then no coach analysis text calls the person fat, lazy or any body word, and none says cheat, sinful, deserve, earn or burn off
+
+Scenario: The coach follows up on its own advice
+  Given on Tuesday the coach told the person to skip General Tso's chicken
+  When it is logged again on Thursday
+  Then Thursday's line says it was told on Tuesday and it's back, with its calories
+
+Scenario: Repeats are counted
+  Given 3 days this week over target by 500 kcal or more
+  Then a line says "Third day this week over by 500 or more" and what drove them
+
+Scenario: Advice taken is said
+  Given the coach said to skip a food that was eaten on 5 of the 14 days before, and it has not been eaten for 3 days since
+  Then a line says it was skipped 3 days running and the calories that saved
+
+Scenario: No profanity
+  Then no coach text contains profanity
 
 Scenario: Back to plan
   Given any day over target
