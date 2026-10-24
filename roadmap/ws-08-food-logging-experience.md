@@ -161,6 +161,7 @@ workstream's.
 - Built 2026-10-14: MM-325 (version 5: the sodium limit's column for a phone that ran the first version 4).
 - Added 2026-10-21 (step 12): MM-471 (cancelling a pack download on the phone never settled it, done).
 - Added 2026-10-19 (step 13): MM-406 (the camera on iOS).
+- Added 2026-10-24 (step 17): MM-611 (mark a day as a Refeed or a Day off).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

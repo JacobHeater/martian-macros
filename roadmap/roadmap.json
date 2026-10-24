@@ -1961,7 +1961,8 @@
           "MM-51"
         ],
         "remaining": [
-          "MM-50"
+          "MM-50",
+          "MM-616"
         ]
       },
       "sequence": [
@@ -2023,6 +2024,13 @@
             "MM-307"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 8,
+          "title": "Catalog foods carry a food group, mapped from the USDA categories, so the coach's trade can offer a catalog food of the same kind (MM-616)",
+          "tickets": [
+            "MM-616"
+          ]
         }
       ],
       "gate": {
@@ -2607,7 +2615,8 @@
           "MM-596",
           "MM-588",
           "MM-592",
-          "MM-593"
+          "MM-593",
+          "MM-611"
         ]
       },
       "sequence": [
@@ -2826,6 +2835,13 @@
             "MM-592",
             "MM-593"
           ]
+        },
+        {
+          "step": 17,
+          "title": "Mark a day as a Refeed or a Day off, on record, so the coach does not judge it alone (the owner, 2026-10-24, MM-611)",
+          "tickets": [
+            "MM-611"
+          ]
         }
       ],
       "gate": {
@@ -2927,7 +2943,17 @@
           "MM-553"
         ],
         "remaining": [
-          "MM-145"
+          "MM-145",
+          "MM-614",
+          "MM-615",
+          "MM-604",
+          "MM-605",
+          "MM-606",
+          "MM-609",
+          "MM-607",
+          "MM-608",
+          "MM-610",
+          "MM-612"
         ]
       },
       "sequence": [
@@ -3065,6 +3091,28 @@
             "MM-553"
           ],
           "milestone": "M4"
+        },
+        {
+          "step": 15,
+          "title": "Two pattern rules that state patterns that are not there: the unlogged weekday from random gaps (MM-614), weekends higher from one day (MM-615)",
+          "tickets": [
+            "MM-614",
+            "MM-615"
+          ]
+        },
+        {
+          "step": 16,
+          "title": "The coach analyses your data (the owner, 2026-10-24, MM-604): one trend engine (MM-605); food signals (MM-606) and training, water and sleep signals (MM-609); trade X for Y (MM-607) with the prescribed-foods non-goal overruled for trades (MM-608); \"What your data says\" on the Coach tab (MM-610); today so far and yesterday (MM-612)",
+          "tickets": [
+            "MM-604",
+            "MM-605",
+            "MM-606",
+            "MM-609",
+            "MM-607",
+            "MM-608",
+            "MM-610",
+            "MM-612"
+          ]
         }
       ],
       "gate": {
@@ -3135,7 +3183,8 @@
           "MM-489"
         ],
         "remaining": [
-          "MM-74"
+          "MM-74",
+          "MM-613"
         ]
       },
       "sequence": [
@@ -3212,6 +3261,13 @@
             "MM-215",
             "MM-222",
             "MM-447"
+          ]
+        },
+        {
+          "step": 9,
+          "title": "An imported set without repetitions is skipped by weekly volume, the volume jump and strength trends instead of breaking them (MM-613)",
+          "tickets": [
+            "MM-613"
           ]
         }
       ],
@@ -4571,6 +4627,42 @@
         "MM-403"
       ],
       "reason": "An iOS plugin lives in the iOS shell MM-403 creates (the Xcode project, MainViewController's registration, Info.plist): build it after MM-403, in the HS-ios-shell lane. Not a workstream order: WS-03 as a whole waits on nothing here."
+    },
+    {
+      "from": "WS-08",
+      "to": "WS-09",
+      "type": "contract-dependency",
+      "scope": [
+        16
+      ],
+      "satisfiedBy": [
+        "MM-611"
+      ],
+      "reason": "The coach's single-day findings (MM-612) read the day's Refeed or Day off mark that MM-611 stores: agree the mark's type and repository first."
+    },
+    {
+      "from": "WS-04",
+      "to": "WS-09",
+      "type": "soft-preferred-order",
+      "scope": [
+        16
+      ],
+      "satisfiedBy": [
+        "MM-616"
+      ],
+      "reason": "MM-607's catalog trade needs foods to carry a group (MM-616). The trade from the person's own foods does not, so MM-607 can ship with its catalog step off."
+    },
+    {
+      "from": "WS-10",
+      "to": "WS-09",
+      "type": "soft-preferred-order",
+      "scope": [
+        16
+      ],
+      "satisfiedBy": [
+        "MM-613"
+      ],
+      "reason": "MM-609's training signals read weekly volume and strength trends, which an imported set without repetitions breaks until MM-613."
     }
   ],
   "parallelGroups": [

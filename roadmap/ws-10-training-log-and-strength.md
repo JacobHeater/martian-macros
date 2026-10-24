@@ -115,6 +115,7 @@ creates is new.
 - Built 2026-10-21: MM-490 (platform workouts in the app: imported into the log, each once; "Other exercise" moved to a
   chosen exercise).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-193 (Demo workouts repeated for each nutrition day, done); MM-194 (Deleting a custom exercise hides preserved strength sessions, done); MM-192 (Invalid strength evidence bypasses the retry state, done); MM-195 (Weekly volume navigation disappears during a workout, done); MM-196 (Typed set times can overlap another set in the workout, done); MM-214 (A set's reps field can show a value the set does not have, done); MM-215 (Removing a set happens at once and cannot be undone, done); MM-222 (A logged set looks logged, and the next action is in reach, done); MM-447 (A paused workout, and a workout's times, say what they do; placed 2026-10-21, done).
+- Added 2026-10-24 (step 9): MM-613 (an imported set without repetitions breaks weekly volume).
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do
