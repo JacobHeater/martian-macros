@@ -1,6 +1,6 @@
 ---
 id: MM-608
-status: proposed
+status: done
 component: coach-insights
 related: [MM-604, MM-607, MM-144, MM-365, MM-371, MM-141]
 ---
@@ -48,3 +48,9 @@ Scenario: Inline lines unchanged
   Given an inline line under a food (MM-365)
   Then it still names no replacement food
 ```
+
+## Progress
+- Done 2026-10-24: `docs/non-goals.md` and MM-144 mark the prescribed-foods item overruled in part for trades by the product owner on
+  2026-10-24, naming MM-607 and MM-608, with the reasoning kept and meal plans still out. MM-365's "Plain words" scenario carries a
+  comment that it governs inline lines, and that the analysis may name a trade. MM-141's Decisions open with the amendment for the
+  Coach tab. Documentation only; no test.
