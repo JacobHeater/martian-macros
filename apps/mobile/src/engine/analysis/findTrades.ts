@@ -3,10 +3,12 @@ import type { FoodEntry } from '../../domain/FoodEntry';
 import { FoodGradeLetter } from '../../domain/food/grade/FoodGradeLetter';
 import { topSourcesOf } from '../../domain/food/micros/topSourcesOf';
 import type { FoodOrigin } from '../../domain/food/portion/FoodOrigin';
+import type { Portion } from '../../domain/food/portion/Portion';
 import { gramsFor } from '../../domain/food/portion/gramsFor';
 import { Meal } from '../../domain/Meal';
 import { gradeOfFoodEntry } from '../gradeOfFoodEntry';
 import type { CoachTrade } from './CoachTrade';
+import type { CoachTradeFood } from './CoachTradeFood';
 import type { CoachTradeSource } from './CoachTradeSource';
 import type { TradeCatalogFood } from './TradeCatalogFood';
 import type { TradeInput } from './TradeInput';
@@ -25,6 +27,8 @@ interface Profile {
   readonly fiberG: number | undefined;
   readonly alcoholG: number | undefined;
   readonly grams: number | undefined;
+  /** The portion as logged (the usual instance's); a catalog food has none, only its serving's grams. */
+  readonly portion: Portion | undefined;
   readonly grade: FoodGradeLetter | undefined;
 }
 
@@ -124,8 +128,9 @@ export function findTrades(input: TradeInput): CoachTrade[] {
   return trades;
 }
 
-function figuresOf(p: Profile): CoachTrade['x'] {
-  return { name: p.name, kcal: p.kcal, proteinG: p.proteinG, fatG: p.fatG };
+/** A side of the trade at the portion picked: its figures, its sodium where stated, and the portion itself for the words. */
+function figuresOf(p: Profile): CoachTradeFood {
+  return { name: p.name, kcal: p.kcal, proteinG: p.proteinG, fatG: p.fatG, sodiumMg: p.sodiumMg, portion: p.portion, grams: p.grams };
 }
 
 /** A lower number is a better grade; an ungraded food comes last. */
@@ -158,12 +163,13 @@ function profileOf(entry: FoodEntry): Profile {
     fiberG: entry.fiberG,
     alcoholG: entry.alcoholG,
     grams: gramsOf(entry),
+    portion: entry.portion,
     grade: grade.kind === 'graded' ? grade.letter : undefined,
   };
 }
 
 function profileOfCatalog(food: TradeCatalogFood): Profile {
-  return { ...food, name: food.name.trim(), key: keyOf(food.name) };
+  return { ...food, name: food.name.trim(), key: keyOf(food.name), portion: undefined };
 }
 
 /** The grams an entry was logged as, when they can be known. */
@@ -224,14 +230,18 @@ function shortNutrientSources(input: TradeInput): Set<string> {
   return keys;
 }
 
-/** The foods that may be X: eaten on enough days, big enough a time, readable, and none the rules spare. */
+/**
+ * The foods that may be X: eaten on enough days, big enough a time, readable, and none the rules spare. A span
+ * shorter than 3 days asks X to be on each of them: on 1d (MM-612) X is a food logged today.
+ */
 function xFoods(input: TradeInput, snoozed: ReadonlySet<string>): XFood[] {
   const spared = shortNutrientSources(input);
+  const minimumDays = Math.min(TradeRule.xMinDays, input.spanDays);
   const found: XFood[] = [];
   for (const [key, entries] of byFood(input.spanEntries)) {
     if (snoozed.has(key) || spared.has(key)) continue;
     const days = daysOf(entries);
-    if (days < TradeRule.xMinDays) continue;
+    if (days < minimumDays) continue;
     const profile = profileOf(usual(entries));
     if (profile.kcal < TradeRule.xMinKcal || !readable(profile)) continue;
     const proteinFood = proteinShare(profile) >= TradeRule.proteinFoodShare;

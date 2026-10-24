@@ -1,6 +1,6 @@
 ---
 id: MM-605
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-141, MM-139, MM-341, MM-124, MM-606, MM-609, MM-610, MM-612]
 ---
@@ -237,3 +237,67 @@ Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
 - The dismissals are wired: `AppState.coachAnalysis.dismiss` writes `dismissFinding`, and `watchFindingDismissals` hides
   a finding for 28 days. The announcement log is read for each key's transition as of yesterday, but nothing appends
   to it yet, so the state machine is still to be wired.
+
+Evidence rows and the cross-signal null simulation, 2026-10-24. Not run locally; CI validates.
+
+- **Evidence rows (MM-143)** added to `docs/evidence.md`, with the question "What does the coach read in my data?"
+  and the test `apps/mobile/test/engine/coachAnalysisEvidence.test.ts`, which fails for a rule figure without a row.
+  This ticket's rows: every `TrendRule` figure but the rules version, `TrendTier` (Gigerenzer & Hoffrage 1995) and
+  `coachFindingWords` (Kluger & DeNisi 1996), with Nelson 1984, Killick et al. 2012, Hamed & Rao 1998 and Basiotis et
+  al. 1987 cited where the Notes place them.
+- **The cross-signal null simulation** is written: `apps/mobile/test/engine/coachNullSimulation.test.ts`, with the
+  generator `test/engine/support/stationaryCoachUser.ts`. 60 seeded stationary people (fat loss, maintenance and lean
+  gain; food around the fixture's targets with an 8–15% day-to-day spread, stable 4-day training, water around the goal)
+  run `analyseFoodSpan` and `analyseTrainingSpan` on 90 successive days for 2w and 1m; a fix not present the evaluation
+  before counts as new, and each span must stay at 1 or fewer per person per 30 days. Not run locally; CI validates.
+- **Calibrated:** no `TrendRule` figure. Estimated by reasoning and a rough model of the rules before writing the
+  assertion: about 0.5 new fixes per person per 30 days at 2w and 0.2 at 1m, mostly calories against the band (N14) and
+  D1's sign test on the protein target (N2). The one constant that could not meet the budget was MM-606's N15 on lean
+  gain (calibrated there).
+
+The announcement log written, 2026-10-24 (with MM-610's Dashboard card). Not run locally; CI validates.
+
+- **Once a day:** `CoachAnalysis.keepAnnouncing` (started in `App`, for as long as the app is open) evaluates the
+  canonical span as soon as everything it reads is in, and again only when the day changes; the evaluation is as of
+  E (yesterday), E−1 and E−2. Today is never read.
+- **The canonical span** (`canonicalTrendSpan`) is 2w (MM-141's fortnight) when the data supports it, else the longest
+  supported span of at most 30 days: 1m, then 7d. With only 1d supported nothing is evaluated; 1d's findings never go
+  in the log (MM-612).
+- **The keys are the coach's findings** (`CoachFinding.id`: `fatAgainstTarget:level`, `partialDays:dataQuality`,
+  `trainingDropped:fix`), so the log, the dismissals, the Coach tab and the Dashboard name a finding alike. Each fix
+  and data-quality finding said on any of the three days, and each key the log still follows, gets a reading
+  (`coachTrendReadingOf`) and a step of `nextTrendTransition` (`coachTrendSteps`):
+  - detected when the analysis says it, in its way (a fix's `direction` figure); a finding with a trend carries the
+    trend's tier, size and onset, one from a level rule alone is clear and of no size (effect 0, unit `finding`);
+  - held when not said and the span is under 60% fully logged or has fewer than 3 of its last 7 days, or when partial
+    days or estimates rising quiet the composition signals: missing data never resolves;
+  - quiet otherwise; exited a way when not said that way and the key's own exit holds (N1's 65%, MM-606).
+  - Resolution is good news for a fix (the card shows its holding-up line), not for a data-quality finding.
+- **Appended** through `trendLog.appendTrendAnnouncements`, in the order the analysis ranks the keys, so a day's first
+  said entry is its top (the card's ration reads that).
+- **Idempotent against the log:** a key with an entry made for E is not stepped again, so a second evaluation the
+  same day (the app opened again) appends nothing. The log stays append-only.
+- **The state machine:** an update for growth now compares only effects of one unit, and never from an entry that
+  stated no size (`nextTrendTransition`), so a level rule's finding is not re-announced every 14 days.
+- **Ranking:** the transitions as of yesterday are read from the log by the finding's id (`arrangeCoachFindings`), on
+  every span, so a new or reversed finding leads one that continues.
+- **Filters run first:** the safeguards stay inside the analyses (`foodFindingAllowed`, the training restrictions), so
+  a finding they hide is never a key, never ranked, and never on the card; a log entry for it changes nothing.
+- **Tests:**
+  - `apps/mobile/test/engine/coachTrendLog.test.ts`: the canonical span, a finding id's readings (detected, quiet,
+    held, a data-quality limit), new needs E and E−1, idempotent against the log, continuing, resolved and held, 1d
+    never a key, N1's exit through the state machine, and transitions in the ranking;
+  - `apps/mobile/test/state/coachAnalysis.test.ts`: written once a day for 2w and idempotent when the app opens
+    again, ranked as the analysis ranks, the log's transitions ranking the span's fixes, and **filters run first**
+    (an eating-disorder history's hidden fat line, even said reversed in the log, is in no list and displaces nothing;
+    on the card the protein minimum; hidden weight leaves every finding in its place, none carrying a body weight).
+
+Choices made without asking (say if any is wrong):
+- The keys are finding ids rather than the detectors' `signal:aspect`, because a level rule speaks for most fixes
+  (MM-606's "A change is the level rule or the trend") and the card and the dismissals already go by finding id.
+- An exit other than N1's is the finding no longer said, as of E, E−1 and E−2.
+
+Still open, outside this ticket's scenarios:
+- the null simulation over every signal together, and its calibration (another builder's, in `test/engine/`); it
+  should read these finding-id keys too, as their level rules can announce;
+- `findInsights`' rules without an analysis equivalent (MM-610's Progress lists them) stay catalog rules.

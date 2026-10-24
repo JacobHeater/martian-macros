@@ -136,7 +136,7 @@ export function trainingFindingText(f: CoachFinding, fmt: Fmt): readonly [title:
       return [
         `${plural(n('lifts'), 'lift', 'lifts')} level for ${weeks} weeks`,
         `${listed(subjects)} have each stayed within ${percent(raw('tolerance'))} of where they were ${weeks} weeks ago, ` +
-          'and their last three sessions at one load brought no more reps. Open the lift and try one more rep, or one more set.',
+          'and their last three sessions at one load brought no more reps. One more rep or one more set at that load is the usual next step.',
         [
           period,
           ...subjects.map((name, i) => [name, `${fmt.load(raw(`from${i}Kg`))} to ${fmt.load(raw(`to${i}Kg`))}`] as const),

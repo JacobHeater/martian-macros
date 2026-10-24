@@ -1,12 +1,13 @@
 import type { Meal } from '../../domain/Meal';
+import type { CoachTradeFood } from './CoachTradeFood';
 import type { CoachTradeSource } from './CoachTradeSource';
 
 /** Trade X for Y (MM-607), each at the person's usual portion. Words are past or conditional. */
 export interface CoachTrade {
   readonly motive: 'protein' | 'fat' | 'calories' | 'sodium';
   readonly meal: Meal | undefined;
-  readonly x: { readonly name: string; readonly kcal: number; readonly proteinG: number; readonly fatG: number };
-  readonly y: { readonly name: string; readonly kcal: number; readonly proteinG: number; readonly fatG: number };
+  readonly x: CoachTradeFood;
+  readonly y: CoachTradeFood;
   readonly source: CoachTradeSource;
   /** Days X was eaten in the span. */
   readonly days: number;

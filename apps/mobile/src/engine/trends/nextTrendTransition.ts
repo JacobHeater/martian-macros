@@ -83,7 +83,11 @@ export function nextTrendTransition(input: TrendTransitionInput): TrendStep {
     const lastSaid = [...log].reverse().find((a) => said.includes(a.transition));
     if (f !== undefined && lastSaid !== undefined) {
       const rose = TrendTier.rank(f.tier) > TrendTier.rank(lastSaid.tier);
-      const grew = Math.abs(f.effect) >= (1 + TrendRule.reannounceGrowth) * Math.abs(lastSaid.figures.effect);
+      // Growth is read only between effects of one unit, and never from an entry that stated no size (a level rule's, effect 0).
+      const grew =
+        f.unit === lastSaid.figures.unit &&
+        lastSaid.figures.effect !== 0 &&
+        Math.abs(f.effect) >= (1 + TrendRule.reannounceGrowth) * Math.abs(lastSaid.figures.effect);
       if ((rose || grew) && lastSaid.on.daysUntil(on) >= TrendRule.reannounceQuietDays) {
         return { transition: 'update', append: fromFinding('update', f), announced: true };
       }

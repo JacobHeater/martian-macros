@@ -11,9 +11,12 @@ import { coachFindingText } from '../../src/format/coachFindingText';
 import { coachHeadlineText } from '../../src/format/coachHeadlineText';
 import { coachPeriodText } from '../../src/format/coachPeriodText';
 import { Fmt } from '../../src/format/Fmt';
+import { findingControlName } from '../../src/format/findingControlName';
 import { hiddenFindingsText } from '../../src/format/hiddenFindingsText';
+import { hiddenUntilText } from '../../src/format/hiddenUntilText';
 import { moreFindingsText } from '../../src/format/moreFindingsText';
 import { nothingFoundText } from '../../src/format/nothingFoundText';
+import { showsAgainText } from '../../src/format/showsAgainText';
 import { underEatingPointerText } from '../../src/format/underEatingPointerText';
 import { unjudgedAreaText } from '../../src/format/unjudgedAreaText';
 import { food, inputOf, ownersFatWeek, today, yesterday } from '../engine/support/foodAnalysis';
@@ -66,32 +69,42 @@ describe('the lines', () => {
     expect(unjudgedAreaText({ area: 'water', needsDays: 14 })).toBe('Water · needs 2 weeks');
   });
 
-  it('the hidden fold: the count and the day the first shows again', () => {
+  it('the hidden fold: the count, and each row the day it shows again; the snack once one is dismissed', () => {
     const f = { id: 'fiber:level' } as CoachFinding;
     const on = CalendarDate.of(2026, 10, 14);
     expect(hiddenFindingsText([])).toBe('');
-    expect(hiddenFindingsText([{ finding: f, dismissedOn: on, showsAgainOn: on.addDays(28) }])).toBe('1 hidden · shows again Nov 11');
+    expect(hiddenFindingsText([{ finding: f, dismissedOn: on, showsAgainOn: on.addDays(28) }])).toBe('1 finding hidden');
     expect(
       hiddenFindingsText([
         { finding: f, dismissedOn: on, showsAgainOn: on.addDays(28) },
         { finding: f, dismissedOn: on.addDays(2), showsAgainOn: on.addDays(30) },
       ]),
-    ).toBe('2 hidden · the first shows again Nov 11');
+    ).toBe('2 findings hidden');
+    expect(showsAgainText(on.addDays(28))).toBe('shows again Nov 11');
+    expect(hiddenUntilText(on.addDays(28))).toBe('Hidden until Nov 11');
+  });
+
+  it("a finding's controls are named with its title", () => {
+    expect(findingControlName('numbers', 'Fat averaged 90 g against 70 g')).toBe('The numbers behind this: Fat averaged 90 g against 70 g');
+    expect(findingControlName('dismiss', 'Fat averaged 90 g against 70 g')).toBe('Dismiss: Fat averaged 90 g against 70 g');
   });
 
   it('the empty states', () => {
     expect(coachAnalysisWords.nothingLogged).toBe('Log a food and the coach reads it here.');
+    expect(coachAnalysisWords.nothingToday).toBe('Nothing logged today yet.');
+    expect(coachAnalysisWords.weekReads).toBe('7d reads the last week.');
+    expect(coachAnalysisWords.spanName).toBe('Days shown');
     expect(nothingFoundText(['food', 'training', 'water'])).toBe('Nothing stands out. Checked: food, training and water.');
     expect(nothingFoundText(['food'])).toBe('Nothing stands out. Checked: food.');
     expect(moreFindingsText(4)).toBe('4 more from your data');
   });
 
-  it('the headline pairs the strength with the fix in its numbers', () => {
+  it('the headline pairs the strength with the fix by their subjects, not repeating the first title', () => {
     const sections = arrangeCoachFindings(analyseFoodSpan(inputOf(ownersFatWeek()), 14, yesterday), { today });
     const headline = sections.headline;
     expect(headline).toBeDefined();
     if (headline === undefined) return;
-    expect(coachHeadlineText(headline, fmt)).toMatch(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; worth changing: fat averaged 90 g against 70 g\.$/);
+    expect(coachHeadlineText(headline)).toMatch(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; fat is worth changing\.$/);
   });
 });
 
@@ -107,7 +120,7 @@ describe('numbers behind a span’s finding', () => {
     expect(evidence.get('Days counted')).toBe('13');
     expect(evidence.get('Days left out')).toBe('1, not fully logged');
     expect(evidence.get('Rule')).toBe('Fat against your target');
-    expect([...evidence.keys()]).toContain('Peanut butter');
+    expect([...evidence.keys()]).toContain('Peanut butter, share of fat');
   });
 
   it('protein on rest and training days, folded in, is the minimum’s supporting line', () => {
@@ -169,7 +182,10 @@ describe('a refeed in a trend (MM-611’s "Named in trends")', () => {
       trade: undefined,
       trend,
     };
-    expect(new Map(coachFindingText(fat, fmt)[2]).get('Refeeds and days off counted')).toBe('1');
+    const rows = new Map(coachFindingText(fat, fmt)[2]);
+    expect(rows.get('Refeeds and days off counted')).toBe('1');
+    // The tier is "How clear", never "Strength", the lifts' own word.
+    expect(rows.has('Strength')).toBe(false);
   });
 });
 
@@ -188,7 +204,7 @@ describe('words', () => {
     const sections = arrangeCoachFindings(findings, { today });
     const lines = [
       ...texts,
-      ...(sections.headline === undefined ? [] : [coachHeadlineText(sections.headline, fmt)]),
+      ...(sections.headline === undefined ? [] : [coachHeadlineText(sections.headline)]),
       ...Object.values(coachAnalysisWords),
       coachPeriodText({ span: 14, fullyLoggedDays: 12 }),
       nothingFoundText(['food', 'training', 'water']),

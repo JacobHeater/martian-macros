@@ -147,14 +147,31 @@
 
 /* ---- "What your data says" (MM-610): findings flat on the section's card, a hairline between them ---- */
 
+/*
+ * The span switcher under its row's label, across the text column (MM-291's entry row): five spans fit at 360 px,
+ * each segment narrowing to its share, 48 px tall as every segment is.
+ */
+.coach-analysis-spans .mm-segmented {
+  display: grid;
+  width: 100%;
+}
+.coach-analysis-spans .mm-segment {
+  padding: 0 var(--space-4);
+}
 .coach-analysis-period {
   margin: var(--space-8) 0;
 }
+/* The headline straight under the period line: body text, a little heavier than the sentences under it. */
 .coach-analysis-headline {
   margin-bottom: var(--space-12);
+  font-weight: 500;
 }
 .coach-analysis-list {
   margin-top: var(--space-16);
+}
+/* A list's label ("Worth changing") is the Coach's list label, as "Options" on the stall card: a heading in label type. */
+.coach-analysis-list > .coach-options-label {
+  margin: 0 0 var(--space-8);
 }
 .coach-finding + .coach-finding {
   margin-top: var(--space-12);
@@ -164,15 +181,24 @@
 .coach-finding-head {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
   gap: var(--space-8);
 }
+/* The kind of finding, beside its title: neutral, in the secondary text colour, never a warning tone. */
+.coach-finding-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  color: var(--text2);
+}
+/* The title: body size at the weight of a label, so the list's label stays the smaller, quieter line. */
 .coach-finding-title {
   flex: 1;
   margin: 0;
-  font: var(--type-label);
+  font: var(--type-body);
+  font-weight: 600;
 }
-/* "Dismiss" ends at the text's right edge: its padding hangs out, its tap area stays, as "Change pace". */
-.coach-finding-head > :last-child:not(.coach-finding-title) {
-  margin-inline-end: calc(-1 * var(--space-12));
+/* "Dismiss" after the numbers, at the text's start: its padding hangs out, its tap area stays, as "Change pace". */
+.coach-finding-dismiss {
+  margin-inline-start: calc(-1 * var(--space-12));
 }

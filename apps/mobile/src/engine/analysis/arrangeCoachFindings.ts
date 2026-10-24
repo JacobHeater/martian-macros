@@ -6,11 +6,9 @@ import type { TrendFinding } from '../trends/TrendFinding';
 import { TrendTransition } from '../trends/TrendTransition';
 import type { CoachFinding } from './CoachFinding';
 import type { CoachFindingSections } from './CoachFindingSections';
+import { findingQuietDays } from './findingQuietDays';
 import { foldTrainingProtein } from './foldTrainingProtein';
 import type { HiddenFinding } from './HiddenFinding';
-
-/** A dismissed finding stays quiet this long (MM-141's 28 days), then shows again. */
-const quietDays = 28;
 
 /** How many a list holds before the rest go under "N more from your data". */
 const listed = 3;
@@ -33,6 +31,8 @@ const listed = 3;
  *   moves only when a finding changes class or transition, and its figures
  *   update in place.
  * - **Holding up** in the order given; never padded.
+ * - **More:** the fixes past three, then the strengths past three; the
+ *   section shows them as two groups under the same labels (MM-610's PD-2).
  * - The headline is the top holding-up finding and the top fix, only when
  *   both exist.
  */
@@ -47,7 +47,10 @@ export function arrangeCoachFindings(
     today: CalendarDate;
     /** Every dismissal, oldest first (`TrendLogReader.watchFindingDismissals`). */
     dismissals?: readonly FindingDismissal[];
-    /** Each trend key's transition as of the span's last day; a key not here is continuing. */
+    /**
+     * Each key's transition as of the span's last day: a finding's id (the announcement log's key, MM-605), or else
+     * its trend's key. A key not here is continuing.
+     */
     transitions?: ReadonlyMap<string, TrendTransition>;
     previousOrder?: readonly string[];
   },
@@ -62,7 +65,7 @@ export function arrangeCoachFindings(
   const shown: CoachFinding[] = [];
   for (const finding of all) {
     const on = finding.kind === 'left' ? undefined : dismissedOn.get(finding.id);
-    const showsAgainOn = on?.addDays(quietDays);
+    const showsAgainOn = on?.addDays(findingQuietDays);
     if (on !== undefined && showsAgainOn !== undefined && today.isBefore(showsAgainOn)) {
       hidden.push({ finding, dismissedOn: on, showsAgainOn });
     } else {
@@ -104,7 +107,7 @@ function rankFixes(
   const placed = fixes.map((f, i) => ({
     f,
     priority: InsightPriority.index(f.priority),
-    transition: TrendTransition.rank(f.trend === undefined ? 'continuing' : (transitions.get(f.trend.key) ?? 'continuing')),
+    transition: TrendTransition.rank(transitionOf(f, transitions)),
     before: before.get(f.id) ?? unseen,
     // With a trend by the engine's ranking, then the rest as given.
     rank: f.trend === undefined ? trends.length + i : (trendPlace.get(f.trend) ?? i),
@@ -126,4 +129,9 @@ function rankFixes(
     placed.splice(proteinAt, 0, fat);
   }
   return placed.map((p) => p.f);
+}
+
+/** A finding's transition: by its id, as the announcement log keys it, else by its trend's key; continuing when neither is known. */
+function transitionOf(f: CoachFinding, transitions: ReadonlyMap<string, TrendTransition>): TrendTransition {
+  return transitions.get(f.id) ?? (f.trend === undefined ? undefined : transitions.get(f.trend.key)) ?? 'continuing';
 }

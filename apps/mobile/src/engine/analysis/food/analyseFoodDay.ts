@@ -46,7 +46,10 @@ interface DayFix {
  * - **What is left:** calories and protein against today's targets, and up
  *   to two foods the person logs that fit (`foodsThatFit`).
  * - **A Refeed or a Day off** (MM-611) shows its totals and what is left,
- *   and nothing else.
+ *   and nothing else; so does a day with nothing logged yet, what is left
+ *   being the whole of today's targets.
+ * - **Ids** are the day's own (`day:<epochDay>:<signal>:<kind>`): a
+ *   dismissal lasts the day, and never hides another day's line.
  * - **Safeguards** (`foodFindingAllowed`): under 18, paused or bariatric
  *   surgery, nothing; an eating-disorder history, protein only and no food
  *   named; the under-eating finding and the rest as on a span.
@@ -59,7 +62,7 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
   if (limits.nothing || limits.minorOrPaused) return [];
   const record = recordOnOf(input.history)(today);
   const entries = input.entries.filter((e) => e.date === today);
-  if (record === undefined || entries.length === 0) return [];
+  if (record === undefined) return [];
   const targets = record.targets;
   const goal = record.mode;
   const kcalTarget = targets.kcal * (input.plannedShare?.(today) ?? 1);
@@ -75,7 +78,8 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
     figures: Readonly<Record<string, number>>,
     { foods = [], trade }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined } = {},
   ): CoachFinding => ({
-    id: `day:${signal}`,
+    // Today's own: a dismissal lasts the day, and another day's line of the same signal is another finding.
+    id: `day:${today.epochDay}:${signal}:${kind}`,
     signal,
     kind,
     span: 1,
@@ -118,7 +122,8 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
             { foods: fits },
           ),
         ];
-  if (dayKind !== 'none') return left;
+  // A marked day, or nothing logged yet today: what is left (at the full targets when nothing is logged), and nothing else.
+  if (dayKind !== 'none' || entries.length === 0) return left;
 
   // Single-day margins.
   const required = (100 * targets.proteinG) / targets.kcal;
@@ -195,7 +200,9 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
             activeSignals,
             calorieRoom: kcalLeft > 0,
             spanDays: 1,
-            calorieFloorKcal: input.calorieFloorKcal,
+            // No floor check on a day still being eaten: what is logged so far is nearly always under the floor,
+            // and the day is judged against its target, which the floor already bounds.
+            calorieFloorKcal: undefined,
             snoozed: input.snoozed,
           })
         : undefined;

@@ -90,7 +90,7 @@ Signal definitions for MM-605. δ values marked (uncertain) are calibrated by it
 | N12 | fiber | as MM-126 | average ≥ the 14 g per 1,000 kcal guide on ≥ 7 counted days | examples from the person's foods |
 | N13 | sodium (opt-in limit) | as MM-312, plus contributors | under the limit on ≥ 80% of days | sodium-motivated swap |
 | N14 | calories against target | fat loss or recomp: above the band on ≥ 60% of days; lean gain: below the band on ≥ 60% | within the band on ≥ 70% of days | over: a calorie swap that keeps protein; under on lean gain: add |
-| N15 | intake against energy use | fat loss: intake ≥ TDEE − 1σ ("around maintenance"); lean gain: ≤ TDEE + 1σ. Only when `tdeeStatus` is updated | | none; defers to N14 and the stall diagnosis (MM-140) |
+| N15 | intake against energy use | fat loss: intake ≥ TDEE − 1σ ("around maintenance"); lean gain: ≤ TDEE (calibrated from + 1σ, see Progress). Only when `tdeeStatus` is updated | | none; defers to N14 and the stall diagnosis (MM-140) |
 | N16 | meal balance | a meal slot with ≥ 25% of calories and protein density < 50% of req, with N1, N2 or N4 in change | no slot under 70% of req | a swap in that slot |
 | N17 | a repeated food | logged on ≥ 4 of 14 days; ranks levers | a repeated food at ≥ 10 g protein per 100 kcal | feeds MM-607 |
 | N18 | a repeated meal | a saved meal logged ≥ 3 times, at < 70% of req or fat ≥ planned + 15 points | | an item swap inside the meal |
@@ -187,8 +187,8 @@ Built 2026-10-24: the signals, the span analysis and its words. Not run locally;
     words and the eight-word title;
   - `apps/mobile/test/voice.test.ts` bans "too much", "unhealthy", "fattening", "empty calories" and "burn rate".
 - **Remaining:**
-  - ~~wiring into `AppState` and the Coach tab (MM-610)~~ (done, below); the announcement log for MM-605's state machine (N1's
-    exit at 65% is the machine's, not a level rule's);
+  - ~~wiring into `AppState` and the Coach tab (MM-610)~~ (done, below); ~~the announcement log for MM-605's state machine (N1's
+    exit at 65% is the machine's, not a level rule's)~~ (done, below);
   - the evidence register rows (MM-143);
   - calibrating the uncertain thresholds with MM-605's null simulation.
 
@@ -200,3 +200,35 @@ Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
   `analyseFoodSpan` for the span chosen. Its findings are placed by `arrangeCoachFindings` (MM-610).
 - Every scenario is covered by the tests above. Still in progress for the announcement log (the state machine's exit),
   the evidence register rows (MM-143) and the null-simulation calibration of the uncertain thresholds.
+
+Evidence rows, the cross-signal null simulation and calibration, 2026-10-24. Not run locally; CI validates.
+
+- **Evidence rows (MM-143)** added to `docs/evidence.md`, with the question "What does the coach read in my data?"
+  and the test `apps/mobile/test/engine/coachAnalysisEvidence.test.ts`, which fails for a rule figure without a row.
+  This ticket's rows: `foodSignal.*` for N1–N9 and N12–N16, `topContributors` (N11), `foodTrendSignals` (each δ and σ
+  floor), `findTrade` and every `FoodSignalRule` figure, citing Morton 2018, Schoenfeld & Aragon 2018, Rolls 2017,
+  Pérez-Escamilla 2012, Leidy 2015, Burrows 2019 and the IOM AMDR. **The protein rows** (`SafetyBounds.proteinRangeG`,
+  `SafetyBounds.proteinTargetsG`) did not cite the Dietary Guidelines 2025–2030: both now name them as concordant
+  (1.2–1.6 g/kg/day), marked as from a secondary summary (Am Fam Physician 2026;114(1):98-100; the panel's NU-A6).
+- **The cross-signal null simulation** is written: `apps/mobile/test/engine/coachNullSimulation.test.ts`, with the
+  generator `test/engine/support/stationaryCoachUser.ts`. 60 seeded stationary people (fat loss, maintenance and lean
+  gain; food around the fixture's targets with an 8–15% day-to-day spread, stable 4-day training, water around the goal)
+  run `analyseFoodSpan` and `analyseTrainingSpan` on 90 successive days for 2w and 1m; a fix not present the evaluation
+  before counts as new, and each span must stay at 1 or fewer per person per 30 days. Not run locally; CI validates.
+- **Calibrated:** N15 on lean gain, "≤ TDEE + 1σ" → "≤ TDEE" (`FoodSignalRule.energyUseLeanGainSigmas` 0; fat loss
+  keeps 1σ as `energyUseFatLossSigmas`, both read in `readFoodSignals`). A lean-gain surplus (0.15–0.35% a week, about
+  100–250 kcal) is usually within one standard deviation of an updated estimate (Good is under 200 kcal), so at 1σ the
+  line fired on a person eating exactly to plan on about half of days and came and went daily: an estimated 1.2 new
+  fixes per person per 30 days at 2w with a 150 kcal surplus and σ, against about 0.6 at 0σ. The other uncertain
+  thresholds are unchanged: by the same estimate they stay within the budget.
+
+N1's exit at 65%, 2026-10-24 (with MM-605's announcement log). Not run locally; CI validates.
+
+- `foodSpanAnalysisOf` (which `analyseFoodSpan` now wraps) returns, with the findings, the keys whose exit threshold
+  does not hold yet (`FoodSpanAnalysis.unresolved`): `proteinMinimum:level` while the minimum is met on under 65% of
+  judged days (`FoodSignalRule.proteinMinimumExitShare`). N1 is said under 50%; between 50% and 65% it is not said,
+  yet a reported N1 is not resolved; at 65% it resolves once that holds as of E, E−1 and E−2.
+- Tests: `apps/mobile/test/engine/coachTrendLog.test.ts` ("N1's exit at 65%": the analysis at 5, 8 and 10 of 14 days
+  met, and through the state machine).
+- Still in progress for the evidence register rows (MM-143) and the null-simulation calibration of the uncertain
+  thresholds.

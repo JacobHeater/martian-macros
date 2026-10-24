@@ -1,6 +1,6 @@
 ---
 id: MM-610
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-607, MM-609, MM-612, MM-141, MM-256, MM-363, MM-364, MM-108, MM-92, MM-118]
 ---
@@ -188,17 +188,126 @@ Choices made without asking (say if any is wrong):
 - **The fat line leads the protein minimum** when it states the protein it displaced and both are in one priority class
   and transition: it is the line that names the foods and carries the trade.
 - **Stable list:** the order last shown is kept per span for as long as the app is open; after a restart the ranking
-  decides again. Transitions are read from the announcement log, which nothing appends to yet (below), so every key
-  counts as continuing.
-- **The headline** is "<strength> is holding up; worth changing: <the fix's title>."
+  decides again. Transitions are read from the announcement log, written once a day since (below).
+- **The headline** is "<strength> is holding up; worth changing: <the fix's title>." (Since the review fixes below:
+  "<strength's subject> is holding up; <the fix's subject> is worth changing.")
 - **"Days left out"** is the span's days less the days counted, "not fully logged".
-- **The hidden fold** opens to the hidden findings' titles, each with the day it shows again.
+- **The hidden fold** opens to the hidden findings' titles, each with the day it shows again ("shows again Nov 21",
+  under "1 finding hidden" since the review fixes).
 - **Under-eating:** the pointer names the notice while it shows; once it is put off, it says only that nothing here
   asks for less.
 
-Remaining:
-- "Dashboard and Coach agree" and the Dashboard card switched to this engine (the next builder's); `InsightCard` is
-  unchanged.
-- Appending to the announcement log (MM-605's state machine), so transitions and N1's 65% exit are the machine's.
-- Snoozed foods are not passed (`snoozed`): no food snooze is stored yet.
-- The product-designer and UX-accessibility pass over the stories.
+Remaining (at the time; all but the panel pass built below):
+- ~~"Dashboard and Coach agree" and the Dashboard card switched to this engine~~;
+- ~~appending to the announcement log (MM-605's state machine), so transitions and N1's 65% exit are the machine's~~;
+- ~~snoozed foods passed (`snoozed`)~~;
+- the product-designer and UX-accessibility pass over the stories.
+
+Built 2026-10-24: the Dashboard card from the same engine, the announcement log written, and snoozed foods passed.
+Not run locally; CI validates.
+
+- **The card** (`InsightCard`, on `AppState.coachAnalysis.dashboard`, chosen by `selectDashboardInsight` in
+  `src/engine/analysis/`, with the type `DashboardInsight`):
+  - it shows the top finding the announcement log said (new, reversed, update, back again, or resolved, which shows
+    the signal's holding-up line) for the canonical span (MM-605's Progress: 2w, else 1m, then 7d), in the Coach tab's
+    words (`coachFindingText`), with "The numbers behind this" and "Open on Coach", which opens the tab with the
+    section on that span (`CoachAnalysis.openCanonical`);
+  - MM-141's ration, counted from the announcement log and the insight log together: a day's top said entry starts
+    on the card the day after it was made, only when no other start fell that day and fewer than three in the 7 days
+    to it. A day's other entries wait on the Coach tab, never on the card. What is showing keeps showing; between
+    two, the higher priority, then the later start;
+  - Dismiss writes `trendLog.dismissFinding` with the finding's id, the one the Coach tab dismisses by, so each hides
+    it on the other. A finding dismissed today keeps today's start: nothing else starts on the card until tomorrow.
+- **The catalog rules** (MM-141): `InsightRule.analysisSignal` names the three with an equivalent in the analysis
+  (protein short → N1 `proteinMinimum`, protein by meal → N3 `proteinByMeal`, sodium over the limit → N13 `sodium`),
+  and `AppState.insightRules` leaves those out. Every other rule keeps its own: the stall, weigh-in timing, partial
+  days, estimates rising, weigh protein, weekends higher, waist against weight, the consistent day, short sleep and
+  fiber for fullness. They compete with the analysis's top entry by `InsightPriority` (the analysis on a tie), and a
+  rule's start is still written to the insight log, which is unchanged and kept. Strength holding on a cut was
+  already under the lift (MM-377), not on the card.
+- **Snoozed foods:** `snoozedFoodNames` gives the foods with a food kind of inline insight snoozed and still quiet
+  (`AppState.insightSnoozes`), trimmed and in lower case, as `FoodAnalysisInput.snoozed`; MM-607's trades never take
+  them as X or Y.
+- **Transitions in the ranking:** `arrangeCoachFindings` reads a finding's transition by its id (the log's key), then
+  by its trend's key; the log is read for every span.
+- **Story:** `Screens/Today/InsightFromAnalysis` (the fat week's card, and its "Open on Coach").
+- **Tests:**
+  - `apps/mobile/test/engine/coachTrendLog.test.ts`: the card under the ration, a day's later announcements, a rule's
+    start counting against it, dismissed on either tab, resolved good news, the rules kept and which have an
+    equivalent, priority between a rule and a finding, a rule showing keeps showing, partial days left to the rule,
+    transitions in the ranking, and snoozed foods;
+  - `apps/mobile/test/state/coachAnalysis.test.ts`: the card is the top announced finding by the same id, dismissed
+    there it is hidden on the Coach tab and the reverse, pressed it opens the canonical span, and a food snoozed
+    inline is never traded;
+  - `apps/mobile/test/coach/insightCard.test.tsx` ("Dashboard and Coach agree", both ways, and pressing the card).
+- **Existing Dashboard card tests changed** (only where the behaviour changes): in
+  `apps/mobile/test/coach/insightCard.test.tsx`, "a pattern is shown once, with its evidence" now finds the
+  protein-minimum finding's `new` entry in the trend log as of yesterday, and nothing in the insight log, instead of
+  a `proteinShort` row there. Its words ("about 30 g short", "Days at or above the minimum") and the other two
+  dashboard tests are unchanged.
+
+Choices made without asking (say if any is wrong):
+- **Partial days and estimates rising stay rules on the card.** The analysis has its own, but its span reads only once
+  60% of its days are fully logged, which is just when many partial days stop it; the card leaves the analysis's two
+  to the rules, so one is never said twice.
+- **The card waits for the whole analysis**, training included, so it may appear a moment later than the old card.
+- **"Open on Coach"** is a text button under the numbers, as "Dismiss" is beside the title; it opens the tab on the
+  span, not scrolled to the finding. In a development build React's strict mode runs the section's leave effect once
+  on mounting, which puts the span back on 1d; a built app opens on the span.
+
+Not done:
+- The product-designer and UX-accessibility pass over the stories (the section's and the card's).
+
+Review fixes, 2026-10-24 (the product-designer's PD findings and the UX and coaching reviewers' F findings). Not run
+locally; CI validates.
+
+- **PD-1, the switcher:** an `MmListRow` with `entry=` and `flush`, with no `MmListGroup`, as the Goal section's rows
+  (MM-291): the `MmSegmented` runs under the row's label across the text column, its segments narrowed in
+  `.coach-analysis-spans` so five spans fit at 360 px, each 48 px tall. The row is "Days shown", the Dashboard's word.
+  `MmListRow` now applies `flush` to an entry row too.
+- **PD-2, fixes told from strengths:** "N more from your data" opens to two groups under the same "Worth changing" and
+  "Holding up" labels (split in the section by kind, so `CoachFindingSections.more` keeps its shape). Each finding has
+  a small neutral mark beside its title in `--text2`: `checkCircle`, named "Holding up", and `tune`, named "Worth
+  changing"; no new colour and no warning tone.
+- **PD-3:** the list labels are `h3.coach-options-label`, the stall card's list label; a finding's title is body size at
+  weight 600.
+- **PD-4:** the headline comes straight after the period line, at weight 500, and names subjects rather than repeating
+  the first title (`findingSubjectText`): "Calories are holding up; fat is worth changing."
+- **PD-7:** "Not enough data in this span" is a `.coach-options-label` over `.coach-options` captions.
+- **PD-8 and the stories' gaps** (`Screens/Coach`): CoachAnalysisAllSpansSmallPhone (`analysisSeasonScenario`, 95 days
+  logged, every span on a 360 px phone), CoachAnalysisMoreBothKinds (`analysisBalancedScenario`, the fold opened),
+  CoachAnalysisHiddenOpened, CoachAnalysisTodayNumbers, CoachAnalysisTodayTrade (`analysisTodayTradeScenario`),
+  CoachAnalysisNothingLogged (`nothingLoggedScenario`) and CoachAnalysisNothingToday; CoachAnalysisDismissed and
+  CoachAnalysisSpanChosen follow the new words and names. Each is walked with `screenStory`'s `walk`.
+- **PD-11 and F9, dismissing:** "Dismiss" comes after "The numbers behind this", in the reading order and on screen (no
+  CSS reordering). Dismissing moves the focus to the next finding's title (focusable with `tabIndex=-1`), or to the
+  hidden fold's toggle when none follows, and shows the snack "Hidden until {date}" (`hiddenUntilText`), as the
+  weigh-in's snack on the Coach tab. No undo: the trend log only appends a dismissal.
+- **F1:** a 1d finding's id is `day:<epochDay>:<signal>:<kind>`, so a 1d dismissal lasts its day (MM-612).
+- **F2, F3, F6, F7:** the trade sentences (MM-607's Progress).
+- **F4:** `MmDisclosure` takes `name`, what the toggle is heard as; each finding's is "The numbers behind this:
+  {title}" (`findingControlName`, which also names "Dismiss: {title}"). The stories select it by that prefix.
+- **F5 and PD-10:** with history but nothing logged today, 1d says "Nothing logged today yet." and, when 7d is offered,
+  "7d reads the last week.", with what is left at the whole of today's targets under it (`analyseFoodDay` returns the
+  "left" finding with no entries). "Log a food and the coach reads it here." is only for nothing ever logged.
+- **F8, F10, F16:** the findings' words and numbers (MM-612's Progress): food rows "{food}, share of {fat | calories |
+  the gap | sodium}"; one "Days left out" row (sodium and fiber give their own, with why); fiber's days counted and
+  left out; the tier is "How clear"; a "Band" row (low–high kcal) on calories; fat beside protein "on those days"
+  ("On those days fat gave 882 kcal while protein averaged 22 g under your minimum."); a stalled lift's step "One
+  more rep or one more set at that load is the usual next step." (`trainingFindingText`).
+- **F11:** the period line is `aria-live="polite"`.
+- **F13:** the hidden fold is "{n} finding(s) hidden"; each row inside says "shows again {date}" (`showsAgainText`).
+- **F14:** `CoachFindingItem` takes a heading level: h3 for 1d's "what is left", h4 under a list's h3 label, the fold's
+  two groups included (each with its own visible h3).
+- **Tests:** `apps/mobile/test/coach/whatYourDataSays.test.tsx` ("the review fixes": the switcher's row, the live
+  period line and the headline after it, the kind marks, the heading levels, the fold's two groups; nothing today
+  and nothing ever; dismissing's snack, no undo, and the focus), `apps/mobile/test/format/coachAnalysisText.test.ts`
+  (the hidden fold's words, the controls' names, the headline by subjects, "How clear"),
+  `apps/mobile/test/format/foodFindingText.test.ts` and `apps/mobile/test/engine/foodDay.test.ts` (MM-607 and MM-612).
+  Existing tests changed for the new words: the fat-week and safeguard tests in `whatYourDataSays.test.tsx` ("Days
+  shown", the trade's "Trading Peanut butter for", the headline, "1 finding hidden" opened to "shows again", the
+  numbers' name), `coachAnalysisText.test.ts` (the hidden fold, the headline, the food row's label),
+  `foodFindingText.test.ts` (N5's sentence, the trade sentence, 1d's trade), `foodDay.test.ts` (what fits: "48 g
+  protein"), `foodSignals.test.ts` (the fat line's "on those days") and `insightCard.test.tsx` ("Dashboard and Coach
+  agree" opens the hidden fold for its "shows again").
+- **Left for the owner:** PD-6 (the section's length) and F13's "show again" action on a hidden row.

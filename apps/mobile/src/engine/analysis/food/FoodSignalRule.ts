@@ -14,6 +14,8 @@ export const FoodSignalRule = {
   proteinMinimumChangeShare: 0.5,
   /** N1: holding up when met on at least this share (uncertain). */
   proteinMinimumHoldingShare: 0.8,
+  /** N1: a fix in change is over (MM-605's exit threshold) only once met on at least this share. */
+  proteinMinimumExitShare: 0.65,
 
   /** N2: read only when the target is at least this far above the minimum. */
   proteinTargetAboveMinimumG: 15,
@@ -108,6 +110,20 @@ export const FoodSignalRule = {
   caloriesChangeShare: 0.6,
   /** N14: holding up within the band on at least this share. */
   caloriesHoldingShare: 0.7,
+
+  /** N15 on fat loss: intake averaging at least the energy use less this many of its standard deviations. */
+  energyUseFatLossSigmas: 1,
+  /**
+   * N15 on lean gain: intake averaging at most the energy use plus this many
+   * of its standard deviations. Calibrated 1 → 0 by the cross-signal null
+   * simulation (`test/engine/coachNullSimulation.test.ts`): a lean-gain
+   * surplus (0.15–0.35% of body weight a week, about 100–250 kcal) is
+   * usually within one standard deviation of an updated estimate (Good is
+   * under 200 kcal), so at 1 the line fired on a person eating exactly to
+   * plan about half the days and came and went daily. At 0 it says only
+   * what the log shows: no surplus at all.
+   */
+  energyUseLeanGainSigmas: 0,
 
   /** N16: a meal slot giving at least this share of the span's calories… */
   mealShareOfKcal: 0.25,

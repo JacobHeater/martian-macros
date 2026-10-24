@@ -6,6 +6,8 @@ import type { IntakeReader } from '../domain/repositories/IntakeReader';
 import type { WaterReader } from '../domain/repositories/WaterReader';
 import type { FoodAnalysisInput } from '../engine/analysis/food/FoodAnalysisInput';
 import type { TrainingAnalysisInput } from '../engine/analysis/TrainingAnalysisInput';
+import type { Insight } from '../engine/Insight';
+import type { InsightLogEntry } from '../engine/InsightLogEntry';
 import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { CatalogFoodLookup } from '../foodCatalog/CatalogFoodLookup';
 import type { CatalogSearch } from '../foodCatalog/CatalogSearch';
@@ -35,4 +37,15 @@ export interface CoachAnalysisInputs {
   readonly wholeDays: () => readonly IntakeDay[] | undefined;
   /** The under-eating finding holds, and whether its notice is shown (not put off). */
   readonly underEating: () => { readonly holds: boolean; readonly noticeShown: boolean };
+  /** The foods snoozed inline (MM-378), by name in lower case (`snoozedFoodNames`): never in a trade. */
+  readonly snoozed: () => ReadonlySet<string>;
+  /**
+   * For the Dashboard's card (MM-141, MM-610): the catalog's candidates that
+   * the analysis has no equivalent of, highest priority first, the insight
+   * log, and whether a pause within the fortnight silences the card;
+   * undefined while they are read.
+   */
+  readonly insightRules: () =>
+    | { readonly candidates: readonly Insight[]; readonly log: readonly InsightLogEntry[]; readonly paused: boolean }
+    | undefined;
 }

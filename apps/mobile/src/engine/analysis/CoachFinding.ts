@@ -12,7 +12,7 @@ import type { CoachTrade } from './CoachTrade';
  * generated.
  */
 export interface CoachFinding {
-  /** Stable across days while the finding holds: the trend key, or `day:<signal>` for 1d. */
+  /** Stable across days while the finding holds: the trend key, or `day:<epochDay>:<signal>:<kind>` for 1d, so a 1d dismissal lasts the day. */
   readonly id: string;
   /** The catalog signal it comes from, e.g. `fatAgainstTarget` (MM-606) or `trainingDropped` (MM-609). */
   readonly signal: string;

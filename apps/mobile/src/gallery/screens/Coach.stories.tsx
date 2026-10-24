@@ -43,8 +43,12 @@ import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
+import { analysisBalancedScenario } from './analysisBalancedScenario';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
+import { analysisSeasonScenario } from './analysisSeasonScenario';
+import { analysisTodayTradeScenario } from './analysisTodayTradeScenario';
 import { firstMorningScenario } from './firstMorningScenario';
+import { nothingLoggedScenario } from './nothingLoggedScenario';
 import { quietWeekScenario } from './quietWeekScenario';
 
 /**
@@ -1084,7 +1088,7 @@ export const CoachAnalysisNotEnoughData = screenStory({
   walk: pressOnCoach('7d'),
 });
 
-/** MM-610: a week read and nothing stands out: it says so, with the areas it checked; nothing logged today yet on 1d. */
+/** MM-610: a week read and nothing stands out: it says so, with the areas it checked. */
 export const CoachAnalysisNothingFound = screenStory({
   covers: ['CoachScreen'],
   shows: /^Nothing stands out\. Checked: food\.$/,
@@ -1111,10 +1115,10 @@ export const CoachAnalysisMoreFromYourData = screenStory({
   walk: pressOnCoach('2w'),
 });
 
-/** MM-610: a finding dismissed: the fold counts it, with the day it shows again. */
+/** MM-610: a finding dismissed: the fold counts it, the snack says until when, and the focus goes to the next title. */
 export const CoachAnalysisDismissed = screenStory({
   covers: ['CoachScreen'],
-  shows: /^1 hidden · shows again /,
+  shows: '1 finding hidden',
   scenario: analysisFatWeekScenario(),
   open: onCoach,
   walk: async (canvas) => {
@@ -1168,9 +1172,87 @@ export const CoachAnalysisSpanChosen = screenStory({
   open: onCoach,
   walk: async (canvas) => {
     await pressOnCoach('7d')(canvas);
-    const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this/ }, { timeout: 5000 });
+    const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
     if (numbers === undefined) return;
     reveal(numbers);
     await userEvent.click(numbers);
   },
+});
+
+// ---- MM-610's review fixes, 2026-10-24: every state of the section drawn ----
+
+/** MM-610 (PD-1): a season logged, on a 360 px phone: all five spans under "Days shown", 3m chosen, none clipped. */
+export const CoachAnalysisAllSpansSmallPhone = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^90 days through yesterday/,
+  scenario: analysisSeasonScenario,
+  open: onCoach,
+  viewport: 'smallPhone',
+  walk: pressOnCoach('3m'),
+});
+
+/** MM-610 (PD-2): past three of each, "N more from your data" opened: its fixes and its strengths in two groups, each marked. */
+export const CoachAnalysisMoreBothKinds = screenStory({
+  covers: ['CoachScreen'],
+  shows: /more from your data$/,
+  scenario: analysisBalancedScenario,
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('2w')(canvas);
+    await pressOnCoach(/more from your data$/)(canvas);
+  },
+});
+
+/** MM-610 (F13): the hidden fold opened: each hidden finding's title with the day it shows again. */
+export const CoachAnalysisHiddenOpened = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^shows again /,
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('2w')(canvas);
+    const [first] = await within(canvas).findAllByRole('button', { name: /^Dismiss: / }, { timeout: 5000 });
+    if (first === undefined) return;
+    reveal(first);
+    await userEvent.click(first);
+    await pressOnCoach('1 finding hidden')(canvas);
+  },
+});
+
+/** MM-612 (F8): 1d's numbers opened: what is left today against the day's targets, and the rule. */
+export const CoachAnalysisTodayNumbers = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'What is left today',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
+    if (numbers === undefined) return;
+    reveal(numbers);
+    await userEvent.click(numbers);
+  },
+});
+
+/** MM-612, MM-607: a trade on 1d: today's cheese and crackers for the cottage cheese logged at lunch, both named. */
+export const CoachAnalysisTodayTrade = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Trading Cheese and crackers for Cottage cheese with fruit adds about/,
+  scenario: analysisTodayTradeScenario,
+  open: onCoach,
+});
+
+/** MM-610: nothing ever logged: the section asks for a food, and nothing else. */
+export const CoachAnalysisNothingLogged = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Log a food and the coach reads it here.',
+  scenario: nothingLoggedScenario,
+  open: onCoach,
+});
+
+/** MM-612 (F5): a week logged, nothing yet today: it says so, points to 7d, and shows what is left at the full targets. */
+export const CoachAnalysisNothingToday = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Nothing logged today yet. 7d reads the last week.',
+  scenario: quietWeekScenario(),
+  open: onCoach,
 });

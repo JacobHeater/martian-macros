@@ -54,7 +54,7 @@ describe("the owner's fat week", () => {
     expect(fat.figures['proteinReference']).toBe(0);
     const [, body] = textOf(fat);
     expect(body).toMatch(
-      /^Fat averaged 90 g against 70 g; Peanut butter supplied 22% of it\. Fat carries 9 kcal a gram, so those calories went to fat instead of protein, which averaged 20 g under your minimum\./,
+      /^Fat averaged 90 g against 70 g; Peanut butter supplied 22% of it\. Fat carries 9 kcal a gram\. On those days fat gave 811 kcal while protein averaged 20 g under your minimum\./,
     );
   });
 

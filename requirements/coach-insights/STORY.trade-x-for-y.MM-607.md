@@ -167,3 +167,30 @@ Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
 - Every scenario is covered by `findTrade.test.ts`, and the trade is seen on the tab in
   `apps/mobile/test/coach/whatYourDataSays.test.tsx`, so the story is done. Not in its scenarios and still not built:
   the "Not for me" exclusion store (Notes); `snoozed` is not passed, as no food snooze is stored yet.
+
+Review fixes (MM-610's review), 2026-10-24. Not run locally; CI validates.
+
+- **Both foods named:** "Trading {X} for {Y} on those days would have…", never "Trading it".
+- **Calories in words:** "90 kcal fewer each time" or "40 kcal more each time" (on 1d without "each time"), or "about
+  the same calories", in place of a signed figure.
+- **The calorie trade:** "Trading {X} for {Y} on those days would have meant about N kcal less a day, with protein no
+  lower." (on 1d "…means about N kcal less today, with protein no lower."), with no change a time beside it.
+- **The sodium trade** states both foods' sodium: "{X} on 6 of 14 days: 420 kcal with 1,400 mg sodium. {Y}, which you
+  log at lunch, has 500 mg sodium in 380 kcal. Trading…". `CoachTrade`'s sides are now `CoachTradeFood`
+  (`engine/analysis/CoachTradeFood.ts`), with `sodiumMg`, filled by `findTrades`.
+- **Portions:** each side carries the usual portion the engine picked (`portion`, the median instance's as logged, or
+  `grams`, a catalog food's default serving), and the sentence says it after the name: "Granola (80 g) on 6 of 14
+  days: …". The words are `format/portionText.ts`, which `portionAmount` (a meal's row) now uses too; the engine keeps
+  the portion, not words.
+- **No repeat:** a trade on the calorie-density finding leaves out "It is calorie-dense for its protein", which that
+  finding has just said (`coachTradeText`'s `densityStated`).
+- **1d:** X on a span shorter than 3 days is asked to be on each of its days, so a 1d trade can be offered (MM-612).
+- **Tests:** `apps/mobile/test/format/foodFindingText.test.ts` (the trade sentence, both foods named, more or fewer
+  each time, portions, the calorie trade's exact sentence for a span and for 1d, the sodium trade's, no repeat) and
+  `apps/mobile/test/engine/foodDay.test.ts` ("a 1d trade"). The existing trade-sentence tests were changed for the
+  new words. Story: CoachAnalysisTodayTrade.
+
+Choice made without asking (say if any is wrong):
+- **The portion is kept as data** on the trade (`portion`, `grams`) and said by `format/`, since the engine holds no
+  words; the review asked for "portion text".
+
