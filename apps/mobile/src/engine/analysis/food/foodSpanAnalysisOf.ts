@@ -110,7 +110,12 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
     signal: string,
     kind: CoachFindingKind,
     figures: Readonly<Record<string, number>>,
-    { foods = [], trade, trend }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined; trend?: TrendFinding | undefined } = {},
+    {
+      foods = [],
+      trade,
+      trend,
+      direction,
+    }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined; trend?: TrendFinding | undefined; direction?: TrendDirection | undefined } = {},
   ): CoachFinding => ({
     // Stable while the finding holds: the level key of the trend engine (`trendKeyOf`), whichever detector speaks.
     id: kind === 'fix' ? `${signal}:level` : kind === 'dataQuality' ? `${signal}:dataQuality` : `${signal}:holdingUp`,
@@ -119,7 +124,8 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
     span,
     from,
     to: asOf,
-    priority: kind === 'dataQuality' ? 'dataQuality' : 'coaching',
+    // Each signal's own priority (MM-141), not one class for every food finding.
+    priority: kind === 'dataQuality' ? 'dataQuality' : FoodSignalId.priority(signal as FoodSignalId, direction),
     figures,
     foods,
     trade,
@@ -353,7 +359,7 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
       c.kind === 'fix'
         ? { ...c.figures, direction: c.direction === 'down' ? -1 : 1, calorieRoom: calorieRoom ? 1 : 0, tradeDays: unmarked.length }
         : c.figures;
-    const finding = make(c.signal, c.kind, figures, { foods, trade, trend: c.trend });
+    const finding = make(c.signal, c.kind, figures, { foods, trade, trend: c.trend, direction: c.direction });
     (c.kind === 'fix' ? fixes : holding).push(finding);
   }
 

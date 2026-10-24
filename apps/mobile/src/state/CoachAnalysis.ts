@@ -80,6 +80,9 @@ const safelyRead = (analyse: () => FoodSpanAnalysis): FoodSpanAnalysis => {
   }
 };
 
+/** Whether a stream is still on its first read: not in, and not failed. */
+const stillReading = (loadable: Loadable<unknown>): boolean => !loadable.ready && !Loadable.hasFailed(loadable);
+
 /** The section's state's reading of the app's cells, shared by the span chosen and the canonical span. */
 interface AnalysisRead {
   readonly today: CalendarDate;
@@ -383,13 +386,19 @@ export class CoachAnalysis {
     const inputs = this.inputs;
     const read = this.read.value;
     if (read === undefined) return undefined;
+    // The trend log is read on every span, 1d too, so it is in by the time a span is chosen. Until its first read
+    // the view waits: arranged without it, the fixes would be drawn once out of order (the log's transitions rank
+    // them, MM-605) and a dismissed finding would show for a moment. A read that failed ranks and hides nothing.
+    const announced = this.announcements.value;
+    const dismissed = this.dismissals.value;
+    if (stillReading(announced) || stillReading(dismissed)) return undefined;
     const { today, entries, spans } = read;
     const chosen = this.span.value;
     // A span the data no longer supports (an entry deleted) falls back to today.
     const span: AnalysisSpan = spans.includes(chosen) ? chosen : 1;
     const foodInput: FoodAnalysisInput = { ...read.food, catalog: Loadable.valueOf(this.tradeCatalog.value) };
     const { holds: underEating, noticeShown: underEatingNoticeShown } = inputs.underEating();
-    const dismissals = Loadable.valueOf(this.dismissals.value) ?? [];
+    const dismissals = Loadable.valueOf(dismissed) ?? [];
 
     let findings: CoachFinding[];
     let unjudged: UnjudgedArea[] = [];
@@ -419,7 +428,7 @@ export class CoachAnalysis {
         if (water.some((e) => within(e.date))) checked.push('water');
       }
       // The state machine's word on each key as of yesterday (MM-605): the canonical span's log, read for every span.
-      for (const entry of Loadable.valueOf(this.announcements.value) ?? []) {
+      for (const entry of Loadable.valueOf(announced) ?? []) {
         if (entry.on === to) transitions.set(entry.key, entry.transition);
       }
     }

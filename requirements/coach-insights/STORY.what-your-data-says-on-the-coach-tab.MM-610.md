@@ -187,6 +187,12 @@ Choices made without asking (say if any is wrong):
   days), in the test and the story.
 - **The fat line leads the protein minimum** when it states the protein it displaced and both are in one priority class
   and transition: it is the line that names the foods and carries the trade.
+- **The view waits for the trend log's first read** (the announcement log and the dismissals), which it watches on
+  every span, 1d too, so the log is in by the time a span is chosen. Arranged before it, the fixes were drawn once
+  without their transitions (the fat line first, then the protein minimum new as of yesterday) and a dismissed finding
+  showed for a moment. Guarded by `test/state/coachAnalysis.test.ts`'s "the log's transitions rank the span's fixes".
+- **The span switcher sits on a list group** (`MmListGroup`), as every row that holds a control does (MM-291); drawn
+  bare in the framed section at first, it broke rule 1 (`test/gallery/hierarchy.test.tsx`).
 - **Stable list:** the order last shown is kept per span for as long as the app is open; after a restart the ranking
   decides again. Transitions are read from the announcement log, written once a day since (below).
 - **The headline** is "<strength> is holding up; worth changing: <the fix's title>." (Since the review fixes below:

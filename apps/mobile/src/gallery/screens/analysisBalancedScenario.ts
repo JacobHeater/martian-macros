@@ -8,16 +8,17 @@ import { storyTargets } from './storyTargets';
 
 /**
  * A fortnight with as much holding up as worth changing, for the Coach tab's analysis (MM-610's "N more from your
- * data", with both kinds): on a cut at 2,400 kcal, protein 170 g with a 140 g minimum, fat 70 g and carbohydrate
- * 270 g, the 14 days through yesterday logged in full at Full detail. Every day is on its targets (protein 163 g,
- * fat 70 g, about 2,400 kcal), so protein, fat, carbohydrate, the split, calories and protein at each meal hold up;
- * and a large low-protein dinner, crisps weighed at over 5 kcal a gram, little fiber and a lot of sodium under a
- * 2,300 mg limit are each worth changing. Past three of each, the rest folds under "N more", in two groups.
+ * data", with both kinds): on a cut at 2,400 kcal against an energy use of 2,500 (updated from the person's own data),
+ * protein 170 g with a 140 g minimum, fat 70 g and carbohydrate 270 g, the 14 days through yesterday logged in full at
+ * Full detail. Every day is on its targets (protein 183 g, fat 70 g, 2,400 kcal), with protein in each large meal, so
+ * protein, calories (fat with them, one line per family), carbohydrate and the balance of the meals hold up; and
+ * intake around maintenance, crisps weighed at over 5 kcal a gram, little fiber and a lot of sodium under a 2,300 mg
+ * limit are each worth changing. Four of each: past three, the rest folds under "N more", in two groups.
  */
 export const analysisBalancedScenario: StoryScenario = async (repos, today) => {
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-70), healthCheckConfirmedOn: today }));
   await repos.targets.saveTargets(
-    storyTargets(today.addDays(-60), { kcal: 2400, proteinG: 170, proteinMinimumG: 140, fatG: 70, carbsG: 270, tdeeSigmaKcal: 150, tdeeStatus: 'updated' }),
+    storyTargets(today.addDays(-60), { kcal: 2400, proteinG: 170, proteinMinimumG: 140, fatG: 70, carbsG: 270, tdeeKcal: 2500, tdeeSigmaKcal: 150, tdeeStatus: 'updated' }),
   );
   await repos.preferences.saveDetailLevel('full');
   await repos.preferences.saveSodiumLimit(2300, today.addDays(-30));
@@ -62,7 +63,7 @@ export const analysisBalancedScenario: StoryScenario = async (repos, today) => {
     const date = today.addDays(-i);
     await food(date, 'breakfast', 'Protein oats', 500, 50, 12);
     await food(date, 'lunch', 'Chicken and rice', 700, 80, 15);
-    await food(date, 'dinner', 'Pasta with tomato sauce', 900, 30, 25);
+    await food(date, 'dinner', 'Pasta with meat sauce', 900, 50, 25);
     await food(date, 'snack', 'Crisps', 300, 3, 18, 57);
     await repos.dayMarks.setCompleteness(date, 'complete');
   }

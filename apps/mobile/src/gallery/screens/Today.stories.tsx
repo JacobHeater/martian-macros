@@ -351,7 +351,10 @@ export const InsightWaistAgainstWeight = screenStory({
   },
 });
 
-/** MM-126: on a cut, fiber well under the guide and hunger hard: fullness, in foods already logged, at most monthly. */
+/**
+ * MM-126: on a cut, fiber well under the guide and hunger hard: fullness, in foods already logged, at most monthly.
+ * On the card since two days ago, so it keeps its place over the analysis's own fiber line, new as of yesterday (MM-610).
+ */
 export const InsightFiberForFullness = screenStory({
   covers: ['DashboardScreen'],
   shows: 'Fiber, and staying full on a deficit',

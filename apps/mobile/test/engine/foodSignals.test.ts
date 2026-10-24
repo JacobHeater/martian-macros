@@ -34,6 +34,38 @@ const fixes = (found: readonly CoachFinding[]) => found.filter((f) => f.kind ===
 const signals = (found: readonly CoachFinding[]) => found.map((f) => f.signal);
 const composition = FoodSignalId.values.filter((id) => FoodSignalId.isComposition(id)) as readonly string[];
 
+describe('each signal its own priority (MM-141)', () => {
+  it('as the ticket and the nutrition panel give them, never one class for every food finding', () => {
+    const priorities = Object.fromEntries(FoodSignalId.values.map((id) => [id, FoodSignalId.priority(id)] as const));
+    expect(priorities).toEqual({
+      proteinMinimum: 'pattern',
+      proteinTarget: 'education',
+      proteinByMeal: 'education',
+      proteinDensity: 'pattern',
+      fatAgainstTarget: 'pattern',
+      fatShare: 'pattern',
+      carbohydrate: 'education',
+      macroSplit: 'pattern',
+      calorieDensity: 'education',
+      fiber: 'education',
+      sodium: 'pattern',
+      calories: 'pattern',
+      energyUse: 'coaching',
+      mealBalance: 'education',
+    });
+    // N5: fat over its target is a pattern, fat under its minimum coaching.
+    expect(FoodSignalId.priority('fatAgainstTarget', 'up')).toBe('pattern');
+    expect(FoodSignalId.priority('fatAgainstTarget', 'down')).toBe('coaching');
+  });
+
+  it("the owner's fat week: fat over target and the protein minimum it displaced are both patterns", () => {
+    const found = analyseFoodSpan(inputOf(ownersFatWeek()), 14, yesterday);
+    const priorityOf = (signal: string) => fixes(found).find((f) => f.signal === signal)?.priority;
+    expect(priorityOf('fatAgainstTarget')).toBe('pattern');
+    expect(priorityOf('proteinMinimum')).toBe('pattern');
+  });
+});
+
 describe("the owner's fat week", () => {
   const found = analyseFoodSpan(inputOf(ownersFatWeek()), 14, yesterday);
   const calorieFamily = fixes(found).filter((f) => FoodSignalId.family(f.signal as FoodSignalId) === 'calories');

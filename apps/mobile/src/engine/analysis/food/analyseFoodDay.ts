@@ -76,7 +76,11 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
     signal: string,
     kind: CoachFindingKind,
     figures: Readonly<Record<string, number>>,
-    { foods = [], trade }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined } = {},
+    {
+      foods = [],
+      trade,
+      direction,
+    }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined; direction?: TrendDirection | undefined } = {},
   ): CoachFinding => ({
     // Today's own: a dismissal lasts the day, and another day's line of the same signal is another finding.
     id: `day:${today.epochDay}:${signal}:${kind}`,
@@ -85,7 +89,8 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
     span: 1,
     from: today,
     to: today,
-    priority: 'coaching',
+    // What is left today is coaching; a fix or a strength has its signal's own priority (MM-141).
+    priority: kind === 'left' ? 'coaching' : FoodSignalId.priority(signal as FoodSignalId, direction),
     figures,
     foods,
     trade,
@@ -206,7 +211,7 @@ export function analyseFoodDay(input: FoodAnalysisInput, today: CalendarDate): C
             snoozed: input.snoozed,
           })
         : undefined;
-    fixes.push(make(c.signal, 'fix', { ...c.figures, direction: c.direction === 'down' ? -1 : 1, calorieRoom: kcalLeft > 0 ? 1 : 0, tradeDays: 1 }, { foods, trade }));
+    fixes.push(make(c.signal, 'fix', { ...c.figures, direction: c.direction === 'down' ? -1 : 1, calorieRoom: kcalLeft > 0 ? 1 : 0, tradeDays: 1 }, { foods, trade, direction: c.direction }));
   }
 
   // Holding up: never calories under the band.
