@@ -306,7 +306,8 @@ describe('the native-control rule, on samples', () => {
     expect(uiControlProblems('ui/MmSomething.tsx', '<input type="file" />')).toEqual([
       'ui/MmSomething.tsx writes an <input type="file"> that no component owns; add it to controlHomes with its component.',
     ]);
-    expect(uiControlProblems('ui/MmNotes.tsx', '<textarea />')).toEqual(['ui/MmNotes.tsx writes <textarea>; only no file yet may.']);
+    // A text area has its home in MmTextField since MM-603; written anywhere else, it is reported.
+    expect(uiControlProblems('ui/MmNotes.tsx', '<textarea />')).toEqual(['ui/MmNotes.tsx writes <textarea>; only ui/MmTextField.tsx may.']);
   });
 });
 
