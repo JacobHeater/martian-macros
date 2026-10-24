@@ -1,6 +1,7 @@
 import Capacitor
 import Foundation
 import LocalAuthentication
+import PhotosUI
 import SQLite3
 import UIKit
 import UniformTypeIdentifiers
@@ -13,7 +14,10 @@ import UniformTypeIdentifiers
 /// fetches the page, the app nothing. It keeps the progress photos private
 /// (MM-157): the phone's own lock is asked before they show, and while they
 /// do the app switcher shows a blank screen in their place. It reads and
-/// writes the clipboard (MM-590); iOS asks the person before a paste.
+/// writes the clipboard (MM-590); iOS asks the person before a paste. It
+/// picks a meal's photos and shares them with the prompt for the person's
+/// own assistant (MM-599): the photos are written to the temporary folder
+/// only to be handed on, and deleted when the sheet closes.
 @objc(MmBackupPlugin)
 public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     public let identifier = "MmBackupPlugin"
@@ -29,9 +33,15 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "protectScreen", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readClipboard", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "writeClipboard", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "pickPhotos", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "shareMeal", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "clearMealShare", returnType: CAPPluginReturnPromise),
     ]
 
     private var picker: PickDelegate?
+    private var photoPicker: PhotoPickDelegate?
+    /// The photos the last `shareMeal` wrote, deleted when its sheet closes or on `clearMealShare`.
+    private var mealFiles: [URL] = []
     private var cover: UIView?
     private var observers: [NSObjectProtocol] = []
 
@@ -161,6 +171,103 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
+    /// The phone's photo picker (PHPicker), which needs no permission: the person chooses each photo.
+    /// Each is reduced to about 2 megapixels and crosses as base64 JPEG; nothing is kept.
+    @objc func pickPhotos(_ call: CAPPluginCall) {
+        let max = Swift.max(1, call.getInt("max") ?? 1)
+        DispatchQueue.main.async {
+            guard let presenter = self.bridge?.viewController else { return call.reject("Nothing to present on.") }
+            var config = PHPickerConfiguration()
+            config.filter = .images
+            config.selectionLimit = max
+            let picker = PHPickerViewController(configuration: config)
+            let delegate = PhotoPickDelegate { results in
+                self.photoPicker = nil
+                MmBackupPlugin.load(results) { photos in call.resolve(["photos": photos]) }
+            }
+            self.photoPicker = delegate
+            picker.delegate = delegate
+            presenter.present(picker, animated: true)
+        }
+    }
+
+    /// Each chosen photo as `{ data, width, height }`, in the order chosen; one that cannot be read is left out.
+    private static func load(_ results: [PHPickerResult], done: @escaping ([[String: Any]]) -> Void) {
+        var photos = [[String: Any]?](repeating: nil, count: results.count)
+        let group = DispatchGroup()
+        for (at, result) in results.enumerated() {
+            guard result.itemProvider.canLoadObject(ofClass: UIImage.self) else { continue }
+            group.enter()
+            result.itemProvider.loadObject(ofClass: UIImage.self) { object, _ in
+                if let image = object as? UIImage, let reduced = MmBackupPlugin.reduce(image), let jpeg = reduced.jpegData(compressionQuality: 0.85) {
+                    let width = Int(reduced.size.width * reduced.scale)
+                    let height = Int(reduced.size.height * reduced.scale)
+                    DispatchQueue.main.async { photos[at] = ["data": jpeg.base64EncodedString(), "width": width, "height": height] }
+                }
+                group.leave()
+            }
+        }
+        group.notify(queue: .main) { done(photos.compactMap { $0 }) }
+    }
+
+    /// `image` drawn at about 2 megapixels at most, upright.
+    private static func reduce(_ image: UIImage) -> UIImage? {
+        let pixels = image.size.width * image.size.height
+        guard pixels > 0 else { return nil }
+        let factor = Swift.min(1, (2_000_000 / pixels).squareRoot())
+        let size = CGSize(width: (image.size.width * factor).rounded(), height: (image.size.height * factor).rounded())
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1
+        return UIGraphicsImageRenderer(size: size, format: format).image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+    }
+
+    /// The share sheet with the prompt and the photos together. The photos are written to the temporary
+    /// folder only to be handed on, and deleted when the sheet closes. Saving to the phone's Photos is not
+    /// offered: a meal's photos never reach the gallery from the app.
+    @objc func shareMeal(_ call: CAPPluginCall) {
+        let text = call.getString("text") ?? ""
+        let photos = (call.getArray("photos") as? [String] ?? []).compactMap { Data(base64Encoded: $0) }
+        DispatchQueue.main.async {
+            guard let presenter = self.bridge?.viewController else { return call.reject("Nothing to present on.") }
+            self.removeMealFiles()
+            do {
+                for (at, jpeg) in photos.enumerated() {
+                    let url = self.tempUrl("meal-\(at + 1).jpg")
+                    try jpeg.write(to: url, options: .atomic)
+                    self.mealFiles.append(url)
+                }
+            } catch {
+                self.removeMealFiles()
+                return call.reject(mmMessage(error))
+            }
+            let sheet = UIActivityViewController(activityItems: [text] + self.mealFiles, applicationActivities: nil)
+            sheet.excludedActivityTypes = [.saveToCameraRoll, .assignToContact]
+            sheet.completionWithItemsHandler = { _, completed, _, _ in
+                self.removeMealFiles()
+                call.resolve(["outcome": completed ? "sent" : "cancelled"])
+            }
+            if let popover = sheet.popoverPresentationController {
+                popover.sourceView = presenter.view
+                popover.sourceRect = CGRect(x: presenter.view.bounds.midX, y: presenter.view.bounds.midY, width: 1, height: 1)
+            }
+            presenter.present(sheet, animated: true)
+        }
+    }
+
+    @objc func clearMealShare(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            self.removeMealFiles()
+            call.resolve()
+        }
+    }
+
+    private func removeMealFiles() {
+        for url in mealFiles {
+            try? FileManager.default.removeItem(at: url)
+        }
+        mealFiles = []
+    }
+
     @objc func unlock(_ call: CAPPluginCall) {
         let context = LAContext()
         var problem: NSError?
@@ -220,6 +327,19 @@ public class MmBackupPlugin: CAPPlugin, CAPBridgedPlugin {
     private func uncover() {
         cover?.removeFromSuperview()
         cover = nil
+    }
+
+    private final class PhotoPickDelegate: NSObject, PHPickerViewControllerDelegate {
+        private let done: ([PHPickerResult]) -> Void
+
+        init(done: @escaping ([PHPickerResult]) -> Void) {
+            self.done = done
+        }
+
+        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+            picker.dismiss(animated: true)
+            done(results)
+        }
     }
 
     private final class PickDelegate: NSObject, UIDocumentPickerDelegate {

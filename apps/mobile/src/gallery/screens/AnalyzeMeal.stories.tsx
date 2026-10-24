@@ -1,6 +1,9 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
+import { FixturePhotoCamera } from '../../fixtures/FixturePhotoCamera';
 import { InMemoryClipboard } from '../../fixtures/InMemoryClipboard';
+import { InMemoryMealShare } from '../../fixtures/InMemoryMealShare';
+import { InMemoryPhotoLibrary } from '../../fixtures/InMemoryPhotoLibrary';
 import { showViewMealSheet } from '../../food/meal/showViewMealSheet';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import type { AppServices } from '../../state/AppServices';
@@ -38,6 +41,27 @@ const press = (name: string | RegExp) => async (canvas: HTMLElement) =>
 const choose = (name: string) => async (canvas: HTMLElement) =>
   userEvent.click(await sheet(canvas).findByRole('menuitem', { name }));
 
+/** Opens the analysis and names the meal (MM-599). */
+const named = async (canvas: HTMLElement) => {
+  await press('AI meal analysis')(canvas);
+  await userEvent.type(await sheet(canvas).findByRole('textbox', { name: 'Meal name' }), 'Taco night');
+};
+
+/** Opens the analysis, names the meal and chooses photos. */
+const withPhotos = async (canvas: HTMLElement) => {
+  await named(canvas);
+  await press('Choose photos')(canvas);
+};
+
+/** A phone whose share sheet does `outcome`, or cannot share at all (MM-599). */
+const sharing =
+  ({ available = true, outcome = 'sent' }: { available?: boolean; outcome?: InMemoryMealShare['outcome'] }) =>
+  async (services: AppServices): Promise<AppServices> => {
+    const share = new InMemoryMealShare({ available });
+    share.outcome = outcome;
+    return { ...services, mealShare: share };
+  };
+
 /** Opens the analysis, then pastes what the clipboard holds. */
 const pasted = async (canvas: HTMLElement) => {
   await press('AI meal analysis')(canvas);
@@ -65,7 +89,7 @@ export const AnalyzeMealPromptCopied = screenStory({
   shows: 'Prompt copied',
   open: addFood,
   walk: async (canvas) => {
-    await press('AI meal analysis')(canvas);
+    await named(canvas);
     await press('Copy prompt')(canvas);
   },
 });
@@ -81,8 +105,91 @@ export const AnalyzeMealCopyRefused = screenStory({
   },
   open: addFood,
   walk: async (canvas) => {
+    await named(canvas);
+    await press('Copy prompt')(canvas);
+  },
+});
+
+/** MM-599: Copy prompt pressed before the meal has a name: the field says what it needs. */
+export const AnalyzeMealNeedsName = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'The meal needs a name.',
+  open: addFood,
+  walk: async (canvas) => {
     await press('AI meal analysis')(canvas);
     await press('Copy prompt')(canvas);
+  },
+});
+
+/** MM-599: photos chosen: small, each with its remove button, and the step ends in Send to assistant. */
+export const AnalyzeMealWithPhotos = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'Send to assistant',
+  open: addFood,
+  walk: withPhotos,
+});
+
+/** MM-599: six photos, the most a meal is sent with: the photo buttons are off. */
+export const AnalyzeMealSixPhotos = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'Photos · 6 of 6',
+  device: async (services) => ({ ...services, photoLibrary: new InMemoryPhotoLibrary({ chosen: 6 }) }),
+  open: addFood,
+  walk: withPhotos,
+});
+
+/** MM-599: sent: the button says so itself, with a check, and the answer is pasted below. */
+export const AnalyzeMealSent = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'Sent',
+  open: addFood,
+  walk: async (canvas) => {
+    await withPhotos(canvas);
+    await press('Send to assistant')(canvas);
+  },
+});
+
+/** MM-599: a share sheet that would not open: the prompt is copied, and the photos are attached in the assistant. */
+export const AnalyzeMealShareFailed = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: /^The share sheet could not be opened/,
+  device: sharing({ outcome: 'unavailable' }),
+  open: addFood,
+  walk: async (canvas) => {
+    await withPhotos(canvas);
+    await press('Send to assistant')(canvas);
+  },
+});
+
+/** MM-599: a phone that cannot hand photos to another app: said, and the step copies the prompt. */
+export const AnalyzeMealCannotShare = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: /^This phone cannot hand photos to another app/,
+  device: sharing({ available: false }),
+  open: addFood,
+  walk: withPhotos,
+});
+
+/** MM-599: the camera inside the analysis, facing away, for a photo of the plate. */
+export const AnalyzeMealCamera = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'Take photo',
+  open: addFood,
+  walk: async (canvas) => {
+    await press('AI meal analysis')(canvas);
+    await press('Take a photo')(canvas);
+  },
+});
+
+/** MM-599: a camera that could not be opened: said, with Try again. */
+export const AnalyzeMealCameraRefused = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'The camera could not be opened',
+  device: async (services) => ({ ...services, photoCamera: new FixturePhotoCamera({ available: false }) }),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('AI meal analysis')(canvas);
+    await press('Take a photo')(canvas);
   },
 });
 

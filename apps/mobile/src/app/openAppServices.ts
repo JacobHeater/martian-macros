@@ -4,6 +4,7 @@ import { SqlProgressPhotoRepository } from '../data/SqlProgressPhotoRepository';
 import { MediaDevicesPhotoCamera } from '../platform/MediaDevicesPhotoCamera';
 import { NativeDeviceLock } from '../platform/NativeDeviceLock';
 import { NativePrivateScreen } from '../platform/NativePrivateScreen';
+import { NoPhotoLibrary } from '../platform/NoPhotoLibrary';
 import { NoDeviceLock } from '../platform/NoDeviceLock';
 import { NoPrivateScreen } from '../platform/NoPrivateScreen';
 import { NativeBackupPlatform } from '../backup/NativeBackupPlatform';
@@ -53,7 +54,10 @@ import { RenewingRestorer } from '../healthWrite/RenewingRestorer';
 import { NoNotifications } from '../platform/NoNotifications';
 import { VibratingRestSignal } from '../platform/VibratingRestSignal';
 import { NativeClipboard } from '../platform/NativeClipboard';
+import { NativeMealShare } from '../platform/NativeMealShare';
+import { NativePhotoLibrary } from '../platform/NativePhotoLibrary';
 import { NavigatorClipboard } from '../platform/NavigatorClipboard';
+import { NavigatorMealShare } from '../platform/NavigatorMealShare';
 import { WindowExternalLinks } from '../platform/WindowExternalLinks';
 import { mmDb } from '../sql/native/mmDb';
 import { NativeSqlDatabase } from '../sql/native/NativeSqlDatabase';
@@ -168,6 +172,10 @@ export async function openAppServices(): Promise<AppServices> {
     externalLinks: native ? new NativeExternalLinks(mmBackup) : new WindowExternalLinks(),
     // The phone's clipboard through the shell, since Android's WebView cannot read it (MM-590); in a browser, the page's.
     clipboard: native ? new NativeClipboard(mmBackup) : new NavigatorClipboard(),
+    // A meal's photos chosen and handed to the person's assistant with its prompt, never kept (MM-599); in a browser,
+    // the camera only, and the browser's share where it can share files.
+    photoLibrary: native ? new NativePhotoLibrary(mmBackup) : new NoPhotoLibrary(),
+    mealShare: native ? new NativeMealShare(mmBackup) : new NavigatorMealShare(),
     reminderScheduler: native
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),
