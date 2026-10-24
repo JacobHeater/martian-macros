@@ -1,6 +1,7 @@
 import type { SiteObservation } from '../domain/measurements/SiteObservation';
 import type { BodyFatObservation } from '../domain/BodyFatObservation';
-import type { CalendarDate } from '../domain/CalendarDate';
+import { CalendarDate } from '../domain/CalendarDate';
+import type { DayKind } from '../domain/DayKind';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
 import type { Exercise } from '../domain/training/Exercise';
@@ -41,6 +42,9 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  *
  * Without `setup` the report has no body fat (MM-450).
  *
+ * The days marked a Refeed or a Day off (MM-611) are counted, and nothing
+ * else: they change no other figure in the report.
+ *
  * Whole days are judged against the plan (MM-124, `plannedShare`), as the
  * expenditure estimate judges them, so a shaped month's planned lower days
  * count as whole days and keep the longest logging run going.
@@ -60,6 +64,7 @@ export function buildMonthlyReport({
   recommendation,
   setup,
   plannedShare,
+  markedDays = new Map(),
 }: {
   period: ReportPeriod;
   intake: readonly IntakeDay[];
@@ -78,12 +83,21 @@ export function buildMonthlyReport({
   setup?: UserSetup | undefined;
   /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
   plannedShare?: ((date: CalendarDate) => number) | undefined;
+  /** Every day marked a Refeed or a Day off, by epoch day (MM-611). */
+  markedDays?: ReadonlyMap<number, DayKind>;
 }): MonthlyReport {
   const inPeriod = (d: CalendarDate) => !d.isBefore(period.from) && !d.isAfter(period.to);
 
   const logged = intake.filter((d) => inPeriod(d.date) && d.kcal > 0);
   const whole = usableIntakeDays(logged, { plannedShare });
   const weighIns = weights.filter((w) => inPeriod(w.date)).length;
+  let refeeds = 0;
+  let daysOff = 0;
+  for (const [epochDay, kind] of markedDays) {
+    if (!inPeriod(CalendarDate.fromEpochDay(epochDay))) continue;
+    if (kind === 'refeed') refeeds++;
+    else if (kind === 'dayOff') daysOff++;
+  }
 
   const sorted = [...history].sort((a, b) => a.effectiveFrom.compareTo(b.effectiveFrom));
   const inForceOn = (day: CalendarDate): TargetsRecord | undefined => {
@@ -269,6 +283,8 @@ export function buildMonthlyReport({
     daysLogged: logged.length,
     completeDays: whole.length,
     weighIns,
+    refeeds,
+    daysOff,
     trendChangeKg: trendChange,
     intendedChangeKg: intended,
     averageProteinG: averageProtein,

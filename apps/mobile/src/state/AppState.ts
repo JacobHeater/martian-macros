@@ -5,6 +5,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
+import type { DayKind } from '../domain/DayKind';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
@@ -264,6 +265,8 @@ export class AppState {
 
   /** Every pause the user has set (MM-148). */
   readonly pauses: Cell<Loadable<Pause[]>>;
+  /** Every day marked a Refeed or a Day off, by epoch day (MM-611): counted in the monthly report, read by no calculation. */
+  readonly markedDays: Cell<Loadable<ReadonlyMap<number, DayKind>>>;
 
   /** The pause covering today, if any. */
   readonly activePause: Cell<Pause | undefined>;
@@ -581,6 +584,7 @@ export class AppState {
   private readonly foodBeforeDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
   private readonly waterByDay = new Map<number, Cell<Loadable<WaterEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
+  private readonly dayKindByDay = new Map<number, Cell<Loadable<DayKind>>>();
   private readonly reportIntakeByIndex = new Map<number, Cell<Loadable<IntakeDay[]>>>();
   private readonly reportByIndex = new Map<number, Cell<MonthlyReport | undefined>>();
 
@@ -658,6 +662,7 @@ export class AppState {
     this.exercises = derived<readonly Exercise[]>(() => [...builtInExercises, ...(of(this.customExercises) ?? [])]);
     this.exercisesById = derived<ReadonlyMap<string, Exercise>>(() => new Map(this.exercises.value.map((e) => [e.id, e])));
     this.pauses = stream(() => s.pauses.watchPauses());
+    this.markedDays = stream(() => s.dayKinds.watchMarkedDays());
     this.activePause = derived(() => pauseOn(of(this.pauses) ?? [], this.today.value));
     this.intakeDays = stream(() => s.intake.watchIntakeDays({ since: this.today.value.addDays(-60) }));
     this.judgedIntake = derived(() => {
@@ -1731,6 +1736,19 @@ export class AppState {
   }
 
   /**
+   * Whether `date` was marked a Refeed or a Day off (MM-611). Separate from
+   * its completeness, and read by no calculation.
+   */
+  dayKind(date: CalendarDate): Cell<Loadable<DayKind>> {
+    let cell = this.dayKindByDay.get(date.epochDay);
+    if (cell === undefined) {
+      cell = stream(() => this.services.dayKinds.watchDayKind(date));
+      this.dayKindByDay.set(date.epochDay, cell);
+    }
+    return cell;
+  }
+
+  /**
    * Food for a whole report period, read from the log rather than the last
    * 60 days the engine uses, so an old report can be reread (MM-33).
    */
@@ -1770,12 +1788,14 @@ export class AppState {
         const coach = this.coach.value;
         const workouts = of(this.workouts) ?? [];
         const exercises = this.exercises.value;
+        const markedDays = of(this.markedDays);
         if (
           period === undefined ||
           intake === undefined ||
           weights === undefined ||
           waist === undefined ||
-          history === undefined
+          history === undefined ||
+          markedDays === undefined
         ) {
           return undefined;
         }
@@ -1797,6 +1817,8 @@ export class AppState {
           // The body-fat range from the measurements (MM-450), and the eating-disorder answer that withholds its change.
           setup: of(this.setup),
           plannedShare: this.plannedShare(),
+          // The days marked a Refeed or a Day off (MM-611), counted and nothing more.
+          markedDays,
         });
       });
       this.reportByIndex.set(index, cell);

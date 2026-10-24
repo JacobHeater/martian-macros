@@ -1,6 +1,6 @@
 ---
 id: MM-611
-status: proposed
+status: done
 component: food-logging
 related: [MM-604, MM-612, MM-605, MM-27, MM-108, MM-124, MM-92]
 ---
@@ -26,6 +26,11 @@ Choices made without asking (say if any is wrong):
   - it never contributes a food to a trade.
 - **Any day up to today** can be marked or unmarked, from the Food day's header. No future days, since a plan is not a record.
 - **No judgement of how often.** No rule counts marks to warn about them, and no streak or reward involves them (MM-92).
+- **Built like its sibling (MM-318).** The mark sits beside the completeness mark in the Food day's header
+  (`FoodDayHeader`), and "Mark day" opens the same options dialog the completeness row uses (`FoodCompletenessRow`):
+  Refeed, Day off, No mark. The chip is the design system's `MmStatusChip`, neutral and the same for both marks.
+- **Stored apart from completeness**: its own table, `day_kinds` (schema version 27), a row only for a marked day;
+  clearing a mark removes the row.
 
 ## Description
 A per-day mark (none, refeed, day off) stored with the day. It is set and cleared from the Food day's header and shown there as a
@@ -66,3 +71,34 @@ Scenario: Report
 
 ## UI/UX
 - The day header's mark menu and chip, in the Food stories. Both marks use the same neutral chip.
+
+## Progress
+
+Built 2026-10-24. Not run locally; CI validates.
+
+- **Domain**: `DayKind` (`none`, `refeed`, `dayOff`) in `apps/mobile/src/domain/DayKind.ts`, mirroring
+  `DayCompleteness`; `DayKindReader` (`watchDayKind`, `watchMarkedDays`), `DayKindWriter` (`setDayKind`, `none`
+  clears) and `DayKindRepository` in `src/domain/repositories/`.
+- **Data**: `SqlDayKindRepository` (`src/data/`), `InMemoryDayKindRepository` (`src/fixtures/`), both in their
+  repository sets and in `AppServices` as `dayKinds` (`openAppServices.ts`, `fixtureServices.ts`). Schema version 27:
+  the `day_kinds` table in `currentSchema.ts`, `tables.ts` (so erase and restore cover it) and the 26-to-27 step in
+  `migrationSteps.ts`.
+- **State**: `DayKindController` (`src/state/`) marks a day up to today and refuses a day still to come;
+  `AppState.dayKind(date)` reads a day's mark and `AppState.markedDays` feeds the monthly report.
+- **UI**: `FoodDayHeader` shows the mark as a neutral `MmStatusChip` and a "Mark day" `MmIconButton` (flag) that opens
+  the options dialog "Mark this day". No action on a day still to come; the stepper already stops at today. The
+  header wraps on a narrow phone.
+- **Report**: `MonthlyReport.refeeds` and `daysOff`, counted in `buildMonthlyReport` from the marked days in the
+  period, and stated by `MonthlyReportText` as "Refeeds" and "Days off" counts after "Whole days", only when non-zero,
+  with no comment.
+- **No calculation reads the mark**: energy use, the weight trend and the targets are unchanged. The coach's use of
+  it (no single-day finding, named in trends, no trades) is MM-612's.
+- **Tests**: `test/contracts/dayKindRepositoryContract.ts`, run in memory (`test/fixtures/inMemoryContracts.test.ts`)
+  and on SQLite (`test/data/sqlContracts.test.ts`); erase (`test/contracts/dataEraserContract.ts`) and restore
+  (`test/data/restore.test.ts`); the migration (`test/data/upgrade.test.ts`, version 26), the fingerprint
+  (`test/data/schemaFingerprint.test.ts`) and the table list (`test/data/schema.test.ts`); state
+  (`test/state/dayKind.test.ts`: marking up to today, tomorrow refused, calculations identical with and without marks,
+  the report's counts); the report (`test/engine/monthlyReport.test.ts`, `test/format/reportDayKinds.test.ts`); the UI
+  (`test/food/markDay.test.tsx`: marking, unmarking, persistence across a restart, a past day, no step to tomorrow).
+- **Stories**: `Screens/Food` DayMarkedRefeed, DayMarkedDayOffSmallPhone and MarkDay.
+- The scenarios "Not judged alone" and "Named in trends" wait on MM-612.

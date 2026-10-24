@@ -54,6 +54,8 @@ it('round trip: a backup from one phone restored on another holds everything', a
   await a.repos.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'right', suggestionAnswered: true }));
   // MM-507: the goal body fat goes with the backup.
   await a.repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: today.addDays(-3) });
+  // MM-611: the days marked go with the backup.
+  await a.repos.dayKinds.setDayKind(today.addDays(-1), 'refeed');
   const snapshot = await a.db.exportBytes();
 
   const b = await phone();
@@ -83,6 +85,7 @@ it('round trip: a backup from one phone restored on another holds everything', a
   expect(shapes.map((s) => s.balance?.fatShare)).toEqual([CarbFatBalance.moreFatFatShare, CarbFatBalance.moreFatFatShare]);
   expect(shapes.map((s) => [...s.week.higherDays])).toEqual([[], [0, 6]]);
   expect(await valueOf(b.repos.goalBodyFat.watchGoalBodyFat())).toEqual({ percent: 18, setOn: today.addDays(-3) });
+  expect(await valueOf(b.repos.dayKinds.watchDayKind(today.addDays(-1)))).toBe('refeed');
   expect((await valueOf(b.repos.measurements.watchSite('thigh'))).map((o) => [o.valueCm, [...o.readings]])).toEqual([[58, [57.5, 58, 58.5]]]);
   const sites = await valueOf(b.repos.measurementSettings.watchMeasurementSettings());
   expect([[...sites.sites], sites.limbSide, sites.suggestionAnswered]).toEqual([['thigh'], 'right', true]);

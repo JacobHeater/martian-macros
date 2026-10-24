@@ -43,6 +43,9 @@ export class MonthlyReportText {
       ['Days logged', `${report.daysLogged} of ${ReportPeriod.days}`],
       ['Whole days', `${report.completeDays}`],
     ];
+    // The days marked a Refeed or a Day off (MM-611), as counts and nothing more.
+    if (report.refeeds > 0) lines.push(['Refeeds', `${report.refeeds}`]);
+    if (report.daysOff > 0) lines.push(['Days off', `${report.daysOff}`]);
     // The month's longest logging run (MM-92), said from the same length as the Dashboard's streak line: the work only,
     // never how much was eaten.
     if (report.longestRunDays >= StreakRule.showFromDays) {

@@ -4,6 +4,7 @@ import { FakeHealthSource, HealthImporter, recordedHealthHistory } from '../../s
 import { customExerciseRepositoryContract } from '../contracts/customExerciseRepositoryContract';
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
+import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
@@ -61,6 +62,7 @@ weighInWindowContract('SQLite', async () => (await open()).weighInWindow);
 foodRepositoryContract('SQLite', async () => (await open()).food);
 customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);
 dayMarkRepositoryContract('SQLite', async () => (await open()).dayMarks);
+dayKindRepositoryContract('SQLite', async () => (await open()).dayKinds);
 targetsHistoryRepositoryContract('SQLite', async () => (await open()).targets);
 targetShapeRepositoryContract('SQLite', async () => (await open()).targetShapes);
 goalBodyFatRepositoryContract('SQLite', async () => (await open()).goalBodyFat);
@@ -90,6 +92,7 @@ dataEraserContract('SQLite', async () => {
     targets: r.targets,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    dayKinds: r.dayKinds,
     measurements: r.measurements,
     measurementSettings: r.measurementSettings,
     preferences: r.preferences,

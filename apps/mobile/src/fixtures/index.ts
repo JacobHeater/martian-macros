@@ -10,6 +10,7 @@ export * from './InMemoryBackupStorage';
 export * from './InMemoryCustomExerciseRepository';
 export * from './InMemoryCustomFoodRepository';
 export * from './InMemoryDataEraser';
+export * from './InMemoryDayKindRepository';
 export * from './InMemoryDayMarkRepository';
 export * from './InMemoryEntitlement';
 export * from './InMemoryExactAlarms';

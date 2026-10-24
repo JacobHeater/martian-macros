@@ -13,6 +13,7 @@ import type { MeasurementRepository } from '../../src/domain/repositories/Measur
 import type { MeasurementSettingsRepository } from '../../src/domain/repositories/MeasurementSettingsRepository';
 import { MeasurementSettings } from '../../src/domain/measurements/MeasurementSettings';
 import type { GoalBodyFatRepository } from '../../src/domain/repositories/GoalBodyFatRepository';
+import type { DayKindRepository } from '../../src/domain/repositories/DayKindRepository';
 import type { WeightEventRepository } from '../../src/domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../../src/domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../../src/domain/repositories/WorkoutRepository';
@@ -39,6 +40,7 @@ interface Erasable {
   targets: TargetsHistoryRepository;
   targetShapes: TargetShapeRepository;
   goalBodyFat: GoalBodyFatRepository;
+  dayKinds: DayKindRepository;
   measurements: MeasurementRepository;
   measurementSettings: MeasurementSettingsRepository;
   preferences: PreferencesRepository;
@@ -87,6 +89,7 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       );
       await r.targetShapes.saveTargetShape(new TargetShape({ since: day, balance: CarbFatBalance.balanced }));
       await r.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: day });
+      await r.dayKinds.setDayKind(day, 'refeed');
       await r.measurements.saveMeasurement('thigh', day, 58);
       await r.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'left' }));
       await r.workouts.saveWorkout(
@@ -115,6 +118,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.targetShapes.watchTargetShapes())).toEqual([]);
       // MM-507: no goal body fat is left.
       expect(await first(r.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
+      // MM-611: no day is left marked.
+      expect(await first(r.dayKinds.watchMarkedDays())).toEqual(new Map());
       // MM-156: no measurement of any site, and no site chosen.
       expect(await first(r.measurements.watchMeasurements())).toEqual([]);
       expect([...(await first(r.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);

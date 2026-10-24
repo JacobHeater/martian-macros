@@ -18,6 +18,7 @@ export * from './SchemaMigrationError';
 export * from './SqlCustomExerciseRepository';
 export * from './SqlCustomFoodRepository';
 export * from './SqlDataEraser';
+export * from './SqlDayKindRepository';
 export * from './SqlDayMarkRepository';
 export * from './SqlExerciseProgressionRepository';
 export * from './SqlFoodRepository';

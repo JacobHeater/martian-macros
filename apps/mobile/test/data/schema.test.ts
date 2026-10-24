@@ -115,6 +115,8 @@ const tablesAddedSince: readonly string[] = [
   // Version 23 (MM-156): every body measurement by site, and which sites are measured.
   'body_measurements',
   'measurement_settings',
+  // Version 27 (MM-611): the days marked a Refeed or a Day off.
+  'day_kinds',
 ];
 
 /** The Dart database's tables since removed. */

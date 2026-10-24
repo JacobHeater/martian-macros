@@ -2,6 +2,7 @@ import type { CustomExerciseRepository } from '../domain/repositories/CustomExer
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
+import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -38,6 +39,7 @@ import { SqlCustomFoodRepository } from './SqlCustomFoodRepository';
 import { SqlDataEraser } from './SqlDataEraser';
 import { SqlDataRestorer } from './SqlDataRestorer';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
+import { SqlDayKindRepository } from './SqlDayKindRepository';
 import { SqlDayMarkRepository } from './SqlDayMarkRepository';
 import { SqlExerciseProgressionRepository } from './SqlExerciseProgressionRepository';
 import { SqlFoodRepository } from './SqlFoodRepository';
@@ -85,6 +87,8 @@ export class SqlRepositories {
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
+  /** The days marked a Refeed or a Day off (MM-611). */
+  readonly dayKinds: DayKindRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets, by the day each shape was set from (MM-122, MM-124, MM-486). */
@@ -121,6 +125,7 @@ export class SqlRepositories {
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);
     this.dayMarks = new SqlDayMarkRepository(db);
+    this.dayKinds = new SqlDayKindRepository(db);
     this.intake = new SqlIntakeReader(db);
     this.targets = new SqlTargetsHistoryRepository(db);
     this.targetShapes = new SqlTargetShapeRepository(db);

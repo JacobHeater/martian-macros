@@ -2,6 +2,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { customExerciseRepositoryContract } from '../contracts/customExerciseRepositoryContract';
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
+import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
@@ -49,6 +50,7 @@ preferencesRepositoryContract('In-memory', () => new InMemoryRepositories().pref
 foodRepositoryContract('In-memory', () => new InMemoryRepositories().food);
 customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().customFoods);
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
+dayKindRepositoryContract('In-memory', () => new InMemoryRepositories().dayKinds);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
 targetShapeRepositoryContract('In-memory', () => new InMemoryRepositories().targetShapes);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
@@ -78,6 +80,7 @@ dataEraserContract('In-memory', () => {
     targets: r.targets,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    dayKinds: r.dayKinds,
     measurements: r.measurements,
     measurementSettings: r.measurementSettings,
     preferences: r.preferences,
