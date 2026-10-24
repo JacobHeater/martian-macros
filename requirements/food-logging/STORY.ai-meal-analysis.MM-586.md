@@ -31,7 +31,8 @@ Made with the product owner (2026-10-22, a question-and-answer session):
 - **One import is one sitting**: everything eaten, however many photos or plates (a buffet, seconds,
   dessert), as one flat list of items. Plates are not kept apart.
 - **It lives inside Estimate**: Estimate opens with the choice of AI meal analysis or the hand estimate
-  (MM-150). The add-food sheet's row of buttons does not grow.
+  (MM-150). The add-food sheet's row of buttons does not grow. *Superseded by MM-598 (owner, 2026-10-23):
+  the analysis is offered on the add-food sheet's first view, and no longer inside Estimate.*
 - **The prompt is fixed** and holds nothing about the person (no targets, diet or history), since it goes
   to a third party. It works with any assistant and cannot be edited in the app.
 - **The prompt makes the assistant ask** for the meal's name (required), how much was actually eaten, and
@@ -91,10 +92,9 @@ meal" logs every item as one meal (MM-587).
 
 ## Acceptance Criteria
 ```gherkin
-Scenario: Estimate offers the analysis
+Scenario: Add food offers the analysis (MM-598; was "Estimate offers the analysis")
   Given the add-food sheet is open
-  When the person presses Estimate
-  Then "AI meal analysis" is offered above the hand estimate
+  Then "AI meal analysis" is offered
 
 Scenario: The prompt is copied
   When the person presses "Copy prompt"
