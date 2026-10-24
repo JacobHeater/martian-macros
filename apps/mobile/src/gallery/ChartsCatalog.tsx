@@ -50,6 +50,8 @@ export function ChartsCatalog() {
       <MmSurface>
         <HorizonArc progress={0.62} label="1,300 of 2,100 kcal" />
         <HorizonArc progress={1.2} label="Over target" />
+        {/* The zone counted as on target, a quiet band under the track (MM-123). */}
+        <HorizonArc progress={0.9} band={[0.85, 1]} label="1,900 of 2,100 kcal, in the target band" />
       </MmSurface>
       <InfoCard title="Nutrition history">
         <HistoryChart
