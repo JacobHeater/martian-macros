@@ -393,4 +393,9 @@ CREATE TABLE "measurement_settings" (
   "limb_side" TEXT NULL CHECK ("limb_side" IS NULL OR "limb_side" IN ('left', 'right')),
   "suggestion_answered" INTEGER NOT NULL DEFAULT 0 CHECK ("suggestion_answered" IN (0, 1))
 );
+CREATE TABLE "day_kinds" (
+  "epoch_day" INTEGER NOT NULL,
+  "kind" TEXT NOT NULL CHECK ("kind" IN ('refeed', 'dayOff')),
+  PRIMARY KEY ("epoch_day")
+);
 `;

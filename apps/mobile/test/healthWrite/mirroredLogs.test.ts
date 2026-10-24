@@ -315,6 +315,7 @@ dataEraserContract('Erasing that renews the write namespace', () => {
     customExercises: r.customExercises,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    dayKinds: r.dayKinds,
     measurements: r.measurements,
     measurementSettings: r.measurementSettings,
   };

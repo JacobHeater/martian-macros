@@ -366,4 +366,16 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE food_entries ADD COLUMN evidence_citation TEXT NULL');
     },
   ],
+  // 26 to 27 (MM-611): the days marked a Refeed or a Day off, a row for each; none yet, so every day is unmarked.
+  [
+    26,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "day_kinds" (' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"kind" TEXT NOT NULL CHECK ("kind" IN (\'refeed\', \'dayOff\')), ' +
+          'PRIMARY KEY ("epoch_day"))',
+      );
+    },
+  ],
 ]);

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   builtInExercises,
   CalendarDate,
+  type DayKind,
   type Exercise,
   type GoalMode,
   IntakeDay,
@@ -560,5 +561,43 @@ describe('body fat', () => {
 
   it('the user’s own figure is not a range from measurements', () => {
     expect(withBodyFat({ waist: waistOn(6, 13, 20, 27), s: setup.copyWith({ bodyFatPercent: 18 }) }).bodyFat).toBeUndefined();
+  });
+});
+
+// MM-611: the days marked a Refeed or a Day off are counted, and change nothing else in the report.
+describe('days marked a Refeed or a Day off', () => {
+  const marked = (markedDays: ReadonlyMap<number, DayKind>) =>
+    buildMonthlyReport({
+      period: month,
+      intake: everyDay(),
+      weights: everyOtherDay(),
+      waist: [],
+      history: [record(14)],
+      trend: upTo(28).map((d) => point(d, 90 - d * 0.04)),
+      markedDays,
+    });
+
+  it('counts 2 refeeds and 1 day off in the month, and none outside it', () => {
+    const r = marked(
+      new Map<number, DayKind>([
+        [start.addDays(3).epochDay, 'refeed'],
+        [start.addDays(10).epochDay, 'refeed'],
+        [start.addDays(17).epochDay, 'dayOff'],
+        [start.addDays(-1).epochDay, 'refeed'],
+        [start.addDays(ReportPeriod.days).epochDay, 'dayOff'],
+      ]),
+    );
+    expect([r.refeeds, r.daysOff]).toEqual([2, 1]);
+  });
+
+  it('a month with no marks counts none', () => {
+    const r = report();
+    expect([r.refeeds, r.daysOff]).toEqual([0, 0]);
+  });
+
+  it('changes no other figure', () => {
+    const plain = report();
+    const r = marked(new Map<number, DayKind>([[start.addDays(3).epochDay, 'refeed']]));
+    expect({ ...r, refeeds: 0, daysOff: 0 }).toEqual({ ...plain });
   });
 });

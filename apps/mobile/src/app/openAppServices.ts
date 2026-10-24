@@ -118,6 +118,7 @@ export async function openAppServices(): Promise<AppServices> {
     food: new MirroredFoodLog({ log: repositories.food, platform: healthWriting }),
     customFoods: repositories.customFoods,
     dayMarks: repositories.dayMarks,
+    dayKinds: repositories.dayKinds,
     intake: repositories.intake,
     targets: repositories.targets,
     targetShapes: repositories.targetShapes,

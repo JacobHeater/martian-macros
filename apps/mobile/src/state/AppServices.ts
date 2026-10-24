@@ -10,6 +10,7 @@ import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepo
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { BackupPlatform } from '../backup/BackupPlatform';
+import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -85,6 +86,8 @@ export interface AppServices {
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
+  /** The days marked a Refeed or a Day off (MM-611); no calculation reads them. */
+  readonly dayKinds: DayKindRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */

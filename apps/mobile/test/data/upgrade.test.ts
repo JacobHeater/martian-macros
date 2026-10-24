@@ -146,8 +146,11 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 26 left it: no day marked a Refeed or a Day off (MM-611). */
+const versionTwentySix = currentSchema.replace(/CREATE TABLE "day_kinds" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 25 left it: no food is one of a meal, and none says where its numbers came from (MM-586, MM-587). */
-const versionTwentyFive = currentSchema.replace(
+const versionTwentyFive = versionTwentySix.replace(
   ',\n  "logged_meal_key" TEXT NULL,\n' +
     '  "logged_meal_name" TEXT NULL CHECK (("logged_meal_key" IS NULL) = ("logged_meal_name" IS NULL)),\n' +
     `  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN ('cited', 'matched', 'estimated', 'yours')),\n` +
@@ -892,4 +895,31 @@ it('a version 25 database comes up to date with its foods kept and in no meal, a
   expect(rice?.evidence).toEqual({ kind: 'cited', citation: 'USDA FDC 168878' });
   await expect(sql.execute("UPDATE food_entries SET logged_meal_name = NULL WHERE name = 'Rice'"), 'a key needs a name').rejects.toThrow();
   await expect(sql.execute("UPDATE food_entries SET evidence_kind = 'guessed'")).rejects.toThrow();
+});
+
+// MM-611: a version 26 database comes up to date with every day unmarked; a mark set from then on is kept, and
+// clearing it removes it. The table refuses any other kind of day.
+it('a version 26 database comes up to date with no day marked, and keeps a Refeed marked after', async () => {
+  expect(versionTwentySix).not.toContain('day_kinds');
+  expect(versionTwentySix).toContain('logged_meal_key');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 26, schema: versionTwentySix });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'day_kinds')).toEqual(['epoch_day', 'kind']);
+  expect(await first(repos.dayKinds.watchDayKind(day))).toBe('none');
+  await repos.dayKinds.setDayKind(day, 'refeed');
+  expect(await first(repos.dayKinds.watchDayKind(day))).toBe('refeed');
+  await repos.dayKinds.setDayKind(day, 'none');
+  expect(await first(repos.dayKinds.watchMarkedDays())).toEqual(new Map());
+  await expect(sql.execute("INSERT INTO day_kinds (epoch_day, kind) VALUES (1, 'holiday')")).rejects.toThrow();
 });

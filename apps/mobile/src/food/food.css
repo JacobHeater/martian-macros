@@ -201,6 +201,8 @@
 }
 .food-day-header {
   display: inline-flex;
+  /* The day's mark (MM-611) goes under the day on a narrow phone rather than past the bar's edge. */
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
 }
