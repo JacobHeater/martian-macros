@@ -30,6 +30,12 @@ const banned = [
   'starvation mode',
   'metabolic damage',
   'toning',
+  // MM-610's verdicts, for the coach's analysis and everything else.
+  'too much',
+  'unhealthy',
+  'fattening',
+  'empty calories',
+  'burn rate',
 ];
 
 const src = resolve('src');
