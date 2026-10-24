@@ -455,6 +455,18 @@
 .mm-field-suffix {
   color: var(--text2);
 }
+/* A field for longer text (MM-603): the box holds the lines with the same 12 px all round, and the text area
+   grows with what is typed (MmTextField), so the engine's drag handle is never drawn (MM-262). */
+.mm-field-box-multiline {
+  align-items: stretch;
+  padding: var(--space-12);
+}
+.mm-field-textarea {
+  display: block;
+  resize: none;
+  overflow-y: auto;
+  line-height: 1.5;
+}
 .mm-field-helper {
   margin: 0;
   color: var(--text2);

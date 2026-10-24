@@ -17,7 +17,7 @@ keyboard and assistive technology, invisible or wholly restyled:
 | Looks like | Underneath | Why |
 |---|---|---|
 | The switch, the check box, the slider | `<input type="checkbox">`, `<input type="range">` with `appearance: none` | Keyboard, drag and screen reader for free; nothing of the engine's is visible |
-| A text field | `<input type="text">` in our box | The keyboard is the phone's; the box, ring and error are ours |
+| A text field | `<input type="text">` in our box; `<textarea>` for several lines (`lines`, MM-603), grown by the component, with no drag handle | The keyboard is the phone's; the box, ring and error are ours |
 | The calendar (`MmDatePicker`) | Nothing native. A `role="grid"` of `MmCalendarDay` buttons | A native date popup cannot be styled |
 | The drums (`MmTimePicker`) | Nothing native. Each drum is a `role="spinbutton"` | A native time popup cannot be styled |
 | A select (`MmDropdown`) | Nothing native. A field button that opens `overlays.options` | A native list cannot be styled |
@@ -54,7 +54,7 @@ instead of writing one:
 | A button | `MmButton` (`kind`: primary, secondary, text, destructive), `MmIconButton`, `MmFab` | `<button>` |
 | Content pressed as a whole | `MmPressable` | `<button>` |
 | A row | `MmListRow` (`opens` draws the chevron; `trailingAction` sits beside the pressed part) | `<button>` when it presses |
-| Text or a number | `MmTextField` (`kind`, `error`, `helper`, `name`) | `<input type="text">` (MmTextField) |
+| Text or a number | `MmTextField` (`kind`, `error`, `helper`, `name`; `lines` for longer text) | `<input type="text">`, `<textarea>` (MmTextField) |
 | On or off | `MmSwitchRow` | `<input type="checkbox" role="switch">` (MmSwitchRow) |
 | Tick what applies | `MmCheckRow` | `<input type="checkbox">` (MmCheckRow) |
 | A value on a range | `MmSlider`, `MmSliderRow` in a group | `<input type="range">` (MmSlider) |

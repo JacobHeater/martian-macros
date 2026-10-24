@@ -10,6 +10,7 @@ const answers = {
   eaten: 'half' as const,
   notEaten: 'the chips',
   from: '',
+  notes: '',
   day: today.addDays(-1),
   eatenAt: undefined,
   photosAttached: true,
@@ -26,6 +27,12 @@ it('replaces the questions with the answers, and keeps the rest of the prompt as
   expect(prompt).toContain('My photos are attached to this message.');
   expect(prompt.startsWith(mealAnalysisPrompt.slice(0, mealAnalysisPrompt.indexOf('Before you answer')))).toBe(true);
   expect(prompt.endsWith(mealAnalysisPrompt.slice(mealAnalysisPrompt.indexOf('Then identify each separate food')))).toBe(true);
+});
+
+it('MM-602: adds what else the person said, in their words, and nothing when they said nothing', () => {
+  expect(mealAnalysisPromptWith(answers, today)).not.toContain('Something else that may help');
+  const prompt = mealAnalysisPromptWith({ ...answers, notes: '  Cooked in a lot of butter.  ' }, today);
+  expect(prompt).toContain('- It is not from a brand or a restaurant.\n- Something else that may help: Cooked in a lot of butter.\n- I ate it on');
 });
 
 it('gives the time eaten as the eaten_at to use', () => {

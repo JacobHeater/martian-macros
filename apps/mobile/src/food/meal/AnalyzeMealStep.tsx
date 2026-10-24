@@ -72,6 +72,7 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
   const [eaten, setEaten] = useState<MealPortionEaten>('all');
   const [notEaten, setNotEaten] = useState('');
   const [from, setFrom] = useState('');
+  const [notes, setNotes] = useState('');
   const [photos, setPhotos] = useState<readonly CapturedPhoto[]>([]);
   const [camera, setCamera] = useState(false);
   const [triedToSend, setTriedToSend] = useState(false);
@@ -149,7 +150,7 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
   const named = name.trim() !== '';
   /** The prompt with the answers given here (MM-599). */
   const prompt = (photosAttached: boolean) =>
-    mealAnalysisPromptWith({ name, eaten, notEaten, from, day, eatenAt, photosAttached }, today);
+    mealAnalysisPromptWith({ name, eaten, notEaten, from, notes, day, eatenAt, photosAttached }, today);
   const canShare = photos.length > 0 && services.mealShare.available;
 
   /** The photos and the prompt to the share sheet; the prompt is copied too, as some assistants keep only the photos. */
@@ -236,6 +237,14 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
         </div>
         <MmTextField label="Anything you didn’t eat?" hint="Optional: the fries, the crust" value={notEaten} onChange={setNotEaten} />
         <MmTextField label="Brand or restaurant" hint="Optional" value={from} onChange={setFrom} />
+        {/* Anything else the person thinks will help their assistant, put in the prompt in their words (MM-602). */}
+        <MmTextField
+          label="Anything else that would help your assistant?"
+          hint="Optional: cooked in olive oil, a large bowl, no dressing"
+          lines={3}
+          value={notes}
+          onChange={setNotes}
+        />
         <div className="app-gap-small" />
         <MealChips meal={meal} onChange={setMeal} />
         <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />

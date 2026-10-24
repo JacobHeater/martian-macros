@@ -14,6 +14,8 @@ export interface MealQuestionAnswers {
   readonly notEaten: string;
   /** The brand or restaurant it came from; empty when none. */
   readonly from: string;
+  /** Anything else the person wants their assistant to know about the meal (MM-602); empty when nothing. */
+  readonly notes: string;
   /** The day it was eaten, and the minute of that day when one is given. */
   readonly day: CalendarDate;
   readonly eatenAt: number | undefined;

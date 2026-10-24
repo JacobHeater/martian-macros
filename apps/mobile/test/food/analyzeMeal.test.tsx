@@ -71,7 +71,7 @@ it('MM-598: Back returns to Add food, Estimate no longer offers the analysis, an
 
 it('MM-599: the questions come first, and nothing is copied until the meal has a name', async () => {
   const sheet = await open();
-  for (const field of ['Meal name', 'Anything you didn’t eat?', 'Brand or restaurant']) {
+  for (const field of ['Meal name', 'Anything you didn’t eat?', 'Brand or restaurant', 'Anything else that would help your assistant?']) {
     expect(within(sheet).getByRole('textbox', { name: field })).toBeInTheDocument();
   }
   expect(within(sheet).getByRole('group', { name: 'How much did you eat?' })).toBeInTheDocument();
@@ -86,15 +86,17 @@ it('MM-599: with no photos, Copy prompt puts the prompt with the answers on the 
   await typeIn(sheet, 'Meal name', 'Taco night');
   await press(sheet, 'Most');
   await typeIn(sheet, 'Brand or restaurant', 'Chipotle');
+  await typeIn(sheet, 'Anything else that would help your assistant?', 'Extra guacamole');
   await press(sheet, 'Copy prompt');
   const prompt = mealAnalysisPromptWith(
-    { name: 'Taco night', eaten: 'most', notEaten: '', from: 'Chipotle', day: today, eatenAt: 12 * 60, photosAttached: false },
+    { name: 'Taco night', eaten: 'most', notEaten: '', from: 'Chipotle', notes: 'Extra guacamole', day: today, eatenAt: 12 * 60, photosAttached: false },
     today,
   );
   expect(clipboard.text).toBe(prompt);
   expect(prompt).toContain('- The meal is called "Taco night".');
   expect(prompt).toContain('- I ate most of what is shown.');
   expect(prompt).toContain('- It is from Chipotle.');
+  expect(prompt, 'MM-602').toContain('- Something else that may help: Extra guacamole');
   expect(prompt).toContain('Use "eaten_at": "2026-10-22T12:00".');
   expect(prompt).toContain('- Today is Thursday, October 22, 2026.');
   expect(prompt).toContain('I will send my photos in my next message.');
