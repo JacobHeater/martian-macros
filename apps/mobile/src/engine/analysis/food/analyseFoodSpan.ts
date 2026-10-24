@@ -267,6 +267,11 @@ export function analyseFoodSpan(input: FoodAnalysisInput, span: TrendSpan, asOf:
       kept.push(c);
       continue;
     }
+    // Holding up in the calorie family leads with calories, the fact the others qualify.
+    if (c.kind === 'holdingUp' && c.signal === 'calories') {
+      kept[at] = { ...c, figures: { ...c.figures, ...prefixed(top.signal, top.figures) } };
+      continue;
+    }
     kept[at] = { ...top, figures: { ...top.figures, ...prefixed(c.signal, c.figures) } };
   }
   // N6 is folded into N5, or else into N8.
