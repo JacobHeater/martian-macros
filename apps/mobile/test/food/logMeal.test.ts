@@ -22,7 +22,7 @@ afterEach(() => {
 
 it('MM-591: a meal key is made where randomUUID does not exist, as on a page served over http', async () => {
   const real = globalThis.crypto;
-  vi.stubGlobal('crypto', { getRandomValues: <T extends ArrayBufferView>(array: T) => real.getRandomValues(array) });
+  vi.stubGlobal('crypto', { getRandomValues: <T extends ArrayBufferView<ArrayBuffer>>(array: T) => real.getRandomValues(array) });
   expect(globalThis.crypto.randomUUID).toBeUndefined();
   const keys = new Set([newMealKey(), newMealKey(), newMealKey()]);
   expect(keys.size).toBe(3);
@@ -31,7 +31,7 @@ it('MM-591: a meal key is made where randomUUID does not exist, as on a page ser
 
 it('MM-591: a meal is logged where randomUUID does not exist', async () => {
   const real = globalThis.crypto;
-  vi.stubGlobal('crypto', { getRandomValues: <T extends ArrayBufferView>(array: T) => real.getRandomValues(array) });
+  vi.stubGlobal('crypto', { getRandomValues: <T extends ArrayBufferView<ArrayBuffer>>(array: T) => real.getRandomValues(array) });
   const food = new InMemoryFoodRepository();
   const key = await logMeal(food, draft(), { date: day, meal: 'dinner', eatenAt: undefined });
   expect((await first(food.watchFood(day))).map((f) => f.loggedMeal?.key)).toEqual([key, key, key]);
