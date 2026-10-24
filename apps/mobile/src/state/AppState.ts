@@ -947,7 +947,9 @@ export class AppState {
 
     this.insightLog = stream(() => s.insightLog.watchInsightLog());
 
-    this.insightRules = derived(() => {
+    this.insightRules = derived<
+      { readonly candidates: readonly Insight[]; readonly log: readonly InsightLogEntry[]; readonly paused: boolean } | undefined
+    >(() => {
       const setup = of(this.setup);
       const intake = this.judgedIntake.value;
       const weights = of(this.weights);
