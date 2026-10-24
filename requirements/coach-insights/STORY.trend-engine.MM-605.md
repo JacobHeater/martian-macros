@@ -1,6 +1,6 @@
 ---
 id: MM-605
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-141, MM-139, MM-341, MM-124, MM-606, MM-609, MM-610, MM-612]
 ---
@@ -159,3 +159,46 @@ Scenario: Filters run first
     and gated on δ);
   - Gigerenzer & Hoffrage 1995 (natural frequencies).
 - MM-139's coach confidence and this engine's tiers are separate: confidence is about the targets, tiers about one finding.
+
+## Progress
+Built 2026-10-24: the pure engine core. Not run locally; CI validates.
+
+- **Where:** `apps/mobile/src/engine/trends/`, exported through `src/engine/index.ts`. One file per declaration: the series and
+  eligibility types (`TrendDay`, `TrendIneligibleReason`, `TrendSpan`), `TrendRule` (every parameter above, named), the spread
+  (`robustSigma`, `pooledSigma`, `spreadFloorOf`), `binomialCriticalCount`, the detectors (`detectLevelAgainstTarget` D1,
+  `detectDrift` D2 with `theilSenSlope` and `mannKendallZ`, `detectShift` D3 with `bestSplitOf`, `detectLongRun` D4a,
+  `detectShortRun` D4b, `detectWeekend`, `detectWeekday` and `detectUnloggedWeekday` D5, `detectRecentAgainstBaseline` D6), the
+  signal definition (`TrendSignal`), `evaluateSignal`, `dedupeTrendFindings`, `rankTrendFindings`, and the state machine
+  (`nextTrendTransition`, with the log entry `TrendAnnouncement`).
+- **The logging-style switch** is now `styleSwitchOf` (`src/engine/styleSwitchOf.ts`), which `TdeeEstimator` calls unchanged.
+- **Read where this ticket left room:**
+  - The exit threshold holds one way when no detector of the aspect is at half its entry statistic with an effect of δ/2.
+  - A key is held when coverage is under 60%, fewer than 3 of the last 7 days are eligible, or none of its detectors can run.
+  - Entering held and returning from it are logged, so the 21 days are counted from the log.
+  - D5's weeks are 7-day blocks ending yesterday. One weekday fires on every week (at least 4) or 5 of the last 6.
+  - D4 is strong from 8 days (0.5⁸ < 0.005), D5 at α 0.005 over its weeks, D2 at |Z| ≥ 2.81.
+  - D4b's and D6's baselines never cross a logging-style switch. A D3 or D4a event within 3 days of one moves to the key
+    `signal:loggingStyle` as data quality.
+  - Families keep their top finding per span, aspect and direction.
+  - The ticket gives no k_crit table: the tests pin the exact binomial values (7 → 7, 10 → 9, 14 → 11, 20 → 15, 30 → 20).
+- **Tuned:**
+  - D6's threshold, 2.5 → 3.0 (uncertain), for the false-alarm budget.
+  - An unlogged weekday counts a week only with 6 logged days, not 5. At 5, a random logger shows a habit in about one
+    evaluation in five, against the 2% budget.
+- **Tests** (`apps/mobile/test/engine/`):
+  - `trendStatistics.test.ts` (k_crit, σ and its floors, Theil–Sen, Mann–Kendall, rounding);
+  - `trendDetectors.test.ts` (each detector);
+  - `trendScenarios.test.ts` (a step is a shift, a logging-style switch, missing data holds, back-fill, a target change, edits,
+    rounding, today never read, coverage);
+  - `trendStateMachine.test.ts`;
+  - `trendRanking.test.ts`;
+  - `trendNullSimulation.test.ts` (200 stationary users over 180 days, and the random logger);
+  - `styleSwitchOf.test.ts`.
+- **Remaining:**
+  - the announcement-log and dismissal repository, with its SQL implementation, in-memory fixture, contract suite and
+    migration;
+  - wiring: the signals of MM-606 and MM-609 as `TrendSignal`s over `usableIntakeDays`, boundaries from
+    `TargetsRecord.effectiveFrom`, `styleSwitchOf` and the settling windows, and weight drift on `WeightTrendModel`;
+  - `findInsights`' rules moved onto definitions, and the filters (MM-141) run before ranking;
+  - the Coach tab (MM-610);
+  - the null simulation over every signal together.

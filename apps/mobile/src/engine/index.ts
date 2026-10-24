@@ -257,6 +257,9 @@ export * from './TdeeEstimate';
 export * from './TdeeEstimator';
 export * from './TdeePrior';
 export * from './TdeeStatus';
+// The trend engine (MM-605) and the logging-style switch it shares with the estimator.
+export * from './styleSwitchOf';
+export * from './trends';
 export * from './TimedSet';
 export * from './timedSetsOf';
 export * from './TimeSpanProblem';
