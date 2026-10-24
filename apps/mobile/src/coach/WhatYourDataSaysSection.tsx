@@ -18,6 +18,7 @@ import { showsAgainText } from '../format/showsAgainText';
 import { underEatingPointerText } from '../format/underEatingPointerText';
 import { unjudgedAreaText } from '../format/unjudgedAreaText';
 import { MmDisclosure } from '../ui/MmDisclosure';
+import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSegmented } from '../ui/MmSegmented';
@@ -117,23 +118,26 @@ export function WhatYourDataSaysSection() {
         </div>
       ) : null}
       {view.spans.includes(7) ? (
-        <MmListRow
-          leadingIcon="calendar"
-          title={coachAnalysisWords.spanName}
-          flush
-          entry={
-            <div className="coach-analysis-spans">
-              <MmSegmented<AnalysisSpan>
-                name={coachAnalysisWords.spanName}
-                segments={view.spans.map((span) => ({ value: span, label: AnalysisSpan.label(span) }))}
-                selected={view.span}
-                onChange={(chosen) => {
-                  if (chosen !== undefined) analysis.choose(chosen);
-                }}
-              />
-            </div>
-          }
-        />
+        // On the section's list group, as every row that holds a control is: never bare on the canvas (MM-291).
+        <MmListGroup>
+          <MmListRow
+            leadingIcon="calendar"
+            title={coachAnalysisWords.spanName}
+            flush
+            entry={
+              <div className="coach-analysis-spans">
+                <MmSegmented<AnalysisSpan>
+                  name={coachAnalysisWords.spanName}
+                  segments={view.spans.map((span) => ({ value: span, label: AnalysisSpan.label(span) }))}
+                  selected={view.span}
+                  onChange={(chosen) => {
+                    if (chosen !== undefined) analysis.choose(chosen);
+                  }}
+                />
+              </div>
+            }
+          />
+        </MmListGroup>
       ) : null}
       <p className="app-caption coach-analysis-period" aria-live="polite">
         {coachPeriodText(view)}

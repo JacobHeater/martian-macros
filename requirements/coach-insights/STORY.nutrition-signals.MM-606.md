@@ -70,6 +70,12 @@ Settled while building, 2026-10-24 (choices made without asking; say if any is w
   a split that points at carbohydrate; pregnancy, breastfeeding, underweight and low body weight also leave out N15 on fat loss.
   Under 18, paused or under-eating, no food is named, so "a protein add" is the add sentence alone.
 - **N10, N17 and N18** are left to MM-607's `findTrade`, which picks X and Y from the span's and history's entries itself.
+- **Each signal has its own priority (MM-141)**, from the nutrition panel's priorities and the catalog rules for the same
+  signal (`FoodSignalId.priority`): N1, N4, N5 over target, N6, N8, N13 and N14 are patterns; N2, N3, N7, N9, N12 and N16
+  are education; N5 under the fat minimum and N15 are coaching. A fix and a holding-up line take their signal's, 1d's too;
+  what is left today is coaching. (Built first with every food finding as coaching, which outranked the catalog's pattern
+  and education rules on the Dashboard's card, MM-610: fixed 2026-10-24, guarded by `foodSignals.test.ts`'s "each signal
+  its own priority".)
 
 ## Description
 Signal definitions for MM-605. δ values marked (uncertain) are calibrated by its null simulation.
@@ -180,7 +186,7 @@ Built 2026-10-24: the signals, the span analysis and its words. Not run locally;
 - **Contract:** `CoachFood` gained an optional `proteinG`, for the foods that fit what is left (MM-612). A fix carries its direction
   as the figure `direction` (1 or −1), and `calorieRoom` and `tradeDays` for its add and trade.
 - **Tests:**
-  - `apps/mobile/test/engine/foodSignals.test.ts`: the owner's fat week, fat that costs nothing, diffuse trends (and N11), data
+  - `apps/mobile/test/engine/foodSignals.test.ts`: each signal's own priority, the owner's fat week, fat that costs nothing, diffuse trends (and N11), data
     quality first, each day's own targets, the eating-disorder history, under-eating, the other safeguards, lean gain under
     target, and never praise under target over simulated users;
   - `apps/mobile/test/format/foodFindingText.test.ts`: the templates, the trade sentence, and every template against the banned

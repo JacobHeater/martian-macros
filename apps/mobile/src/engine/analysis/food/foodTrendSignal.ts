@@ -64,7 +64,7 @@ export function foodTrendSignal({
     sigmaFloor,
     roundTo,
     family: FoodSignalId.family(id),
-    priority: 'coaching',
+    priority: FoodSignalId.priority(id),
     goodDirection,
     resolutionIsGoodNews: goodDirection !== undefined,
     actionable: true,
