@@ -1,6 +1,6 @@
 ---
 id: MM-613
-status: proposed
+status: done
 component: training
 related: [MM-189, MM-78, MM-366, MM-609]
 ---
@@ -39,3 +39,20 @@ Scenario: Hand entry unchanged
 ## Notes
 Regression test: import the `importedWorkouts.test.tsx` fixture's segment without repetitions, and assert that weekly volume,
 the volume jump and strength trends load.
+
+## Progress
+Built 2026-10-24. A set with 0 reps is skipped as evidence of nothing; negative reps are still an error.
+- `apps/mobile/src/engine/countHardSets.ts` skips a set with 0 reps instead of throwing, so weekly volume
+  (`buildWeeklyVolume`) and the volume jump (`volumeJumpInsights`) load and count it toward no group.
+- `apps/mobile/src/engine/buildStrengthTrends.ts` leaves sets with 0 reps out before taking a session's best, so a
+  session of them is no session of the lift. `estimatedOneRepMax` still refuses 0 reps when called directly.
+- The imported workout keeps its sets with 0 reps, for the user to edit (MM-189); once edited they count as any other set.
+- Hand entry is unchanged: "Finish workout" stays disabled until a set has reps (`WorkoutScreen.tsx`'s `hasWork`), guarded
+  by `test/train/train.test.tsx` "finishing lists the workout, which can be reopened" ("a set with no reps yet").
+
+Tests, in `apps/mobile/test/engine/importedSetWithoutReps.test.ts`: "the import keeps the sets without reps, for the user
+to edit", "weekly volume loads, and a set without reps counts toward no group", "the volume jump loads, and sets without
+reps make no jump", "strength trends load, and a session of sets without reps is no session of the lift", "once edited to
+8 reps, the sets count as any other".
+
+Not run locally; CI validates.

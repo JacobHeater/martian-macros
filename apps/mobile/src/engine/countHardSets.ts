@@ -9,7 +9,9 @@ import { ArgumentError } from '../lang/ArgumentError';
  * volume counts them (MM-78): a set is hard with 4 or fewer reps in reserve
  * or none recorded; it counts in full toward its exercise's main group and
  * half toward each other group it trains. Returns the hard sets of
- * exercises no longer known, which no group is given.
+ * exercises no longer known, which no group is given. A set with no reps
+ * (an imported one whose platform gave none, MM-189) is evidence of nothing
+ * and counts toward nothing until the user edits it (MM-613).
  */
 export function countHardSets(
   workout: Workout,
@@ -21,12 +23,13 @@ export function countHardSets(
     let hardSets = 0;
     for (const set of entry.sets) {
       if (
-        set.reps < 1 ||
+        set.reps < 0 ||
         !Number.isFinite(set.loadKg) ||
         (set.rir !== undefined && (set.rir < 0 || set.rir > WorkoutSet.maxRir))
       ) {
         throw new ArgumentError('Invalid set: Invalid reps, load or RIR.');
       }
+      if (set.reps === 0) continue;
       if (set.rir === undefined || set.rir <= 4) hardSets++;
     }
     const exercise = exercisesById.get(entry.exerciseId);
