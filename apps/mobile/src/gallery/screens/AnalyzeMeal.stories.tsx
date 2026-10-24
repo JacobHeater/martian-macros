@@ -20,8 +20,8 @@ import type { StoryStage } from './StoryStage';
 const meta = { title: 'Screens/AI meal analysis', ...screensMeta } satisfies Meta;
 export default meta;
 
-/** Add food opened on Estimate, where the analysis is offered. */
-const estimate = ({ overlays, today }: StoryStage) => void showAddFoodSheet(overlays, today, { estimateSize: 'regular' });
+/** Add food, where the analysis is offered (MM-598). */
+const addFood = ({ overlays, today }: StoryStage) => void showAddFoodSheet(overlays, today);
 
 /** A phone whose clipboard holds `text`, or refuses to be read. */
 const clipboard =
@@ -44,11 +44,18 @@ const pasted = async (canvas: HTMLElement) => {
   await press('Paste from clipboard')(canvas);
 };
 
+/** MM-598: Add food offers the analysis on its first view, above Scan, Saved and Estimate. */
+export const AddFoodOffersAnalysis = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'AI meal analysis',
+  open: addFood,
+});
+
 /** MM-586: the analysis's first step, with the prompt to copy and the place to paste the answer. */
 export const AnalyzeMealStart = screenStory({
-  covers: ['AnalyzeMealStep', 'EstimateMealStep'],
+  covers: ['AnalyzeMealStep'],
   shows: 'Copy prompt',
-  open: estimate,
+  open: addFood,
   walk: press('AI meal analysis'),
 });
 
@@ -56,7 +63,7 @@ export const AnalyzeMealStart = screenStory({
 export const AnalyzeMealPromptCopied = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: 'Prompt copied',
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await press('AI meal analysis')(canvas);
     await press('Copy prompt')(canvas);
@@ -72,7 +79,7 @@ export const AnalyzeMealCopyRefused = screenStory({
     held.refusesWrite = true;
     return { ...services, clipboard: held };
   },
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await press('AI meal analysis')(canvas);
     await press('Copy prompt')(canvas);
@@ -83,7 +90,7 @@ export const AnalyzeMealCopyRefused = screenStory({
 export const AnalyzeMealUnreadable = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: /^There is no meal in this text/,
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await press('AI meal analysis')(canvas);
     await userEvent.type(await sheet(canvas).findByRole('textbox', { name: 'Or paste the answer here' }), 'Sure, here you go!');
@@ -96,7 +103,7 @@ export const AnalyzeMealClipboardRefused = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: /^The phone did not hand over the clipboard/,
   device: clipboard(cleanMealAnswer, { refusesRead: true }),
-  open: estimate,
+  open: addFood,
   walk: pasted,
 });
 
@@ -105,7 +112,7 @@ export const AnalyzeMealReview = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: 'Review the meal',
   device: clipboard(cleanMealAnswer),
-  open: estimate,
+  open: addFood,
   walk: pasted,
 });
 
@@ -114,7 +121,7 @@ export const AnalyzeMealChangeFood = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: 'Grams eaten',
   device: clipboard(cleanMealAnswer),
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await pasted(canvas);
     await press('More actions for White rice')(canvas);
@@ -127,7 +134,7 @@ export const AnalyzeMealAddFood = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: 'Look up in the app’s foods',
   device: clipboard(cleanMealAnswer),
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await pasted(canvas);
     await press('Add a food')(canvas);
@@ -139,7 +146,7 @@ export const AnalyzeMealProblems = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: /fixing or removing before the meal can be logged/,
   device: clipboard(troubledMealAnswer),
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await pasted(canvas);
     await press('Log meal')(canvas);
@@ -152,7 +159,7 @@ export const AnalyzeMealLogFailed = screenStory({
   shows: /^The meal could not be logged/,
   device: clipboard(cleanMealAnswer),
   stores: failingWrite('food', 'addFood'),
-  open: estimate,
+  open: addFood,
   walk: async (canvas) => {
     await pasted(canvas);
     await press('Log meal')(canvas);

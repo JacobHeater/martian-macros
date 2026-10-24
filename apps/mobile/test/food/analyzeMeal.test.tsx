@@ -14,7 +14,7 @@ import { first } from '../support/first';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
-/** MM-586: AI meal analysis, from Estimate to a meal logged. */
+/** MM-586: AI meal analysis, from Add food to a meal logged; MM-598: offered on Add food, not inside Estimate. */
 const today = CalendarDate.of(2026, 10, 22);
 let repos: InMemoryRepositories;
 let clipboard: InMemoryClipboard;
@@ -26,13 +26,11 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
-/** Opens Add food for lunch, then Estimate, then the analysis, with `change` made to the app's services. */
+/** Opens Add food for lunch, then the analysis, with `change` made to the app's services. */
 async function open(change: (services: AppServices) => AppServices = (services) => services): Promise<HTMLElement> {
   renderApp(repos, today, { change: (services) => ({ ...change(services), clipboard }) });
   await openTab('Food');
   const sheet = await openAddFood('lunch');
-  await press(sheet, 'Estimate');
-  await within(sheet).findByRole('heading', { name: 'Estimate a meal' });
   await press(sheet, 'AI meal analysis');
   await within(sheet).findByRole('heading', { name: 'AI meal analysis' });
   return sheet;
@@ -47,7 +45,20 @@ async function paste(sheet: HTMLElement, text: string): Promise<void> {
 
 const logged = async (day = today) => first(repos.food.watchFood(day));
 
-it('Estimate offers the analysis, and Copy prompt puts the fixed prompt on the clipboard', async () => {
+it('MM-598: Back returns to Add food, Estimate no longer offers the analysis, and a search hides it', async () => {
+  const sheet = await open();
+  await press(sheet, 'Back');
+  expect(await within(sheet).findByRole('textbox', { name: 'Search foods' }), 'the first view').toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: 'AI meal analysis' }), 'offered there').toBeInTheDocument();
+  await typeIn(sheet, 'Search foods', 'zzqx');
+  expect(within(sheet).queryByRole('button', { name: 'AI meal analysis' }), 'hidden while searching').not.toBeInTheDocument();
+  await typeIn(sheet, 'Search foods', '');
+  await press(sheet, 'Estimate');
+  await within(sheet).findByRole('heading', { name: 'Estimate a meal' });
+  expect(within(sheet).queryByRole('button', { name: 'AI meal analysis' }), 'Estimate is the hand estimate alone').not.toBeInTheDocument();
+});
+
+it('Add food offers the analysis, and Copy prompt puts the fixed prompt on the clipboard', async () => {
   const sheet = await open();
   await press(sheet, 'Copy prompt');
   expect(clipboard.text).toBe(mealAnalysisPrompt);

@@ -17,7 +17,8 @@ export function matchedMealItem(item: MealItemDraft, food: CatalogFood): MealIte
   const micros: Partial<Record<Micronutrient, number>> = {};
   for (const n of Micronutrient.values) {
     const stated = pack.of(n);
-    micros[n] = stated === undefined ? item.micros.of(n) : stated * factor;
+    const value = stated === undefined ? item.micros.of(n) : stated * factor;
+    if (value !== undefined) micros[n] = value;
   }
   const brand = food.brand === undefined ? '' : `, ${food.brand}`;
   return {
