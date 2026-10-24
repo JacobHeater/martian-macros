@@ -5,4 +5,6 @@ export interface CoachFood {
   readonly share: number;
   readonly days: number;
   readonly kcal: number;
+  /** Its protein a time, where the words need it ("Your usual chicken and rice (48 g, 520 kcal) fits", MM-612). */
+  readonly proteinG?: number | undefined;
 }

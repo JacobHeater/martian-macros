@@ -33,6 +33,9 @@ export * from './explanationLineText';
 export * from './extraNutrientsLine';
 export * from './Fmt';
 export * from './foodSourceLabel';
+// Food findings and their trade (MM-606, MM-607, MM-612).
+export * from './coachTradeText';
+export * from './foodFindingText';
 export * from './onlineLookupChoiceLabel';
 export * from './onlineLookupOffText';
 export * from './onlineLookupQuestion';

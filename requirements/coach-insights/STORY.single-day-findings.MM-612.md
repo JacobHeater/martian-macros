@@ -1,6 +1,6 @@
 ---
 id: MM-612
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-607, MM-610, MM-611, MM-608, MM-141, MM-124, MM-114, MM-11]
 ---
@@ -41,6 +41,19 @@ Choices made without asking (say if any is wrong):
   - Under 18, or paused: nothing.
 - **1d findings are not trends.** They are not written to MM-605's announcement log and have no state.
 
+Settled while building, 2026-10-24 (choices made without asking; say if any is wrong):
+- **Fat on 1d** is said, as on a span, only when it displaces protein (the density line holds) or calories are over the band.
+- **Calories over the band** is a 1d line on fat loss and recomp, as N14 on a span; it states the figure and at most a trade, never
+  "eat less".
+- **Fiber on 1d** is said only as holding up (at the guide so far): a day not yet over is not judged short. Sodium is a fix once
+  the known sodium is over the limit, since it can only rise.
+- **What is left** is against today's calorie target as planned (MM-124) and the protein target. The foods that fit are foods or
+  meals logged as one (MM-587) on at least 2 days of the last 56, at their median portion, within the calories left, with at least
+  10 g of protein and a fifth of their energy from it; most protein first.
+- **Safeguards on 1d:** the under-eating finding leaves protein, fiber and what is left (MM-606's "adds only"); kidney disease
+  leaves protein out of what is left; an eating-disorder history leaves protein alone in it, with no food. A marked day shows one
+  "left" finding carrying the day's totals.
+
 ## Description
 The 1d view of MM-610's section: MM-606's signal definitions applied to today, with single-day margins and MM-607's trade.
 
@@ -76,3 +89,17 @@ Scenario: Holding up
   Given today at the protein minimum and within the calorie band
   Then 1d says so in numbers
 ```
+
+## Progress
+Built 2026-10-24: the 1d analysis and its words. Not run locally; CI validates.
+
+- **Where:** `apps/mobile/src/engine/analysis/food/analyseFoodDay.ts`: `analyseFoodDay(input, today)`, with the foods that fit
+  what is left (`foodsThatFit.ts`), on MM-606's input, safeguards, N11 and MM-607's `findTrade`. The words are
+  `apps/mobile/src/format/foodFindingText.ts`.
+- **Contract:** `CoachFood` gained an optional `proteinG`. The 'left' finding's figures carry the day's totals (`kcal`,
+  `proteinG`, `fatG`, `carbsG`), the targets, what is left, and `marked` (1 a Refeed, 2 a Day off).
+- **Tests:** `apps/mobile/test/engine/foodDay.test.ts` (today from the first entry, what is left, updates with each entry, a
+  marked day, never compensation, the eating-disorder history, holding up, and the other safeguards) and
+  `apps/mobile/test/format/foodFindingText.test.ts` (1d never names another day; the eating-disorder "left" says nothing of
+  calories).
+- **Remaining:** wiring into `AppState` and the Coach tab's 1d (MM-610), recomputed on each log change.

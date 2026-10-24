@@ -1,6 +1,6 @@
 ---
 id: MM-606
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-605, MM-607, MM-610, MM-612, MM-141, MM-121, MM-122, MM-124, MM-125, MM-126, MM-312, MM-365, MM-114, MM-11, MM-92]
 ---
@@ -41,6 +41,35 @@ Choices made without asking (from the nutrition panel; say if any is wrong):
   - Bariatric surgery: nothing.
   - Insulin or sulfonylurea: no carbohydrate-lowering line.
 - **Never praise under target.** "On target" is the band, never "under" (MM-92).
+
+Settled while building, 2026-10-24 (choices made without asking; say if any is wrong):
+- **A change is the level rule or the trend.** A signal is in change when the table's "change when" column holds over the
+  span's judged days, or when MM-605's engine finds it off its target the bad way (level against target, or a long run). Its
+  other detectors (a shift, a short run, recent against baseline, a drift) date the change ("It has held since 12 Oct") but say
+  nothing alone, since a move that stays on the right side of the target is not worth changing. The sign test alone is stricter
+  than the table: at 14 days it needs 11 days off target, and the owner's fat week has 10.
+- **Judged days:** whole days with targets, each against its own targets and its own planned calories (MM-124). A span is read
+  only with at least 5 judged days and MM-605's 60% coverage. A Refeed or Day off is counted, as MM-605 has it; foods and trades
+  come from whole, unmarked days only.
+- **Thresholds the table leaves open:** fat "within ±15%" and carbohydrate "within ±15%" hold up on 70% of days; carbohydrate under
+  the floor is a change on 50% of days; N2's "within 5%" includes any day over the target; N3's holding up counts only days with
+  entries; N9's water-rich meal is a main meal whose weighed foods under 0.6 kcal a gram (Rolls' lowest band) are half its grams,
+  on 3 days; N16's holding up reads only slots with a quarter of the calories. The δ of each trend signal is in
+  `foodTrendSignals` (uncertain, for the null simulation).
+- **N14 on maintenance** has no change line, as the table names only fat loss, recomp and lean gain.
+- **N8 is gated like N5** (said only when protein is displaced or calories are over the band), and never shown beside N5: when
+  fat over target is said, the split goes into it as figures; otherwise N8 is the line. N6 is never a line of its own.
+- **N5's "averaged {shortG} g under your minimum"** is the minimum less the average protein; when the average is above the minimum,
+  the sentence says on how many days protein fell short instead.
+- **Families** keep one finding per direction, holding up included; the lowest in the catalog order speaks, the others' figures
+  go with it.
+- **N11:** the total counts every entry, so a share is honest; only foods that may be named are ranked (no quick-add estimate, no
+  drink mostly of alcohol, macros explaining 75%). A food's calories are its median a time. A diffuse pattern names no food and
+  offers no trade.
+- **Safeguards:** kidney disease also leaves out protein's holding-up lines (protein is a cap); insulin or a sulfonylurea leaves out
+  a split that points at carbohydrate; pregnancy, breastfeeding, underweight and low body weight also leave out N15 on fat loss.
+  Under 18, paused or under-eating, no food is named, so "a protein add" is the add sentence alone.
+- **N10, N17 and N18** are left to MM-607's `findTrade`, which picks X and Y from the span's and history's entries itself.
 
 ## Description
 Signal definitions for MM-605. δ values marked (uncertain) are calibrated by its null simulation.
@@ -132,3 +161,33 @@ Sources (nutrition panel, accessed 2026-10-24):
 - Dietary Guidelines 2025–2030 (protein 1.2–1.6 g/kg; check the evidence register cites them).
 
 Each rule gets its evidence register row (MM-143).
+
+## Progress
+Built 2026-10-24: the signals, the span analysis and its words. Not run locally; CI validates.
+
+- **Where:** `apps/mobile/src/engine/analysis/food/`, exported through `src/engine/analysis/index.ts`, one declaration per file:
+  - the input (`FoodAnalysisInput`), the day (`FoodDay`, `foodDaysOf`) and the span (`FoodSpan`);
+  - the signal ids, families and trade motives (`FoodSignalId`) and the thresholds (`FoodSignalRule`);
+  - N1–N9 and N12–N16 as MM-605 `TrendSignal`s (`foodTrendSignal`, `foodTrendSignals`), with forced boundaries at target
+    changes and the logging-style switch (`foodBoundariesOf`);
+  - the table's level rules (`readFoodSignals`, `FoodSignalReading`);
+  - N11 (`topContributors`, with `countsAsFood` and `foodKeyOf`);
+  - the safeguards (`FoodLimits`, `foodLimitsOf`, `foodFindingAllowed`);
+  - `analyseFoodSpan(input, span, asOf)`: data quality first, the trend engine and its de-duplication, the gates, the safeguards,
+    the families, foods, and MM-607's `findTrade` for a change that allows one, as `CoachFinding`s.
+- **Words:** `apps/mobile/src/format/foodFindingText.ts` (title, body and the numbers behind it, with the ticket's templates) and
+  `coachTradeText.ts` (MM-607's trade sentence).
+- **Contract:** `CoachFood` gained an optional `proteinG`, for the foods that fit what is left (MM-612). A fix carries its direction
+  as the figure `direction` (1 or −1), and `calorieRoom` and `tradeDays` for its add and trade.
+- **Tests:**
+  - `apps/mobile/test/engine/foodSignals.test.ts`: the owner's fat week, fat that costs nothing, diffuse trends (and N11), data
+    quality first, each day's own targets, the eating-disorder history, under-eating, the other safeguards, lean gain under
+    target, and never praise under target over simulated users;
+  - `apps/mobile/test/format/foodFindingText.test.ts`: the templates, the trade sentence, and every template against the banned
+    words and the eight-word title;
+  - `apps/mobile/test/voice.test.ts` bans "too much", "unhealthy", "fattening", "empty calories" and "burn rate".
+- **Remaining:**
+  - wiring into `AppState` and the Coach tab (MM-610), with the announcement log for MM-605's state machine (N1's exit at 65% is
+    the machine's, not a level rule's);
+  - the evidence register rows (MM-143);
+  - calibrating the uncertain thresholds with MM-605's null simulation.

@@ -20,3 +20,5 @@ export * from './TrainingAnalysisRule';
 export * from './TrainingFindingSignal';
 export * from './UnjudgedArea';
 export * from './unjudgedTrainingAreas';
+// Food signals and the 1d analysis (MM-606, MM-612).
+export * from './food';
