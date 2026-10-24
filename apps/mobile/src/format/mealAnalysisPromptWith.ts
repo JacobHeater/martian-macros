@@ -33,6 +33,7 @@ export function mealAnalysisPromptWith(answers: MealQuestionAnswers, today: Cale
   if (start < 0 || end < start) throw new Error('The meal analysis prompt no longer has its questions.');
   const notEaten = answers.notEaten.trim();
   const from = answers.from.trim();
+  const notes = answers.notes.trim();
   const when =
     answers.eatenAt === undefined
       ? `${said(answers.day)}; I did not give a time, so leave "eaten_at" out.`
@@ -43,6 +44,8 @@ export function mealAnalysisPromptWith(answers: MealQuestionAnswers, today: Cale
     `- The meal is called ${JSON.stringify(answers.name.trim())}. Use it exactly as the meal's "name".`,
     `- I ate ${eatenText[answers.eaten]}${notEaten === '' ? '' : `, except ${notEaten}`}.`,
     `- ${from === '' ? 'It is not from a brand or a restaurant.' : `It is from ${from}.`}`,
+    // What else the person said, in their words, to help the analysis (MM-602).
+    ...(notes === '' ? [] : [`- Something else that may help: ${notes}`]),
     `- I ate it on ${when}`,
     `- Today is ${said(today)}.`,
     answers.photosAttached

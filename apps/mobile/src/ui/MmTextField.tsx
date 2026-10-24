@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useLayoutEffect, useRef } from 'react';
 import type { MmTextFieldKind } from './MmTextFieldKind';
 import './ui.css';
 
@@ -37,9 +37,18 @@ interface MmTextFieldProps {
   onBlur?: (() => void) | undefined;
   /** The helper is said politely as it changes (a caution that follows the value typed, MM-507). */
   helperPolite?: boolean;
+  /**
+   * For text that may run to sentences (MM-603): the lines the field shows
+   * when empty. Above one it is a text area that grows with what is typed,
+   * to eight lines, then scrolls; Enter starts a new line. One by default.
+   */
+  lines?: number;
 }
 
-/** The app's text input. */
+/** The most lines a field grows to before it scrolls (MM-603). */
+const maxLines = 8;
+
+/** The app's text input: one line, or several for longer text (MM-603). */
 export function MmTextField({
   value,
   onChange,
@@ -59,8 +68,19 @@ export function MmTextField({
   autoFocus = false,
   onBlur,
   helperPolite = false,
+  lines = 1,
 }: MmTextFieldProps) {
   const id = useId();
+  const multiline = lines > 1;
+  const area = useRef<HTMLTextAreaElement>(null);
+  // A text area as tall as what is typed, from `lines` to `maxLines`; no handle is drawn to drag it (MM-262).
+  useLayoutEffect(() => {
+    const element = area.current;
+    if (element === null) return;
+    element.style.height = 'auto';
+    const line = Number.parseFloat(getComputedStyle(element).lineHeight) || 24;
+    element.style.height = `${Math.min(Math.max(element.scrollHeight, line * lines), line * maxLines)}px`;
+  }, [value, lines]);
   const helperId = `${id}-helper`;
   const errorId = `${id}-error`;
   const suffixId = `${id}-suffix`;
@@ -86,30 +106,49 @@ export function MmTextField({
           {label}
         </label>
       )}
-      <div className={`mm-field-box${error === undefined ? '' : ' mm-field-box-error'}`}>
-        <input
-          id={id}
-          className="mm-field-input"
-          autoFocus={autoFocus}
-          type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
-          inputMode={kind === 'number' ? 'decimal' : kind === 'count' ? 'numeric' : 'text'}
-          autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
-          autoComplete={kind === 'passphrase' ? (secret === 'existing' ? 'current-password' : 'new-password') : 'off'}
-          aria-label={spoken}
-          aria-invalid={error === undefined ? undefined : true}
-          aria-describedby={describedBy === '' ? undefined : describedBy}
-          placeholder={hint}
-          enterKeyHint={onSubmit === undefined ? undefined : 'done'}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          onBlur={onBlur}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && onSubmit !== undefined) {
-              event.preventDefault();
-              onSubmit();
-            }
-          }}
-        />
+      <div className={`mm-field-box${multiline ? ' mm-field-box-multiline' : ''}${error === undefined ? '' : ' mm-field-box-error'}`}>
+        {multiline ? (
+          <textarea
+            ref={area}
+            id={id}
+            className="mm-field-input mm-field-textarea"
+            autoFocus={autoFocus}
+            rows={lines}
+            autoCapitalize="sentences"
+            autoComplete="off"
+            aria-label={spoken}
+            aria-invalid={error === undefined ? undefined : true}
+            aria-describedby={describedBy === '' ? undefined : describedBy}
+            placeholder={hint}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            onBlur={onBlur}
+          />
+        ) : (
+          <input
+            id={id}
+            className="mm-field-input"
+            autoFocus={autoFocus}
+            type={kind === 'passphrase' && !revealed ? 'password' : 'text'}
+            inputMode={kind === 'number' ? 'decimal' : kind === 'count' ? 'numeric' : 'text'}
+            autoCapitalize={kind === 'text' ? 'sentences' : 'none'}
+            autoComplete={kind === 'passphrase' ? (secret === 'existing' ? 'current-password' : 'new-password') : 'off'}
+            aria-label={spoken}
+            aria-invalid={error === undefined ? undefined : true}
+            aria-describedby={describedBy === '' ? undefined : describedBy}
+            placeholder={hint}
+            enterKeyHint={onSubmit === undefined ? undefined : 'done'}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            onBlur={onBlur}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && onSubmit !== undefined) {
+                event.preventDefault();
+                onSubmit();
+              }
+            }}
+          />
+        )}
         {suffix === undefined ? null : (
           <span id={suffixId} className="mm-field-suffix">
             {suffix}

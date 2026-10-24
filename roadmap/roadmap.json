@@ -1598,7 +1598,8 @@
           "MM-224",
           "MM-242",
           "MM-453",
-          "MM-601"
+          "MM-601",
+          "MM-603"
         ]
       },
       "sequence": [
@@ -1900,6 +1901,13 @@
           "title": "Every snack goes by itself after ten seconds, Undo too (the owner, 2026-10-24, MM-601, replacing MM-272's waiting snack)",
           "tickets": [
             "MM-601"
+          ]
+        },
+        {
+          "step": 23,
+          "title": "A text field of several lines for longer text, grown with what is typed (the owner, 2026-10-24, MM-603)",
+          "tickets": [
+            "MM-603"
           ]
         }
       ],
@@ -2590,6 +2598,7 @@
           "MM-598",
           "MM-599",
           "MM-600",
+          "MM-602",
           "MM-589",
           "MM-590",
           "MM-591",
@@ -2806,6 +2815,7 @@
             "MM-598",
             "MM-599",
             "MM-600",
+            "MM-602",
             "MM-588"
           ]
         },

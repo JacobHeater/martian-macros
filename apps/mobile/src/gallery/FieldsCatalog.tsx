@@ -15,6 +15,7 @@ const today = CalendarDate.of(2026, 10, 13);
 function Fields() {
   const overlays = useOverlays();
   const [search, setSearch] = useState('');
+  const [note, setNote] = useState('');
   const [weight, setWeight] = useState('184.1');
   const [meal, setMeal] = useState('lunch');
   const [slept, setSlept] = useState({ hours: '7', minutes: '20' });
@@ -25,6 +26,8 @@ function Fields() {
   return (
     <div className="gallery-stack">
       <MmTextField label="Search foods" value={search} onChange={setSearch} hint="Oats, chicken, rice" />
+      {/* Longer text, several lines that grow with it (MM-603). */}
+      <MmTextField label="Anything else that would help your assistant?" lines={3} value={note} onChange={setNote} hint="Optional: cooked in olive oil, a large bowl" />
       <MmPickerField
         label="Date of birth"
         valueText={Fmt.longDate(birth)}

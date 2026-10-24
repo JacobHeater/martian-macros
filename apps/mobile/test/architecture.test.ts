@@ -63,7 +63,7 @@ const controlHomes: Record<string, readonly string[]> = {
   checkbox: ['ui/MmCheckRow.tsx', 'ui/MmSwitchRow.tsx'],
   radio: ['ui/MmSegmented.tsx'],
   select: [],
-  textarea: [],
+  textarea: ['ui/MmTextField.tsx'],
 };
 
 /**
