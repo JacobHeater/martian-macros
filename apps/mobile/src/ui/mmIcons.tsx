@@ -46,6 +46,7 @@ import PauseOutlined from '@mui/icons-material/PauseOutlined';
 import PercentOutlined from '@mui/icons-material/PercentOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import PhotoCameraOutlined from '@mui/icons-material/PhotoCameraOutlined';
+import PhotoLibraryOutlined from '@mui/icons-material/PhotoLibraryOutlined';
 import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
 import QrCodeScannerOutlined from '@mui/icons-material/QrCodeScannerOutlined';
 import RadioButtonUncheckedOutlined from '@mui/icons-material/RadioButtonUncheckedOutlined';
@@ -159,4 +160,5 @@ export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   protein: ShakerBottleOutlined,
   sleep: BedtimeOutlined,
   assistant: AutoAwesomeOutlined,
+  photos: PhotoLibraryOutlined,
 };

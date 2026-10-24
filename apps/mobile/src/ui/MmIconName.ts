@@ -76,5 +76,6 @@ export type MmIconName =
   // The day's protein, a shaker (the owner, MM-335).
   | 'protein'
   | 'sleep'
-  // The person's own AI assistant (MM-598).
-  | 'assistant';
+  // The person's own AI assistant (MM-598), and photos chosen from the phone's library (MM-599).
+  | 'assistant'
+  | 'photos';

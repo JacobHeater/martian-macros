@@ -153,7 +153,13 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   cancel and resume with matching checksums (MM-387); a glass pouring in the
   three palettes (MM-329); the lean-gain card at 200% text (MM-129); Coach >
   Body in its three states (MM-34); "On the web" opening the browser
-  (MM-454); a year of Health Connect history read once allowed (MM-73).
+  (MM-454); a year of Health Connect history read once allowed (MM-73);
+  AI meal analysis with photos, on Android and iOS, a release build too
+  (MM-599): Choose photos (the phone's picker, no permission asked), Take a
+  photo, then Send to assistant to ChatGPT, Claude and Gemini, noting which
+  keep both the photos and the prompt; no "Save Image" offered on iOS; and,
+  after the sheet closes, nothing left under the app's cache
+  (`mm-meal-shared` on Android, `mm-backup-*-meal-*.jpg` on iOS).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
