@@ -30,6 +30,7 @@ export * from './food/checkNutrition';
 export * from './food/maxKcalPer100g';
 export * from './food/CookingFat';
 export * from './food/CookingFatKind';
+export * from './food/FoodGroup';
 export * from './food/custom/CustomFood';
 export * from './food/custom/CustomFoodKind';
 export * from './food/custom/IngredientSource';
