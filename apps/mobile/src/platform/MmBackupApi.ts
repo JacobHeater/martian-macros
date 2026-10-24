@@ -1,4 +1,5 @@
 import type { MmClipboardApi } from './MmClipboardApi';
+import type { MmMealShareApi } from './MmMealShareApi';
 import type { MmOpenInBrowserApi } from './MmOpenInBrowserApi';
 import type { MmPrivacyApi } from './MmPrivacyApi';
 
@@ -8,9 +9,10 @@ import type { MmPrivacyApi } from './MmPrivacyApi';
  * cross the bridge as base64. It also hands an address to the phone's
  * browser (MM-454), being the plugin that hands things to the phone's other
  * apps, keeps the photos private (MM-157), and reads and writes the
- * clipboard (MM-590).
+ * clipboard (MM-590), and picks a meal's photos and shares them with its
+ * prompt (MM-599).
  */
-export interface MmBackupApi extends MmOpenInBrowserApi, MmPrivacyApi, MmClipboardApi {
+export interface MmBackupApi extends MmOpenInBrowserApi, MmPrivacyApi, MmClipboardApi, MmMealShareApi {
   /** `VACUUM INTO` a temporary file from the database named, returned as base64 and then deleted. */
   snapshot(options: { name: string }): Promise<{ data: string }>;
   /** Writes `data` to a temporary file and gives its path, for `MmDb.open({ path })`. */

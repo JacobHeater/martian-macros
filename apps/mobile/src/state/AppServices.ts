@@ -50,7 +50,9 @@ import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { HealthProfileReader } from '../domain/integration/HealthProfileReader';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { DeviceLock } from '../domain/integration/DeviceLock';
+import type { MealShare } from '../domain/integration/MealShare';
 import type { PhotoCamera } from '../domain/integration/PhotoCamera';
+import type { PhotoLibrary } from '../domain/integration/PhotoLibrary';
 import type { PrivateScreen } from '../domain/integration/PrivateScreen';
 import type { ProgressPhotoRepository } from '../domain/repositories/ProgressPhotoRepository';
 import type { Watched } from '../lang/Watched';
@@ -201,4 +203,10 @@ export interface AppServices {
 
   /** The phone's clipboard: a prompt copied out to the person's own AI assistant and its answer pasted back (MM-586). */
   readonly clipboard: Clipboard;
+
+  /** The phone's photo picker, for a meal's photos sent to the person's assistant and never kept (MM-599). */
+  readonly photoLibrary: PhotoLibrary;
+
+  /** The phone's share sheet, handing a meal's photos and prompt to the person's assistant together (MM-599). */
+  readonly mealShare: MealShare;
 }
