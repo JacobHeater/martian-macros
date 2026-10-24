@@ -154,6 +154,17 @@ Choices made without asking (say if any is wrong):
 - **Under-eating** silences what an eating-disorder history does (T2, T3, T7's held line, X3), as the Decisions say.
 
 Remains:
-- Wiring (`AppState` builds the input and calls both functions for the span chosen), ranking with MM-605's
-  `rankTrendFindings` order, X1 folding into N1 when N1 fires, and the Coach section (MM-610).
+- ~~Wiring (`AppState` builds the input and calls both functions for the span chosen), ranking with MM-605's
+  `rankTrendFindings` order, X1 folding into N1 when N1 fires, and the Coach section (MM-610).~~ Done, below.
 - Evidence register rows for this catalog's thresholds (MM-143), and the null-simulation calibration of the uncertain ones.
+
+Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
+
+- `AppState.coachAnalysis` builds `TrainingAnalysisInput` (setup, workouts, exercises, progressions, weights, pauses,
+  targets history, `deficitRestartOn`, the stall, sleep, the last 30 days of water, the water goal, the whole days of
+  the judged intake and the safeguards) and calls `analyseTrainingSpan` and `unjudgedTrainingAreas` for a span.
+- `arrangeCoachFindings` ranks them with the food findings, and `foldTrainingProtein` folds X1 into N1 when both are in
+  change; `coachFindingText` adds X1's rows and sentence to N1's.
+- Tests: `apps/mobile/test/engine/coachFindingSections.test.ts` (X1 folded) and `apps/mobile/test/coach/whatYourDataSays.test.tsx`
+  ("Training · needs 4 weeks"). Every scenario is covered; still in progress for the evidence register rows and the
+  null-simulation calibration.

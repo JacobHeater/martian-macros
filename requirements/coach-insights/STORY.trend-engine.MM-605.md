@@ -231,3 +231,9 @@ Built 2026-10-24: the announcement-log and dismissal repository, and D5 aligned 
     before the first log are not gaps.
 - **Remaining:** wiring the repository into `AppState` and the UI (the Coach tab, MM-610), with the other items listed
   under "Remaining" above.
+
+Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
+
+- The dismissals are wired: `AppState.coachAnalysis.dismiss` writes `dismissFinding`, and `watchFindingDismissals` hides
+  a finding for 28 days. The announcement log is read for each key's transition as of yesterday, but nothing appends
+  to it yet, so the state machine is still to be wired.

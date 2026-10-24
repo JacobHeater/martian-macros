@@ -125,6 +125,8 @@ import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
 import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
 import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
+import { SafetyBounds } from '../engine/SafetyBounds';
+import { usableIntakeDays } from '../engine/usableIntakeDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
@@ -147,6 +149,7 @@ import { currentValueOf } from '../lang/currentValueOf';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
+import { CoachAnalysis } from './CoachAnalysis';
 import { DerivedCell } from './DerivedCell';
 import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
@@ -227,6 +230,9 @@ export class AppState {
 
   /** Saves new targets when they are due, for as long as it is started. */
   readonly checkIn: CheckIn;
+
+  /** "What your data says" on the Coach tab (MM-610): the span chosen, the spans offered, and the findings. */
+  readonly coachAnalysis: CoachAnalysis;
 
   /** The weigh-ins the user typed, and nothing imported. */
   readonly typedWeights: Cell<Loadable<WeightObservation[]>>;
@@ -1420,6 +1426,7 @@ export class AppState {
     });
 
     this.checkIn = this.makeCheckIn();
+    this.coachAnalysis = this.makeCoachAnalysis();
   }
 
   /** Reads again which packs are installed, and the catalog made of them. */
@@ -1636,6 +1643,96 @@ export class AppState {
       today: this.today,
       targets: this.services.targets,
       setups: this.services.setup,
+    });
+  }
+
+  /** What the Coach tab's analysis reads (MM-610), each part as the app holds it; made last, as the check-in is. */
+  private makeCoachAnalysis(): CoachAnalysis {
+    const s = this.services;
+    return new CoachAnalysis({
+      today: this.today,
+      food: s.food,
+      intake: s.intake,
+      water: s.water,
+      trendLog: s.trendLog,
+      catalog: () => of(this.foodCatalog),
+      pauses: () => of(this.pauses),
+      plannedShare: () => this.plannedShare(),
+      foodInput: () => {
+        const setup = of(this.setup);
+        const history = of(this.targetsHistory);
+        const safeguards = this.insightSafeguards.value;
+        const markedDays = of(this.markedDays);
+        if (setup === undefined || history === undefined || safeguards === undefined || markedDays === undefined) return undefined;
+        const coach = this.coach.value;
+        const today = this.today.value;
+        const goals = of(this.nutritionGoals);
+        const level = of(this.detailLevel);
+        const checkIns = of(this.recoveryCheckIns);
+        // The carb and fat balance in force (MM-122): the latest shape set on or before today.
+        let shape: TargetShape | undefined;
+        for (const set of of(this.targetShapes) ?? []) {
+          if (!set.since.isAfter(today) && (shape === undefined || !set.since.isBefore(shape.since))) shape = set;
+        }
+        const weightKg = coach?.trendWeightKg;
+        const { sex, heightCm } = setup.profile;
+        const limitMg = goals?.sodiumLimitMg;
+        const since = goals?.sodiumLimitSince;
+        return {
+          history,
+          safeguards,
+          markedDays,
+          plannedShare: this.plannedShare(),
+          fatMinimumG: weightKg === undefined ? undefined : (kcal: number) => SafetyBounds.minFatG({ sex, weightKg, heightCm, kcal }),
+          balance: shape?.balance,
+          weightKg,
+          // Fiber only at Full detail, where it is shown (MM-126).
+          fiber: level !== undefined && DetailLevel.showsExtras(level) && checkIns !== undefined ? { sex, checkIns } : undefined,
+          sodium: limitMg === undefined || since === undefined ? undefined : { limitMg, since },
+          calorieFloorKcal: coach?.calorieFloorKcal,
+        };
+      },
+      trainingInput: () => {
+        const setup = of(this.setup);
+        const workouts = of(this.workouts);
+        const weights = of(this.weights);
+        const pauses = of(this.pauses);
+        const history = of(this.targetsHistory);
+        const safeguards = this.insightSafeguards.value;
+        if (
+          setup === undefined ||
+          workouts === undefined ||
+          weights === undefined ||
+          pauses === undefined ||
+          history === undefined ||
+          safeguards === undefined
+        ) {
+          return undefined;
+        }
+        return {
+          setup,
+          workouts,
+          exercises: this.exercises.value,
+          progressions: of(this.exerciseProgressions),
+          weights,
+          pauses,
+          history,
+          deficitRestartOn: this.coach.value?.deficitRestartOn,
+          progressStalled: this.stallAssessment.value?.status === 'stalled',
+          // A record that could not be read is no record, as for the check-in.
+          sleep: of(this.sleepNights) ?? [],
+          waterGoal: this.waterGoal.value,
+          safeguards,
+        };
+      },
+      wholeDays: () => {
+        const intake = this.judgedIntake.value;
+        return intake === undefined ? undefined : usableIntakeDays(intake, { plannedShare: this.plannedShare() });
+      },
+      underEating: () => ({
+        holds: this.underEatingFinding.value !== undefined,
+        noticeShown: this.underEatingNotice.value !== undefined,
+      }),
     });
   }
 

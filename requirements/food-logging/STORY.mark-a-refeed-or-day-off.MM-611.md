@@ -101,4 +101,8 @@ Built 2026-10-24. Not run locally; CI validates.
   the report's counts); the report (`test/engine/monthlyReport.test.ts`, `test/format/reportDayKinds.test.ts`); the UI
   (`test/food/markDay.test.tsx`: marking, unmarking, persistence across a restart, a past day, no step to tomorrow).
 - **Stories**: `Screens/Food` DayMarkedRefeed, DayMarkedDayOffSmallPhone and MarkDay.
-- The scenarios "Not judged alone" and "Named in trends" wait on MM-612.
+- ~~The scenarios "Not judged alone" and "Named in trends" wait on MM-612.~~ Checked 2026-10-24: "Not judged alone" is
+  `apps/mobile/test/engine/foodDay.test.ts` "a marked day shows its totals and what is left, and no fix" (MM-612), now
+  shown on the Coach tab's 1d (MM-610). "Named in trends" had no test: the trend counts a marked day (`TrendDay.planned`,
+  `TrendFinding.plannedDays`, MM-606's `foodTrendSignal`), and `apps/mobile/test/format/coachAnalysisText.test.ts`
+  "a trend spanning a marked day says the span includes 1 refeed" now covers it.

@@ -1,6 +1,6 @@
 ---
 id: MM-612
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-607, MM-610, MM-611, MM-608, MM-141, MM-124, MM-114, MM-11]
 ---
@@ -102,4 +102,11 @@ Built 2026-10-24: the 1d analysis and its words. Not run locally; CI validates.
   marked day, never compensation, the eating-disorder history, holding up, and the other safeguards) and
   `apps/mobile/test/format/foodFindingText.test.ts` (1d never names another day; the eating-disorder "left" says nothing of
   calories).
-- **Remaining:** wiring into `AppState` and the Coach tab's 1d (MM-610), recomputed on each log change.
+- ~~**Remaining:** wiring into `AppState` and the Coach tab's 1d (MM-610), recomputed on each log change.~~ Done, below.
+
+Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
+
+- `AppState.coachAnalysis` (`state/CoachAnalysis.ts`) runs `analyseFoodDay` for 1d, the default span, and works it out
+  again on every log change; "what is left" is shown at the top of the section (`WhatYourDataSaysSection`).
+- Tests: `apps/mobile/test/state/coachAnalysis.test.ts` ("a log of today's food is read at once") and
+  `apps/mobile/test/coach/whatYourDataSays.test.tsx` ("opens on today"). Every scenario is covered, so the story is done.

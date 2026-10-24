@@ -1,6 +1,6 @@
 ---
 id: MM-610
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-607, MM-609, MM-612, MM-141, MM-256, MM-363, MM-364, MM-108, MM-92, MM-118]
 ---
@@ -137,3 +137,68 @@ Scenario: Words
 ## Notes
 Kluger & DeNisi 1996: feedback helps on average (d = .41), but over a third of feedback interventions made performance worse, and
 effectiveness fell as attention moved toward the self. That is why every line is about the task.
+
+## Progress
+Built 2026-10-24: the section, its state, its words and its stories. Not run locally; CI validates.
+
+- **Engine (pure, `apps/mobile/src/engine/analysis/`):**
+  - `supportedAnalysisSpans({ firstEntryOn, wholeDays, today })`: 1d always; a span once the days since the first entry
+    reach it and at least 60% of its days through yesterday are fully logged (`TrendRule.coverageMinimum`).
+  - `arrangeCoachFindings(findings, { today, dismissals, transitions, previousOrder })` gives `CoachFindingSections`
+    (`left`, `headline`, `worthChanging` ≤ 3, `holdingUp` ≤ 3, `more`, `hidden` as `HiddenFinding` with
+    `showsAgainOn` = dismissed + 28 days). Data quality first; fixes by priority class, then the key's transition,
+    then `rankTrendFindings` for those with a trend, then the order given; holding up in the order given.
+  - `foldTrainingProtein`: X1 folded into N1 when both are in change, its figures under `proteinByTrainingDay.*`.
+- **State (`apps/mobile/src/state/`):** `CoachAnalysis` (on `AppState.coachAnalysis`, built from `CoachAnalysisInputs`
+  in `AppState.makeCoachAnalysis`): `span` (a `ValueCell`, 1d by default, not kept), `spans`, `view`
+  (`CoachAnalysisView`), `choose(span)`, `open()` and `dismiss(findingId)` (through `trendLog.dismissFinding`). It
+  reads the food and intake of the last 119 days, the water of the last 30, the dismissals and the announcement log;
+  `analyseFoodDay` on 1d, else `analyseFoodSpan` + `analyseTrainingSpan` + `unjudgedTrainingAreas` through yesterday.
+  The trade catalog (`CatalogTradeCatalog.load`) is read ahead in a stream cell, again only when the set of catalog
+  foods logged changes, and passed as `catalog: undefined` until it is ready.
+- **Words (`apps/mobile/src/format/`):** `coachFindingText` (picks `foodFindingText` or `trainingFindingText` by signal;
+  adds "Days left out" beside "Days counted", and X1's rows and sentence when folded into N1), `coachHeadlineText`,
+  `coachPeriodText`, `unjudgedAreaText` with `analysisAreaLabel`, `hiddenFindingsText`, `moreFindingsText`,
+  `nothingFoundText`, `underEatingPointerText` and `coachAnalysisWords`.
+- **UI:** `apps/mobile/src/coach/WhatYourDataSaysSection.tsx` in `CoachScreen` directly under `OneThingRow`, above "Your
+  targets"; each finding is `CoachFindingItem.tsx`. The switcher is an `MmSegmented` in a list row ("Days read"), as
+  the Dashboard's "Days shown" holds its own, so it sits on a surface (MM-291); "The numbers behind this" is an
+  `MmDisclosure` of `StatRow`s as in the confidence section; a finding's "Dismiss" is a text button as on
+  `InsightCard`, the sibling it is built like. The span goes back to 1d when the tab is left.
+- **Stories (`Screens/Coach`):** CoachAnalysisFirstDay, CoachAnalysisNotEnoughData, CoachAnalysisNothingFound,
+  CoachAnalysisFatWeek, CoachAnalysisMoreFromYourData, CoachAnalysisDismissed, CoachAnalysisToday,
+  CoachAnalysisUnderEating, CoachAnalysisEatingDisorderHistory, CoachAnalysisHiddenWeight, CoachAnalysisSpanChosen
+  (scenarios `analysisFatWeekScenario`, `quietWeekScenario`, `firstMorningScenario` in `src/gallery/screens/`).
+- **Tests:**
+  - `apps/mobile/test/coach/whatYourDataSays.test.tsx`: the owner's fat week on the tab, the placement, opens on today,
+    back to 1d on return, spans appear with data, a span's analysis, areas a span cannot judge, nothing found, nothing
+    logged, numbers behind it, dismissed but visible, dismissing, hidden weight, under-eating, the eating-disorder
+    history, and the words on the tab;
+  - `apps/mobile/test/state/coachAnalysis.test.ts`: the spans offered (9 days, 7 fully logged; a first entry this
+    morning), the span chosen and reset, a log read at once, and a dismissal through the trend log;
+  - `apps/mobile/test/engine/coachFindingSections.test.ts`: the span rule, everything shown (9 findings), not padded,
+    the headline, data quality first, the ranking, 1d's "left", dismissed but visible, a stable list, X1 folded into
+    N1, and the fat week's order;
+  - `apps/mobile/test/format/coachAnalysisText.test.ts`: the lines, the numbers behind a span's finding, X1's rows, a
+    refeed counted in a trend, and every text against the banned words.
+
+Choices made without asking (say if any is wrong):
+- **"Opens on today" for the fat week:** the tab opens on 1d, so the owner's fat week is read by choosing 2w (its 14
+  days), in the test and the story.
+- **The fat line leads the protein minimum** when it states the protein it displaced and both are in one priority class
+  and transition: it is the line that names the foods and carries the trade.
+- **Stable list:** the order last shown is kept per span for as long as the app is open; after a restart the ranking
+  decides again. Transitions are read from the announcement log, which nothing appends to yet (below), so every key
+  counts as continuing.
+- **The headline** is "<strength> is holding up; worth changing: <the fix's title>."
+- **"Days left out"** is the span's days less the days counted, "not fully logged".
+- **The hidden fold** opens to the hidden findings' titles, each with the day it shows again.
+- **Under-eating:** the pointer names the notice while it shows; once it is put off, it says only that nothing here
+  asks for less.
+
+Remaining:
+- "Dashboard and Coach agree" and the Dashboard card switched to this engine (the next builder's); `InsightCard` is
+  unchanged.
+- Appending to the announcement log (MM-605's state machine), so transitions and N1's 65% exit are the machine's.
+- Snoozed foods are not passed (`snoozed`): no food snooze is stored yet.
+- The product-designer and UX-accessibility pass over the stories.

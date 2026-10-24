@@ -76,6 +76,7 @@ import { TargetsHistoryScreen } from './TargetsHistoryScreen';
 import { TrainingLapseNotice } from './TrainingLapseNotice';
 import { UnderEatingNotice } from './UnderEatingNotice';
 import { WhatToExpectScreen } from './WhatToExpectScreen';
+import { WhatYourDataSaysSection } from './WhatYourDataSaysSection';
 import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
 import { usePaceInWords } from './usePaceInWords';
 import { usePaceSheet } from './usePaceSheet';
@@ -359,6 +360,8 @@ export function CoachScreen() {
         />
       </MmSection>
       <OneThingRow />
+      {/* What the coach reads in the log (MM-610): under the one thing to do, above the targets; the safeguards stay above. */}
+      <WhatYourDataSaysSection />
       {current === undefined ? null : (
         <MmSection framed icon="tune" title="Your targets">
           {shownTargets?.proteinMinimumG === undefined ? null : (
