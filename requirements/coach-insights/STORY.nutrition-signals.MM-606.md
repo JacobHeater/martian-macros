@@ -1,6 +1,6 @@
 ---
 id: MM-606
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-605, MM-607, MM-610, MM-612, MM-141, MM-121, MM-122, MM-124, MM-125, MM-126, MM-312, MM-365, MM-114, MM-11, MM-92]
 ---
@@ -232,3 +232,5 @@ N1's exit at 65%, 2026-10-24 (with MM-605's announcement log). Not run locally; 
   met, and through the state machine).
 - Still in progress for the evidence register rows (MM-143) and the null-simulation calibration of the uncertain
   thresholds.
+
+Done 2026-10-24: every remaining item above is built (wiring, N1's exit, evidence rows, calibration). Not run locally; CI validates.
