@@ -104,6 +104,7 @@ export * from './trainingGoalNote';
 export * from './trainingMeaning';
 export * from './trainsNotYet';
 export * from './trainingLapseText';
+export * from './trainingFindingText';
 export * from './weekdayLabel';
 export * from './whatToExpectClosing';
 export * from './whatToExpectPoints';

@@ -218,6 +218,9 @@ export * from './TrainingLapse';
 export * from './TrainingLapseKind';
 export * from './assessTrainingLapse';
 export * from './trainingSuspended';
+// A session is a workout with a hard set (MM-609).
+export * from './hasHardSet';
+export * from './isHardSet';
 export * from './CycleRule';
 export * from './cycleWindows';
 export * from './MaintenanceStatus';

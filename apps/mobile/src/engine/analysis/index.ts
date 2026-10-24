@@ -12,3 +12,11 @@ export * from './TradeCatalogFood';
 export * from './TradeInput';
 export * from './TradeRule';
 export * from './TradeTarget';
+// Training, water and sleep signals (MM-609).
+export * from './AnalysisArea';
+export * from './analyseTrainingSpan';
+export * from './TrainingAnalysisInput';
+export * from './TrainingAnalysisRule';
+export * from './TrainingFindingSignal';
+export * from './UnjudgedArea';
+export * from './unjudgedTrainingAreas';

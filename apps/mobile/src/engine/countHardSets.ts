@@ -3,6 +3,7 @@ import type { MuscleGroup } from '../domain/training/MuscleGroup';
 import type { Workout } from '../domain/training/Workout';
 import { WorkoutSet } from '../domain/training/WorkoutSet';
 import { ArgumentError } from '../lang/ArgumentError';
+import { isHardSet } from './isHardSet';
 
 /**
  * Adds the hard sets of `workout` to `totals`, by muscle group, as weekly
@@ -29,8 +30,7 @@ export function countHardSets(
       ) {
         throw new ArgumentError('Invalid set: Invalid reps, load or RIR.');
       }
-      if (set.reps === 0) continue;
-      if (set.rir === undefined || set.rir <= 4) hardSets++;
+      if (isHardSet(set)) hardSets++;
     }
     const exercise = exercisesById.get(entry.exerciseId);
     if (exercise === undefined) {
