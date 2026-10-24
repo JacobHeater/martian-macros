@@ -94,7 +94,7 @@ it('being over target is stated plainly', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40))], foods: [food('Big meal', 3000, today)] });
   await openFood();
   expect(await screen.findByText('over 2,400')).toBeInTheDocument();
-  expect(screen.getByText('600')).toBeInTheDocument();
+  expect(screen.getByText('+600')).toBeInTheDocument();
 });
 
 it('protein shows the minimum and target as separate marks', async () => {

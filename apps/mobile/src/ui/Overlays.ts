@@ -111,8 +111,9 @@ export interface Overlays {
 
   /**
    * Shows a short message at the bottom of the screen, optionally with one
-   * action (an "Undo", say). A snack with an action waits for it, the next
-   * snack or a dismissal; one without goes after a few seconds (MM-272).
+   * action (an "Undo", say). Every snack goes after ten seconds, or sooner by
+   * its action, the next snack or a dismissal; it stays while it is focused
+   * or pointed at (MM-601, which replaced MM-272's waiting Undo).
    */
   snack(message: string, action?: { label: string; onAction: () => void }): void;
 }

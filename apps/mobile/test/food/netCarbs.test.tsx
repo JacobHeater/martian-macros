@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -43,7 +43,7 @@ it('a bar of 24 g carbohydrate, 9 g fiber and 10 g sugar alcohols counts 5 g net
   await screen.findByText('Protein bar');
   expect(carbsBar()).toHaveTextContent('Net carbs');
   expect(carbsBar()).toHaveTextContent('5 / 250 g');
-  expect(screen.getByText(/P 20 · C 5 · F 7/)).toBeInTheDocument();
+  expect(within(screen.getByRole('button', { name: 'Edit Protein bar' })).getByText(/P 20 · C 5 · F 7/)).toBeInTheDocument();
 });
 
 it('switched off, the same day shows 24 g, labelled Carbs', async () => {

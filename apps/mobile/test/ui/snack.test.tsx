@@ -5,8 +5,9 @@ import type { Overlays } from '../../src/ui/Overlays';
 import { useOverlays } from '../../src/ui/useOverlays';
 
 /**
- * MM-272: a snack carrying an action waits for it; one without goes after
- * four seconds, unless it is being read or pointed at.
+ * MM-601 (the owner, 2026-10-24): every snack goes after ten seconds, one
+ * with an Undo too, unless it is being read or pointed at. Before then, the
+ * action, a dismissal or the back button takes it (MM-272).
  */
 let overlays: Overlays | undefined;
 
@@ -32,11 +33,16 @@ afterEach(() => {
 const pass = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 
 describe('a snack', () => {
-  it('with an action stays until the action, a dismissal or the back button', async () => {
+  it('with an action goes after ten seconds, and sooner by a dismissal or the back button', async () => {
     let undone = 0;
     act(() => overlays?.snack('Oats removed.', { label: 'Undo', onAction: () => undone++ }));
-    await pass(10_000);
+    await pass(9_900);
     expect(screen.getByText('Oats removed.')).toBeInTheDocument();
+    await pass(200);
+    expect(screen.queryByText('Oats removed.'), 'gone after ten seconds').not.toBeInTheDocument();
+    expect(undone, 'and nothing undone').toBe(0);
+
+    act(() => overlays?.snack('Oats removed.', { label: 'Undo', onAction: () => undone++ }));
     expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
     act(() => void overlays?.closeTop());
     expect(screen.queryByText('Oats removed.')).not.toBeInTheDocument();
@@ -47,9 +53,9 @@ describe('a snack', () => {
     expect(screen.queryByText('Oats removed.')).not.toBeInTheDocument();
   });
 
-  it('with nothing to press goes after four seconds', async () => {
+  it('with nothing to press goes after ten seconds', async () => {
     act(() => overlays?.snack('Saved.'));
-    await pass(3_900);
+    await pass(9_900);
     expect(screen.getByText('Saved.')).toBeInTheDocument();
     await pass(200);
     expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
@@ -59,10 +65,10 @@ describe('a snack', () => {
     act(() => overlays?.snack('Saved.'));
     const snack = screen.getByText('Saved.').parentElement as HTMLElement;
     act(() => snack.focus());
-    await pass(10_000);
+    await pass(20_000);
     expect(screen.getByText('Saved.')).toBeInTheDocument();
     act(() => snack.blur());
-    await pass(4_100);
+    await pass(10_100);
     expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
   });
 });

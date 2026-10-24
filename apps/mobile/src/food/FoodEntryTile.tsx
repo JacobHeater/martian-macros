@@ -41,8 +41,8 @@ export function FoodEntryTile({ entry }: { entry: FoodEntry }) {
             : `P ${whole(entry.proteinG)}`}
         </span>
         {amount === undefined ? null : <span className="food-entry-line food-entry-portion">{amount}</span>}
-        {/* How it was measured is drawn as the icon; it is still heard with the lines. */}
-        <span className="mm-visually-hidden">{method}</span>
+        {/* How it was measured is drawn as the icon; it is still heard with the lines, once: an estimate's amount line already says it. */}
+        {amount === method ? null : <span className="mm-visually-hidden">{method}</span>}
       </span>
       <span className="food-entry-kcal">{Fmt.whole(entry.kcal)}</span>
     </span>

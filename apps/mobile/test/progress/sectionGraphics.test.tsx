@@ -63,7 +63,7 @@ it('an event older than the trend’s range is listed, and the line says none is
   await repos.weights.saveWeight(today, 82);
   await repos.weightEvents.saveWeightEvent({ date: today.addDays(-60), type: 'travel' });
   const events = await open('Weight events');
-  expect(await within(events).findByText(/^None in the last 30 days/)).toBeInTheDocument();
+  expect(await within(events).findByText(/^None in the last 30 days, the trend chart’s range/)).toBeInTheDocument();
   expect(within(events).getByText('Travel')).toBeInTheDocument();
 });
 

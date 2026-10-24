@@ -50,7 +50,7 @@ export const NotWeighedTodayLargeText = screenStory({
 
 export const FirstDay = screenStory({
   covers: ['DashboardScreen'],
-  shows: /kcal left/,
+  shows: /^left of [\d,]+/,
   scenario: firstDayScenario,
 });
 

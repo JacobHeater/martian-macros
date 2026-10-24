@@ -13,8 +13,8 @@ import type { Overlays } from './Overlays';
 import { OverlaysContext } from './OverlaysContext';
 import './ui.css';
 
-/** How long a short message with nothing to press stays, as Material's snack bar does. */
-const snackMs = 4000;
+/** Every snack goes after ten seconds, one with an Undo too, unless it is focused or pointed at (the owner, MM-601). */
+const snackMs = 10_000;
 
 interface Snack {
   readonly id: number;
@@ -208,7 +208,7 @@ export function MmOverlays({ children }: { children: ReactNode }) {
   }, [snack]);
 
   useEffect(() => {
-    if (snack === undefined || snack.action !== undefined || held) return undefined;
+    if (snack === undefined || held) return undefined;
     const timer = setTimeout(() => setSnack((current) => (current?.id === snack.id ? undefined : current)), snackMs);
     return () => clearTimeout(timer);
   }, [snack, held]);

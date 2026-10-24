@@ -1391,10 +1391,10 @@ export const AddFoodManuallyFull = screenStory({
   walk: press('Enter manually'),
 });
 
-/** MM-49: at Full detail a row shows the sugars and saturated fat its source stated (format 3 packs carry them). */
+/** MM-49, MM-564: at Full detail a row with the label's sugars and saturated fat stored keeps to its name, macros and amount. */
 export const FoodFullLabelLines = screenStory({
   covers: ['FoodScreen'],
-  shows: /Sugars 15 g · Saturated fat 3 g/,
+  shows: /P 12 · C 17 · F 4/,
   scenario: demoWith({
     detail: 'full',
     then: async (repos, today) => {

@@ -237,6 +237,10 @@
 .food-chips {
   margin-top: var(--space-12);
 }
+/* Scan, Saved and Estimate share the width of the button above them, and wrap whole on a narrow phone (MM-600). */
+.food-chips-fill > * {
+  flex: 1 1 auto;
+}
 .food-fields {
   display: flex;
   gap: var(--space-8);

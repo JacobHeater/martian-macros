@@ -31,6 +31,6 @@ Scenario: Copied where the clipboard API is refused
 ```
 
 ## Notes
-- Regression test: `test/platform/navigatorClipboard.test.ts`, "MM-589: copies by selection when the
+- Regression test: `test/platform/navigatorClipboard.test.tsx`, "MM-589: copies by selection when the
   clipboard API refuses".
 - Owed on a phone: the copy on Android and on iOS.

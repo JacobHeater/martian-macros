@@ -71,7 +71,7 @@ it('above the band: over', async () => {
   await seed({ history: [targetsFrom(today.addDays(-40), { kcal: 2400 })], foods: [day(2560)] });
   await openFood();
   expect(await screen.findByText('over 2,400')).toBeInTheDocument();
-  expect(screen.getByText('160')).toBeInTheDocument();
+  expect(screen.getByText('+160')).toBeInTheDocument();
 });
 
 it('a smaller target has a band of 100 kcal either side, never narrower', async () => {

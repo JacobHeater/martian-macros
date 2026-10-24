@@ -47,7 +47,7 @@ it('MM-596: a food of an analysed meal is found by its own name, and comes back 
   await typeIn(sheet, 'Search foods', 'white rice');
   await userEvent.click(await within(sheet).findByRole('button', { name: /^White rice.*From your log/ }));
   // The meal had 186 g of it; it comes back as its usual portion, 1 cup of 158 g (MM-595).
-  expect(within(sheet).getByRole('button', { name: 'Label serving', pressed: true })).toBeInTheDocument();
+  expect(within(sheet).getByRole('button', { name: '1 cup', pressed: true })).toBeInTheDocument();
   await press(sheet, 'Log it');
   await expect.poll(async () => (await first(repos.food.watchFood(today))).length).toBe(1);
   const [rice] = await first(repos.food.watchFood(today));
