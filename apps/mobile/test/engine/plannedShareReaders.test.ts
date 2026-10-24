@@ -181,7 +181,8 @@ describe('insights read a shaped week against its plan (MM-141, MM-27)', () => {
   it('a planned higher weekend is not "weekends run higher"', () => {
     const weekend = new WeekShape({ higherDays: [6, 0], raise: 0.2 });
     const share = plannedDayShare([new TargetShape({ since: start.addDays(-60), week: weekend })]);
-    const intake = shapedDays({ count: 14, week: weekend, higher: 2400, lower: 1840 });
+    // Four weeks: the weekend rule pairs each weekend with its own week and needs three agreeing (MM-615).
+    const intake = shapedDays({ from: start.addDays(-14), count: 28, week: weekend, higher: 2400, lower: 1840 });
     expect(rules(intake)).toContain('weekendHigher');
     expect(rules(intake, share)).not.toContain('weekendHigher');
   });

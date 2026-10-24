@@ -11,6 +11,7 @@ import {
   TargetsRecord,
   WeightTrendPoint,
 } from '../../src/engine';
+import { DartRandom } from '../support/DartRandom';
 import { expectClose } from '../support/expectClose';
 import { upTo } from '../support/upTo';
 
@@ -231,20 +232,51 @@ describe('the catalog', () => {
   // `through` is a Saturday, so days 0, 6, 7 and 13 ago are the weekend days.
   const weekendDays = [0, 6, 7, 13];
   const daysAgo = (d: IntakeDay) => d.date.daysUntil(through);
-  const week = (changes: (daysAgo: number) => Parameters<typeof day>[1]) => upTo(14).map((i) => day(i, changes(i)));
+  const week = (changes: (daysAgo: number) => Parameters<typeof day>[1], count = 14) =>
+    upTo(count).map((i) => day(i, changes(i)));
+  const isWeekend = (daysAgo: number) => through.addDays(-daysAgo).isWeekend;
 
-  it('weekends a fifth of the target above weekdays', () => {
-    const i = only(find({ intake: week((d) => ({ kcal: weekendDays.includes(d) ? 2600 : 2100 })) }));
+  // MM-615: each weekend against its own Monday-to-Sunday week, three weeks running. Over 21 days back from a Saturday the
+  // oldest week holds only its Sunday, so three weeks count: five weekend days and fifteen weekdays.
+  it('weekends a fifth of the target above that week\'s weekdays, three weeks running', () => {
+    const i = only(find({ intake: week((d) => ({ kcal: isWeekend(d) ? 2600 : 2100 }), 21) }));
     expect(i.rule).toBe('weekendHigher');
-    expect(i.figures['weekendDays']).toBe(4);
-    expect(i.figures['weekdayDays']).toBe(10);
+    expect(i.figures['weeks']).toBe(3);
+    expect(i.figures['higherWeeks']).toBe(3);
+    expect(i.figures['weekendDays']).toBe(5);
+    expect(i.figures['weekdayDays']).toBe(15);
     expect(i.figures['weekendAverageKcal']).toBe(2600);
     expect(i.figures['weekdayAverageKcal']).toBe(2100);
     expect(i.figures['targetKcal']).toBe(2100);
+    expect(i.from).toEqual(through.addDays(-19));
+  });
+
+  it('two weeks of higher weekends are not yet a pattern', () => {
+    expect(find({ intake: week((d) => ({ kcal: isWeekend(d) ? 2600 : 2100 })) })).toEqual([]);
   });
 
   it('a smaller weekend excess says nothing', () => {
-    expect(find({ intake: week((d) => ({ kcal: weekendDays.includes(d) ? 2400 : 2100 })) })).toEqual([]);
+    expect(find({ intake: week((d) => ({ kcal: isWeekend(d) ? 2400 : 2100 }), 21) })).toEqual([]);
+  });
+
+  // MM-615 regression: one Saturday 1,000 kcal over and an on-target Sunday made the old fortnight's weekend mean
+  // 500 kcal over, past a fifth of the target. Paired within its week it is one week of the two that count.
+  it('one big Saturday is not a weekend pattern', () => {
+    const fortnight = week((d) => ({ kcal: d === 0 ? 3100 : 2100 })).filter((d) => ![7, 13].includes(daysAgo(d)));
+    expect(find({ intake: fortnight }).map((i) => i.rule)).not.toContain('weekendHigher');
+    expect(find({ intake: week((d) => ({ kcal: d === 0 ? 3100 : 2100 }), 28) })).toEqual([]);
+  });
+
+  it('with fewer than five weeks, one week that disagrees breaks the pattern', () => {
+    const intake = week((d) => ({ kcal: isWeekend(d) && d !== 13 && d !== 14 ? 2600 : 2100 }), 28);
+    expect(find({ intake }).map((i) => i.rule)).not.toContain('weekendHigher');
+  });
+
+  it('over five weeks, four in five higher is a pattern', () => {
+    const intake = week((d) => ({ kcal: isWeekend(d) && d !== 13 && d !== 14 ? 2600 : 2100 }), 34);
+    const i = find({ intake }).find((x) => x.rule === 'weekendHigher');
+    expect(i?.figures['weeks']).toBe(5);
+    expect(i?.figures['higherWeeks']).toBe(4);
   });
 
   it('one weekend day is not a pattern', () => {
@@ -282,12 +314,26 @@ describe('the catalog', () => {
     expect(i.figures['averageKcal']).toBe(2700);
   });
 
-  it('the same weekday unlogged in both weeks', () => {
-    const intake = week(() => ({})).filter((d) => ![3, 10].includes(daysAgo(d)));
+  // MM-614: Saturday (0, 7 and 14 days ago) unlogged in three of the last four weeks, each with five or more days logged,
+  // around two other gaps.
+  it('the same weekday unlogged in three of the last four weeks', () => {
+    const intake = week(() => ({}), 28).filter((d) => ![0, 7, 14, 9, 23].includes(daysAgo(d)));
     const i = only(find({ intake }));
     expect(i.rule).toBe('consistentDay');
-    expect(i.figures['weekday']).toBe(through.addDays(-3).weekday);
+    expect(i.figures['weekday']).toBe(6);
     expect(i.figures['unlogged']).toBe(1);
+    expect(i.figures['unloggedWeeks']).toBe(3);
+    expect(i.figures['weeks']).toBe(4);
+    expect(i.basisDays).toBe(28);
+  });
+
+  it('a weekday unlogged in two weeks is not a habit', () => {
+    expect(find({ intake: week(() => ({}), 28).filter((d) => ![3, 10].includes(daysAgo(d))) })).toEqual([]);
+  });
+
+  it('a weekday unlogged in weeks with too few days logged is not a habit', () => {
+    const intake = week(() => ({}), 28).filter((d) => ![3, 10, 17, 1, 2, 8, 9, 15, 16].includes(daysAgo(d)));
+    expect(find({ intake }).map((i) => i.rule)).not.toContain('consistentDay');
   });
 
   it('a highest day that moves about is not consistent', () => {
@@ -358,5 +404,51 @@ describe('rationing', () => {
 
   it('with no candidates there is nothing to show', () => {
     expect(selectInsight({ candidates: [], log: [], today })).toBeUndefined();
+  });
+});
+
+// MM-614 regression: two random days a week left unlogged share a weekday in two weeks about half the time, so the old
+// rule named a weekday habit that did not exist. Eight weeks for each of 100 seeded loggers, evaluated on each of the
+// last 29 days.
+describe('the unlogged weekday against random gaps', () => {
+  it('names a weekday in at most 2% of evaluations', () => {
+    const monday = CalendarDate.of(2026, 1, 5);
+    let evaluations = 0;
+    let named = 0;
+    for (let seed = 1; seed <= 100; seed++) {
+      const random = new DartRandom(seed);
+      const intake = upTo(8).flatMap((w) => {
+        const skipped = new Set<number>();
+        while (skipped.size < 2) skipped.add(random.nextInt(7));
+        return upTo(7)
+          .filter((i) => !skipped.has(i))
+          .map(
+            (i) =>
+              new IntakeDay({
+                date: monday.addDays(7 * w + i),
+                kcal: 2100,
+                proteinG: 150,
+                carbsG: 200,
+                fatG: 70,
+                completeness: 'complete',
+                estimatedShare: 0,
+                palmProteinShare: 0,
+              }),
+          );
+      });
+      for (let t = 27; t < 56; t++) {
+        const asOf = monday.addDays(t);
+        const insights = findInsights({
+          through: asOf,
+          intake: intake.filter((d) => !d.date.isAfter(asOf)),
+          weights: [],
+          history: [targets()],
+        });
+        evaluations++;
+        if (insights.some((i) => i.rule === 'consistentDay' && i.figures['unlogged'] === 1)) named++;
+      }
+    }
+    expect(evaluations).toBe(2900);
+    expect(named / evaluations).toBeLessThanOrEqual(0.02);
   });
 });
