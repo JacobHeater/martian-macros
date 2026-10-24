@@ -28,4 +28,10 @@ export interface CoachFinding {
   readonly trade: CoachTrade | undefined;
   /** For a span finding, the trend it rests on (MM-605). */
   readonly trend: TrendFinding | undefined;
+  /**
+   * What the words name that is not a figure (MM-609): the lifts, as their
+   * strength trend names them ("Deleted exercise" for one since deleted,
+   * MM-348), or the muscle groups by id. Absent when nothing is named.
+   */
+  readonly subjects?: readonly string[] | undefined;
 }

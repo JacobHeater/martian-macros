@@ -1,6 +1,6 @@
 ---
 id: MM-609
-status: proposed
+status: in-progress
 component: coach-insights
 related: [MM-604, MM-605, MM-610, MM-78, MM-79, MM-117, MM-121, MM-134, MM-252, MM-366, MM-368, MM-377, MM-442, MM-613]
 ---
@@ -104,3 +104,56 @@ Sources (training panel, accessed 2026-10-24):
 - Craven 2022 (acute sleep loss, not used).
 
 Register row 394's "Pelland 2024" needs re-verifying against the published version.
+
+## Progress
+Built 2026-10-24: the pure engine and its words. Wiring into `AppState` and the Coach tab (MM-610) remains. Not run locally; CI
+validates.
+
+- **Where:** `apps/mobile/src/engine/analysis/`, exported through `src/engine/index.ts`:
+  - `analyseTrainingSpan(input, span, asOf)` returns `CoachFinding[]` for T1, T2, T3, T5, T6, T7, T8, T9, X1 and X3, unranked;
+  - `unjudgedTrainingAreas(input, span, asOf)` returns `UnjudgedArea[]` (`{ area, needsDays }`, with `AnalysisArea`) for
+    MM-610's "Not enough data in this span";
+  - `TrainingAnalysisInput` is what both read; `TrainingAnalysisRule` holds every threshold; `TrainingFindingSignal` names
+    the signal ids;
+  - one file per signal (`trainingStoppedFindings`, `trainingDroppedFindings`, `setsPerMuscleFindings`,
+    `strengthRisingFindings`, `strengthStalledFindings`, `strengthOnFatLossFindings`, `trainingDaysFindings`,
+    `rirUnrecordedFindings`, `proteinByTrainingDayFindings`, `waterOnTrainingDaysFindings`), with `regularLiftOf`,
+    `daysTrainedBetween`, `proteinMinimumOn` and `coachFindingOf` beside them.
+- **Reused, not repeated:** `assessTrainingLapse` (T1), `buildWeeklyVolume` (T3), `buildStrengthTrends`, `fallingLifts` and
+  `slowerPace` (T7 falling), `strengthOnFatLossInsights` (T7 held), `suggestProgression`'s hold (T6), `usualTrainingWeekdays`
+  (T8), `sleepAverageOf` and `shortSleep` (T7's co-evidence), MM-367's suggested-goal rule (X3), and MM-377's `upBy`,
+  `heldTolerance` and `maxGapDays` (T5, T6).
+- **A session** is a finished workout with a hard set: `isHardSet` and `hasHardSet` in `src/engine/`. `countHardSets` now uses
+  `isHardSet`. **The defect** (an empty imported session counted as training) is fixed in `assessTrainingLapse` and, so the
+  notice and the suspension agree, in `trainingSuspended`.
+- **The shared contract:** `CoachFinding` gained one optional field, `subjects`: the lifts (by the strength trend's name, so
+  "Deleted exercise") or the muscle groups (by id) the words name. These findings carry no `trend`, `foods` or `trade`.
+- **Words:** `apps/mobile/src/format/trainingFindingText.ts`, the same tuple and `Evidence` as `insightText`.
+- **Tests:** `apps/mobile/test/engine/trainingSpanAnalysis.test.ts` (every scenario above, and T5, T6, T8, T9 and the
+  areas a span cannot judge), `apps/mobile/test/format/trainingFindingText.test.ts` (the words), and the regression
+  `apps/mobile/test/engine/trainingLapse.test.ts` "an imported session with no sets, or no hard set, is not training (MM-609)".
+
+Choices made without asking (say if any is wrong):
+- **Sessions are days trained:** two sessions on one day count once.
+- **The shortest span each signal is judged in:** T1's notice in any span; T2, T9, X1 and X3 from 2w (their 14 days); T1's
+  holding up, T3 and T8 from 1m (4 weeks); T5, T6 and T7's held line at 3m only (42 days); T7's falling lifts from 1m (MM-117's 3
+  weeks). T2's usual rate reads the 4 weeks before its 14 days, which may lie before the span, as MM-605's baselines do. A
+  shorter span names the area: "Training · needs 4 weeks" (28 days) on 7d and 2w, "Strength · needs 6 weeks" (42) below 3m,
+  "Water · needs 2 weeks" (14) on 7d. An area is named only once its log is in use.
+- **A pause on any of the last 14 days** silences T1 and T2, not only a pause in force on the day.
+- **T2's holding up** is the last 14 days at 75% of the usual rate or more.
+- **T3** names each neglected major group in its own finding, against the group with the most sets; its holding up is one
+  finding listing every group at 10–20 sets in 3 of 4 weeks.
+- **T5 and T6** read a lift from its first session in the span to its last, at least 42 days apart, the last in the final 14
+  days. T6 is one finding naming up to 3 lifts.
+- **T7:** the held line is not said beside falling lifts, and covers MM-377's "held or up" in one finding of up to 3 lifts, at
+  each lift's latest session in the last 14 days. Falling lifts are not said during a pause, as the MM-117 offer is not.
+  Protein short is MM-141's rule (the minimum met on under half of at least 7 whole days in 14).
+- **X3's holding up** is the training days at the goal on 75% of them or more. Training days without water logged are not
+  counted.
+- **Under-eating** silences what an eating-disorder history does (T2, T3, T7's held line, X3), as the Decisions say.
+
+Remains:
+- Wiring (`AppState` builds the input and calls both functions for the span chosen), ranking with MM-605's
+  `rankTrendFindings` order, X1 folding into N1 when N1 fires, and the Coach section (MM-610).
+- Evidence register rows for this catalog's thresholds (MM-143), and the null-simulation calibration of the uncertain ones.
