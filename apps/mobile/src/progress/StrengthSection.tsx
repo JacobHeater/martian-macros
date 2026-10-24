@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ChartPlaceholder } from '../charts/ChartPlaceholder';
 import { MiniTrend } from '../charts/MiniTrend';
 import type { StrengthTrend } from '../engine/StrengthTrend';
@@ -32,6 +33,15 @@ export function StrengthSection() {
   const trends = useCell(state.strengthTrends);
   const setup = useLoaded(state.setup);
   const weightDisplay = useCell(state.weightDisplay);
+  // Each time the trends go from no recent lift to one, the section is drawn anew, so it opens as it says it
+  // starts with lifts; going back to none leaves it as the person has it.
+  const hasRecent = trends.ready && trends.value.some((trend) => trend.recentSessions > 0);
+  const [hadRecent, setHadRecent] = useState(hasRecent);
+  const [opened, setOpened] = useState(0);
+  if (hasRecent !== hadRecent) {
+    setHadRecent(hasRecent);
+    if (hasRecent) setOpened((n) => n + 1);
+  }
   if (setup === undefined) return null;
   const fmt = new Fmt(setup.unitSystem);
   const weightHidden = weightDisplay === 'hidden';
@@ -70,8 +80,9 @@ export function StrengthSection() {
   else if (recent.length === 0) summary = 'No qualifying sessions in the last 90 days.';
   else summary = `${recent.length === 1 ? '1 lift' : `${recent.length} lifts`} over the last 90 days.`;
   return (
-    // Keyed apart from the loading and failed sections, so it starts folded as it says and not as the loading one was left.
-    <MmSection key="trends" icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
+    // Keyed apart from the loading and failed sections, and anew when a first recent lift arrives: it starts folded
+    // with none and open with some, as it says, rather than as the section before it was left.
+    <MmSection key={`trends-${opened}`} icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
       {all.length === 0 ? (
         <ChartPlaceholder text="No strength history yet. Finish a workout in Train; each lift you train gets a line here." />
       ) : (
