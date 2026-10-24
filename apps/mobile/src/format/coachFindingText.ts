@@ -12,7 +12,8 @@ const trainingSignals: readonly string[] = TrainingFindingSignal.values;
  * The words of any finding of "What your data says" (MM-610): the training,
  * water and sleep signals' (MM-609) or the food signals' (MM-606, MM-612),
  * chosen by the signal. Two things are added to "The numbers behind this":
- * the days a span left out and why, beside the days counted; and, when
+ * the days a span left out and why, beside the days counted (unless the
+ * finding gave its own); and, when
  * MM-609's protein on rest and training days was folded into the protein
  * minimum, its figures, as the minimum's supporting line.
  */
@@ -22,7 +23,8 @@ export function coachFindingText(f: CoachFinding, fmt: Fmt): readonly [title: st
   const rows = [...evidence];
   const countedAt = rows.findIndex(([label]) => label === 'Days counted');
   const counted = rows[countedAt];
-  if (f.span > 1 && counted !== undefined) {
+  // Once: a finding that says its own days left out (fiber, sodium: without that nutrient's data) keeps its row.
+  if (f.span > 1 && counted !== undefined && !rows.some(([label]) => label === 'Days left out')) {
     const leftOut = f.span - Number(counted[1]);
     if (leftOut > 0) rows.splice(countedAt + 1, 0, ['Days left out', `${leftOut}, not fully logged`]);
   }

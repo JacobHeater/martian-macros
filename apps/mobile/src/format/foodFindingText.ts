@@ -1,5 +1,6 @@
 import { CalendarDate, Meal } from '../domain';
 import type { CoachFinding, CoachFood } from '../engine';
+import { CalorieBand } from '../engine/CalorieBand';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { StateError } from '../lang/StateError';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
@@ -33,6 +34,20 @@ const ruleNames: Readonly<Record<string, string>> = {
 
 const macroNames = ['protein', 'carbohydrate', 'fat'] as const;
 
+/** What a contributing food's share is of, by signal, in "The numbers behind this": "Peanut butter, share of fat". */
+const shareNames: Readonly<Record<string, string>> = {
+  proteinMinimum: 'the gap',
+  proteinTarget: 'the gap',
+  proteinByMeal: 'the gap',
+  proteinDensity: 'the gap',
+  mealBalance: 'the gap',
+  fatAgainstTarget: 'fat',
+  fatShare: 'fat',
+  calorieDensity: 'calories',
+  calories: 'calories',
+  sodium: 'sodium',
+};
+
 /**
  * The fixed words of a food finding (MM-606, MM-612), filled from its own
  * figures: a title in numbers of eight words or fewer, the body (what was
@@ -63,11 +78,37 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
   const period: readonly [string, string] = ['Period', today ? 'Today so far' : `${f.span} days through ${Fmt.shortDay(f.to)}`];
   const counted = (key = 'judgedDays'): readonly (readonly [string, string])[] =>
     today || f.figures[key] === undefined ? [] : [['Days counted', `${n(key)}`]];
+  /** The split's foods are a share of its largest part; the protein gap's when that is protein. */
+  const shareOf =
+    f.signal === 'macroSplit'
+      ? n('largest') === 0
+        ? 'the gap'
+        : (macroNames[n('largest')] ?? 'fat')
+      : (shareNames[f.signal] ?? 'the total');
   const foodRows = (foods: readonly CoachFood[]): readonly (readonly [string, string])[] =>
-    foods.map((food) => [food.name, `${percent(food.share)} · ${days(food.days)}`] as const);
+    foods.map((food) => [`${food.name}, share of ${shareOf}`, `${percent(food.share)} · ${days(food.days)}`] as const);
+  /**
+   * The days of the span not counted, and why: not fully logged, or (for a
+   * nutrient only some foods state) without enough of its data. None on 1d.
+   */
+  const leftOut = (countedDays: number, noData: number | undefined, what: string): readonly (readonly [string, string])[] => {
+    const total = f.span - countedDays;
+    if (today || total <= 0) return [];
+    if (noData === undefined) return [['Days left out', `${total}, not fully logged or without enough ${what} data`]];
+    if (noData <= 0) return [['Days left out', `${total}, not fully logged`]];
+    const notFull = total - noData;
+    return [
+      ['Days left out', notFull > 0 ? `${total}: ${notFull} not fully logged, ${noData} without ${what} data` : `${total}, without ${what} data`],
+    ];
+  };
+  /** The band around the calorie target, low to high (MM-92's band). */
+  const bandRow = (): readonly [string, string] => {
+    const band = new CalorieBand(x('targetKcal'));
+    return ['Band', `${Fmt.whole(band.lowKcal)}–${Fmt.kcal(band.highKcal)}`];
+  };
   const trendRows: readonly (readonly [string, string])[] = [
     ...((f.trend?.plannedDays ?? 0) > 0 ? [['Refeeds and days off counted', `${f.trend?.plannedDays ?? 0}`] as const] : []),
-    ...(f.trend === undefined || f.trend.tier === 'silent' ? [] : [['Strength', f.trend.tier === 'strong' ? 'Strong' : 'Clear'] as const]),
+    ...(f.trend === undefined || f.trend.tier === 'silent' ? [] : [['How clear', f.trend.tier === 'strong' ? 'Strong' : 'Clear'] as const]),
   ];
   const rule: readonly [string, string] = ['Rule', ruleNames[f.signal] ?? f.signal];
   const evidence = (...rows: readonly (readonly [string, string])[]): Evidence => [
@@ -86,7 +127,10 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
 
   /** The trade, or the add when there is calorie room and no trade, or nothing (the honest answer is "worth knowing"). */
   const action = (add: string | undefined) => {
-    if (f.trade !== undefined) return ` ${coachTradeText(f.trade, { spanDays: n('tradeDays'), today })}`;
+    if (f.trade !== undefined) {
+      // The calorie-density line has said "calorie-dense for its protein" already.
+      return ` ${coachTradeText(f.trade, { spanDays: n('tradeDays'), today, densityStated: f.signal === 'calorieDensity' })}`;
+    }
     return add !== undefined && x('calorieRoom') === 1 ? ` ${add}` : '';
   };
   const proteinAdd = 'Your calories have room for more of a protein food you log.';
@@ -195,7 +239,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
         ];
       }
       return [
-        `${one('densityG')} against ${one('requiredG')} g protein per 100 kcal`,
+        today ? `${g('proteinG')} protein in ${kcal('kcal')} so far` : `${one('densityG')} against ${one('requiredG')} g protein per 100 kcal`,
         (today
           ? `So far today: ${kcal('kcal')} with ${g('proteinG')} protein, ${one('densityG')} g per 100 kcal. Reaching ` +
             `${g('targetG')} within ${kcal('targetKcal')} takes about ${one('requiredG')} g per 100 kcal.`
@@ -230,7 +274,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
       if (today) {
         const why =
           x('densityLow') === 1
-            ? 'Fat carries 9 kcal a gram, so those calories went to fat instead of protein.'
+            ? `Fat carries 9 kcal a gram. So far today fat gave ${Fmt.kcal(9 * x('fatG'))} while protein was ${g('proteinG')}.`
             : 'Fat carries 9 kcal a gram; calories today are over the band around your target.';
         return [
           `Fat ${g('fatG')} so far, against ${g('targetFatG')}`,
@@ -240,14 +284,16 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
       }
       const reference = f.figures['proteinReference'];
       const short = x('proteinShortG');
+      // Side by side, "on those days", never as a cause (MM-610).
+      const fatKcal = `On those days fat gave ${Fmt.kcal(9 * x('averageFatG'))}`;
       const why =
         reference === 0
           ? short >= 1
-            ? `Fat carries 9 kcal a gram, so those calories went to fat instead of protein, which averaged ${g('proteinShortG')} under your minimum.`
-            : `Fat carries 9 kcal a gram, so those calories went to fat instead of protein, which fell short of your ` +
-              `minimum on ${n('proteinMissedDays')} of ${n('proteinJudgedDays')} days.`
+            ? `Fat carries 9 kcal a gram. ${fatKcal} while protein averaged ${g('proteinShortG')} under your minimum.`
+            : `Fat carries 9 kcal a gram. ${fatKcal} while protein fell short of your minimum on ` +
+              `${n('proteinMissedDays')} of ${n('proteinJudgedDays')} days.`
           : reference === 1
-            ? `Fat carries 9 kcal a gram, so those calories went to fat instead of protein, which averaged ${g('proteinShortG')} under your target.`
+            ? `Fat carries 9 kcal a gram. ${fatKcal} while protein averaged ${g('proteinShortG')} under your target.`
             : `Fat carries 9 kcal a gram; calories were over the band on ${n('caloriesAboveDays')} of ${n('caloriesJudgedDays')} days.`;
       return [
         `Fat averaged ${g('averageFatG')} against ${g('targetFatG')}`,
@@ -324,6 +370,15 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
       ];
     }
     case 'fiber': {
+      const fiberEvidence: Evidence = [
+        period,
+        ['Days counted', `${n('countedDays')}`],
+        ...leftOut(n('countedDays'), undefined, 'fiber'),
+        ['Average fiber', g('averageG')],
+        ['Guide', g('guideG')],
+        ...trendRows,
+        rule,
+      ];
       if (f.kind === 'holdingUp') {
         if (today) {
           return [
@@ -336,7 +391,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
           `Fiber averaged ${g('averageG')}, at the guide`,
           `On the ${n('countedDays')} days with enough fiber data, fiber averaged ${g('averageG')}, at or above the ` +
             `${g('guideG')} guide.`,
-          evidence(['Days with enough fiber data', `${n('countedDays')}`], ['Guide', g('guideG')]),
+          fiberEvidence,
         ];
       }
       const names = f.foods.map((food) => food.name);
@@ -347,7 +402,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
         `On the ${n('countedDays')} days with enough fiber data, fiber averaged about ${g('averageG')} against a guide ` +
           `of ${g('guideG')}. More fiber and bulkier foods usually make a deficit easier: they fill you up for the same ` +
           `calories.${listed}`,
-        [period, ['Days with enough fiber data', `${n('countedDays')}`], ['Average fiber', g('averageG')], ['Guide', g('guideG')], ...trendRows, rule],
+        fiberEvidence,
       ];
     }
     case 'sodium':
@@ -356,7 +411,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
           `Sodium under limit on ${n('underDays')} of ${n('judgedDays')} days`,
           `Sodium was under your limit of ${Fmt.whole(x('limitMg'))} mg on ${n('underDays')} of ${n('judgedDays')} days ` +
             'with enough sodium data.',
-          evidence(['Limit', `${Fmt.whole(x('limitMg'))} mg`]),
+          evidence(...leftOut(n('judgedDays'), n('leftOutDays'), 'sodium'), ['Limit', `${Fmt.whole(x('limitMg'))} mg`]),
         ];
       }
       if (today) {
@@ -371,7 +426,11 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
         `Sodium over limit on ${n('overDays')} of ${n('judgedDays')} days`,
         `Sodium was over your limit of ${Fmt.whole(x('limitMg'))} mg on ${n('overDays')} of ${n('judgedDays')} days with ` +
           `enough sodium data.${since}${foodsLine('it')}${action(undefined)}`,
-        evidence(['Days over', `${n('overDays')}`], ['Days left out', `${n('leftOutDays')}`], ['Limit', `${Fmt.whole(x('limitMg'))} mg`]),
+        evidence(
+          ...leftOut(n('judgedDays'), n('leftOutDays'), 'sodium'),
+          ['Days over', `${n('overDays')}`],
+          ['Limit', `${Fmt.whole(x('limitMg'))} mg`],
+        ),
       ];
     case 'calories':
       if (f.kind === 'holdingUp') {
@@ -379,13 +438,13 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
           return [
             `${kcal('kcal')}, within your target's band`,
             `Today so far is ${kcal('kcal')}, within the band around your ${kcal('targetKcal')} target.`,
-            evidence(['Calories', kcal('kcal')], ['Target', kcal('targetKcal')]),
+            evidence(['Calories', kcal('kcal')], ['Target', kcal('targetKcal')], bandRow()),
           ];
         }
         return [
           `Calories on target on ${n('withinDays')} of ${n('judgedDays')} days`,
           `Calories were within the band around your target on ${n('withinDays')} of ${n('judgedDays')} days.`,
-          evidence(['Days within the band', `${n('withinDays')}`]),
+          evidence(['Days within the band', `${n('withinDays')}`], ['Target', kcal('targetKcal')], bandRow()),
         ];
       }
       if (today) {
@@ -393,7 +452,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
           `${kcal('kcal')} so far, over the band`,
           `Today so far is ${kcal('kcal')}, over the band around your ${kcal('targetKcal')} target.` +
             `${foodsLine('the calories')}${action(undefined)}`,
-          evidence(['Calories', kcal('kcal')], ['Target', kcal('targetKcal')]),
+          evidence(['Calories', kcal('kcal')], ['Target', kcal('targetKcal')], bandRow()),
         ];
       }
       if (x('direction') === -1) {
@@ -402,7 +461,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
           `Calories averaged ${kcal('averageKcal')} against your ${kcal('targetKcal')} target, and were under the band ` +
             `around it on ${n('belowDays')} of ${n('judgedDays')} days. A lean gain runs on the planned surplus; more of a ` +
             `food you log would bring those days to target.${since}`,
-          evidence(['Average', kcal('averageKcal')], ['Target', kcal('targetKcal')], ['Days under the band', `${n('belowDays')}`]),
+          evidence(['Average', kcal('averageKcal')], ['Target', kcal('targetKcal')], bandRow(), ['Days under the band', `${n('belowDays')}`]),
         ];
       }
       return [
@@ -410,7 +469,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
         `Calories averaged ${kcal('averageKcal')} against your ${kcal('targetKcal')} target, and were over the band around ` +
           `it on ${n('aboveDays')} of ${n('judgedDays')} days, by about ${kcal('averageOverKcal')} on those days.` +
           `${since}${foodsLine('the calories')}${action(undefined)}`,
-        evidence(['Average', kcal('averageKcal')], ['Target', kcal('targetKcal')], ['Days over the band', `${n('aboveDays')}`]),
+        evidence(['Average', kcal('averageKcal')], ['Target', kcal('targetKcal')], bandRow(), ['Days over the band', `${n('aboveDays')}`]),
       ];
     case 'energyUse':
       return [
@@ -450,7 +509,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
     const pLeft = x('proteinLeftG');
     const marked = n('marked');
     const fits = f.foods;
-    const fitRow = (food: CoachFood) => `${food.name} (${Fmt.grams(food.proteinG ?? 0)}, ${Fmt.kcal(food.kcal)})`;
+    const fitRow = (food: CoachFood) => `${food.name} (${Fmt.grams(food.proteinG ?? 0)} protein, ${Fmt.kcal(food.kcal)})`;
     const fitsLine =
       fits.length === 0
         ? ''
@@ -487,7 +546,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
     const rows: (readonly [string, string])[] = [period];
     if (!proteinOnly) rows.push(['Calories', `${kcal('kcal')} of ${kcal('kcalTarget')}`]);
     if (proteinShown) rows.push(['Protein', `${g('proteinG')} of ${g('proteinTargetG')}`]);
-    for (const food of fits) rows.push([food.name, `${Fmt.grams(food.proteinG ?? 0)}, ${Fmt.kcal(food.kcal)}`]);
+    for (const food of fits) rows.push([food.name, `${Fmt.grams(food.proteinG ?? 0)} protein, ${Fmt.kcal(food.kcal)}`]);
     rows.push(rule);
     return [title, body, rows];
   }

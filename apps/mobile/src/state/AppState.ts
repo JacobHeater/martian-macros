@@ -77,13 +77,15 @@ import { missedPeriodQuestion } from '../engine/missedPeriodQuestion';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
 import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
+import type { Insight } from '../engine/Insight';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
+import { InsightRule } from '../engine/InsightRule';
 import type { InsightSafeguards } from '../engine/InsightSafeguards';
 import type { InsightSnooze } from '../engine/InsightSnooze';
 import type { ItemInsight } from '../engine/ItemInsight';
 import { itemInsightKinds } from '../engine/itemInsightKinds';
 import { InsightRationing } from '../engine/InsightRationing';
-import type { InsightSelection } from '../engine/InsightSelection';
+import { snoozedFoodNames } from '../engine/analysis/snoozedFoodNames';
 import type { LoggingStreak } from '../engine/LoggingStreak';
 import { loggingStreakOf } from '../engine/loggingStreakOf';
 import type { MonthlyReport } from '../engine/MonthlyReport';
@@ -109,7 +111,6 @@ import { reminderIgnoredStreak } from '../engine/reminderIgnoredStreak';
 import { ReminderRule } from '../engine/ReminderRule';
 import type { ReportPeriod } from '../engine/ReportPeriod';
 import { reportPeriods } from '../engine/reportPeriods';
-import { selectInsight } from '../engine/selectInsight';
 import { trainingItemInsights } from '../engine/trainingItemInsights';
 import { foodItemInsights } from '../engine/foodItemInsights';
 import { waistWithinNoiseInsights } from '../engine/waistWithinNoiseInsights';
@@ -438,11 +439,15 @@ export class AppState {
   readonly insightLog: Cell<Loadable<InsightLogEntry[]>>;
 
   /**
-   * The one insight to show today, if any (MM-141): the catalog's rules
-   * run over the data to yesterday, then rationed against what was already
-   * shown.
+   * The catalog's rules for the Dashboard's card (MM-141), run over the data
+   * to yesterday, without those the coach's analysis says instead
+   * (`InsightRule.analysisSignal`, MM-610), with the insight log they are
+   * rationed against and whether a recent pause silences the card. The card
+   * itself is `coachAnalysis.dashboard`.
    */
-  readonly insightSelection: Cell<InsightSelection | undefined>;
+  readonly insightRules: Cell<
+    { readonly candidates: readonly Insight[]; readonly log: readonly InsightLogEntry[]; readonly paused: boolean } | undefined
+  >;
 
   /** The switches of Settings > Coach (MM-364). */
   readonly insightSwitches: Cell<Loadable<InsightSwitches>>;
@@ -942,7 +947,7 @@ export class AppState {
 
     this.insightLog = stream(() => s.insightLog.watchInsightLog());
 
-    this.insightSelection = derived(() => {
+    this.insightRules = derived(() => {
       const setup = of(this.setup);
       const intake = this.judgedIntake.value;
       const weights = of(this.weights);
@@ -951,36 +956,27 @@ export class AppState {
       const coach = this.coach.value;
       const paused = this.pauseWithin(InsightRationing.patternDays);
       const today = this.today.value;
-      if (
-        setup === undefined ||
-        intake === undefined ||
-        weights === undefined ||
-        history === undefined ||
-        log === undefined ||
-        coach === undefined ||
-        paused
-      ) {
+      if (setup === undefined || intake === undefined || weights === undefined || history === undefined || log === undefined || coach === undefined) {
         return undefined;
       }
-      return selectInsight({
-        candidates: findInsights({
-          through: today.addDays(-1),
-          intake,
-          weights,
-          history,
-          stall: this.stallAssessment.value,
-          mealProtein: this.mealProtein.value,
-          sodium: this.sodiumPattern.value,
-          trend: coach.trend,
-          waist: of(this.waist) ?? [],
-          limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
-          sleepAverage: this.sleepAverage.value,
-          fiber: this.fiberPattern.value,
-          plannedShare: this.plannedShare(),
-        }),
-        log,
-        today,
+      if (paused) return { candidates: [], log, paused };
+      const candidates = findInsights({
+        through: today.addDays(-1),
+        intake,
+        weights,
+        history,
+        stall: this.stallAssessment.value,
+        mealProtein: this.mealProtein.value,
+        sodium: this.sodiumPattern.value,
+        trend: coach.trend,
+        waist: of(this.waist) ?? [],
+        limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
+        sleepAverage: this.sleepAverage.value,
+        fiber: this.fiberPattern.value,
+        plannedShare: this.plannedShare(),
       });
+      // A rule the coach's analysis has an equivalent of is said by the analysis instead (MM-610).
+      return { candidates: candidates.filter((i) => InsightRule.analysisSignal(i.rule) === undefined), log, paused };
     });
 
     this.insightSwitches = stream(() => s.preferences.watchInsightSwitches());
@@ -1733,6 +1729,9 @@ export class AppState {
         holds: this.underEatingFinding.value !== undefined,
         noticeShown: this.underEatingNotice.value !== undefined,
       }),
+      // A snooze that could not be read yet is none: the trade is offered until it is.
+      snoozed: () => snoozedFoodNames(of(this.insightSnoozes) ?? [], this.today.value),
+      insightRules: () => this.insightRules.value,
     });
   }
 

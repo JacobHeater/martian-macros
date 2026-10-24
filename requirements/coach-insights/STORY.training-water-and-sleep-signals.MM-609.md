@@ -1,6 +1,6 @@
 ---
 id: MM-609
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-605, MM-610, MM-78, MM-79, MM-117, MM-121, MM-134, MM-252, MM-366, MM-368, MM-377, MM-442, MM-613]
 ---
@@ -168,3 +168,21 @@ Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
 - Tests: `apps/mobile/test/engine/coachFindingSections.test.ts` (X1 folded) and `apps/mobile/test/coach/whatYourDataSays.test.tsx`
   ("Training · needs 4 weeks"). Every scenario is covered; still in progress for the evidence register rows and the
   null-simulation calibration.
+
+Evidence rows and the cross-signal null simulation, 2026-10-24. Not run locally; CI validates.
+
+- **Evidence rows (MM-143)** added to `docs/evidence.md`, with the question "What does the coach read in my data?"
+  and the test `apps/mobile/test/engine/coachAnalysisEvidence.test.ts`, which fails for a rule figure without a row.
+  This ticket's rows: `trainingSignal.*` for T1, T2, T3, T5, T6, T7, T8, T9, X1 and X3, and every
+  `TrainingAnalysisRule` figure, citing Bosquet 2013, Spiering 2021, Schoenfeld 2017, Morton 2018, Murphy & Koehler 2022
+  and Savoie 2015.
+- **The cross-signal null simulation** is written: `apps/mobile/test/engine/coachNullSimulation.test.ts`, with the
+  generator `test/engine/support/stationaryCoachUser.ts`. 60 seeded stationary people (fat loss, maintenance and lean
+  gain; food around the fixture's targets with an 8–15% day-to-day spread, stable 4-day training, water around the goal)
+  run `analyseFoodSpan` and `analyseTrainingSpan` on 90 successive days for 2w and 1m; a fix not present the evaluation
+  before counts as new, and each span must stay at 1 or fewer per person per 30 days. Not run locally; CI validates.
+- **Calibrated:** nothing. Estimated by reasoning before writing the assertion: for a steady trainee (4 planned days a
+  week, 90% kept) T2's drop needs 3 or fewer of 8 sessions (well under 1%), T3 needs half of a group's sessions missed,
+  T7's falling lifts need two lifts down 5% when reps in reserve vary by one, and X3 needs half the training days 500 ml
+  under the goal (under 1% of evaluations). Training adds well under 0.1 new fixes per person per 30 days.
+- Every item that remained is done.

@@ -1,10 +1,11 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { analysisFatWeekScenario } from '../../src/gallery/screens/analysisFatWeekScenario';
 import { firstMorningScenario } from '../../src/gallery/screens/firstMorningScenario';
+import { nothingLoggedScenario } from '../../src/gallery/screens/nothingLoggedScenario';
 import { quietWeekScenario } from '../../src/gallery/screens/quietWeekScenario';
 import type { StoryScenario } from '../../src/gallery/screens/StoryScenario';
 import { weightLossMedicationScenario } from '../../src/gallery/screens/weightLossMedicationScenario';
@@ -46,8 +47,10 @@ describe("the owner's fat week on the tab", () => {
     const titles = (await s.findAllByRole('heading', { level: 4 })).map((h) => h.textContent);
     expect(titles[0]).toBe('Fat averaged 90 g against 70 g');
     expect(s.getByText(/^Fat averaged 90 g against 70 g; Peanut butter supplied 22% of it\./)).toBeInTheDocument();
-    expect(s.getByText(/Peanut butter on \d+ of \d+ days: .* Trading it on those days would have meant about \d+ g less fat a day/)).toBeInTheDocument();
-    expect(s.getByText(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; worth changing: fat averaged 90 g against 70 g\.$/)).toBeInTheDocument();
+    expect(
+      s.getByText(/Peanut butter on \d+ of \d+ days: .* Trading Peanut butter for .+ on those days would have meant about \d+ g less fat a day/),
+    ).toBeInTheDocument();
+    expect(s.getByText(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; fat is worth changing\.$/)).toBeInTheDocument();
     expect(s.getByText('Worth changing')).toBeInTheDocument();
     expect(s.getByText('Holding up')).toBeInTheDocument();
   });
@@ -65,7 +68,7 @@ describe('opens on today', () => {
     await onCoach(firstMorningScenario);
     const s = await section();
     expect(await s.findByText('Today so far')).toBeInTheDocument();
-    expect(s.queryByRole('group', { name: 'Days read' })).not.toBeInTheDocument();
+    expect(s.queryByRole('group', { name: 'Days shown' })).not.toBeInTheDocument();
     expect(s.queryByRole('button', { name: '7d' })).not.toBeInTheDocument();
   });
 
@@ -115,9 +118,19 @@ describe('areas a span cannot judge', () => {
     expect(await (await section()).findByText('Nothing stands out. Checked: food.')).toBeInTheDocument();
   });
 
-  it('nothing logged today yet: the 1d analysis asks for a food', async () => {
+  it('nothing logged today yet, with history: it says so, points to 7d, and shows what is left at the full targets', async () => {
     await onCoach(quietWeekScenario());
-    expect(await (await section()).findByText('Log a food and the coach reads it here.')).toBeInTheDocument();
+    const s = await section();
+    expect(await s.findByText('Nothing logged today yet. 7d reads the last week.')).toBeInTheDocument();
+    expect(s.getByRole('heading', { level: 3, name: '150 g protein and 2,400 kcal left' })).toBeInTheDocument();
+    expect(s.queryByText('Log a food and the coach reads it here.')).not.toBeInTheDocument();
+  });
+
+  it('nothing ever logged: the section asks for a food', async () => {
+    await onCoach(nothingLoggedScenario);
+    const s = await section();
+    expect(await s.findByText('Log a food and the coach reads it here.')).toBeInTheDocument();
+    expect(s.queryByText(/^Nothing logged today yet/)).not.toBeInTheDocument();
   });
 });
 
@@ -126,8 +139,7 @@ describe('numbers behind it', () => {
     await onCoach(analysisFatWeekScenario());
     await choose('2w');
     const s = await section();
-    const [numbers] = await s.findAllByRole('button', { name: /^The numbers behind this/ });
-    if (numbers === undefined) throw new Error('No numbers to open.');
+    const numbers = await s.findByRole('button', { name: 'The numbers behind this: Fat averaged 90 g against 70 g' });
     await userEvent.click(numbers);
     expect(await s.findByText('14 days through Oct 23')).toBeInTheDocument();
     expect(s.getByText('Days counted')).toBeInTheDocument();
@@ -143,8 +155,9 @@ describe('dismissed but visible', () => {
     await onCoach(analysisFatWeekScenario(), (repos) => repos.trendLog.dismissFinding('fatAgainstTarget:level', today.addDays(-10)));
     await choose('2w');
     const s = await section();
-    expect(await s.findByText(`1 hidden · shows again ${Fmt.shortDay(today.addDays(18))}`)).toBeInTheDocument();
-    expect(s.queryByText('Fat averaged 90 g against 70 g')).not.toBeInTheDocument();
+    await userEvent.click(await s.findByRole('button', { name: '1 finding hidden' }));
+    expect(s.getByText(`shows again ${Fmt.shortDay(today.addDays(18))}`)).toBeInTheDocument();
+    expect(s.queryByRole('heading', { name: 'Fat averaged 90 g against 70 g' })).not.toBeInTheDocument();
   });
 
   it('dismissing one hides it at once, and counts it', async () => {
@@ -152,7 +165,23 @@ describe('dismissed but visible', () => {
     await choose('2w');
     const s = await section();
     await userEvent.click(await s.findByRole('button', { name: 'Dismiss: Fat averaged 90 g against 70 g' }));
-    expect(await s.findByText(`1 hidden · shows again ${Fmt.shortDay(today.addDays(28))}`)).toBeInTheDocument();
+    expect(await s.findByRole('button', { name: '1 finding hidden' })).toBeInTheDocument();
+    await userEvent.click(s.getByRole('button', { name: '1 finding hidden' }));
+    expect(s.getByText(`shows again ${Fmt.shortDay(today.addDays(28))}`)).toBeInTheDocument();
+  });
+
+  it('dismissing says until when, with no undo, and puts the focus on the next finding’s title', async () => {
+    await onCoach(analysisFatWeekScenario());
+    await choose('2w');
+    const s = await section();
+    await userEvent.click(await s.findByRole('button', { name: 'Dismiss: Fat averaged 90 g against 70 g' }));
+    expect(await screen.findByText(`Hidden until ${Fmt.shortDay(today.addDays(28))}`)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^Undo/ })).not.toBeInTheDocument();
+    await waitFor(() => {
+      const focused = document.activeElement;
+      expect(focused?.tagName).toBe('H4');
+      expect(focused?.textContent).not.toBe('Fat averaged 90 g against 70 g');
+    });
   });
 });
 
@@ -162,7 +191,7 @@ describe('safeguards', () => {
     await choose('2w');
     const s = await section();
     await s.findByText('Worth changing');
-    for (const numbers of s.getAllByRole('button', { name: /^The numbers behind this/ })) await userEvent.click(numbers);
+    for (const numbers of s.getAllByRole('button', { name: /^The numbers behind this: / })) await userEvent.click(numbers);
     const region = screen.getByRole('region', { name: 'What your data says' });
     expect(region.textContent).not.toMatch(/\d\s?(kg|lb)\b/);
   });
@@ -180,7 +209,46 @@ describe('safeguards', () => {
     const titles = (await s.findAllByRole('heading', { level: 4 })).map((h) => h.textContent ?? '');
     expect(titles.every((t) => t.startsWith('Protein'))).toBe(true);
     expect(s.queryByText(/Peanut butter/)).not.toBeInTheDocument();
-    expect(s.queryByText(/Trading it/)).not.toBeInTheDocument();
+    expect(s.queryByText(/Trading /)).not.toBeInTheDocument();
+  });
+});
+
+describe('the review fixes (MM-610, 2026-10-24)', () => {
+  it('the switcher sits under "Days shown", the period line is said again on a change, and the headline follows it', async () => {
+    await onCoach(analysisFatWeekScenario());
+    const s = await section();
+    expect(await s.findByRole('group', { name: 'Days shown' })).toBeInTheDocument();
+    await choose('2w');
+    const period = await s.findByText('14 days through yesterday · 14 fully logged');
+    expect(period).toHaveAttribute('aria-live', 'polite');
+    const headline = s.getByText(/holding up; fat is worth changing\.$/);
+    expect(period.nextElementSibling).toBe(headline);
+  });
+
+  it('each finding is marked as worth changing or holding up, in words a screen reader says', async () => {
+    await onCoach(analysisFatWeekScenario());
+    await choose('2w');
+    const s = await section();
+    expect((await s.findAllByRole('img', { name: 'Worth changing' })).length).toBeGreaterThan(0);
+    expect(s.getAllByRole('img', { name: 'Holding up' }).length).toBeGreaterThan(0);
+  });
+
+  it('the list labels are headings above their findings, and 1d’s "what is left" is a heading of its own', async () => {
+    await onCoach(analysisFatWeekScenario());
+    const s = await section();
+    expect(await s.findByRole('heading', { level: 3, name: /left/ })).toBeInTheDocument();
+    await choose('2w');
+    expect(await s.findByRole('heading', { level: 3, name: 'Worth changing' })).toBeInTheDocument();
+  });
+
+  it('"N more from your data" keeps fixes and strengths apart, under the same labels', async () => {
+    await onCoach(analysisFatWeekScenario({ busy: true }));
+    await choose('2w');
+    const s = await section();
+    await userEvent.click(await s.findByRole('button', { name: /more from your data$/ }));
+    const labels = s.getAllByRole('heading', { level: 3 }).map((h) => h.textContent);
+    // More is worth changing than the three listed, so the fold has its own "Worth changing" group under the list's.
+    expect(labels.filter((label) => label === 'Worth changing')).toHaveLength(2);
   });
 });
 

@@ -3,10 +3,12 @@ export * from './CoachFinding';
 export * from './CoachFindingKind';
 export * from './CoachFood';
 export * from './CoachTrade';
+export * from './CoachTradeFood';
 export * from './CoachTradeSource';
 // Trade X for Y (MM-607).
 export * from './findTrade';
 export * from './findTrades';
+export * from './findingQuietDays';
 export * from './TradeCatalog';
 export * from './TradeCatalogFood';
 export * from './TradeInput';
@@ -28,3 +30,11 @@ export * from './CoachFindingSections';
 export * from './foldTrainingProtein';
 export * from './HiddenFinding';
 export * from './supportedAnalysisSpans';
+// The announcement log and the Dashboard's card (MM-605, MM-610).
+export * from './canonicalTrendSpan';
+export * from './CoachSpanEvaluation';
+export * from './coachTrendReadingOf';
+export * from './coachTrendSteps';
+export * from './DashboardInsight';
+export * from './selectDashboardInsight';
+export * from './snoozedFoodNames';

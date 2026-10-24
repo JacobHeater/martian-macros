@@ -110,3 +110,38 @@ Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
   again on every log change; "what is left" is shown at the top of the section (`WhatYourDataSaysSection`).
 - Tests: `apps/mobile/test/state/coachAnalysis.test.ts` ("a log of today's food is read at once") and
   `apps/mobile/test/coach/whatYourDataSays.test.tsx` ("opens on today"). Every scenario is covered, so the story is done.
+
+Review fixes (MM-610's review), 2026-10-24. Not run locally; CI validates.
+
+- **Ids:** a 1d finding's id is `day:<epochDay>:<signal>:<kind>` (`analyseFoodDay`), no longer `day:<signal>`.
+- **Nothing logged today, with history:** `analyseFoodDay` gives the "left" finding alone, at the whole of today's
+  targets; the section says "Nothing logged today yet." and "7d reads the last week." when 7d is offered. "Log a food
+  and the coach reads it here." stays for nothing ever logged.
+- **A trade on 1d (a bug, fixed):** MM-607's X had to be on 3 days of the span's entries, which a single day can never
+  give, so 1d never offered a trade. On a span shorter than 3 days X is now asked to be on each of its days
+  (`findTrades`), so on 1d it is a food logged today; Y is still one the person logs in that meal on 2 days of the last
+  56. Regression test: `apps/mobile/test/engine/foodDay.test.ts` ("a 1d trade").
+- **Words:** the 1d density title is in plain amounts ("18 g protein in 780 kcal so far"); what fits says "48 g
+  protein"; the 1d calories lines carry a "Band" row; the 1d fat line puts fat beside protein ("So far today fat gave
+  855 kcal while protein was 20 g."), never "so those calories went to fat".
+- **Tests:** `apps/mobile/test/engine/foodDay.test.ts` ("history but nothing logged today", "a 1d dismissal lasts the
+  day": dismissing yesterday's holding-up calories line leaves today's calories fix showing, and hides that line for
+  the rest of its own day; "a 1d trade"; what fits now "48 g protein"), `apps/mobile/test/format/foodFindingText.test.ts`
+  (the 1d density title, the band) and `apps/mobile/test/coach/whatYourDataSays.test.tsx` (nothing today, nothing
+  ever). Stories: CoachAnalysisTodayNumbers, CoachAnalysisTodayTrade, CoachAnalysisNothingToday.
+
+Choices made without asking (say if any is wrong):
+- **A 1d dismissal lasts the day.** Dismissing a line on 1d hides that line, of that kind, for that day only: the next
+  day's line of the same signal is another finding and shows, as is the same signal's line of another kind that day
+  (a holding-up calories line dismissed does not hide a calories fix later the same day). It is still written to the
+  trend log with the 28 days of any dismissal, which can only matter on its own day.
+- **X on 1d** needs only be logged today (above).
+
+Not done (found while fixing, for the owner):
+- **The calorie floor on 1d:** `findTrades` keeps a trade from taking the span's average intake under the calorie floor;
+  on 1d that average is today so far, nearly always under the floor before dinner, so in the app a 1d trade is offered
+  only when Y has at least X's calories. The story `CoachAnalysisTodayTrade` uses such a Y. Reading the floor against
+  the day's target instead is a behaviour change left for a decision.
+  - **Settled 2026-10-24:** 1d passes no floor to `findTrades`. A day still being eaten is judged against its target, which
+    the floor already bounds, and a trade keeps calories within 0.6–1.1× of X. A lower-calorie Y can now be offered on 1d.
+

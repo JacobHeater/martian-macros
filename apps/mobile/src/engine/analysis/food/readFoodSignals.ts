@@ -385,9 +385,9 @@ export function readFoodSignals({
       reading(
         'energyUse',
         { judgedDays: n, averageKcal: average, energyUseKcal: tdeeKcal },
-        goal === 'fatLoss' && average >= tdeeKcal - tdeeSigmaKcal
+        goal === 'fatLoss' && average >= tdeeKcal - R.energyUseFatLossSigmas * tdeeSigmaKcal
           ? 'up'
-          : goal === 'leanGain' && average <= tdeeKcal + tdeeSigmaKcal
+          : goal === 'leanGain' && average <= tdeeKcal + R.energyUseLeanGainSigmas * tdeeSigmaKcal
             ? 'down'
             : undefined,
         false,

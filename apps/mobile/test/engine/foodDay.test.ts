@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { arrangeCoachFindings } from '../../src/engine/analysis/arrangeCoachFindings';
 import { analyseFoodDay } from '../../src/engine/analysis/food/analyseFoodDay';
 import { analyseFoodSpan } from '../../src/engine/analysis/food/analyseFoodSpan';
 import type { CoachFinding } from '../../src/engine/analysis/CoachFinding';
@@ -74,8 +75,67 @@ describe('what is left', () => {
 
   it('and names the logged meal that fits', () => {
     expect(left.foods).toEqual([expect.objectContaining({ name: 'Chicken and rice', kcal: 520, proteinG: 48, days: 2 })]);
-    expect(textOf(left)[1]).toBe('62 g protein and 610 kcal left today. Your usual Chicken and rice (48 g, 520 kcal) fits.');
+    expect(textOf(left)[1]).toBe('62 g protein and 610 kcal left today. Your usual Chicken and rice (48 g protein, 520 kcal) fits.');
   });
+});
+
+it('history but nothing logged today: what is left, at the whole of today’s targets, and nothing else', () => {
+  const input = inputOf([{ date: yesterday, entries: [food(yesterday, 'dinner', 'Pasta', 900, 30, 25)] }]);
+  const found = analyseFoodDay(input, today);
+  expect(found.map((f) => f.kind)).toEqual(['left']);
+  expect(found[0]?.figures).toMatchObject({ kcal: 0, kcalLeft: 2400, proteinLeftG: 170 });
+});
+
+describe('a 1d dismissal lasts the day (MM-610 review, F1)', () => {
+  // Yesterday within the band; today over it, on a cut, with fat at target.
+  const onTarget = [
+    food(yesterday, 'breakfast', 'Oats and whey', 600, 45, 12),
+    food(yesterday, 'lunch', 'Chicken salad', 800, 55, 30),
+    food(yesterday, 'dinner', 'Salmon and potatoes', 1000, 52, 34),
+  ];
+  const over = [
+    food(today, 'breakfast', 'Oats and whey', 600, 45, 12),
+    food(today, 'lunch', 'Chicken and rice', 1200, 80, 20),
+    food(today, 'dinner', 'Rice pudding', 1000, 30, 20),
+  ];
+  const input = inputOf([
+    { date: yesterday, entries: onTarget },
+    { date: today, entries: over },
+  ]);
+
+  it("a 1d id is the day's, the signal's and the kind's", () => {
+    const calories = analyseFoodDay(input, yesterday).find((f) => f.signal === 'calories');
+    expect(calories?.id).toBe(`day:${yesterday.epochDay}:calories:holdingUp`);
+  });
+
+  it("dismissing yesterday's holding-up calories line leaves today's calories fix showing", () => {
+    const held = analyseFoodDay(input, yesterday).find((f) => f.kind === 'holdingUp' && f.signal === 'calories') as CoachFinding;
+    const dismissals = [{ findingId: held.id, dismissedOn: yesterday }];
+    const sections = arrangeCoachFindings(analyseFoodDay(input, today), { today, dismissals });
+    expect(sections.worthChanging.map((f) => f.id)).toContain(`day:${today.epochDay}:calories:fix`);
+    expect(sections.hidden).toEqual([]);
+  });
+
+  it('and hides that line for the rest of its own day', () => {
+    const held = analyseFoodDay(input, yesterday).find((f) => f.kind === 'holdingUp' && f.signal === 'calories') as CoachFinding;
+    const sections = arrangeCoachFindings(analyseFoodDay(input, yesterday), {
+      today: yesterday,
+      dismissals: [{ findingId: held.id, dismissedOn: yesterday }],
+    });
+    expect(sections.hidden.map((h) => h.finding.id)).toEqual([held.id]);
+  });
+});
+
+it('a 1d trade: a food logged today for one the person logs in that meal (X needs only be today’s on 1d)', () => {
+  const yogurt = (date: typeof today) => food(date, 'lunch', 'Cottage cheese with fruit', 450, 35, 10);
+  const input = inputOf([
+    { date: yesterday.addDays(-5), entries: [yogurt(yesterday.addDays(-5))] },
+    { date: yesterday.addDays(-2), entries: [yogurt(yesterday.addDays(-2))] },
+    { date: today, entries: [food(today, 'lunch', 'Cheese and crackers', 600, 14, 40)] },
+  ]);
+  const density = analyseFoodDay(input, today).find((f) => f.kind === 'fix' && f.signal === 'proteinDensity') as CoachFinding;
+  expect(density.trade).toMatchObject({ x: { name: 'Cheese and crackers' }, y: { name: 'Cottage cheese with fruit' }, days: 1 });
+  expect(textOf(density)[1]).toContain('Trading Cheese and crackers for Cottage cheese with fruit adds about 21 g of protein');
 });
 
 it('updates with each entry', () => {
