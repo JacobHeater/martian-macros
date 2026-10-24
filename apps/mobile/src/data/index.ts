@@ -39,6 +39,7 @@ export * from './SqlRepositories';
 export * from './SqlSetupRepository';
 export * from './SqlTargetShapeRepository';
 export * from './SqlTargetsHistoryRepository';
+export * from './SqlTrendLogRepository';
 export * from './SqlWeightEventRepository';
 export * from './SqlWeightRepository';
 export * from './SqlWorkoutRepository';

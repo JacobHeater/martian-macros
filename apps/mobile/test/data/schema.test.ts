@@ -117,6 +117,9 @@ const tablesAddedSince: readonly string[] = [
   'measurement_settings',
   // Version 27 (MM-611): the days marked a Refeed or a Day off.
   'day_kinds',
+  // Version 28 (MM-605): the trend engine's announcement log, and the coach's findings dismissed.
+  'trend_announcements',
+  'finding_dismissals',
 ];
 
 /** The Dart database's tables since removed. */

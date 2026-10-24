@@ -169,14 +169,53 @@ describe('D5, day of week', () => {
     expect(up(detectWeekday(blocksOf(days), 100, 500))?.fires).toBe(false);
   });
 
-  it('an unlogged weekday fires when the same day is the only one unlogged in 3 of the last 4 weeks', () => {
-    const sundays = trendDays(start, Array.from({ length: 28 }, (_, i) => (start.addDays(i).weekday === 0 ? undefined : 2000)));
-    expect(down(detectUnloggedWeekday(blocksOf(sundays)))).toMatchObject({ fires: true, weekday: 0, k: 4, effect: 4 });
+  // MM-614's rule: 3 of the last 4 weeks, each with 5 logged days, the weekday more than half of the gaps.
+  const sundaysOff = () =>
+    Array.from({ length: 28 }, (_, i): number | undefined => (start.addDays(i).weekday === 0 ? undefined : 2000));
 
-    // Two weeks with a second unlogged day count for neither.
-    const values = Array.from({ length: 28 }, (_, i): number | undefined => (start.addDays(i).weekday === 0 ? undefined : 2000));
+  it('an unlogged weekday fires when the same day is unlogged in 3 of the last 4 weeks and is most of the gaps', () => {
+    expect(down(detectUnloggedWeekday(blocksOf(trendDays(start, sundaysOff()))))).toMatchObject({
+      fires: true,
+      weekday: 0,
+      k: 4,
+      effect: 4,
+    });
+
+    // A week with a second gap still has 5 logged days and counts; Sunday is 4 of the 6 gaps.
+    const values = sundaysOff();
     for (const week of [0, 1]) values[week * 7 + 3] = undefined;
-    expect(down(detectUnloggedWeekday(blocksOf(trendDays(start, values))))?.fires).toBe(false);
+    expect(down(detectUnloggedWeekday(blocksOf(trendDays(start, values))))).toMatchObject({ fires: true, weekday: 0, k: 4 });
+  });
+
+  it('an unlogged weekday that is not most of the gaps is not a habit', () => {
+    // Sunday in 3 of 4 weeks, but each week has another gap on a different day, and the last a third: 3 of 8 gaps.
+    const values = sundaysOff();
+    values[27] = 2000;
+    for (const week of [0, 1, 2, 3]) values[week * 7 + week] = undefined;
+    values[25] = undefined;
+    const found = down(detectUnloggedWeekday(blocksOf(trendDays(start, values))));
+    expect(found).toMatchObject({ weekday: 0, k: 3, fires: false });
+    expect(found?.ratio).toBeLessThan(1);
+  });
+
+  it('a week with fewer than 5 logged days does not count toward an unlogged weekday', () => {
+    // Sunday every week, but weeks 0 and 1 have two more gaps each: 4 logged days.
+    const values = sundaysOff();
+    for (const week of [0, 1]) {
+      values[week * 7 + 2] = undefined;
+      values[week * 7 + 3] = undefined;
+    }
+    expect(down(detectUnloggedWeekday(blocksOf(trendDays(start, values))))).toMatchObject({ k: 2, fires: false });
+  });
+
+  it('days before the first log are not gaps', () => {
+    // Nothing logged in the first week; then Sunday is the one gap of each of the last 3 weeks.
+    const values = sundaysOff();
+    for (let i = 0; i < 7; i++) values[i] = undefined;
+    const blocks = blocksOf(trendDays(start, values));
+    expect(down(detectUnloggedWeekday(blocks))).toMatchObject({ fires: true, weekday: 0, k: 3 });
+    // Had the person logged before the window, that empty week would be 7 gaps, and Sunday 3 of 10.
+    expect(down(detectUnloggedWeekday(blocks, start.addDays(-30)))?.fires).toBe(false);
   });
 
   it('does not run under 3 weeks', () => {
