@@ -35,7 +35,7 @@ describe('k_crit, the exact one-sided sign test at p 0.5', () => {
   it('at α 0.005, strong, it is stricter', () => {
     expect(binomialCriticalCount(8, 0.005)).toBe(8);
     expect(binomialCriticalCount(10, 0.005)).toBe(10);
-    expect(binomialCriticalCount(14, 0.005)).toBe(14);
+    expect(binomialCriticalCount(14, 0.005)).toBe(13);
     expect(binomialCriticalCount(20, 0.005)).toBe(17);
   });
 
