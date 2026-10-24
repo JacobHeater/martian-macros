@@ -144,3 +144,35 @@
   gap: var(--space-8);
   margin-top: var(--space-12);
 }
+
+/* ---- "What your data says" (MM-610): findings flat on the section's card, a hairline between them ---- */
+
+.coach-analysis-period {
+  margin: var(--space-8) 0;
+}
+.coach-analysis-headline {
+  margin-bottom: var(--space-12);
+}
+.coach-analysis-list {
+  margin-top: var(--space-16);
+}
+.coach-finding + .coach-finding {
+  margin-top: var(--space-12);
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--edge);
+}
+.coach-finding-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+.coach-finding-title {
+  flex: 1;
+  margin: 0;
+  font: var(--type-label);
+}
+/* "Dismiss" ends at the text's right edge: its padding hangs out, its tap area stays, as "Change pace". */
+.coach-finding-head > :last-child:not(.coach-finding-title) {
+  margin-inline-end: calc(-1 * var(--space-12));
+}

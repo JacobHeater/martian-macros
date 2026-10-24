@@ -22,3 +22,9 @@ export * from './UnjudgedArea';
 export * from './unjudgedTrainingAreas';
 // Food signals and the 1d analysis (MM-606, MM-612).
 export * from './food';
+// The Coach tab's section (MM-610).
+export * from './arrangeCoachFindings';
+export * from './CoachFindingSections';
+export * from './foldTrainingProtein';
+export * from './HiddenFinding';
+export * from './supportedAnalysisSpans';

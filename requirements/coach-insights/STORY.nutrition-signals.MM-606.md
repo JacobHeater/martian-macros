@@ -187,7 +187,16 @@ Built 2026-10-24: the signals, the span analysis and its words. Not run locally;
     words and the eight-word title;
   - `apps/mobile/test/voice.test.ts` bans "too much", "unhealthy", "fattening", "empty calories" and "burn rate".
 - **Remaining:**
-  - wiring into `AppState` and the Coach tab (MM-610), with the announcement log for MM-605's state machine (N1's exit at 65% is
-    the machine's, not a level rule's);
+  - ~~wiring into `AppState` and the Coach tab (MM-610)~~ (done, below); the announcement log for MM-605's state machine (N1's
+    exit at 65% is the machine's, not a level rule's);
   - the evidence register rows (MM-143);
   - calibrating the uncertain thresholds with MM-605's null simulation.
+
+Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
+
+- `AppState.coachAnalysis` builds `FoodAnalysisInput` from the app's cells (the last 119 days of food and intake, the
+  targets history, the safeguards, the marked days, the planned share, the fat minimum, the balance in force, the
+  trend weight, fiber at Full detail, the sodium limit, the calorie floor and the trade catalog once read) and runs
+  `analyseFoodSpan` for the span chosen. Its findings are placed by `arrangeCoachFindings` (MM-610).
+- Every scenario is covered by the tests above. Still in progress for the announcement log (the state machine's exit),
+  the evidence register rows (MM-143) and the null-simulation calibration of the uncertain thresholds.

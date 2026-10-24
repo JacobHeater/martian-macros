@@ -1,6 +1,6 @@
 ---
 id: MM-607
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-604, MM-605, MM-606, MM-608, MM-616, MM-365, MM-126, MM-371, MM-11, MM-114]
 ---
@@ -158,3 +158,12 @@ Choices made without asking while building (say if any is wrong):
   without them that check is not made. The signal ids a trade spares are `sodium` and `fiber` (`TradeRule`).
 - **A catalog Y** whose name matches X or one of the person's own foods in the slot is left out, so the same food is not
   offered twice. A group lists at most 500 foods, in the order the packs store them.
+
+Wired into the Coach tab (MM-610), 2026-10-24. Not run locally; CI validates.
+
+- `AppState.coachAnalysis` reads `CatalogTradeCatalog.load(foodCatalog, entries)` ahead in a stream cell, again when the
+  set of catalog foods logged changes (not on every log), and passes `catalog: undefined` until it is ready; MM-606
+  sets `CoachFinding.trade`, and the trade sentence (`coachTradeText`) is shown in the finding.
+- Every scenario is covered by `findTrade.test.ts`, and the trade is seen on the tab in
+  `apps/mobile/test/coach/whatYourDataSays.test.tsx`, so the story is done. Not in its scenarios and still not built:
+  the "Not for me" exclusion store (Notes); `snoozed` is not passed, as no food snooze is stored yet.
