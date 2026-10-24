@@ -1,6 +1,6 @@
 ---
 id: MM-604
-status: proposed
+status: done
 component: coach-insights
 related: [MM-137, MM-141, MM-256, MM-361, MM-363, MM-365, MM-108, MM-92, MM-11, MM-118, MM-114, MM-605, MM-606, MM-607, MM-608, MM-609, MM-610, MM-611, MM-612, MM-613, MM-614, MM-615, MM-616]
 ---
@@ -72,3 +72,14 @@ The epic is done when:
 ## Notes
 Panel reports are summarised in each story. Every threshold the panels marked uncertain is marked "(uncertain)" in its story and
 is calibrated by MM-605's null simulation before the story is done.
+
+## Progress
+Built 2026-10-24 on `feat/mm-604-coach-analysis` (PR #313). Every child is done: MM-605 (trend engine and its log), MM-606
+(food signals), MM-607 (trades), MM-608 (the non-goal overruled for trades), MM-609 (training, water and sleep), MM-610 (the
+Coach section with the `1d | 7d | 2w | 1m | 3m` switcher, and the Dashboard card on the same engine), MM-611 (Refeed and Day off),
+MM-612 (the 1d analysis), MM-613, MM-614 and MM-615 (bugs found on the way) and MM-616 (catalog food groups). The product-designer
+and UX-accessibility reviews ran on the section, and their blocking findings are fixed (MM-610's Progress). Not run locally; CI
+validates.
+
+Left for the owner: the section's length on a long span (design review PD-6); a "Show again" action for a hidden finding; the
+published food packs rebuilt so that catalog foods carry groups (MM-616); Open Food Facts products' groups.
