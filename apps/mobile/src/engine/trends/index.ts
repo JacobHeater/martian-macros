@@ -3,6 +3,7 @@
  * out. Pure: no clock and no storage. The detectors and their statistics
  * are imported from their own files; this is what the signals use.
  */
+export * from './FindingDismissal';
 export * from './TrendAnnouncement';
 export * from './TrendAspect';
 export * from './TrendBoundary';
@@ -15,6 +16,9 @@ export * from './TrendFigures';
 export * from './TrendFinding';
 export * from './TrendPoint';
 export * from './TrendIneligibleReason';
+export * from './TrendLogReader';
+export * from './TrendLogRepository';
+export * from './TrendLogWriter';
 export * from './TrendReading';
 export * from './TrendReadingStatus';
 export * from './TrendRule';

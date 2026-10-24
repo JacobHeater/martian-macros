@@ -65,7 +65,13 @@ export function evaluateSignal<Input>(
   const lookStart = spanStart.addDays(-TrendRule.baselineLookbackDays);
 
   const known = new Map<number, TrendDay>();
+  // The first logged day of the whole series: a day before it is not a gap (D5's unlogged weekday, MM-614).
+  let firstLogged: CalendarDate | undefined;
   for (const day of signal.series(input)) {
+    const logged = day.value !== undefined && day.reason !== 'unlogged';
+    if (logged && !day.date.isAfter(asOf) && (firstLogged === undefined || day.date.isBefore(firstLogged))) {
+      firstLogged = day.date;
+    }
     if (day.date.isBefore(lookStart) || day.date.isAfter(asOf)) continue;
     const extra = day.eligible ? signal.eligibility?.(day, input) : undefined;
     const usable = day.eligible && extra === undefined && day.value !== undefined && Number.isFinite(day.value);
@@ -144,7 +150,7 @@ export function evaluateSignal<Input>(
     if (blocks.length >= TrendRule.weekday.minimumWeeks) {
       if (applies('weekend')) record('weekend', detectWeekend(blocks, delta));
       if (applies('weekday')) record('weekday', detectWeekday(blocks, delta, robustSigma(blocks.flat().filter(isPoint), sigmaFloor)));
-      if (applies('unloggedWeekday')) record('unloggedWeekday', detectUnloggedWeekday(blocks));
+      if (applies('unloggedWeekday')) record('unloggedWeekday', detectUnloggedWeekday(blocks, firstLogged));
     }
   }
 

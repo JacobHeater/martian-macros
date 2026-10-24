@@ -36,6 +36,7 @@ export * from './InMemoryRestSignal';
 export * from './InMemorySetupRepository';
 export * from './InMemoryTargetShapeRepository';
 export * from './InMemoryTargetsHistoryRepository';
+export * from './InMemoryTrendLogRepository';
 export * from './InMemoryMeasurementRepository';
 export * from './InMemoryMeasurementSettingsRepository';
 export * from './InMemoryWeightEventRepository';

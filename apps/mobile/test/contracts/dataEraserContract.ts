@@ -28,6 +28,7 @@ import type { WeighInWindowReader } from '../../src/healthIngest/WeighInWindowRe
 import type { WeighInWindowWriter } from '../../src/healthIngest/WeighInWindowWriter';
 import type { TargetsHistoryRepository } from '../../src/engine/TargetsHistoryRepository';
 import { TargetsRecord } from '../../src/engine/TargetsRecord';
+import type { TrendLogRepository } from '../../src/engine/trends/TrendLogRepository';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 
@@ -41,6 +42,7 @@ interface Erasable {
   targetShapes: TargetShapeRepository;
   goalBodyFat: GoalBodyFatRepository;
   dayKinds: DayKindRepository;
+  trendLog: TrendLogRepository;
   measurements: MeasurementRepository;
   measurementSettings: MeasurementSettingsRepository;
   preferences: PreferencesRepository;
@@ -90,6 +92,19 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       await r.targetShapes.saveTargetShape(new TargetShape({ since: day, balance: CarbFatBalance.balanced }));
       await r.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: day });
       await r.dayKinds.setDayKind(day, 'refeed');
+      await r.trendLog.appendTrendAnnouncements([
+        {
+          key: 'protein:level',
+          transition: 'new',
+          on: day,
+          direction: 'down',
+          onsetDate: undefined,
+          figures: { effect: -25, unit: 'g', n: 14, k: 11, span: 14, coverage: 1 },
+          tier: 'clear',
+          rulesVersion: 1,
+        },
+      ]);
+      await r.trendLog.dismissFinding('protein:level', day);
       await r.measurements.saveMeasurement('thigh', day, 58);
       await r.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'left' }));
       await r.workouts.saveWorkout(
@@ -120,6 +135,9 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       expect(await first(r.goalBodyFat.watchGoalBodyFat())).toBeUndefined();
       // MM-611: no day is left marked.
       expect(await first(r.dayKinds.watchMarkedDays())).toEqual(new Map());
+      // MM-605: nothing the trend engine said is left, and no finding dismissed.
+      expect(await first(r.trendLog.watchTrendAnnouncements())).toEqual([]);
+      expect(await first(r.trendLog.watchFindingDismissals())).toEqual([]);
       // MM-156: no measurement of any site, and no site chosen.
       expect(await first(r.measurements.watchMeasurements())).toEqual([]);
       expect([...(await first(r.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);

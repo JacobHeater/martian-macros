@@ -30,7 +30,7 @@ Choices made without asking (from the measurement panel; say if any is wrong):
 | D2 | Drift: Theil–Sen slope with Mann–Kendall, n shrunk by lag-1 autocorrelation (uncertain) | regime ≥ 21 days with ≥ 12 eligible days, ≥ 3 in each third; \|Z\| ≥ 2.33 (uncertain); \|slope × span\| ≥ δ |
 | D3 | Change point: scan the split with prefix sums on values winsorised at ±3σ; recurse once and keep the most recent | ≥ 7 eligible days before and ≥ 5 after; max T ≥ 3.5 (uncertain); \|difference\| ≥ δ |
 | D4 | Runs ending yesterday or the day before | (a) ≥ 7 days each beyond δ on one side of target; (b) ≥ 4 days each beyond baseline median ± 1σ in one direction, run mean beyond δ, baseline ≥ 14 eligible days in the prior 28. One ineligible day may sit inside a run; a second breaks it |
-| D5 | Day of week, paired within the week (value minus the median of the week's other eligible days) | weekend: ≥ 3 weeks all beyond δ the same way, or ≥ 5 weeks with ≥ 80% agreeing; one weekday: ≥ 4 weeks beyond max(δ, σ), or 5 of 6; unlogged weekday: ≥ 3 of the last 4 weeks, each with ≥ 5 logged days. Last 56 days |
+| D5 | Day of week, paired within the week (value minus the median of the week's other eligible days) | weekend: ≥ 3 weeks all beyond δ the same way, or ≥ 5 weeks with ≥ 80% agreeing; one weekday: ≥ 4 weeks beyond max(δ, σ), or 5 of 6; unlogged weekday (MM-614): ≥ 3 of the last 4 weeks, each with ≥ 5 logged days, and the weekday > half of the unlogged days in the 4 weeks; days before the first log are not gaps. Last 56 days |
 | D6 | Recent against baseline: D3's statistic at the fixed split last 7 against the 28 before | ≥ 5 recent and ≥ 14 baseline eligible days; T ≥ 2.5 (uncertain); \|difference\| ≥ δ |
 
 - **The span is the one chosen on the switcher** (7d, 14d, 30d or 90d, MM-610), ending yesterday. Within it, change points mark
@@ -183,8 +183,8 @@ Built 2026-10-24: the pure engine core. Not run locally; CI validates.
   - The ticket gives no k_crit table: the tests pin the exact binomial values (7 → 7, 10 → 9, 14 → 11, 20 → 15, 30 → 20).
 - **Tuned:**
   - D6's threshold, 2.5 → 3.0 (uncertain), for the false-alarm budget.
-  - An unlogged weekday counts a week only with 6 logged days, not 5. At 5, a random logger shows a habit in about one
-    evaluation in five, against the 2% budget.
+  - An unlogged weekday first counted a week only with 6 logged days. It now takes MM-614's rule instead (see below), with
+    the 5 restored.
 - **Tests** (`apps/mobile/test/engine/`):
   - `trendStatistics.test.ts` (k_crit, σ and its floors, Theil–Sen, Mann–Kendall, rounding);
   - `trendDetectors.test.ts` (each detector);
@@ -195,10 +195,39 @@ Built 2026-10-24: the pure engine core. Not run locally; CI validates.
   - `trendNullSimulation.test.ts` (200 stationary users over 180 days, and the random logger);
   - `styleSwitchOf.test.ts`.
 - **Remaining:**
-  - the announcement-log and dismissal repository, with its SQL implementation, in-memory fixture, contract suite and
-    migration;
+  - ~~the announcement-log and dismissal repository~~ (built, below);
   - wiring: the signals of MM-606 and MM-609 as `TrendSignal`s over `usableIntakeDays`, boundaries from
     `TargetsRecord.effectiveFrom`, `styleSwitchOf` and the settling windows, and weight drift on `WeightTrendModel`;
   - `findInsights`' rules moved onto definitions, and the filters (MM-141) run before ranking;
   - the Coach tab (MM-610);
   - the null simulation over every signal together.
+
+Built 2026-10-24: the announcement-log and dismissal repository, and D5 aligned with MM-614. Not run locally; CI validates.
+
+- **The repository** (read and write split like the insight log):
+  - interfaces in `apps/mobile/src/engine/trends/`: `TrendLogReader` (`watchTrendAnnouncements()`,
+    `watchFindingDismissals()`), `TrendLogWriter` (`appendTrendAnnouncements(entries)`, `dismissFinding(findingId, day)`),
+    `TrendLogRepository`, and the record `FindingDismissal` (`findingId`, `dismissedOn`). A finding id is MM-604's
+    `CoachFinding.id`. The log is append-only: nothing updates or deletes an entry. Dismissing a finding twice on one day
+    keeps one row.
+  - `SqlTrendLogRepository` (`src/data/`) and `InMemoryTrendLogRepository` (`src/fixtures/`), registered as `trendLog`
+    in `SqlRepositories`, `InMemoryRepositories` (erased with the rest), `AppServices`, `openAppServices.ts` and
+    `gallery/fixtureServices.ts`.
+- **Schema version 28:** the tables `trend_announcements` (one row per entry; the figures as columns, as the insight logs
+  keep theirs: `effect`, `unit`, `n`, `k`, `span_days`, `coverage`) and `finding_dismissals` (one row per finding and
+  day). Both are in `tables.ts`, so erasing and restoring cover them. The 27-to-28 step creates them empty.
+- **D5 aligned with MM-614:** `detectUnloggedWeekday` fires on ≥ 3 of the last 4 weeks, each with ≥ 5 logged days
+  (`TrendRule.weekday.unloggedMinimumLoggedDays` back to 5), when the weekday is more than half of the unlogged days in
+  the 4 weeks. Days before the first logged day of the whole series are not gaps: `evaluateSignal` passes that day in.
+  The detector's ratio carries both gates, so the exit threshold reads them too.
+- **Tests:**
+  - `test/contracts/trendLogRepositoryContract.ts`, run in `test/data/sqlContracts.test.ts` and
+    `test/fixtures/inMemoryContracts.test.ts`;
+  - `dataEraserContract` (and its three callers) and `test/data/restore.test.ts` cover the trend log;
+  - `test/data/upgrade.test.ts`: a version 27 database comes up to date with an empty trend log;
+  - `test/data/schemaFingerprint.test.ts` records version 28;
+  - `test/data/schema.test.ts` lists the two tables;
+  - `test/engine/trendDetectors.test.ts`: the weekday must be most of the gaps, a week needs 5 logged days, and days
+    before the first log are not gaps.
+- **Remaining:** wiring the repository into `AppState` and the UI (the Coach tab, MM-610), with the other items listed
+  under "Remaining" above.

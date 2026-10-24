@@ -378,4 +378,34 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 27 to 28 (MM-605): the trend engine's append-only announcement log, a row for each entry with its figures, and the
+  // coach's findings dismissed, a row for each finding and day; none yet, so nothing has been said or dismissed.
+  [
+    27,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "trend_announcements" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"trend_key" TEXT NOT NULL, ' +
+          '"transition" TEXT NOT NULL CHECK ("transition" IN (\'new\', \'continuing\', \'update\', \'reversed\', \'held\', \'resolved\', \'backAgain\')), ' +
+          '"on_epoch_day" INTEGER NOT NULL, ' +
+          '"direction" TEXT NOT NULL CHECK ("direction" IN (\'down\', \'up\')), ' +
+          '"onset_epoch_day" INTEGER NULL, ' +
+          '"effect" REAL NOT NULL, ' +
+          '"unit" TEXT NOT NULL, ' +
+          '"n" INTEGER NOT NULL, ' +
+          '"k" INTEGER NOT NULL, ' +
+          '"span_days" INTEGER NOT NULL CHECK ("span_days" IN (7, 14, 30, 90)), ' +
+          '"coverage" REAL NOT NULL, ' +
+          '"tier" TEXT NOT NULL CHECK ("tier" IN (\'silent\', \'clear\', \'strong\')), ' +
+          '"rules_version" INTEGER NOT NULL)',
+      );
+      await db.execute(
+        'CREATE TABLE "finding_dismissals" (' +
+          '"finding_id" TEXT NOT NULL, ' +
+          '"dismissed_epoch_day" INTEGER NOT NULL, ' +
+          'PRIMARY KEY ("finding_id", "dismissed_epoch_day"))',
+      );
+    },
+  ],
 ]);

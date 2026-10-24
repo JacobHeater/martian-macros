@@ -32,4 +32,6 @@ export const tables = [
   'body_measurements',
   'measurement_settings',
   'day_kinds',
+  'trend_announcements',
+  'finding_dismissals',
 ] as const;

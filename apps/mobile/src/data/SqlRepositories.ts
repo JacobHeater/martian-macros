@@ -30,6 +30,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
@@ -57,6 +58,7 @@ import { SqlSleepRepository } from './SqlSleepRepository';
 import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
 import { SqlGoalBodyFatRepository } from './SqlGoalBodyFatRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
+import { SqlTrendLogRepository } from './SqlTrendLogRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlMeasurementRepository } from './SqlMeasurementRepository';
 import { SqlMeasurementSettingsRepository } from './SqlMeasurementSettingsRepository';
@@ -101,6 +103,8 @@ export class SqlRepositories {
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
+  /** What the trend engine said, and the coach's findings dismissed (MM-605). */
+  readonly trendLog: TrendLogRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -136,6 +140,7 @@ export class SqlRepositories {
     this.insightLog = new SqlInsightLogRepository(db);
     this.inlineInsightLog = new SqlInlineInsightLogRepository(db);
     this.insightSnoozes = new SqlInsightSnoozeRepository(db);
+    this.trendLog = new SqlTrendLogRepository(db);
     this.pauses = new SqlPauseRepository(db);
     this.reminders = new SqlReminderRepository(db);
     this.recovery = new SqlRecoveryCheckInRepository(db);

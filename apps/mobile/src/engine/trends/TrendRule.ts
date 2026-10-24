@@ -97,12 +97,12 @@ export const TrendRule = {
     unloggedOf: 4,
     unlogged: 3,
     /**
-     * Logged days a week needs for its unlogged weekday to count. The panel
-     * proposed 5; at 5, a person who leaves two random days a week unlogged
-     * shows a habit in about one evaluation in five, so a week counts only
-     * when the weekday is its one unlogged day (tuned for MM-605's 2%).
+     * Logged days a week needs for its unlogged weekday to count (the
+     * panel's 5). MM-614's rule keeps a random logger under MM-605's 2%: the
+     * weekday must also be more than half of the unlogged days in the weeks,
+     * and a day before the first log is not one of them.
      */
-    unloggedMinimumLoggedDays: 6,
+    unloggedMinimumLoggedDays: 5,
     strongAlpha: 0.005,
   },
 

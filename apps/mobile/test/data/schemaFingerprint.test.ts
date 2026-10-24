@@ -51,6 +51,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   26: '192f435111b9277d998f7453963ca98ef9e6178d14041461f7e3dcd295aed87c',
   // MM-611: the days marked a Refeed or a Day off.
   27: '845de30559ea783461b8cbd0b894ce15fb119fd37b14835ec821fbf02dafbad9',
+  // MM-605: the trend engine's announcement log, and the coach's findings dismissed.
+  28: '7aa93f2312df5aa82daca1ee7761a8dabd91d0ce8806c39fefc2355ab7ca1822',
 };
 
 it('the schema is the one recorded for its version', () => {
