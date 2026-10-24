@@ -563,14 +563,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         meal={meal}
         initialSize={estimateSize ?? 'regular'}
         onManual={() => setStep({ at: 'manual' })}
-        onAnalyze={() => setStep({ at: 'analyzing' })}
         onBack={choices}
         onDone={onDone}
       />
     );
   }
   if (step.at === 'analyzing') {
-    return <AnalyzeMealStep day={firstDay} meal={meal} onBack={() => setStep({ at: 'estimating' })} onDone={onDone} />;
+    return <AnalyzeMealStep day={firstDay} meal={meal} onBack={choices} onDone={onDone} />;
   }
   if (step.at === 'scanning') {
     return (
@@ -853,11 +852,15 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       <h2 className="app-headline">{isEditing ? 'Edit food' : 'Add food'}</h2>
       {searching ? <MmTextField label="Search foods" value={search} onChange={setSearch} /> : null}
       {searching && query === '' ? (
-        <div className="app-row food-chips">
-          <MmButton label="Scan" kind="secondary" icon="barcode" onPress={() => setStep({ at: 'scanning' })} />
-          <MmButton label="Saved" kind="secondary" icon="history" onPress={() => setStep({ at: 'myFoods' })} />
-          <MmButton label="Estimate" kind="secondary" icon="food" onPress={() => setStep({ at: 'estimating' })} />
-        </div>
+        <>
+          {/* The person's own AI, one press from a meal's "+" rather than inside Estimate (MM-598). */}
+          <MmButton label="AI meal analysis" kind="secondary" icon="assistant" expand onPress={() => setStep({ at: 'analyzing' })} />
+          <div className="app-row food-chips">
+            <MmButton label="Scan" kind="secondary" icon="barcode" onPress={() => setStep({ at: 'scanning' })} />
+            <MmButton label="Saved" kind="secondary" icon="history" onPress={() => setStep({ at: 'myFoods' })} />
+            <MmButton label="Estimate" kind="secondary" icon="food" onPress={() => setStep({ at: 'estimating' })} />
+          </div>
+        </>
       ) : null}
       {isEditing ? (
         <>

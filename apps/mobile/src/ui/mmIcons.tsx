@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import AccessibilityNewOutlined from '@mui/icons-material/AccessibilityNewOutlined';
 import AddOutlined from '@mui/icons-material/AddOutlined';
 import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import BackHandOutlined from '@mui/icons-material/BackHandOutlined';
 import BedtimeOutlined from '@mui/icons-material/BedtimeOutlined';
 import BoltOutlined from '@mui/icons-material/BoltOutlined';
@@ -157,4 +158,5 @@ export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   // Drawn for the app: Material has no shaker (MM-335).
   protein: ShakerBottleOutlined,
   sleep: BedtimeOutlined,
+  assistant: AutoAwesomeOutlined,
 };
