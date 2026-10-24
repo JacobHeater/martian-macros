@@ -128,6 +128,7 @@ Scenario: Under-eating
 
 Scenario: Plain words
   Then no food rule's line calls a food good or bad, names a replacement food, suggests eating less of it, or says "lean", "room", "item" or "usual serving"
+  # Amended 2026-10-24 (MM-608): this governs inline lines under an item. The coach's analysis may name a replacement food as a trade (MM-607).
 
 Scenario: Logged foods only
   When food search or the amount step is shown
