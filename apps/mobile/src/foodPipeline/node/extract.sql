@@ -16,6 +16,10 @@
 -- carbohydrate is surely a US label's total, 'unknown' for an Open Food Facts
 -- product also sold outside the US and Canada, whose figure may be an EU
 -- label's available carbohydrate (the panel's NU-1; usLabelCarbs decides).
+-- Both files end with category (MM-616): the source's own category, which
+-- foodGroupTable maps to a food group: USDA Branded's branded_food_category,
+-- Foundation's and SR Legacy's food_category, FNDDS's WWEIA category; empty
+-- for Open Food Facts.
 -- All nutrients are per 100 g.
 
 COPY (
@@ -76,7 +80,8 @@ COPY (
     try_cast(bf.fdc_id AS BIGINT) AS version_key,
     CAST(epoch(try_cast(bf.modified_date AS DATE)) AS BIGINT) AS updated_at,
     nut.sugar_alcohols,
-    'us' AS carbs_label
+    'us' AS carbs_label,
+    nullif(trim(bf.branded_food_category), '') AS category
   FROM bf
   JOIN fd USING (fdc_id)
   LEFT JOIN nut USING (fdc_id)
@@ -113,7 +118,8 @@ COPY (
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
     try_cast(polyols_100g AS DOUBLE),
-    CASE WHEN regexp_full_match(countries_tags, 'en:(united-states|canada)(,en:(united-states|canada))*') THEN 'us' ELSE 'unknown' END
+    CASE WHEN regexp_full_match(countries_tags, 'en:(united-states|canada)(,en:(united-states|canada))*') THEN 'us' ELSE 'unknown' END,
+    NULL
   -- The export's brand column is `brands_en` since 2026 (MM-409); `strict_mode`
   -- off, because DuckDB 1.5 otherwise stops at the first row that is not
   -- standard CSV, where 1.1 skipped about 250,000 rows under `ignore_errors`.
@@ -127,22 +133,37 @@ COPY (
 -- USDA Foundation and SR Legacy: generic foods, with their household measures.
 COPY (
   WITH fd AS (
-    SELECT 'usda_foundation' AS source, fdc_id, description
+    SELECT 'usda_foundation' AS source, fdc_id, description, food_category_id
     FROM read_csv('{{cache}}/usda_foundation/food.csv', header = true,
                   all_varchar = true, ignore_errors = true)
     WHERE data_type = 'foundation_food'
     UNION ALL
-    SELECT 'usda_sr_legacy', fdc_id, description
+    SELECT 'usda_sr_legacy', fdc_id, description, food_category_id
     FROM read_csv('{{cache}}/usda_sr_legacy/food.csv', header = true,
                   all_varchar = true, ignore_errors = true)
     WHERE data_type = 'sr_legacy_food'
     UNION ALL
     -- FNDDS 2021-2023 (MM-383): foods as eaten, compiled by USDA for the
     -- national dietary survey; the same CSV layout and nutrient ids.
-    SELECT 'usda_fndds', fdc_id, description
+    SELECT 'usda_fndds', fdc_id, description, food_category_id
     FROM read_csv('{{cache}}/usda_fndds/food.csv', header = true,
                   all_varchar = true, ignore_errors = true)
     WHERE data_type = 'survey_fndds_food'
+  ),
+  -- Each food's category (MM-616): food_category_id is an id into food_category.csv
+  -- for Foundation and SR Legacy, and a WWEIA category code for FNDDS.
+  categories AS (
+    SELECT 'usda_foundation' AS source, id, description FROM read_csv(
+      '{{cache}}/usda_foundation/food_category.csv', header = true,
+      all_varchar = true, ignore_errors = true)
+    UNION ALL
+    SELECT 'usda_sr_legacy', id, description FROM read_csv(
+      '{{cache}}/usda_sr_legacy/food_category.csv', header = true,
+      all_varchar = true, ignore_errors = true)
+    UNION ALL
+    SELECT 'usda_fndds', wweia_food_category, wweia_food_category_description FROM read_csv(
+      '{{cache}}/usda_fndds/wweia_food_category.csv', header = true,
+      all_varchar = true, ignore_errors = true)
   ),
   nut_all AS (
     SELECT 'usda_foundation' AS source, * FROM read_csv(
@@ -236,9 +257,11 @@ COPY (
     coalesce(nut.kcal, nut.kcal_atwater) AS kcal,
     nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
     nut.potassium_mg, nut.calcium_mg, nut.iron_mg, nut.magnesium_mg, nut.zinc_mg, nut.vitamin_a_ug, nut.vitamin_c_mg, coalesce(nut.vitamin_d_ug, nut.vitamin_d_iu / 40) AS vitamin_d_ug, nut.vitamin_b12_ug, nut.folate_ug, coalesce(nut.sugars_g, nut.sugars_nlea_g) AS sugars_g, nut.saturated_fat_g, nut.cholesterol_mg,
-    portions.servings, 0 AS version_key, 0 AS updated_at
+    portions.servings, 0 AS version_key, 0 AS updated_at,
+    nullif(trim(cat.description), '') AS category
   FROM fd
   LEFT JOIN nut ON nut.source = fd.source AND nut.fdc_id = fd.fdc_id
   LEFT JOIN portions ON portions.source = fd.source AND portions.fdc_id = fd.fdc_id
+  LEFT JOIN categories cat ON cat.source = fd.source AND cat.id = fd.food_category_id
   ORDER BY fd.source, fd.fdc_id
 ) TO '{{out}}/candidates_generic.csv' (FORMAT csv, HEADER);

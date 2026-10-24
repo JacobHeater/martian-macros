@@ -13,6 +13,8 @@ export * from './csvRows';
 export * from './csvRowsFromBytes';
 export * from './DropReason';
 export * from './FoodKind';
+export * from './foodGroupOf';
+export * from './foodGroupTable';
 export * from './MostRecentPolicy';
 export * from './PackBuilder';
 export * from './PackBuildResult';

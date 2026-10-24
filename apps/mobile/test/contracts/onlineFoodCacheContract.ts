@@ -82,6 +82,15 @@ export function onlineFoodCacheContract(name: string, create: () => OnlineFoodCa
       expect((await cache.search('peanut', { limit: 1 })).length).toBe(1);
     });
 
+    // MM-616: a food found online carries no group, so a search in a group finds none of them.
+    it('keeps no group, and a search in a group finds nothing', async () => {
+      const kept = await cache.remember({ ...entry(), food: new CatalogFood({ ...entry().food, group: 'breakfastCereals' }) });
+      expect(kept.group).toBeUndefined();
+      expect((await cache.search('peanut')).length).toBe(1);
+      expect(await cache.search('peanut', { group: 'breakfastCereals' })).toEqual([]);
+      expect(await cache.search('', { group: 'breakfastCereals' })).toEqual([]);
+    });
+
     it('servings are asked only of its own foods', async () => {
       const other = new CatalogFood({ ...entry().food, id: 1, packId: 'barcode_us', brand: undefined });
       expect(await cache.servingsOf(other)).toEqual([]);

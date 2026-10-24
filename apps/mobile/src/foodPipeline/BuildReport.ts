@@ -1,7 +1,10 @@
+import { FoodGroup } from '../domain/food/FoodGroup';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import { PackMicronutrient } from '../foodCatalog/PackMicronutrient';
 import { compareStrings } from '../lang/compareStrings';
+import { categoryKey } from './categoryKey';
 import type { DropReason } from './DropReason';
+import { foodGroupByCategory } from './foodGroupByCategory';
 
 const sum = (counts: Iterable<number>) => [...counts].reduce((a, b) => a + b, 0);
 
@@ -72,6 +75,19 @@ export class BuildReport {
   /** Generic foods kept over a same-named record that stated more of the grade's inputs (the panel's IN-15). */
   duplicateWinnersSparser = 0;
 
+  /** Written foods by food group (MM-616), a food without one under `none`. */
+  readonly groups = new Map<FoodGroup | 'none', number>();
+
+  /**
+   * The source categories in no row of the food group table (MM-616), by
+   * `source: category`, with how many written foods carry each: their foods
+   * have no group until the table names them.
+   */
+  readonly unmappedCategories = new Map<string, number>();
+
+  /** Written foods whose source gave a category; the groups section is reported only when there are any. */
+  private categorised = 0;
+
   constructor({ expected = [] }: { expected?: readonly string[] } = {}) {
     this.expected = expected;
   }
@@ -94,6 +110,17 @@ export class BuildReport {
     for (const [row, holds] of Object.entries(readiness)) {
       if (holds(food)) counts.set(row, (counts.get(row) ?? 0) + 1);
     }
+  }
+
+  /** A written food from `source`, in the source's `category`, was put in `group` (MM-616). */
+  countGroup(source: string, category: string | undefined, group: FoodGroup | undefined): void {
+    const key = group ?? 'none';
+    this.groups.set(key, (this.groups.get(key) ?? 0) + 1);
+    if (category === undefined) return;
+    this.categorised += 1;
+    if (foodGroupByCategory.has(categoryKey(category))) return;
+    const unmapped = `${source}: ${category.trim()}`;
+    this.unmappedCategories.set(unmapped, (this.unmappedCategories.get(unmapped) ?? 0) + 1);
   }
 
   countRead(source: string): void {
@@ -154,6 +181,18 @@ export class BuildReport {
       `${this.reconciles ? '' : '  (DOES NOT RECONCILE)'}\n`;
     // Only a build run by the tool (with its expected sources) reports the duplicates line, so an older report compares as it did.
     if (this.expected.length > 0) out += `duplicate winners stating fewer of the grade's inputs than their loser: ${this.duplicateWinnersSparser}\n`;
+    // Only an extract that carries categories reports the groups (MM-616), so an older report compares as it did.
+    if (this.categorised > 0) out += this.formatGroups();
+    return out;
+  }
+
+  /** Written foods per food group, then every unmapped source category, most foods first (MM-616). */
+  private formatGroups(): string {
+    let out = 'food groups:\n';
+    for (const group of [...FoodGroup.values, 'none' as const]) out += `    ${group}: ${this.groups.get(group) ?? 0}\n`;
+    const unmapped = [...this.unmappedCategories.entries()].sort((a, b) => b[1] - a[1] || compareStrings(a[0], b[0]));
+    out += `unmapped source categories (no group; add them to foodGroupTable): ${unmapped.length}\n`;
+    for (const [category, count] of unmapped) out += `    ${category}: ${count}\n`;
     return out;
   }
 

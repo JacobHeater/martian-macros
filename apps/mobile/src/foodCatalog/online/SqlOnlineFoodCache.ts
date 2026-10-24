@@ -1,3 +1,4 @@
+import type { FoodGroup } from '../../domain/food/FoodGroup';
 import { FormatError } from '../../lang/FormatError';
 import type { SqlDatabase } from '../../sql/SqlDatabase';
 import type { SqlRow } from '../../sql/SqlRow';
@@ -70,9 +71,13 @@ export class SqlOnlineFoodCache implements OnlineFoodCache {
     await this.db.execute(`DELETE FROM ${table}`);
   }
 
-  async search(query: string, { limit = 25, offset = 0 }: { limit?: number; offset?: number } = {}): Promise<SearchHit[]> {
+  async search(
+    query: string,
+    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+  ): Promise<SearchHit[]> {
     const words = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
-    if (words.length === 0) return [];
+    // A food found online carries no group (MM-616), so it is in none.
+    if (words.length === 0 || group !== undefined) return [];
     const where = words.map(() => "(lower(name) LIKE ? OR lower(coalesce(brand, '')) LIKE ?)").join(' AND ');
     const params = words.flatMap((w) => [`%${w}%`, `%${w}%`]);
     const rows = await this.db.select(`SELECT * FROM ${table} WHERE ${where} ORDER BY name, id LIMIT ? OFFSET ?`, [
