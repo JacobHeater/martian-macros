@@ -7,6 +7,8 @@ related: [MM-262, MM-48, MM-104]
 
 # Bug: a snack carrying Undo expires after four seconds
 
+*Superseded by MM-601 (the owner, 2026-10-24): every snack, one with Undo too, now goes after ten seconds.*
+
 ## What the walk found
 
 The snack auto-dismisses in four seconds even when it carries the only

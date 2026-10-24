@@ -853,9 +853,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       {searching ? <MmTextField label="Search foods" value={search} onChange={setSearch} /> : null}
       {searching && query === '' ? (
         <>
-          {/* The person's own AI, one press from a meal's "+" rather than inside Estimate (MM-598). */}
+          {/* The person's own AI, one press from a meal's "+" rather than inside Estimate (MM-598): 12 px from the
+              search and from the row under it, which fills the same width (MM-600). */}
+          <div className="app-gap-small" />
           <MmButton label="AI meal analysis" kind="secondary" icon="assistant" expand onPress={() => setStep({ at: 'analyzing' })} />
-          <div className="app-row food-chips">
+          <div className="app-row food-chips food-chips-fill">
             <MmButton label="Scan" kind="secondary" icon="barcode" onPress={() => setStep({ at: 'scanning' })} />
             <MmButton label="Saved" kind="secondary" icon="history" onPress={() => setStep({ at: 'myFoods' })} />
             <MmButton label="Estimate" kind="secondary" icon="food" onPress={() => setStep({ at: 'estimating' })} />

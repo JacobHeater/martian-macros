@@ -167,5 +167,5 @@ Scenario: Saved for later
   `logged_meal_name`, `evidence_kind` and `evidence_citation` to the food log.
 - Tests: `test/domain/mealAnalysis.test.ts` (reading, the citation rule, the checks, the entry, the fix
   message, the prompt's own example), `test/food/analyzeMeal.test.tsx` (every scenario above),
-  `test/platform/navigatorClipboard.test.ts`, the food repository contract (MM-586 cases) and
+  `test/platform/navigatorClipboard.test.tsx`, the food repository contract (MM-586 cases) and
   `test/data/upgrade.test.ts` (version 25 to 26).

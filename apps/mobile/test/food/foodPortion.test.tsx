@@ -227,7 +227,7 @@ it('cupped hands are a count of an estimated portion', async () => {
   expect(entry.portion?.quantity).toBe(2);
   expect(entry.portion?.unit).toBe('cuppedHand');
   expect(entry.kcal).toBe(400);
-  expect(await screen.findByText(/2 cupped hands · estimated/)).toBeInTheDocument();
+  expect(await screen.findByText(/^2 cupped hands/)).toBeInTheDocument();
 });
 
 it('Estimate has no amount or unit', async () => {

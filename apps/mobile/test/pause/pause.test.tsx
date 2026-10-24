@@ -55,7 +55,7 @@ it('a paused day is never called over', async () => {
   expect(screen.getByText(/Paused until/)).toBeInTheDocument();
   // "Recovery" and "discovery" are not the word.
   expect(shown()).not.toMatch(/\bover\b/);
-  expect(screen.getByText('3,400')).toBeInTheDocument();
+  expect(screen.getByText('3,400', { selector: '.food-hero-figure' })).toBeInTheDocument();
 });
 
 it('the same day without a pause is over', async () => {

@@ -71,7 +71,7 @@ export function IntakeTimeline({ steps, targetKcal, targetWord = 'target', band,
     });
 
   const said = [
-    steps.length === 0 ? 'Nothing logged yet.' : `${Fmt.whole(total)} kcal eaten`,
+    `${Fmt.whole(total)} kcal eaten`,
     ...ends.map((step) => `${Fmt.whole(step.total)} after ${mealLabel(step.meal).toLowerCase()}${step.approximate ? '' : ` at ${minuteOfDayText(step.minute)}`}`),
     ...(targetKcal === undefined ? [] : [`${targetWord} ${Fmt.whole(targetKcal)}`]),
     ...(crossed === undefined ? [] : [`passed at ${mealLabel(crossed.meal).toLowerCase()}`]),

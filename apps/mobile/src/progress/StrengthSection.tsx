@@ -70,7 +70,8 @@ export function StrengthSection() {
   else if (recent.length === 0) summary = 'No qualifying sessions in the last 90 days.';
   else summary = `${recent.length === 1 ? '1 lift' : `${recent.length} lifts`} over the last 90 days.`;
   return (
-    <MmSection icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
+    // Keyed apart from the loading and failed sections, so it starts folded as it says and not as the loading one was left.
+    <MmSection key="trends" icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
       {all.length === 0 ? (
         <ChartPlaceholder text="No strength history yet. Finish a workout in Train; each lift you train gets a line here." />
       ) : (

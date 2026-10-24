@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -36,17 +36,20 @@ async function openFood(): Promise<void> {
 const marker = (meal: string) =>
   screen.getByRole('region', { name: meal }).querySelector('[aria-label="A solid serving of protein"]');
 
+/** The meal's subtotal in the entries' letters (MM-563): "P 30 · C 30 · F 10". */
+const subtotal = (meal: string) => screen.getByRole('region', { name: meal }).querySelector('.food-meal-total');
+
 it('at Full, a lunch with 30 g carries the marker', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(await screen.findByText(/30 g protein/)).toBeInTheDocument();
+  await waitFor(() => expect(subtotal('Lunch')).toHaveTextContent(/^P 30 · /));
   expect(marker('Lunch')).not.toBeNull();
 });
 
 it('the marker, pressed, says what it means and what earns it (MM-597)', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  await screen.findByText(/30 g protein/);
+  await waitFor(() => expect(subtotal('Lunch')).toHaveTextContent(/^P 30 · /));
   const lunch = marker('Lunch');
   if (!(lunch instanceof HTMLElement)) throw new Error('no marker on lunch');
   await userEvent.click(lunch);
@@ -59,7 +62,7 @@ it('the marker, pressed, says what it means and what earns it (MM-597)', async (
 it('a meal without it shows nothing in its place', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(await screen.findByText(/6 g protein/)).toBeInTheDocument();
+  await waitFor(() => expect(subtotal('Breakfast')).toHaveTextContent(/^P 6 · /));
   expect(marker('Breakfast')).toBeNull();
 });
 
@@ -72,7 +75,8 @@ it('at Standard no meal has a marker', async () => {
 it('no meal ever shows a protein target', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  const headers = (await screen.findAllByText(/g protein/)).map((line) => line.textContent ?? '').join(' ').toLowerCase();
+  await waitFor(() => expect(document.querySelectorAll('.food-meal-total').length).toBeGreaterThan(0));
+  const headers = Array.from(document.querySelectorAll('.food-meal-total'), (line) => line.textContent ?? '').join(' ').toLowerCase();
   expect(headers).not.toBe('');
   for (const word of ['target', 'of ', '/', 'goal', 'min']) expect(headers, word).not.toContain(word);
 });
@@ -82,6 +86,6 @@ it('for a heavy person the marker is per kg of reference weight', async () => {
   await repos.weights.saveWeight(today, 130);
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(await screen.findByText(/30 g protein/)).toBeInTheDocument();
+  await waitFor(() => expect(subtotal('Lunch')).toHaveTextContent(/^P 30 · /));
   expect(marker('Lunch')).not.toBeNull();
 });

@@ -48,7 +48,7 @@ it('Standard shows the macros and no extras', async () => {
   await openFood();
   // Carbs are shown net by default (MM-396): 40 g less 16 g fiber.
   expect(screen.getAllByText('Net carbs').length).toBeGreaterThan(0);
-  expect(screen.getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
+  expect(within(screen.getByRole('button', { name: 'Edit Lentils' })).getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
   expect(document.querySelector('.food-entry-extras')).toBeNull();
 });
 
@@ -56,7 +56,7 @@ it('Standard shows the macros and no extras', async () => {
 it('Full keeps the row to name, macros and amount', async () => {
   await repos.preferences.saveDetailLevel('full');
   await openFood();
-  expect(screen.getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
+  expect(within(screen.getByRole('button', { name: 'Edit Lentils' })).getByText(/P 18 · C 24 · F 1/)).toBeInTheDocument();
   expect(screen.queryByText(/Fiber 16 g/)).not.toBeInTheDocument();
   expect(document.querySelector('.food-entry-extras')).toBeNull();
 });
@@ -64,7 +64,7 @@ it('Full keeps the row to name, macros and amount', async () => {
 it('Simple hides carbohydrate and fat, not the data', async () => {
   await repos.preferences.saveDetailLevel('simple');
   await openFood();
-  expect(await screen.findByText('P 18')).toBeInTheDocument();
+  expect(within(screen.getByRole('button', { name: 'Edit Lentils' })).getByText('P 18')).toBeInTheDocument();
   // The hero shows protein alone, with no Grams/Split switch (MM-179): carbs and fat are named nowhere in it.
   const hero = document.querySelector('.mm-hero');
   expect(hero).not.toHaveTextContent('Carbs');

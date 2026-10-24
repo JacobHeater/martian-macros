@@ -1597,7 +1597,8 @@
           "MM-101",
           "MM-224",
           "MM-242",
-          "MM-453"
+          "MM-453",
+          "MM-601"
         ]
       },
       "sequence": [
@@ -1893,6 +1894,13 @@
             "MM-422"
           ],
           "milestone": "M2"
+        },
+        {
+          "step": 22,
+          "title": "Every snack goes by itself after ten seconds, Undo too (the owner, 2026-10-24, MM-601, replacing MM-272's waiting snack)",
+          "tickets": [
+            "MM-601"
+          ]
         }
       ],
       "gate": {
@@ -2581,6 +2589,7 @@
           "MM-597",
           "MM-598",
           "MM-599",
+          "MM-600",
           "MM-589",
           "MM-590",
           "MM-591",
@@ -2796,6 +2805,7 @@
             "MM-597",
             "MM-598",
             "MM-599",
+            "MM-600",
             "MM-588"
           ]
         },

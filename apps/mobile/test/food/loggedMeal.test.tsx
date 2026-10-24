@@ -87,7 +87,7 @@ it('View meal shows each food with where its numbers came from', async () => {
   expect(within(sheet).getByText(/^522 kcal · /)).toBeInTheDocument();
   // The grade on a row of its own, said what it is; the sheet's ✕ closes it, with no second Close beside Delete meal.
   expect(within(sheet).getByText('Meal grade')).toBeInTheDocument();
-  expect(within(sheet).queryByRole('button', { name: 'Close' })).toBeNull();
+  expect(within(sheet).getAllByRole('button', { name: 'Close' }), 'only the sheet’s ✕').toHaveLength(1);
 });
 
 it('View meal shows the meal’s macro split, drawn again from the foods that remain when one is removed (MM-597)', async () => {
@@ -96,7 +96,7 @@ it('View meal shows the meal’s macro split, drawn again from the foods that re
   expect(within(sheet).getByText('Macro split')).toBeInTheDocument();
   const ring = within(sheet).getByRole('img', { name: /^Logged macronutrient energy split\. / });
   const before = ring.getAttribute('aria-label') ?? '';
-  expect(before).toMatch(/Protein: .+ · .+%\. Carbs: .+ · .+%\. Fat: .+ · .+%\.$/);
+  expect(before).toMatch(/Protein: .+ · .+%\. Net carbs: .+ · .+%\. Fat: .+ · .+%\.$/);
   await press(sheet, 'More actions for White rice');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }));
   await expect
@@ -124,7 +124,7 @@ it('a slot’s menu opens the macro split of everything in it, its meal’s food
   const ring = within(sheet).getByRole('img', { name: /^Logged macronutrient energy split\. / });
   const meal = new LoggedMeal((await logged()).filter((entry) => entry.loggedMeal !== undefined));
   const fat = meal.fatG + 14;
-  const energy = meal.proteinG * 4 + meal.carbsG * 4 + fat * 9;
+  const energy = meal.proteinG * 4 + meal.netCarbsG * 4 + fat * 9;
   expect(ring.getAttribute('aria-label')).toContain(`Fat: ${Fmt.grams(fat)} · ${toStringAsFixed((100 * fat * 9) / energy, 1)}%`);
 });
 

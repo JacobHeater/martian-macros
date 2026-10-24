@@ -67,7 +67,7 @@ it('the app opens on the dashboard with its destinations', async () => {
   renderApp(repos, today);
   const bar = await screen.findByRole('navigation', { name: 'Destinations' });
   for (const label of ['Dashboard', 'Food', 'Progress', 'Coach']) expect(bar).toHaveTextContent(label);
-  expect(await screen.findByText(/kcal left/)).toBeInTheDocument();
+  expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
 });
 
 it('a normal day shows calories, protein and the trend weight', async () => {

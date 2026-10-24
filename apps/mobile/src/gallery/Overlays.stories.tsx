@@ -41,7 +41,7 @@ export const Sheet: Story = { args: { kind: 'sheet' }, parameters: { shows: /A s
 
 export const SheetBare: Story = { args: { kind: 'sheetBare' }, parameters: { shows: 'The sheet on its own.' } };
 
-/** MM-272: a snack with nothing to press goes after four seconds. */
+/** MM-272, MM-601: a snack with nothing to press goes after ten seconds. */
 export const Snack: Story = { args: { kind: 'snack' }, parameters: { shows: 'Saved.' } };
 
 /** MM-272: a snack with Undo waits, with a Dismiss beside it. */
