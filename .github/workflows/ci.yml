@@ -12,7 +12,8 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # The tests alone take about 20 minutes now (2026-10-24), then the stories, the build and Android's.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
