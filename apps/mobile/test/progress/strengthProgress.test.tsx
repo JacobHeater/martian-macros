@@ -158,6 +158,8 @@ it('the detail chart includes older history', async () => {
   const repos = await fresh();
   await repos.workouts.saveWorkout(workout({ daysAgo: 200 }));
   await open(repos);
+  // No lift in the last 90 days: the section starts folded (MM-578), and is opened by its header.
+  await userEvent.click(screen.getByRole('button', { name: /^Strength trends/ }));
   await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
   await userEvent.click(await screen.findByRole('button', { name: /^Barbell bench press/ }));
   const chart = await within(topLayer()).findByRole('img', { name: /history, / });
