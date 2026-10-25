@@ -10,10 +10,14 @@ import { gradeOfFoodEntry } from '../gradeOfFoodEntry';
 import type { CoachTrade } from './CoachTrade';
 import type { CoachTradeFood } from './CoachTradeFood';
 import type { CoachTradeSource } from './CoachTradeSource';
+import { breadedOrFried } from './swap/breadedOrFried';
+import { readableFood } from './swap/readableFood';
+import { tradeGainOf } from './swap/tradeGainOf';
+import { tradeTargetFor } from './swap/tradeTargetFor';
+import { unbalancedFood } from './swap/unbalancedFood';
 import type { TradeCatalogFood } from './TradeCatalogFood';
 import type { TradeInput } from './TradeInput';
 import { TradeRule } from './TradeRule';
-import type { TradeTarget } from './TradeTarget';
 
 /** A food at the person's usual portion, or a catalog food at its default serving. */
 interface Profile {
@@ -88,7 +92,7 @@ export function findTrades(input: TradeInput): CoachTrade[] {
   const ranked: Ranked[] = [];
   for (const x of xFoods(input, snoozed)) {
     for (const y of yFoods(input, x, snoozed)) {
-      const gain = gainOf(motive, x.profile, y.profile);
+      const gain = tradeGainOf(motive, x.profile, y.profile);
       if (gain === undefined) continue;
       const deltaKcal = y.profile.kcal - x.profile.kcal;
       if (!harmless(input, x.profile, y.profile)) continue;
@@ -138,17 +142,13 @@ function gradeRank(grade: FoodGradeLetter | undefined): number {
   return grade === undefined ? FoodGradeLetter.values.length : FoodGradeLetter.values.indexOf(grade);
 }
 
-/** Whether a food's figures can be read: calories, macros explaining most of them, and not a drink of alcohol. */
-function readable(p: Profile): boolean {
-  if (!(p.kcal > 0)) return false;
-  const alcoholKcal = 7 * (p.alcoholG ?? 0);
-  const explained = 4 * p.proteinG + 4 * p.carbsG + 9 * p.fatG + alcoholKcal;
-  return explained >= TradeRule.knownMacrosShare * p.kcal && alcoholKcal < TradeRule.alcoholShare * p.kcal;
-}
-
+const readable = (p: Profile) => readableFood(p);
 const proteinShare = (p: Profile) => (4 * p.proteinG) / p.kcal;
-const fatShare = (p: Profile) => (9 * p.fatG) / p.kcal;
-const proteinPer100Kcal = (p: Profile) => (100 * p.proteinG) / p.kcal;
+/** Fat's share of the energy its macros give: a breaded food's label rarely adds up to its calories. */
+const macroFatShare = (p: Profile) => {
+  const macros = 4 * p.proteinG + 4 * p.carbsG + 9 * p.fatG;
+  return macros > 0 ? (9 * p.fatG) / macros : 0;
+};
 
 function profileOf(entry: FoodEntry): Profile {
   const grade = gradeOfFoodEntry(entry);
@@ -244,24 +244,20 @@ function xFoods(input: TradeInput, snoozed: ReadonlySet<string>): XFood[] {
     if (days < minimumDays) continue;
     const profile = profileOf(usual(entries));
     if (profile.kcal < TradeRule.xMinKcal || !readable(profile)) continue;
+    // A protein food is never X for a protein or fat trade, unless it is breaded or fried (its name's tags), or fat is a
+    // large share of its energy (MM-617): fried chicken, sausage, bacon, chicken thigh with the skin.
     const proteinFood = proteinShare(profile) >= TradeRule.proteinFoodShare;
-    if (proteinFood && (input.motive === 'protein' || input.motive === 'fat')) continue;
+    const replaceable = breadedOrFried(profile.name) || macroFatShare(profile) >= TradeRule.friedProteinFatShare;
+    if (proteinFood && !replaceable && (input.motive === 'protein' || input.motive === 'fat')) continue;
     const origin = entries.find((e) => e.portion?.origin !== undefined)?.portion?.origin;
     found.push({ profile, days, meal: slotOf(entries), origin });
   }
   return found;
 }
 
-/** The band of calories Y may have a time, by the goal. */
-function targetFor(input: TradeInput, x: Profile): TradeTarget {
-  return input.goal === 'leanGain'
-    ? { minKcal: TradeRule.leanGainFloorRatio * x.kcal, maxKcal: undefined }
-    : { minKcal: TradeRule.kcalFloorRatio * x.kcal, maxKcal: TradeRule.kcalCeilingRatio * x.kcal };
-}
-
 /** The foods that may take X's place, in the order they are offered: logged in X's slot, saved, then the catalog. */
 function yFoods(input: TradeInput, x: XFood, snoozed: ReadonlySet<string>): YFood[] {
-  const target = targetFor(input, x.profile);
+  const target = tradeTargetFor(input.goal, x.profile.kcal);
   const inBand = (p: Profile) => p.kcal >= target.minKcal && (target.maxKcal === undefined || p.kcal <= target.maxKcal);
   const own: YFood[] = [];
   const ownKeys = new Set<string>();
@@ -293,35 +289,6 @@ function yFoods(input: TradeInput, x: XFood, snoozed: ReadonlySet<string>): YFoo
   return [...own, ...catalog];
 }
 
-/** What Y gains over X a time for the motive, or undefined when Y does not meet the motive's rules. */
-function gainOf(motive: CoachTrade['motive'], x: Profile, y: Profile): number | undefined {
-  switch (motive) {
-    case 'protein': {
-      const gain = y.proteinG - x.proteinG;
-      const denser = proteinPer100Kcal(y) - proteinPer100Kcal(x) >= TradeRule.proteinDensityGainG;
-      return denser && gain >= TradeRule.proteinGainG ? gain : undefined;
-    }
-    case 'fat': {
-      const drop = x.fatG - y.fatG;
-      const leaner = fatShare(x) - fatShare(y) >= TradeRule.fatShareDrop;
-      return leaner && drop >= TradeRule.fatDropG && y.proteinG >= x.proteinG ? drop : undefined;
-    }
-    case 'calories': {
-      const drop = x.kcal - y.kcal;
-      if (drop < TradeRule.kcalDrop || y.proteinG < x.proteinG) return undefined;
-      if (x.grams !== undefined && y.grams !== undefined && x.grams > 0 && y.grams > 0 && y.kcal / y.grams > x.kcal / x.grams) {
-        return undefined;
-      }
-      return drop;
-    }
-    case 'sodium': {
-      if (x.sodiumMg === undefined || y.sodiumMg === undefined || !(x.sodiumMg > 0)) return undefined;
-      const lower = (100 * y.sodiumMg) / y.kcal <= TradeRule.sodiumDensityRatio * ((100 * x.sodiumMg) / x.kcal);
-      return lower ? x.sodiumMg - y.sodiumMg : undefined;
-    }
-  }
-}
-
 /** Y does no harm on the other findings in change, is no lower a grade band, and is not itself mostly fat or light on protein. */
 function harmless(input: TradeInput, x: Profile, y: Profile): boolean {
   if (input.activeSignals.has(TradeRule.sodiumSignal) && x.sodiumMg !== undefined) {
@@ -331,7 +298,5 @@ function harmless(input: TradeInput, x: Profile, y: Profile): boolean {
     if (y.fiberG === undefined || y.fiberG < x.fiberG - TradeRule.fiberDropG) return false;
   }
   if (x.grade !== undefined && y.grade !== undefined && y.grade.charAt(0) > x.grade.charAt(0)) return false;
-  const mostlyFat = fatShare(y) >= TradeRule.mostlyFatShare && y.kcal >= TradeRule.mostlyFatMinKcal && proteinShare(y) < TradeRule.proteinFoodShare;
-  const lightOnProtein = proteinShare(y) < TradeRule.lightOnProteinShare && y.kcal >= TradeRule.lightOnProteinMinKcal;
-  return !mostlyFat && !lightOnProtein;
+  return !unbalancedFood(y);
 }

@@ -11,6 +11,8 @@ export const TradeRule = {
   knownMacrosShare: 0.75,
   /** A protein food (this share of energy from protein) is never X for a protein or fat trade. */
   proteinFoodShare: 0.2,
+  /** …unless it is breaded or fried (its name's tags), or has at least this share of its macros' energy from fat (MM-617). */
+  friedProteinFatShare: 0.4,
   /** Alcohol (this share of a food's energy) is never an X or a Y. */
   alcoholShare: 0.5,
   /** A food the person logs: in X's meal slot on at least this many days of the history. */

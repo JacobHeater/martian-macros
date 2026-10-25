@@ -201,13 +201,33 @@ describe('findTrade (MM-607)', () => {
     expect(findTrade(input({ goal: 'leanGain', history: [...span, ...logged(bigger, [-3, -2])] }))?.y.name).toBe('Yogurt bowl');
   });
 
-  it('a protein food is never X for a protein or fat trade', () => {
+  it('a lean protein food is never X for a protein or fat trade', () => {
+    // Fat under 40% of its energy, and neither breaded nor fried: chicken breast would be a fat trade if it could be X.
+    const meatballs: Food = { name: 'Turkey meatballs', meal: 'lunch', kcal: 300, proteinG: 40, carbsG: 10, fatG: 12.4 };
+    const breast: Food = { name: 'Chicken breast', meal: 'lunch', kcal: 280, proteinG: 45, carbsG: 15, fatG: 4 };
+    const span = logged(meatballs, granolaDays);
+    const history = [...span, ...logged(breast, [-4, -2, 1])];
+    expect(findTrade(input({ motive: 'fat', spanEntries: span, history }))).toBeUndefined();
+    expect(findTrade(input({ motive: 'protein', spanEntries: span, history }))).toBeUndefined();
+    expect(findTrade(input({ motive: 'calories', spanEntries: span, history }))).toBeUndefined();
+  });
+
+  it('a protein food that is breaded or fried, or mostly fat, can be X (MM-617)', () => {
+    // Chicken thigh with the skin: 66% of its macros' energy from fat.
     const thigh: Food = { name: 'Chicken thigh', meal: 'lunch', kcal: 300, proteinG: 25, carbsG: 0, fatG: 22 };
     const breast: Food = { name: 'Chicken breast', meal: 'lunch', kcal: 250, proteinG: 45, carbsG: 1, fatG: 6 };
     const span = logged(thigh, granolaDays);
     const history = [...span, ...logged(breast, [-4, -2, 1])];
-    expect(findTrade(input({ motive: 'fat', spanEntries: span, history }))).toBeUndefined();
-    expect(findTrade(input({ motive: 'protein', spanEntries: span, history }))).toBeUndefined();
+    expect(findTrade(input({ motive: 'fat', spanEntries: span, history }))).toMatchObject({ x: { name: 'Chicken thigh' }, y: { name: 'Chicken breast' } });
+    // A breaded cutlet with fat a third of its energy: replaceable because it is breaded.
+    const cutlet: Food = { name: 'Breaded chicken cutlet', meal: 'lunch', kcal: 350, proteinG: 35, carbsG: 25, fatG: 12 };
+    const grilled: Food = { name: 'Grilled chicken breast', meal: 'lunch', kcal: 280, proteinG: 50, carbsG: 0, fatG: 6 };
+    const cutlets = logged(cutlet, granolaDays);
+    const withGrilled = [...cutlets, ...logged(grilled, [-4, -2, 1])];
+    expect(findTrade(input({ motive: 'protein', spanEntries: cutlets, history: withGrilled }))).toMatchObject({
+      x: { name: 'Breaded chicken cutlet' },
+      y: { name: 'Grilled chicken breast' },
+    });
   });
 
   it('a fat trade keeps protein and lowers the fat share', () => {

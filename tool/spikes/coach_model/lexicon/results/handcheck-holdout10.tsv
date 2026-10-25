@@ -1,0 +1,201 @@
+source	name	tags
+usda_sr_legacy	Pork, fresh, loin, tenderloin, separable lean only, with added solution, cooked, roasted	roasted leanProtein
+usda_branded	CINNAMON RAISIN OAT & FRUIT COOKIES, CINNAMON RAISIN	dessert
+off	Brioche style bakery bread	refinedGrain pastry
+usda_branded	PREMIUM BAR ROOM BLITZ	snackFood
+off	Crispy Wafers With Cocoa And Chocolate Cream Filling	dessert
+usda_branded	PEACHES & CREAM OATMEAL MIX-INS, PEACHES & CREAM	creamy wholeGrain
+off	Takuwan pickled radish	vegetable
+off	FREE SHAREABLE Mike Ike Original Fruits Chewy Asso	fruit
+usda_branded	PREMIUM CAKE MIX, LEMON	dessert
+usda_branded	PRIVATE SELECTION, ICE CREAM, CARAMEL HAZELNUT FUDGE TRUFFLE	dessert
+usda_branded	NO PULP ORANGE JUICE WITH OMEGA 3, NO PULP ORANGE WITH OMEGA 3	sugaryDrink
+usda_branded	SEASONED WEDGE CUT FRENCH FRIED POTATOES, SEASONED WEDGE CUT	fried vegetable
+usda_sr_legacy	Yogurt, vanilla or lemon flavor, nonfat milk, sweetened with low-calorie sweetener, fortified with vitamin D	dairy
+usda_sr_legacy	Beef, round, eye of round roast, boneless, separable lean only, trimmed to 0" fat, all grades, raw	raw leanProtein
+usda_branded	BUFFALO WINGS WITH RANCH FLAVORED POTATO CRISPS, BUFFALO WINGS WITH RANCH	fattyMeat snackFood
+usda_branded	MAC & CHEESE WITH BBQ PULLED PORK	sauced creamy cheesy fattyMeat refinedGrain
+usda_sr_legacy	Pancakes, special dietary, dry mix	refinedGrain
+usda_branded	VEGETABLE & FRUIT SAUCE (SEMI-SWEET)	sauced vegetable
+usda_sr_legacy	McDONALD'S, McFLURRY with M&M'S CANDIES	dessert candy fastFood restaurant
+usda_fndds	Corn nuts	nut vegetable
+usda_branded	VALUED NATURALS CHIA SEEDS, 11.5 OZ	nut
+usda_sr_legacy	McDONALD'S, Fruit 'n Yogurt Parfait (without granola)	dairy fastFood restaurant
+usda_branded	ROASTED GARLIC & OLIVE OIL LONG GRAIN & WILD RICE, ROASTED GARLIC & OLIVE OIL	wholeGrain
+usda_sr_legacy	KFC, Fried Chicken, ORIGINAL RECIPE, Skin and Breading	fried breaded fastFood restaurant
+usda_branded	Bush's Purple Hull Peas 15.8 oz	vegetable
+usda_branded	SQUARES CARAMEL CHOCOLATE COLLECTION, CARAMEL	candy
+usda_branded	SICILIAN LEMON & DILL MAYO	sauced creamy
+usda_branded	GRILLERS VEGGIE CRUMBLES, GRILLERS	vegetable
+usda_sr_legacy	Sweet potato, cooked, boiled, without skin	steamed vegetable
+usda_branded	CRANBERRY & CANDIED WALNUT SPRING MIX, DRIED CRANBERRIES, CANDIED WALNUTS, FETA CHEESE, FLATBREAD STRIPS, DOLE'S RASPBERRY VINAIGRETTE, CRANBERRY & CANDIED WALNUT	cheesy vegetable salad refinedGrain
+off	Tabasco Scorpion Sauce	sauced
+usda_branded	TAILGATE TACOS FLAVORED POTATO CHIPS, TAILGATE TACOS	fried snackFood
+usda_branded	SWEET ITALIAN FRESH SAUSAGE, SWEET ITALIAN	processedMeat
+usda_branded	Crispy Steak Blue Label Fully Cooked Breaded Beef Steak Fritters	fried breaded fattyMeat
+usda_branded	LOBSTER GOURMET RAVIOLI, LOBSTER	leanProtein seafood refinedGrain
+usda_branded	SPROUTED MULTI GRAIN BREAD, MULTI GRAIN	refinedGrain
+usda_branded	ITALIAN GREEN BEANS CUT	vegetable
+usda_sr_legacy	Cereals, QUAKER, Oat Bran, QUAKER/MOTHER'S Oat Bran, dry	wholeGrain
+off	the bossy gourmet hatch red Chile sauce	sauced
+usda_branded	NAVY BEANS, NAVY	legume
+usda_branded	GELATO SORBET, MINT STRACCIATELLA	dessert
+usda_branded	ORGANIC DRIED APPLES	fruit
+usda_sr_legacy	Crustaceans, crayfish, mixed species, farmed, cooked, moist heat	leanProtein seafood
+off	Bridgford, real snack bites, pepperoni	snackFood
+usda_branded	CHEDDAR CHEESE ORGANIC BITE SIZE SANDWICH MINIS, CHEDDAR CHEESE	cheesy refinedGrain
+usda_branded	LUVO, CHICKEN IN BBQ SAUCE	sauced leanProtein
+usda_branded	LIGHT JUICE BEVERAGE	sugaryDrink
+usda_branded	SUPERFOOD BABY BEETS, SUNFLOWER MICROS & KALE BLEND, SUPERFOOD	nut vegetable
+usda_branded	EXTREME TORTILLA CHIPS	fried snackFood
+usda_branded	SLICED COTTAGE BREAD	refinedGrain
+usda_sr_legacy	Corn, sweet, white, raw	raw vegetable
+usda_branded	VEGGIE BACON & POTATO FRITTATA	processedMeat egg
+off	Qualified Belgian-style quadruple ale	alcohol
+usda_branded	APPLE JUICE, APPLE	sugaryDrink
+usda_branded	Tyson Uncooked Split Cornish Hens, 24 Pieces per case, 10 Lb.	leanProtein
+usda_branded	CHERRY COLA CAFFEINATED SPARKLING WATER, CHERRY COLA	dietDrink
+usda_branded	ALFREDO CHICKEN GRILLED WHITE MEAT CHICKEN WITH PASTA IN AN ALFREDO CHEESE SAUCE WITH CARROTS, BROCCOLI AND PEAS, ALFREDO CHICKEN	sauced creamy cheesy grilled vegetable refinedGrain
+usda_branded	BACON BREAKFAST BURRITOS WITH PICO DE GALLO, SPICY SALSA AND RANCH, BACON	sauced creamy processedMeat refinedGrain
+usda_branded	SUJA, FRUIT JUICE DRINK, MAPLE SYRUP LEMON	sugaryDrink
+usda_branded	DARK CHOCOLATE ALMOND BARS, DARK CHOCOLATE	candy
+usda_branded	BUTTERNUT SQUASH & SAGE RAVIOLIS FILLED WITH SWEET BUTTERNUT SQUASH, A BLEND OF THREE CHEESES AND HONEY IN A BROWN BUTTER SAGE SAUCE, BUTTERNUT SQUASH & SAGE	sauced cheesy dairy vegetable
+usda_branded	INSTANT HOT COCOA MIX WITH MARSHMALLOWS, MARSHMALLOWS	sugaryDrink
+usda_branded	GOLDEN VALLEY NATURAL, TURKEY JERKY, TERIYAKI	processedMeat
+usda_sr_legacy	Hyacinth beans, mature seeds, cooked, boiled, with salt	steamed legume
+usda_sr_legacy	Alcoholic Beverage, wine, table, red, Sangiovese	alcohol
+usda_branded	STRAWBERRY BANANA SHORTCAKE STRAWBERRY SHORTCAKE AND BANANA ICE CREAMS WITH STRAWBERRIES AND CAKE PIECES, STRAWBERRY BANANA SHORTCAKE	dessert
+off	risotto al formaggio	creamy refinedGrain
+usda_branded	JACKIE'S COOKIE CONNECTION, COOKIE BABIES, CHOCOLATE CHOCOLATE CHIP, CHOCOLATE CHOCOLATE CHIP	dessert
+usda_branded	HICKORY SMOKED HONEY HAM	processedMeat
+off	Angus roasted beef	roasted fattyMeat
+off	Plant-Based Herb & Garlic Broth	soup
+usda_branded	DESSERT KIT, TWINKIES INSTANT PUDDING, CREAM FILLING MIX	dessert
+usda_branded	AHOLD, SPINACH DIP	creamy
+usda_fndds	Sweet potato, boiled, fat added	steamed vegetable
+usda_fndds	Pizza with extra meat, thin crust	cheesy refinedGrain
+usda_branded	STRAWBERRY CHEESECAKE CUPS, STRAWBERRY	dessert
+off	Italian wedding almonds and amaretto	nut
+usda_fndds	Soup, tomato	vegetable soup
+usda_branded	FIRE! SAUCE	sauced
+usda_branded	HIGHLAND POP, SLIM KIM POPCORN	snackFood
+off	Coffee Caramel Stroopwafel	sugaryDrink
+usda_branded	CHOCOLATEY DIPPED MARSHMALLOW CANDY CONFETTI EGGS, CHOCOLATEY DIPPED MARSHMALLOW	egg candy
+usda_branded	JARRITOS, SODA, MANDARIN	sugaryDrink
+usda_branded	FROSTED STRAWBERRY MILKSHAKE FLAVORED 25% LESS SUGAR TOASTER PASTRIES, FROSTED STRAWBERRY MILKSHAKE	pastry
+usda_sr_legacy	Pasta, homemade, made without egg, cooked	refinedGrain
+usda_fndds	Egg sandwich on biscuit, with sausage and cheese	cheesy processedMeat egg refinedGrain pastry
+off	Tri-colored rotini enriched macaroni product	refinedGrain
+usda_sr_legacy	Beef, ground, 85% lean meat / 15% fat, patty, cooked, pan-broiled	grilled fattyMeat
+usda_sr_legacy	Peas and onions, canned, solids and liquids	vegetable
+usda_branded	DIVINE, MILK CHOCOLATE WITH TOFFEE & ESPRESSO	candy
+usda_branded	RASPBERRY WHIPPED FROZEN GREEK YOGURT BARS, RASPBERRY	dessert
+usda_branded	STRAWBERRY PREMIUM STRAWBERRY CHEESECAKE ICE CREAM WITH A DECADENT STRAWBERRY SWIRL TOPPED WITH A MILK CHOCOLATE FLAVORED COOKIE CRUNCH COATING CHEESECAKE ICE CREAM BARS, STRAWBERRY	dessert
+usda_branded	BOSCOLI FAMILY, JALAPENO OLIVE SALAD	salad
+usda_branded	COLBY JACK COLBY & MONTEREY JACK CHEESE SNACK STICKS, COLBY JACK	cheesy processedMeat
+usda_branded	CHOCOLATE MINI BROWNIES	dessert
+usda_branded	WEIS QUALITY, ITALIAN LIGHT DRESSING, LIGHT	sauced
+usda_branded	GARLIC & HERB SHIRATAKI PASTA	refinedGrain
+usda_branded	SPICY BLOODY MARY PICKLES	alcohol
+usda_fndds	Tea, iced, brewed, black, pre-sweetened with sugar	sugaryDrink
+usda_sr_legacy	Sauce, peanut, made from peanut butter, water, soy sauce	sauced
+off	Tableta de Chocolate Blanco	candy
+usda_branded	Kellogg's Rice Krispies Treats Squares Cocoa With M&M 1.94oz	dessert
+usda_branded	THE HONEST STAND, CHEESY SAUCE, ALFREDO, ALFREDO	sauced
+usda_fndds	Energy drink (XS Gold Plus)	sugaryDrink
+off	Too San Imitation Noodles	refinedGrain
+usda_branded	TWICE BAKED POTATOES WITH BACON & CHIVES	baked processedMeat
+usda_fndds	Taco or tostada salad with chicken	fried salad
+usda_branded	TROPICAL FLAVORED ICED TEA, TROPICAL	sugaryDrink
+usda_branded	THE BAKERY BAKED WITH PRIDE, COOKIES, ICED SHAMROCK	baked dessert
+usda_branded	MONTCHEVRE, BUCHERON, SOFT RIPENED GOAT CHEESE	cheesy dairy
+usda_branded	MUSSELS IN TOMATO GARLIC SAUCE, TOMATO GARLIC	sauced leanProtein seafood vegetable
+usda_branded	MINI CHOCOLATE GELATO	dessert
+usda_branded	POW POW SAUCE	sauced
+usda_branded	Kellogg's Froot Loops Cereal Reduced Sugar 1oz	refinedGrain
+usda_branded	HONEY BOURBON MARINATED SKIRT STEAK, HONEY BOURBON	fattyMeat
+usda_branded	SOUR FLAVOR INFUSED PINEAPPLE, SOUR	fruit
+usda_fndds	Hot chocolate / cocoa, with whipped cream	sugaryDrink
+usda_branded	ORANGE GINGER STIR-FRY SAUCE	sauced
+usda_branded	KASHI CHEWY BARS CHOCOLATE ALMOND 12OZ	snackFood
+usda_sr_legacy	Beef, shoulder pot roast or steak, boneless, separable lean only, trimmed to 0" fat, all grades, raw	raw leanProtein
+usda_branded	KALAMATA OLIVE CIABATTA, KALAMATA OLIVE	refinedGrain
+usda_fndds	Chocolate syrup, light	dessert
+usda_branded	SUPER PREMIUM FOUNTAIN ICE CREAM	dessert
+usda_branded	GREEN TEA BOBA PREMIUM TROPICAL ICE CREAM, GREEN TEA	dessert
+usda_branded	BOLD FLAVOR COCKTAIL SAUCE, BOLD	sauced
+usda_branded	LA CHOY Whole Water Chestnuts 12/15 oz. Can	vegetable
+usda_branded	ARGENTINE RED EASY-PEEL, TAIL-ON WILD JUMBO RAW SHRIMP, ARGENTINE RED	raw leanProtein seafood
+usda_branded	SHREDDED DOUBLE CHEDDAR CHEESE BLEND	cheesy dairy
+off	Tops, star fruit	fruit
+usda_branded	CAJUN ROASTED CHICKPEAS, CAJUN	roasted legume
+off	Crispy Marshmallow Squares	candy
+off	Creamy alfredo pasta sauce, creamy alfredo	sauced
+usda_sr_legacy	Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, drained, rinsed in tap water	legume
+usda_branded	08 PEACH MANGO SMART ENERGY DRINK	sugaryDrink
+usda_branded	CANDIED SWEET POTATOES SAUCED YAMS, CANDIED SWEET POTATOES	vegetable
+usda_branded	ORGANIC MILK CHOCOLATE, CARAMEL & SEA SALT	candy
+usda_branded	LINDT, EXCELLENCE DARK CHOCOLATE	candy
+off	Matrashino cherrys	fruit
+usda_branded	GOURMET SPICY ARRABBIATA PASTA SAUCE	sauced
+usda_fndds	Cheese, Parmesan, dry grated, reduced fat	cheesy dairy
+usda_branded	PROBIOTIC FIBER SUPERFOOD SNACKS	snackFood
+usda_branded	VANILLA BEAN NONFAT GREEK YOGURT, VANILLA BEAN	leanProtein dairy
+off	Salt free rice cakes	snackFood
+off	Rice Cracker Sweet Potato Flavor	snackFood
+usda_branded	CANDY CRUSH, MIXED FRUIT GUMMIES, BLUE RASPBERRY, GREEN APPLE, LEMON, CHERRY, ORANGE, GRAPE	sugaryDrink
+usda_branded	DARK CHOCOLATE, BRAZIL NUTS	candy
+usda_branded	STRAWBERRY POPS	fruit
+usda_branded	CREAMERY CHEDDAR, CREAMERY	cheesy dairy
+off	Raw Wild Caught Alaskan Skinless Boneless Cod Fillets	raw leanProtein seafood
+usda_branded	UNCURED TURKEY BREAST FRANKS, UNCURED TURKEY BREAST	processedMeat
+off	Austin grand prize salsa	vegetable
+off	The essential baking company, all natural flourless chocolate tart	candy
+usda_branded	MILK CHOCOLATE CARAMELS WITH SEA SALT	candy
+usda_branded	CHEESE CURD BRAT SMOKED SAUSAGE WITH CHEESE	cheesy processedMeat
+off	Sandwich Cremed Vanilla with Lemon Creme	creamy refinedGrain
+usda_branded	TORN & GLASSER, YOGURT RAISINS	candy
+usda_branded	Betty Crocker Delights Super Moist Lemon Cake Mix	dessert
+usda_branded	PEANUT BUTTER & PLANTAIN CHIPS SNACK COLLECTION, PEANUT BUTTER, CASHEWS, DRIED CRANBERRIES, PLANTAIN CHIPS, POMEGRANATE FRUIT STRIP	candy
+usda_fndds	Corned beef, potatoes, and vegetables including carrots, broccoli, and/or dark-green leafy; no sauce	processedMeat
+off	Lentil dal soup	legume soup
+usda_branded	BBQ PORK RINDS, BBQ	fried fattyMeat snackFood
+off	Clean Greens Cold Pressed Juice	sugaryDrink
+usda_branded	ALL NUTS & CARAMEL COVERED IN MILK CHOCOLATE	candy
+usda_branded	Whole Grain Mini Bagel - Bulk	wholeGrain
+usda_fndds	Pie, pecan	dessert
+usda_branded	7 OZ IQF FLOUNDER FILLETS	leanProtein seafood
+usda_branded	CHOCOLATE CHIP COOKIE ICE CREAM SANSWICH, CHOCOLATE CHIP COOKIE	dessert
+usda_fndds	Seafood garden salad with seafood, lettuce, vegetables excluding tomato and carrots, no dressing	seafood vegetable salad
+usda_branded	HOME STYLE MARINARA SAUCE	sauced
+off	Wawa, Holiday Blend Coffee, 20 Oz	fastFood restaurant
+usda_branded	Banquet Brown 'N Serve Pancake Breakfast, Frozen Meal, 5.02 oz.	refinedGrain
+usda_branded	Diet Cherry Coke Can, 12 fl oz	dietDrink
+usda_branded	SIMPLE PLANT PROTEIN POWDER, CREAMY VANILLA, CREAMY VANILLA	leanProtein
+usda_branded	INSTANT BOUILLON CUBES, BEEF	fattyMeat soup
+usda_foundation	Chicken, breast, boneless, skinless, raw	raw leanProtein
+usda_branded	MINI CRUNCHY BROWN SUGAR OATMEAL COOKIES, MINI CRUNCHY BROWN SUGAR OATMEAL	dessert
+usda_branded	BISQUE, ROASTED RED PEPPER AND SMOKED GOUDA	creamy cheesy roasted vegetable soup
+off	Lemon Rosemary Turkey Tenderloin	leanProtein
+usda_branded	Red Gold Tomato Sauce 29oz	sauced
+usda_branded	POMEGRANATE & ELDERFLOWER SPARKLING WATER, POMEGRANATE & ELDERFLOWER	dietDrink
+usda_branded	HIGH PERFORMANCE ENERGY DRINK	sugaryDrink
+usda_branded	Quaker Big Chewy Chocolate Chip Granola Bars (14-1.48 Ounce) 20.7 Ounce 14 Count Plastic Bags	snackFood
+off	Juvo, Organic Raw Meal, Green Apple	raw fruit
+usda_sr_legacy	Archway Home Style Cookies, Molasses	dessert
+usda_branded	SEASIDE BARBECUE SAUCE	sauced
+usda_branded	FRUIT FLAVORED HALLOWEEN MEGA MIX CHEWY CANDY, FRUIT	candy
+usda_sr_legacy	Winged bean tuber, raw	raw legume
+usda_branded	TRADER JOE'S, ORGANIC LOWFAT YOGURT, BLUEBERRY	dairy
+usda_branded	THE BAKERY BAKED WITH PRIDE, SHORTBREAD COOKIES	baked dessert
+usda_branded	EVERYTHING MUSHROOM, EVERYTHING	vegetable
+usda_branded	FROSTED PRETZELS SALTY PRETZELS COVERED IN DELICIOUS WHITE FUDGE, FROSTED	snackFood
+usda_branded	BIRTHDAY CAKE FLAVORED DRIZZLED GRANOLA CLUSTERS, BIRTHDAY CAKE	wholeGrain
+usda_branded	ALMOND VANILLA CRUNCHY WHOLE GRAIN FLAKES WITH HONEY ROASTED ALMONDS AND VANILLA FLAVOR, ALMOND VANILLA CRUNCH	wholeGrain
+usda_branded	DARK CHOCOLATE CHERRY TRAIL MIX, DARK CHOCOLATE CHERRY	nut snackFood
+usda_branded	DELUXE MACARONI & CHEESE CUP, DELUXE	creamy cheesy refinedGrain
+usda_branded	WISH-BONE, LIGHT VINAIGRETTE DRESSING, RASPBERRY WALNUT, RASPBERRY WALNUT	sauced
+usda_fndds	Shrimp garden salad, shrimp, lettuce, eggs, tomato and/or carrots, other vegetables, no dressing	leanProtein seafood egg vegetable salad
+usda_branded	Totino's Buffalo Chicken Pizza Rolls 160 Count	fried sauced cheesy refinedGrain
+usda_branded	CARAMEL ICE CREAM WITH SEA SALT CARAMEL SWIRL AND CARAMEL FUDGE TRUFFLES	dessert
+usda_branded	ORGANIC EMERALD GREENS CUCUMBER, APPLE, SPINACH, ROMAINE, KALE, LIME, VEGETABLE & FRUIT JUICE BLEND, EMERALD GREENS	sugaryDrink

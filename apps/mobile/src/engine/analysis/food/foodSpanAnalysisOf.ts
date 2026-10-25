@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../../../domain/CalendarDate';
 import type { FoodEntry } from '../../../domain/FoodEntry';
 import type { GoalMode } from '../../../domain/GoalMode';
+import type { Meal } from '../../../domain/Meal';
 import { InsightPriority } from '../../InsightPriority';
 import { dedupeTrendFindings } from '../../trends/dedupeTrendFindings';
 import { evaluateSignal } from '../../trends/evaluateSignal';
@@ -9,15 +10,22 @@ import type { TrendFinding } from '../../trends/TrendFinding';
 import { TrendRule } from '../../trends/TrendRule';
 import type { TrendSpan } from '../../trends/TrendSpan';
 import { TrendTier } from '../../trends/TrendTier';
+import type { CoachAdvice } from '../CoachAdvice';
+import type { CoachAdviceFood } from '../CoachAdviceFood';
+import type { CoachCause } from '../CoachCause';
 import type { CoachFinding } from '../CoachFinding';
 import type { CoachFindingKind } from '../CoachFindingKind';
 import type { CoachFood } from '../CoachFood';
 import type { CoachTrade } from '../CoachTrade';
 import { findTrade } from '../findTrade';
+import { swapFor } from '../swap/swapFor';
+import { adviceFoodOf } from './adviceFoodOf';
+import { dominantDayAdviceOf } from './dominantDayAdviceOf';
 import type { FoodAnalysisInput } from './FoodAnalysisInput';
 import { foodBoundariesOf } from './foodBoundariesOf';
 import { foodDaysOf } from './foodDaysOf';
 import { foodFindingAllowed } from './foodFindingAllowed';
+import { foodGroupOf } from './foodGroupOf';
 import { foodLimitsOf } from './foodLimitsOf';
 import { FoodSignalId } from './FoodSignalId';
 import type { FoodSignalReading } from './FoodSignalReading';
@@ -26,6 +34,7 @@ import { FoodSignalRule } from './FoodSignalRule';
 import { foodTrendSignals } from './foodTrendSignals';
 import { readFoodSignals } from './readFoodSignals';
 import { recordOnOf } from './recordOnOf';
+import { spanAdviceOf } from './spanAdviceOf';
 import { topContributors } from './topContributors';
 
 const R = FoodSignalRule;
@@ -40,6 +49,9 @@ const levelOnly: readonly FoodSignalId[] = [
   'fiber',
   'sodium',
 ];
+
+/** The calorie line a single day can drive (MM-617's meal breakdown of that day). */
+const dayDriven: readonly FoodSignalId[] = ['calories', 'fatAgainstTarget', 'calorieDensity'];
 
 /** A trend is a change by itself only when it is read against the target. A move that stays on the right side of it is not. */
 const againstTarget: readonly string[] = ['levelAgainstTarget', 'longRun'];
@@ -85,6 +97,11 @@ interface Candidate {
  *    `findTrade`) for a change that allows one, from whole, unmarked days.
  *    A diffuse pattern names no food and offers no trade. An
  *    eating-disorder history names no food at all.
+ * 7. **Orders (MM-617):** every fix ends in at least one (`spanAdviceOf`,
+ *    swaps by `swapFor`), after the safeguards; a fix left with none is not
+ *    said. A calorie line driven by one day (`dominantDayAdviceOf`) also
+ *    skips that day's worst food, and names that day's meal as its cause;
+ *    else the top food is the cause.
  *
  * "Holding up" findings come from the table's "holding up when" column, and
  * calories hold up only within the band: nothing praises eating under
@@ -115,7 +132,16 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
       trade,
       trend,
       direction,
-    }: { foods?: readonly CoachFood[]; trade?: CoachTrade | undefined; trend?: TrendFinding | undefined; direction?: TrendDirection | undefined } = {},
+      advice,
+      cause,
+    }: {
+      foods?: readonly CoachFood[];
+      trade?: CoachTrade | undefined;
+      trend?: TrendFinding | undefined;
+      direction?: TrendDirection | undefined;
+      advice?: readonly CoachAdvice[] | undefined;
+      cause?: CoachCause | undefined;
+    } = {},
   ): CoachFinding => ({
     // Stable while the finding holds: the level key of the trend engine (`trendKeyOf`), whichever detector speaks.
     id: kind === 'fix' ? `${signal}:level` : kind === 'dataQuality' ? `${signal}:dataQuality` : `${signal}:holdingUp`,
@@ -130,6 +156,8 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
     foods,
     trade,
     trend,
+    ...(advice === undefined ? {} : { advice }),
+    ...(cause === undefined ? {} : { cause }),
   });
 
   // 1. Data quality.
@@ -323,6 +351,20 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
   };
   const calorieRoom = mean(judged.map((d) => d.intake?.kcal ?? 0)) < mean(judged.map((d) => d.kcalTarget ?? 0));
   const activeSignals = new Set<string>(kept.filter((k) => k.kind === 'fix').map((k) => k.signal));
+  const spanGoal: GoalMode = goal;
+  const swapIn = (slot: Meal | undefined, among: readonly FoodEntry[]) => (food: CoachAdviceFood) =>
+    swapFor({
+      food,
+      group: foodGroupOf(food.key, among, input.catalog),
+      meal: slot,
+      goal: spanGoal,
+      history: historyEntries,
+      catalog: input.catalog,
+      safeguards: input.safeguards,
+      cautions: input.safeguards.cautions,
+    });
+  const dayDrivenFix = kept.some((k) => k.kind === 'fix' && k.direction === 'up' && dayDriven.includes(k.signal));
+  const dominant = dayDrivenFix && !limits.proteinOnly ? dominantDayAdviceOf(unmarked) : undefined;
   const fixes: CoachFinding[] = [];
   const holding: CoachFinding[] = [];
   for (const c of kept) {
@@ -359,8 +401,29 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
       c.kind === 'fix'
         ? { ...c.figures, direction: c.direction === 'down' ? -1 : 1, calorieRoom: calorieRoom ? 1 : 0, tradeDays: unmarked.length }
         : c.figures;
-    const finding = make(c.signal, c.kind, figures, { foods, trade, trend: c.trend, direction: c.direction });
-    (c.kind === 'fix' ? fixes : holding).push(finding);
+    if (c.kind !== 'fix') {
+      holding.push(make(c.signal, c.kind, figures, { foods, trade, trend: c.trend, direction: c.direction }));
+      continue;
+    }
+    // 7. The orders, and what drove it.
+    const driven = c.direction === 'up' && dayDriven.includes(c.signal) ? dominant : undefined;
+    const advice = spanAdviceOf({
+      signal: c.signal,
+      direction: c.direction,
+      figures,
+      foods,
+      trade,
+      entries,
+      history: historyEntries,
+      limits,
+      meal: inSlot ? slot : undefined,
+      swap: swapIn(inSlot ? slot : undefined, entries),
+      extra: driven?.advice ?? [],
+    });
+    if (advice.length === 0) continue;
+    const top = foods[0];
+    const cause: CoachCause | undefined = driven?.cause ?? (top === undefined ? undefined : { food: adviceFoodOf(top.name, entries) });
+    fixes.push(make(c.signal, c.kind, figures, { foods, trade, trend: c.trend, direction: c.direction, advice, cause }));
   }
 
   const tier = (f: CoachFinding) => (f.trend === undefined ? 1 : TrendTier.rank(f.trend.tier));

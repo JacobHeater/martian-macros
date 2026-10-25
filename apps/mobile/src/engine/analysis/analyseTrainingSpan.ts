@@ -10,6 +10,7 @@ import { setsPerMuscleFindings } from './setsPerMuscleFindings';
 import { strengthOnFatLossFindings } from './strengthOnFatLossFindings';
 import { strengthRisingFindings } from './strengthRisingFindings';
 import { strengthStalledFindings } from './strengthStalledFindings';
+import { trainingAdviceOf } from './trainingAdviceOf';
 import type { TrainingAnalysisContext } from './TrainingAnalysisContext';
 import type { TrainingAnalysisInput } from './TrainingAnalysisInput';
 import { trainingDaysFindings } from './trainingDaysFindings';
@@ -31,6 +32,8 @@ import { waterOnTrainingDaysFindings } from './waterOnTrainingDaysFindings';
  * - A signal needing more days than the span is not run here;
  *   `unjudgedTrainingAreas` names its area instead.
  * - A training-stopped notice (T1) suppresses T2 to T9.
+ * - Every fix ends in an order (MM-617, `trainingAdviceOf`); a fix left
+ *   with none is not said.
  *
  * Pure: nothing after `asOf` is read, and nothing is stored.
  */
@@ -51,8 +54,8 @@ export function analyseTrainingSpan(input: TrainingAnalysisInput, span: TrendSpa
   };
   const stopped = trainingStoppedFindings(context);
   const besideTraining = [...proteinByTrainingDayFindings(context), ...waterOnTrainingDaysFindings(context)];
-  if (stopped.some((f) => f.kind === 'fix')) return [...stopped, ...besideTraining];
-  return [
+  if (stopped.some((f) => f.kind === 'fix')) return ordered([...stopped, ...besideTraining], context.restricted);
+  return ordered([
     ...stopped,
     ...trainingDroppedFindings(context),
     ...setsPerMuscleFindings(context),
@@ -62,5 +65,14 @@ export function analyseTrainingSpan(input: TrainingAnalysisInput, span: TrendSpa
     ...trainingDaysFindings(context),
     ...rirUnrecordedFindings(context),
     ...besideTraining,
-  ];
+  ], context.restricted);
+}
+
+/** Each fix with its orders; a fix with none is left out. */
+function ordered(findings: readonly CoachFinding[], restricted: boolean): CoachFinding[] {
+  return findings.flatMap((f) => {
+    if (f.kind !== 'fix') return [f];
+    const advice = trainingAdviceOf(f, restricted);
+    return advice.length === 0 ? [] : [{ ...f, advice }];
+  });
 }

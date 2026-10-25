@@ -38,3 +38,14 @@ export * from './coachTrendSteps';
 export * from './DashboardInsight';
 export * from './selectDashboardInsight';
 export * from './snoozedFoodNames';
+// The coach tells you straight (MM-617): its orders, food language and swaps.
+export * from './CoachAdvice';
+export * from './CoachAdviceFood';
+export * from './CoachAdviceReplacement';
+export * from './CoachAdviceRule';
+export * from './CoachCause';
+export * from './CoachVerdict';
+export * from './coachVerdictOf';
+export * from './trainingAdviceOf';
+export * from './language';
+export * from './swap';
