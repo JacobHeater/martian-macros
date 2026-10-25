@@ -1,0 +1,298 @@
+{
+ "summary": {
+  "model": "Qwen3-1.7B-Q4_K_M",
+  "size_mb": 1056,
+  "passed": 0,
+  "runs": 21,
+  "pass_rate": 0.0,
+  "median_tokens_per_second": 14.5,
+  "median_seconds": 11.0
+ },
+ "runs": [
+  {
+   "scenario": "1-buffet-day",
+   "sample": 0,
+   "text": "The biggest problem is that you ate too much at lunch, specifically the Chinese buffet, which contributed 3229 kcal. The cause was General Tso's chicken, which was in the buffet and contributed 744 kcal. The over_kcal is 1054, which is a significant amount for your goal. You should skip it next time, or take one spoonful. The meal cost you 2368 kcal, which is more than your target of 2175. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You consumed too much sodium, with 6923 mg, which is way above your limit of 1800 mg. You should drink water tonight; next time get sauce on the side. The fiber is low, with only 14 g, which is below your guide of 30 g. You should eat two cups of vegetables at dinner. You are holding up on protein, with",
+   "problems": [
+    "11 sentences"
+   ],
+   "pass": false,
+   "seconds": 29.6,
+   "tokens": 220,
+   "tokens_per_second": 13.3,
+   "prompt_tokens_per_second": 89.2
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 1,
+   "text": "The biggest problem is that you ate too much at lunch, specifically the Chinese buffet, which contributed 3229 kcal. The cause was General Tso's chicken, which was in the buffet and contributed 744 kcal. You overeaten by 1054 kcal. The meal cost you 2368 kcal. Without that meal, you would have eaten 310 kcal less. You need to skip it next time or take one spoonful. The order is to skip it next time, or take one spoonful. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You are holding up on protein, and you need to get 155 g of protein. The sodium is too high, and you need to drink water tonight; next time get sauce on the side. You are not following the plan properly. You are not following the plan properly. You are not following the plan properly. You are not following the plan properly.",
+   "problems": [
+    "14 sentences"
+   ],
+   "pass": false,
+   "seconds": 16.4,
+   "tokens": 220,
+   "tokens_per_second": 13.4,
+   "prompt_tokens_per_second": 14.1
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 2,
+   "text": "The biggest problem is that you ate too much at lunch, specifically the Chinese buffet, which contributed 3229 kcal. The cause was General Tso's chicken, which was in the buffet and contributed 744 kcal. You overeaten by 1054 kcal. The meal cost you 2368 kcal. Without that meal, you would have eaten 310 kcal instead. You need to skip it next time or take one spoonful. The order is to skip it next time, or take one spoonful. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. The sodium is too high, so drink water tonight; next time get sauce on the side. The fiber is short, so two cups of vegetables at dinner. You are holding up on protein, so you need to get 155 g of protein. The goal is fat loss, so you need to focus on that. You are not following the plan, so",
+   "problems": [
+    "13 sentences"
+   ],
+   "pass": false,
+   "seconds": 16.1,
+   "tokens": 220,
+   "tokens_per_second": 13.7,
+   "prompt_tokens_per_second": 13.9
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 0,
+   "text": "The biggest problem is that you ate 2890 kcal today, which is 715 kcal over your target of 2175. The cause was the Chinese buffet for lunch, which provided 1980 kcal. You were supposed to eat 2175 kcal today, but you ate 2890. The meal and food that did the damage is the Chinese buffet, and it cost 1980 kcal. Without that meal, you would have eaten 2175 kcal today. You repeated the mistake on Tuesday, and it is back. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You are over target by 500 kcal or more, and you have 3 days over target this week. You are not allowed to eat less, skip meals, or eat more tomorrow. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables,",
+   "problems": [
+    "10 sentences"
+   ],
+   "pass": false,
+   "seconds": 18.3,
+   "tokens": 220,
+   "tokens_per_second": 14.6,
+   "prompt_tokens_per_second": 87.1
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 1,
+   "text": "The biggest problem is that you ate too much at lunch, specifically the Chinese buffet, which contributed 1980 kcal. This caused an over_target of 715 kcal, which is more than the 500 kcal threshold. The cause_meal is lunch, and the cause_name is Chinese buffet. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You repeated the order to skip the General Tso's chicken on Tuesday, and it is back. You have 3 days over target by 500 kcal or more this week. Skip it, halve it, swap it, add this, stop here, drink water, back to plan. The choice was too much. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You have 3 days over target by 500 kcal or more this week. You repeated the order to skip the General Tso",
+   "problems": [
+    "11 sentences"
+   ],
+   "pass": false,
+   "seconds": 14.9,
+   "tokens": 220,
+   "tokens_per_second": 14.7,
+   "prompt_tokens_per_second": 15.2
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 2,
+   "text": "The biggest problem is that you ate too much at lunch, specifically the Chinese buffet, which contributed 1980 kcal. This caused an over_target of 715 kcal, which is more than the 500 kcal threshold. The cause_meal is lunch, and the cause_name is Chinese buffet. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You repeated the order to skip the General Tso's chicken on Tuesday, and it is back. This is the third day over target by 500 kcal or more this week. Skip it, halve it, swap it, add this, stop here, drink water, back to plan. The choice was too much. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You repeated the order to skip the General Tso's chicken on Tuesday, and it is back. This is the third day over target by",
+   "problems": [
+    "11 sentences"
+   ],
+   "pass": false,
+   "seconds": 15.4,
+   "tokens": 220,
+   "tokens_per_second": 14.3,
+   "prompt_tokens_per_second": 15.4
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 0,
+   "text": "The biggest problem is that you have been eating too much, specifically biscuits and gravy for 9 days, which caused an over_target_days of 9. This food contributed 830 kcal per day, and you ate it 9 days in a row. The meal caused a 420 kcal over per day, which is too much for your goal. You should skip it, halve it, or swap it. The swap was a good idea, but you should have done it on weekdays. You are not getting enough protein, so you should add a protein food at breakfast every day. You are holding up your training, which is important, but you need to focus on your goal. You should drink water and back to plan.",
+   "problems": [
+    "8 sentences"
+   ],
+   "pass": false,
+   "seconds": 14.9,
+   "tokens": 156,
+   "tokens_per_second": 14.3,
+   "prompt_tokens_per_second": 84.9
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 1,
+   "text": "The biggest problem is that you've eaten too much biscuits and gravy for 9 days, which caused an over_target_days of 9. The cause_meal is breakfast, and the cause_food is biscuits and gravy. You ate 830 kcal each day for 9 days, which is too much. The meal cost you 420 kcal per day, and you should have saved 286 kcal per day. Skip it. Halve it. Swap it. Add this. Stop here. The protein_short issue is that you didn't eat enough protein at breakfast. The replacement is Greek yogurt with berries and granola, which is better. The holding_up issue is that you didn't train enough. The tomorrow order is back to plan. You did well in the protein_short issue.",
+   "problems": [
+    "14 sentences"
+   ],
+   "pass": false,
+   "seconds": 11.9,
+   "tokens": 168,
+   "tokens_per_second": 14.2,
+   "prompt_tokens_per_second": 14.8
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 2,
+   "text": "The biggest problem is that you've eaten too much biscuits and gravy for 9 days, which caused an over_target_days of 9. That's 9 days over the target, and each day you ate 830 kcal. The cause_food is biscuits and gravy, and the cause_meal is breakfast. You should skip it. The meal and food that did the damage is biscuits and gravy, and it cost 830 kcal. Without that food, you would have had 14 days with 286 kcal saved per day. You should add this. The problem is that you've eaten too much biscuits and gravy. That was the mistake. The food did nothing for your goal. You should hold them to account. You followed advice. You should credit what went right. You should stop here. Drink water. Back to plan.",
+   "problems": [
+    "16 sentences"
+   ],
+   "pass": false,
+   "seconds": 12.3,
+   "tokens": 179,
+   "tokens_per_second": 14.5,
+   "prompt_tokens_per_second": 15.3
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 0,
+   "text": "The biggest problem is fat loss. The cause is peanut butter. It cost 380 kcal and 32 g of fat. The day without peanut butter would have been 14 days with 140 g of protein. Skip it. Halve it. Swap it for Greek yogurt. Does nothing for your goal. That was the mistake. You followed advice. Credit what went right: you reduced calories. Back to plan.",
+   "problems": [
+    "12 sentences",
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 9.6,
+   "tokens": 95,
+   "tokens_per_second": 14.4,
+   "prompt_tokens_per_second": 84.6
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 1,
+   "text": "The biggest problem is fat loss. The cause is peanut butter, which is contributing 35% of the calories and 32g of fat. The meal and food that did the damage is peanut butter, and it cost 380 kcal. Without peanut butter, the day would have been 14 days with 10 days over the goal. Skip it, halve it, swap it, add this, stop here. The choice is too much. The mistake was peanut butter. Does nothing for your goal. You followed advice. Credit what went right: you held up calories.",
+   "problems": [
+    "10 sentences"
+   ],
+   "pass": false,
+   "seconds": 8.4,
+   "tokens": 127,
+   "tokens_per_second": 15.1,
+   "prompt_tokens_per_second": 14.4
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 2,
+   "text": "The biggest problem is fat loss. The cause is peanut butter. It cost 380 kcal and 32 grams of fat. The day would have been 14 days with 10 days over the goal. Skip it. Halve it. Swap it. Add this. Drink water. Back to plan. The choice was too much. The mistake was that was the mistake. Does nothing for your goal. You followed advice. Credit what went right: you followed advice.",
+   "problems": [
+    "15 sentences"
+   ],
+   "pass": false,
+   "seconds": 6.8,
+   "tokens": 104,
+   "tokens_per_second": 15.2,
+   "prompt_tokens_per_second": 14.7
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 0,
+   "text": "The biggest problem is that you skipped a session in the last 14 days, which is a mistake. The meal that did the damage was the one you had on last Monday, which cost you 150 grams of protein. Without that meal, you would have had 12 days of protein intake instead of 14. Skip it, halve it, swap it, add this, stop here. The choice that does nothing for your goal is to skip the session. Drink water, back to plan. You followed advice by getting back in the gym, so credit that. The problem is that you missed a session and had too much protein.",
+   "problems": [
+    "8 sentences",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 11.0,
+   "tokens": 139,
+   "tokens_per_second": 15.3,
+   "prompt_tokens_per_second": 82.3
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 1,
+   "text": "The biggest problem is that you skipped a session in the last 14 days, which is a key part of your fat loss plan. The meal that did the damage was the protein you were supposed to be eating, which you didn't consume. Without that meal, you would have had 12 days of protein intake, but you only had 10 days. Skip it, halve it, swap it, add this, stop here. The mistake was that you didn't eat protein, which is essential for fat loss. You did nothing for your goal. You followed advice, so credit that. The order is to skip the meal, halve it, swap it, add this, stop here.",
+   "problems": [
+    "8 sentences",
+    "numbers not in facts: 10",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 9.9,
+   "tokens": 149,
+   "tokens_per_second": 15.0,
+   "prompt_tokens_per_second": 16.3
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 2,
+   "text": "The biggest problem is that you skipped a session in the last 14 days, which is a key part of your fat loss plan. The meal that did the damage was the protein you were supposed to be eating, which you didn't consume. Without that meal, you would have had 12 days of protein intake, but you only had 10 days. Skip it, halve it, swap it, add this, stop here. The mistake was that you didn't eat the protein you were supposed to be eating. You did nothing for your goal. You followed advice, so credit that.",
+   "problems": [
+    "7 sentences",
+    "numbers not in facts: 10",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 8.8,
+   "tokens": 128,
+   "tokens_per_second": 14.5,
+   "prompt_tokens_per_second": 16.1
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 0,
+   "text": "The biggest problem is that you ate 2150 calories today, which is 25 calories less than your target of 2175. The food that did the damage was sausage, egg and cheese biscuit, which cost you 1400 calories. Without that food, you would have eaten 750 calories less, which is 750 calories less than your target. You skipped 3 days, which is a mistake. You should not skip meals. The order is to skip it. Drink water. Back to plan. The choice was too much. Does nothing for your goal. You followed advice. Credit what went right: you followed advice.",
+   "problems": [
+    "12 sentences",
+    "numbers not in facts: 25, 750"
+   ],
+   "pass": false,
+   "seconds": 13.1,
+   "tokens": 145,
+   "tokens_per_second": 13.9,
+   "prompt_tokens_per_second": 85.9
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 1,
+   "text": "The biggest problem is that you ate 2150 calories today, which is 25 calories less than your target of 2175. The food that did the damage was sausage, egg and cheese biscuit, which cost 1400 calories. Without that food, you would have eaten 750 calories less, which is 1500 calories less than your target. You skipped 3 days, which is a mistake. You should not skip meals. The order is to skip it. Drink water. Back to plan. The choice was too much. Does nothing for your goal. You followed advice. Credit what went right: you followed advice.",
+   "problems": [
+    "12 sentences",
+    "numbers not in facts: 1500, 25, 750"
+   ],
+   "pass": false,
+   "seconds": 10.2,
+   "tokens": 145,
+   "tokens_per_second": 14.2,
+   "prompt_tokens_per_second": 13.7
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 2,
+   "text": "The biggest problem is that you ate 2150 calories today, which is 25 calories less than your target of 2175. The food that did the damage was sausage, egg and cheese biscuit, which cost 1400 calories. Without that food, you would have eaten 750 calories less, which would have brought you closer to your goal. You skipped the biscuit three days in a row, which is a good choice. The fiber is short, so you need to add a cup of vegetables. Skip it, halve it, swap it, add this, stop here. The food you ate was not good for your goal. You followed the advice, so credit that.",
+   "problems": [
+    "8 sentences",
+    "numbers not in facts: 25, 750"
+   ],
+   "pass": false,
+   "seconds": 10.8,
+   "tokens": 154,
+   "tokens_per_second": 14.3,
+   "prompt_tokens_per_second": 14.6
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 0,
+   "text": "The biggest problem is that you ate too much protein. The food that did the damage was a protein meal, and it cost you 155 grams. Without that food, you would have had 149 grams of protein. Skip it, halve it, swap it, or add this. Does nothing for your goal. You followed advice. Credit what went right: you kept a protein food at each meal.",
+   "problems": [
+    "7 sentences",
+    "restriction in the protected path"
+   ],
+   "pass": false,
+   "seconds": 6.9,
+   "tokens": 91,
+   "tokens_per_second": 15.6,
+   "prompt_tokens_per_second": 85.3
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 1,
+   "text": "The biggest problem is that you ate too much protein. The meal you had caused the issue, and it cost you 155 grams of protein. Without that meal, you would have had 149 grams of protein. Skip it, halve it, swap it, or add this. Does nothing for your goal. You followed the advice to keep a protein food at each meal. Credit what went right: you followed the advice to keep a protein food at each meal.",
+   "problems": [
+    "7 sentences",
+    "restriction in the protected path"
+   ],
+   "pass": false,
+   "seconds": 6.7,
+   "tokens": 103,
+   "tokens_per_second": 15.4,
+   "prompt_tokens_per_second": 15.8
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 2,
+   "text": "The biggest problem is that you ate too much protein today. The food that did the damage was a protein shake, which cost you 155 grams. Without that food, you would have had 149 grams of protein at today's meals. Skip it, halve it, or swap it. Do nothing for your goal. You followed the advice to keep a protein food at each meal. You did well.",
+   "problems": [
+    "7 sentences",
+    "restriction in the protected path"
+   ],
+   "pass": false,
+   "seconds": 5.9,
+   "tokens": 91,
+   "tokens_per_second": 15.4,
+   "prompt_tokens_per_second": 15.8
+  }
+ ]
+}

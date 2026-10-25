@@ -1,0 +1,12 @@
+{
+  "scenario": "Training dropped: 1 session in 14 days against a usual 4 a week",
+  "facts": {
+    "period": "the last 14 days",
+    "goal": "fat loss",
+    "items": [
+      {"type": "training_dropped", "sessions": 1, "days": 14, "usual_per_week": 4, "order": "get two sessions in this week; one heavy session a week is the minimum that holds your strength"},
+      {"type": "said_before", "on": "last Monday", "order_given": "get back in the gym", "repeat": "you did not"},
+      {"type": "holding_up", "what": "protein", "met_days": 12, "days": 14, "minimum_g": 150}
+    ]
+  }
+}
