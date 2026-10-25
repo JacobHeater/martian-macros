@@ -1,0 +1,13 @@
+{
+  "scenario": "MM-606's fat week: fat over target on 10 of 14 days, peanut butter 35% of it, protein short",
+  "facts": {
+    "period": "the last 14 days",
+    "goal": "fat loss",
+    "items": [
+      {"type": "fat_over", "days_over": 10, "days": 14, "average_fat_g": 98, "target_fat_g": 70, "cause_food": "peanut butter", "cause_share_pct": 35, "cause_days": 8},
+      {"type": "protein_short", "met_days": 5, "days": 14, "minimum_g": 140, "average_short_g": 36},
+      {"type": "swap", "food": "peanut butter", "kcal": 380, "fat_g": 32, "replacement": "Greek yogurt", "replacement_kcal": 200, "replacement_protein_g": 20, "order": "cut it to one tablespoon or swap it for Greek yogurt"},
+      {"type": "holding_up", "what": "calories", "days_within": 12, "days": 14}
+    ]
+  }
+}

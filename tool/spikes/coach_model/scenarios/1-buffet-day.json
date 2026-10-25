@@ -1,0 +1,18 @@
+{
+  "scenario": "The owner's buffet day, 2026-10-24 (General Tso's chicken figures are from the test fixture)",
+  "facts": {
+    "period": "today so far",
+    "goal": "fat loss",
+    "items": [
+      {"type": "over_target", "eaten_kcal": 3229, "target_kcal": 2175, "over_kcal": 1054, "cause_meal": "lunch", "cause_name": "Chinese buffet", "cause_kcal": 2368},
+      {"type": "worst_food", "food": "General Tso's chicken", "in": "the Chinese buffet", "kcal": 744, "fat_g": 33, "order": "skip it next time, or take one spoonful", "over_without_it_kcal": 310, "keep_instead": "steamed chicken with vegetables"},
+      {"type": "rest_of_today", "order": "you are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce"},
+      {"type": "sodium", "mg": 6923, "limit_mg": 1800, "times_limit": 3.8, "top_foods": ["General Tso's chicken", "hot and sour soup"], "order": "drink water tonight; next time get sauce on the side"},
+      {"type": "swap", "food": "sausage, egg and cheese biscuit", "meal": "breakfast", "kcal": 691, "fat_g": 45, "replacement": "two eggs on an English muffin with a slice of cheese", "replacement_kcal": 400, "replacement_protein_g": 25, "order": "swap it"},
+      {"type": "fiber_short", "g": 14, "guide_g": 30, "order": "two cups of vegetables at dinner"},
+      {"type": "no_value", "food": "cookie butter", "kcal": 170, "protein_g": 1, "order": "skip it"},
+      {"type": "holding_up", "what": "protein", "value_g": 155, "minimum_g": 149},
+      {"type": "tomorrow", "target_kcal": 2175, "order": "back to plan; do not skip meals to make up for today"}
+    ]
+  }
+}
