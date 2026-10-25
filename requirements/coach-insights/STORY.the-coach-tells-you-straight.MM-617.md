@@ -60,6 +60,49 @@ Choices made without asking (say if any is wrong):
 - **Holding up is said bluntly too:** "Protein 155 g. Minimum hit. Keep that."
 - **The headline is the day's verdict in one line, about the biggest thing:** "1,054 kcal over. The buffet did it." Strengths come after the problems.
 
+**The voice standard** (the owner, 2026-10-24: "I like that, it's better"). The owner's buffet day must read like this:
+> **1,054 kcal over. The buffet did it.** Lunch was the problem. The Chinese buffet: 2,368 kcal, more than your whole day's
+> 2,175. General Tso's chicken was the worst of it: {kcal} kcal, {fat} g fat. Skip it next time, or take one spoonful. Fill the
+> plate with {the meal's best protein-per-calorie food} and steamed vegetables first. Without the General Tso's you'd be {x}
+> over, not 1,054. You're done eating for today. If you're hungry, dinner under 400 kcal: lean protein and vegetables. No sauce.
+> Sodium 6,923 mg, 3.8× your 1,800 limit. {Foods} did it. Drink water tonight. Next time: sauce on the side. Breakfast: the
+> sausage, egg and cheese biscuit, 691 kcal, 45 g fat. Swap it for two eggs on an English muffin with a slice of cheese: about
+> 400 kcal, 25 g protein, half the fat. Fiber 14 g of 30. You ate almost no vegetables. Two cups at dinner. Cookie butter: 170
+> kcal, 1 g protein. Does nothing for your goal. Skip it. Protein 155 g. Minimum hit. Keep that. Tomorrow: back to 2,175. Don't
+> skip meals to make up for today.
+
+**No model at run time** (MM-618, 2026-10-24): five permissively licensed models of 4B and under failed to phrase the coach
+safely. The owner chose language processing, dictionaries and grammar instead: "use NLP, dictionaries, whatever. I want this
+done right."
+
+## How the coach understands food and speaks (the owner's choice, 2026-10-24)
+- **Numbers first.** Anything a food's nutrients can say is never looked up by name:
+  - protein per 100 kcal ("calorie-dense for its protein", "does nothing for your goal");
+  - the fat share;
+  - sodium per serving;
+  - fiber;
+  - sugar;
+  - the shares of the meal and the day.
+- **A food-language tagger for what numbers can't say.** It finds how a food was made and what kind it is, from its name:
+  - tags such as fried, breaded, sauced, creamy, processed meat, sugary drink, dessert, pastry, refined grain, lean protein,
+    vegetable, grilled, steamed, buffet;
+  - deterministic: tokenizing, normalizing case, accents and plurals, and multi-word phrases ("general tso", "sweet and sour",
+    "deep dish");
+  - a reviewed lexicon, measured against the real catalog's names, with its coverage recorded;
+  - the same name always gets the same tags.
+- **Swaps found in the catalog, not only a hand table.**
+  - Candidates come from the food's group (MM-616), ranked by name similarity: tokens weighted by how rare they are across the
+    catalog (TF-IDF cosine).
+  - They are kept only when the profile is better (MM-607's rules) and the tags say a better preparation (grilled for fried,
+    sauce-free for sauced).
+  - A reviewed table of classic swaps covers what name similarity can't (biscuit → English muffin, regular soda → diet).
+- **A phrasing grammar, not a model.**
+  - Each message is slots: lead, evidence, cause, order, consequence.
+  - Each slot has several phrasings in the owner's voice, chosen deterministically for a day and a finding, so the coach doesn't
+    read the same words every day.
+  - The grammar handles lists ("General Tso's chicken and hot and sour soup"), plurals, number formats and capitalization.
+  - Every phrasing is a reviewed string in `format/`.
+
 ## Description
 1. **An advice layer on the analysis.** Every 'fix' finding (1d and span) carries an action, from:
    - the meal breakdown;
