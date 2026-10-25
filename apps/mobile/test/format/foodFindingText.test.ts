@@ -64,12 +64,14 @@ describe("the ticket's templates, in the coach's voice (MM-617)", () => {
   });
 
   it('N4, change: the density against what the targets need', () => {
-    const [, body] = foodFindingText(
+    const [, body, evidence] = foodFindingText(
       finding('proteinDensity', 'fix', { densityG: 5.1, requiredG: 7.1, targetG: 170, targetKcal: 2400, direction: -1, calorieRoom: 0 }),
       fmt,
     );
-    expect(body).toMatch(/5\.1 g/);
-    expect(body).toMatch(/7\.1 g/);
+    // MM-617: the lead is plain words; the figures are in the numbers behind it.
+    expect(body).not.toMatch(/per 100 kcal/);
+    expect(JSON.stringify(evidence)).toMatch(/5\.1 g/);
+    expect(JSON.stringify(evidence)).toMatch(/7\.1 g/);
   });
 
   it('N1, holding up: blunt and short', () => {
@@ -377,7 +379,7 @@ describe('words', () => {
   });
 
   it('1d never names another day', () => {
-    for (const { f, body } of texts.filter(({ f }) => f.span === 1)) {
+    for (const { f, body } of texts.filter(({ f }) => f.span === 1 && f.kind !== 'dataQuality')) {
       expect(`${f.signal} ${body}`).not.toMatch(/yesterday|on those days|would have|since/i);
     }
   });

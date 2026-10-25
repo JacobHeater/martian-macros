@@ -30,3 +30,5 @@ export * from './termWeightsOf';
 export * from './tradeGainOf';
 export * from './tradeTargetFor';
 export * from './unbalancedFood';
+export * from './worsePreparationCount';
+export * from './worsePreparations';

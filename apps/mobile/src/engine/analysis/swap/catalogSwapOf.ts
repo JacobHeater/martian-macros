@@ -6,6 +6,7 @@ import { betterPreparation } from './betterPreparation';
 import { nameTermsOf } from './nameTermsOf';
 import { nearestByName } from './nearestByName';
 import { proteinSourceWords } from './proteinSourceWords';
+import { worsePreparationCount } from './worsePreparationCount';
 import { readableFood } from './readableFood';
 import type { SwapInput } from './SwapInput';
 import type { SwapLimits } from './SwapLimits';
@@ -55,6 +56,7 @@ export function catalogSwapOf(input: SwapInput, limits: SwapLimits): CoachAdvice
   kept.sort(
     (a, b) =>
       Number(b.sameSource) - Number(a.sameSource) ||
+      worsePreparationCount(a.match.food.tags) - worsePreparationCount(b.match.food.tags) ||
       b.match.similarity - a.match.similarity ||
       a.match.food.food.kcal - b.match.food.food.kcal ||
       compareStrings(a.match.food.food.name, b.match.food.food.name),
