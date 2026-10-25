@@ -19,6 +19,9 @@ export const sauceWords: FoodPhrases = {
   without: ['without'],
   'hold the': ['without'],
   minus: ['without'],
+  // MM-622: "battered fried chicken pieces, excluding sauce" is not sauced.
+  excluding: ['without'],
+  'not including': ['without'],
   gravy: ['sauced', 'sauceHead'],
   'country gravy': ['sauced', 'sauceHead', 'creamy'],
   'white gravy': ['sauced', 'sauceHead', 'creamy'],

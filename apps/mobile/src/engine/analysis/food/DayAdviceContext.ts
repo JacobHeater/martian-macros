@@ -21,7 +21,7 @@ export interface DayAdviceContext {
   readonly proteinLeftG: number;
   /** The foods the person logs that fit what is left (`foodsThatFit`). */
   readonly fits: readonly CoachFood[];
-  /** Any of today's foods was sauced, fried or breaded (`saucedOrFried`). */
+  /** Any of today's foods was sauced (`sauced`). */
   readonly sauced: boolean;
   readonly dinnerLogged: boolean;
   /** What goes in a unit's place (`swapFor`), or undefined. */

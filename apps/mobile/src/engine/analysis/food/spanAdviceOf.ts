@@ -12,7 +12,7 @@ import { allowedOrders } from './allowedOrders';
 import type { FoodLimits } from './FoodLimits';
 import type { FoodSignalId } from './FoodSignalId';
 import { foodsThatFit } from './foodsThatFit';
-import { saucedOrFried } from './saucedOrFried';
+import { sauced } from './sauced';
 import { tradeAdviceOf } from './tradeAdviceOf';
 
 /**
@@ -31,7 +31,7 @@ import { tradeAdviceOf } from './tradeAdviceOf';
  *   under on a lean gain**: an add;
  * - **fiber**: an add of vegetables, with a fiber food the person logs;
  * - **sodium**: the trade, or the top food swapped or halved, and sauce on
- *   the side when its foods were sauced or fried;
+ *   the side when its foods were sauced (MM-622);
  * - **intake at energy use**: back to the target (fat loss) or an add (lean gain).
  *
  * `extra` (the meal breakdown of a day that drove the span) follows the
@@ -119,8 +119,8 @@ export function spanAdviceOf({
       fallback = [vegetables];
       break;
     case 'sodium':
-      orders = [...lower(), ...(foods.some((f) => saucedOrFried(f.name)) ? [{ kind: 'sauceOnSide' as const }] : [])];
-      fallback = [{ kind: 'sauceOnSide' }, { kind: 'drinkWater' }];
+      orders = [...lower(), ...(foods.some((f) => sauced(f.name)) ? [{ kind: 'sauceOnSide' as const }] : [])];
+      fallback = [{ kind: 'drinkWater' }];
       break;
     case 'calories':
       orders = direction === 'down' ? [moreCalories] : lower();
