@@ -38,6 +38,7 @@ export * from './InMemoryTargetShapeRepository';
 export * from './InMemoryTargetsHistoryRepository';
 export * from './InMemoryTradeCatalog';
 export * from './InMemoryTrendLogRepository';
+export * from './InMemoryCoachAdviceRecordRepository';
 export * from './InMemoryMeasurementRepository';
 export * from './InMemoryMeasurementSettingsRepository';
 export * from './InMemoryWeightEventRepository';

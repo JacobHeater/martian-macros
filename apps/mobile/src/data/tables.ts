@@ -34,4 +34,5 @@ export const tables = [
   'day_kinds',
   'trend_announcements',
   'finding_dismissals',
+  'coach_advice_given',
 ] as const;

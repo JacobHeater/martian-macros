@@ -9,7 +9,8 @@ import { readFoodSignals } from '../../src/engine/analysis/food/readFoodSignals'
 import { topContributors } from '../../src/engine/analysis/food/topContributors';
 import type { CoachFinding } from '../../src/engine/analysis/CoachFinding';
 import { CalorieBand } from '../../src/engine/CalorieBand';
-import { foodFindingText } from '../../src/format/foodFindingText';
+import { coachAdviceText } from '../../src/format/coach/coachAdviceText';
+import { foodFindingText } from '../../src/format/coach/foodFindingText';
 import { Fmt } from '../../src/format/Fmt';
 import {
   type FixtureDay,
@@ -86,7 +87,7 @@ describe("the owner's fat week", () => {
     expect(fat.figures['proteinReference']).toBe(0);
     const [, body] = textOf(fat);
     expect(body).toMatch(
-      /^Fat averaged 90 g against 70 g; Peanut butter supplied 22% of it\. Fat carries 9 kcal a gram\. On those days fat gave 811 kcal while protein averaged 20 g under your minimum\./,
+      /^Fat (averaged 90 g against 70 g|90 g a day, against 70 g)\. Peanut butter (gave|was) 22% of it\. (That fat crowded out protein|Protein paid for it): 20 g under your minimum on average\. /,
     );
   });
 
@@ -225,7 +226,8 @@ it('under-eating: no fat, density or calorie finding, and a protein add may be',
   expect(signals(found).filter((s) => !allowed.includes(s))).toEqual([]);
   const minimum = found.find((f) => f.signal === 'proteinMinimum') as CoachFinding;
   expect(minimum.foods).toEqual([]);
-  expect(textOf(minimum)[1]).toContain('Your calories have room for more of a protein food you log.');
+  expect(minimum.advice?.[0]).toMatchObject({ kind: 'add', nutrient: 'protein' });
+  for (const order of coachAdviceText(minimum, fmt).orders) expect(textOf(minimum)[1]).toContain(order);
 });
 
 describe('other safeguards', () => {
@@ -268,7 +270,7 @@ describe('lean gain under target', () => {
     expect(signals(found)).not.toContain('calorieDensity');
     const calories = found.find((f) => f.signal === 'calories') as CoachFinding;
     expect(calories).toMatchObject({ kind: 'fix', figures: { direction: -1, belowDays: 14 } });
-    expect(textOf(calories)[1]).toContain('more of a food you log would bring those days to target');
+    expect(textOf(calories)[1]).toMatch(/(Eat about 250 kcal more a day|Add about 250 kcal a day: a lean gain runs on the surplus)\.$/);
   });
 
   it('on fat loss, the same chips are a calorie-dense food, calorie-dense for its protein', () => {
@@ -276,7 +278,7 @@ describe('lean gain under target', () => {
     const dense = found.find((f) => f.signal === 'calorieDensity') as CoachFinding;
     expect(dense.kind).toBe('fix');
     expect(dense.foods[0]).toMatchObject({ name: 'Potato chips', days: 14 });
-    expect(textOf(dense)[1]).toContain('It is calorie-dense for its protein.');
+    expect(textOf(dense)[1]).toMatch(/calorie-dense for its protein/i);
   });
 });
 

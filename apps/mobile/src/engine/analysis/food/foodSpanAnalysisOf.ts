@@ -71,7 +71,7 @@ interface Candidate {
 /**
  * MM-606's food analysis over one span ending on `asOf`, which is
  * yesterday: what is worth changing, what is holding up, and what limits
- * the rest, as figures (the words are `format/foodFindingText`).
+ * the rest, as figures (the words are `format/coach/foodFindingText`).
  *
  * 1. **Data quality first.** Partial days (more than a third of the logged
  *    days) or mostly estimated calories quiet every composition signal; a

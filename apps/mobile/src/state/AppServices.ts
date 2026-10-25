@@ -35,6 +35,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
 import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { PackFileFetch } from '../foodCatalog/download/PackFileFetch';
 import type { PackHttp } from '../foodCatalog/download/PackHttp';
@@ -103,6 +104,8 @@ export interface AppServices {
   readonly insightSnoozes: InsightSnoozeRepository;
   /** What the trend engine said, and the coach's findings dismissed (MM-605). */
   readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;

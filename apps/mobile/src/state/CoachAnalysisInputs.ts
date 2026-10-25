@@ -4,6 +4,7 @@ import type { Pause } from '../domain/Pause';
 import type { FoodRangeReader } from '../domain/repositories/FoodRangeReader';
 import type { IntakeReader } from '../domain/repositories/IntakeReader';
 import type { WaterReader } from '../domain/repositories/WaterReader';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
 import type { FoodAnalysisInput } from '../engine/analysis/food/FoodAnalysisInput';
 import type { TrainingAnalysisInput } from '../engine/analysis/TrainingAnalysisInput';
 import type { Insight } from '../engine/Insight';
@@ -25,6 +26,13 @@ export interface CoachAnalysisInputs {
   readonly intake: IntakeReader;
   readonly water: Pick<WaterReader, 'watchWaterSince'>;
   readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617): written when the tab shows it, read for the follow-ups. */
+  readonly adviceRecord: CoachAdviceRecordRepository;
+  /**
+   * Minutes after midnight now, from the app's clock (`minuteOfDayNow`): 1d's evening fiber line (MM-617). Read
+   * each time the analysis is worked out.
+   */
+  readonly nowMinute: () => number;
   /** The installed catalog, for a trade's catalog food (MM-607); undefined until it is read. */
   readonly catalog: () => (CatalogSearch & CatalogFoodLookup & CatalogServingLookup) | undefined;
   /** The food analysis's input but its days (entries and intake) and the catalog. */

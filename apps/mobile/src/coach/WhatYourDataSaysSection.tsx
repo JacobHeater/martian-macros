@@ -6,8 +6,8 @@ import { AnalysisSpan } from '../engine/analysis/AnalysisSpan';
 import type { CoachFinding } from '../engine/analysis/CoachFinding';
 import { findingQuietDays } from '../engine/analysis/findingQuietDays';
 import { coachAnalysisWords } from '../format/coachAnalysisWords';
-import { coachFindingText } from '../format/coachFindingText';
-import { coachHeadlineText } from '../format/coachHeadlineText';
+import { coachFindingText } from '../format/coach/coachFindingText';
+import { coachHeadlineText } from '../format/coach/coachHeadlineText';
 import { coachPeriodText } from '../format/coachPeriodText';
 import { Fmt } from '../format/Fmt';
 import { hiddenFindingsText } from '../format/hiddenFindingsText';
@@ -36,10 +36,12 @@ import './coach.css';
  * their controls (MM-291); leaving the tab brings it back to 1d. Top to
  * bottom: the pointer to the under-eating notice while that finding holds,
  * the switcher, the period line (said again when the span changes), the
- * headline, what is left today (1d), "Worth changing" and "Holding up" (3
- * each, never padded), every other finding folded in the same two groups,
- * the hidden ones with the day each shows again, and the areas the span
- * cannot judge. With the weight hidden, no finding carries a weight figure
+ * headline (MM-617's verdict: "1,054 kcal over. The buffet did it."), what
+ * is left today (1d), "Worth changing" and "Holding up" (3 each, never
+ * padded), every other finding folded in the same two groups, 1d's closing
+ * line ("Tomorrow: back to 2,175. Don't skip meals to make up for
+ * today."), the hidden ones with the day each shows again, and the areas
+ * the span cannot judge. With the weight hidden, no finding carries a weight figure
  * (MM-118): none of their words reads one.
  *
  * Dismissing a finding hides it until the day it shows again, says so in a
@@ -62,6 +64,8 @@ export function WhatYourDataSaysSection() {
   const titleIdOf = (finding: CoachFinding) => `${base}-${finding.id}`;
   // The tab opens on 1d each time: the span chosen is put back when the tab is left.
   useEffect(() => () => analysis.open(), [analysis]);
+  // The coach keeps a record of the advice it shows, for its follow-ups (MM-617).
+  useEffect(() => analysis.keepRecording(), [analysis]);
   useEffect(() => {
     const target = focusNext.current;
     if (target === undefined) return;
@@ -73,7 +77,7 @@ export function WhatYourDataSaysSection() {
   }, [view, hiddenFoldId]);
   if (setup === undefined || view === undefined) return null;
   const fmt = new Fmt(setup.unitSystem, { weightDisplay });
-  const { left, headline, worthChanging, holdingUp, more, hidden } = view.sections;
+  const { left, verdict, close, worthChanging, holdingUp, more, hidden } = view.sections;
   const moreFixes = more.filter((f) => f.kind !== 'holdingUp');
   const moreHolding = more.filter((f) => f.kind === 'holdingUp');
   // In the order they are drawn, so the one after a dismissed finding is the next a reader meets.
@@ -142,7 +146,7 @@ export function WhatYourDataSaysSection() {
       <p className="app-caption coach-analysis-period" aria-live="polite">
         {coachPeriodText(view)}
       </p>
-      {headline === undefined ? null : <p className="app-text coach-analysis-headline">{coachHeadlineText(headline)}</p>}
+      {verdict === undefined ? null : <p className="app-text coach-analysis-headline">{coachHeadlineText(verdict, fmt)}</p>}
       {nothingEver ? <p className="app-text">{coachAnalysisWords.nothingLogged}</p> : null}
       {nothingToday ? (
         <p className="app-text">
@@ -159,6 +163,7 @@ export function WhatYourDataSaysSection() {
           {group(coachAnalysisWords.holdingUp, moreHolding)}
         </MmDisclosure>
       )}
+      {close === undefined || nothingEver ? null : <p className="app-text">{coachFindingText(close, fmt)[1]}</p>}
       {hidden.length === 0 ? null : (
         <div id={hiddenFoldId}>
           <MmDisclosure title={hiddenFindingsText(hidden)}>

@@ -11,6 +11,7 @@ import type { StoryScenario } from '../../src/gallery/screens/StoryScenario';
 import { weightLossMedicationScenario } from '../../src/gallery/screens/weightLossMedicationScenario';
 import { Fmt } from '../../src/format/Fmt';
 import { openTab } from '../support/openTab';
+import { coachBannedWords } from '../support/coachBannedWords';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -32,6 +33,9 @@ async function onCoach(scenario: StoryScenario, then?: (repos: InMemoryRepositor
 }
 
 /** The section, once it has drawn. */
+/** MM-617's headline for the fat week over 2w: the top fix, and the food that did it. */
+const headline = /^Fat averaged 90 g against 70 g\. (Peanut butter did it|That was peanut butter|Peanut butter put you there)\.$/;
+
 const section = async () => within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
 
 async function choose(label: string) {
@@ -40,17 +44,15 @@ async function choose(label: string) {
 }
 
 describe("the owner's fat week on the tab", () => {
-  it('"Worth changing" lists the fat and protein finding first, with peanut butter, its share and a trade; the headline pairs a strength with it', async () => {
+  it('"Worth changing" lists the fat and protein finding first, with peanut butter, its share and a trade; the headline is the verdict (MM-617)', async () => {
     await onCoach(analysisFatWeekScenario());
     await choose('2w');
     const s = await section();
     const titles = (await s.findAllByRole('heading', { level: 4 })).map((h) => h.textContent);
     expect(titles[0]).toBe('Fat averaged 90 g against 70 g');
-    expect(s.getByText(/^Fat averaged 90 g against 70 g; Peanut butter supplied 22% of it\./)).toBeInTheDocument();
-    expect(
-      s.getByText(/Peanut butter on \d+ of \d+ days: .* Trading Peanut butter for .+ on those days would have meant about \d+ g less fat a day/),
-    ).toBeInTheDocument();
-    expect(s.getByText(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; fat is worth changing\.$/)).toBeInTheDocument();
+    expect(s.getByText(/^Fat (averaged 90 g against 70 g|90 g a day, against 70 g)\. Peanut butter (gave|was) 22% of it\./)).toBeInTheDocument();
+    expect(s.getByText(/Peanut butter(,| on) \d+ of \d+ days: .* (Swap it for|Have) .+[Aa]bout \d+ g less fat a day/)).toBeInTheDocument();
+    expect(s.getByText(headline)).toBeInTheDocument();
     expect(s.getByText('Worth changing')).toBeInTheDocument();
     expect(s.getByText('Holding up')).toBeInTheDocument();
   });
@@ -210,6 +212,7 @@ describe('safeguards', () => {
     expect(titles.every((t) => t.startsWith('Protein'))).toBe(true);
     expect(s.queryByText(/Peanut butter/)).not.toBeInTheDocument();
     expect(s.queryByText(/Trading /)).not.toBeInTheDocument();
+    expect(s.queryByText(/Swap it for|instead, which you log|Skip it/)).not.toBeInTheDocument();
   });
 });
 
@@ -221,8 +224,7 @@ describe('the review fixes (MM-610, 2026-10-24)', () => {
     await choose('2w');
     const period = await s.findByText('14 days through yesterday · 14 fully logged');
     expect(period).toHaveAttribute('aria-live', 'polite');
-    const headline = s.getByText(/holding up; fat is worth changing\.$/);
-    expect(period.nextElementSibling).toBe(headline);
+    expect(period.nextElementSibling).toBe(s.getByText(headline));
   });
 
   it('each finding is marked as worth changing or holding up, in words a screen reader says', async () => {
@@ -259,8 +261,7 @@ describe('words', () => {
     const s = await section();
     await s.findByText('Worth changing');
     const text = screen.getByRole('region', { name: 'What your data says' }).textContent ?? '';
-    for (const word of ['too much', 'unhealthy', 'fattening', 'empty calories', 'burn rate', 'should', 'avoid', 'good', 'bad']) {
-      expect(text).not.toMatch(new RegExp(`\\b${word}\\b`, 'i'));
-    }
+    // The coach's list (MM-617): verdicts on choices are its voice; profanity and words about the person never are.
+    expect(coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name)).toEqual([]);
   });
 });

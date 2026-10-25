@@ -30,6 +30,7 @@ import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
 import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -55,6 +56,7 @@ import { InMemoryTargetShapeRepository } from './InMemoryTargetShapeRepository';
 import { InMemoryGoalBodyFatRepository } from './InMemoryGoalBodyFatRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
 import { InMemoryTrendLogRepository } from './InMemoryTrendLogRepository';
+import { InMemoryCoachAdviceRecordRepository } from './InMemoryCoachAdviceRecordRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
 import { InMemoryMeasurementRepository } from './InMemoryMeasurementRepository';
 import { InMemoryMeasurementSettingsRepository } from './InMemoryMeasurementSettingsRepository';
@@ -96,6 +98,8 @@ export class InMemoryRepositories {
   readonly insightSnoozes: InsightSnoozeRepository;
   /** What the trend engine said, and the coach's findings dismissed (MM-605). */
   readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -128,6 +132,7 @@ export class InMemoryRepositories {
     const inlineInsightLog = new InMemoryInlineInsightLogRepository();
     const insightSnoozes = new InMemoryInsightSnoozeRepository();
     const trendLog = new InMemoryTrendLogRepository();
+    const adviceRecord = new InMemoryCoachAdviceRecordRepository();
     const pauses = new InMemoryPauseRepository();
     const reminders = new InMemoryReminderRepository();
     const recovery = new InMemoryRecoveryCheckInRepository();
@@ -160,6 +165,7 @@ export class InMemoryRepositories {
     this.inlineInsightLog = inlineInsightLog;
     this.insightSnoozes = insightSnoozes;
     this.trendLog = trendLog;
+    this.adviceRecord = adviceRecord;
     this.pauses = pauses;
     this.reminders = reminders;
     this.recovery = recovery;
@@ -189,6 +195,7 @@ export class InMemoryRepositories {
       () => inlineInsightLog.clear(),
       () => insightSnoozes.clear(),
       () => trendLog.clear(),
+      () => adviceRecord.clear(),
       () => pauses.clear(),
       () => reminders.clear(),
       () => recovery.clear(),

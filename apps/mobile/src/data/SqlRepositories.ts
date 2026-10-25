@@ -30,6 +30,7 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
 import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
@@ -59,6 +60,7 @@ import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
 import { SqlGoalBodyFatRepository } from './SqlGoalBodyFatRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
 import { SqlTrendLogRepository } from './SqlTrendLogRepository';
+import { SqlCoachAdviceRecordRepository } from './SqlCoachAdviceRecordRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlMeasurementRepository } from './SqlMeasurementRepository';
 import { SqlMeasurementSettingsRepository } from './SqlMeasurementSettingsRepository';
@@ -105,6 +107,8 @@ export class SqlRepositories {
   readonly insightSnoozes: InsightSnoozeRepository;
   /** What the trend engine said, and the coach's findings dismissed (MM-605). */
   readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -141,6 +145,7 @@ export class SqlRepositories {
     this.inlineInsightLog = new SqlInlineInsightLogRepository(db);
     this.insightSnoozes = new SqlInsightSnoozeRepository(db);
     this.trendLog = new SqlTrendLogRepository(db);
+    this.adviceRecord = new SqlCoachAdviceRecordRepository(db);
     this.pauses = new SqlPauseRepository(db);
     this.reminders = new SqlReminderRepository(db);
     this.recovery = new SqlRecoveryCheckInRepository(db);

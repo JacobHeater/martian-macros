@@ -69,6 +69,9 @@ it('round trip: a backup from one phone restored on another holds everything', a
   } as const;
   await a.repos.trendLog.appendTrendAnnouncements([said]);
   await a.repos.trendLog.dismissFinding('protein:level', today);
+  // MM-617: the coach's record of the advice it showed goes with the backup.
+  const advised = { foodKey: 'biscuit', foodName: 'Biscuit', kind: 'swap', replacementName: 'biscuit', kcal: 691, on: today } as const;
+  await a.repos.adviceRecord.recordAdviceGiven([advised]);
   const snapshot = await a.db.exportBytes();
 
   const b = await phone();
@@ -101,6 +104,7 @@ it('round trip: a backup from one phone restored on another holds everything', a
   expect(await valueOf(b.repos.dayKinds.watchDayKind(today.addDays(-1)))).toBe('refeed');
   expect(await valueOf(b.repos.trendLog.watchTrendAnnouncements())).toEqual([said]);
   expect(await valueOf(b.repos.trendLog.watchFindingDismissals())).toEqual([{ findingId: 'protein:level', dismissedOn: today }]);
+  expect(await valueOf(b.repos.adviceRecord.watchAdviceGivenSince(today.addDays(-14)))).toEqual([advised]);
   expect((await valueOf(b.repos.measurements.watchSite('thigh'))).map((o) => [o.valueCm, [...o.readings]])).toEqual([[58, [57.5, 58, 58.5]]]);
   const sites = await valueOf(b.repos.measurementSettings.watchMeasurementSettings());
   expect([[...sites.sites], sites.limbSide, sites.suggestionAnswered]).toEqual([['thigh'], 'right', true]);

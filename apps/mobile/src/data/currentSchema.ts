@@ -419,4 +419,13 @@ CREATE TABLE "finding_dismissals" (
   "dismissed_epoch_day" INTEGER NOT NULL,
   PRIMARY KEY ("finding_id", "dismissed_epoch_day")
 );
+CREATE TABLE "coach_advice_given" (
+  "food_key" TEXT NOT NULL,
+  "kind" TEXT NOT NULL CHECK ("kind" IN ('skip', 'halve', 'swap', 'taken')),
+  "given_epoch_day" INTEGER NOT NULL,
+  "food_name" TEXT NOT NULL,
+  "replacement_name" TEXT NULL,
+  "kcal" REAL NOT NULL,
+  PRIMARY KEY ("food_key", "kind", "given_epoch_day")
+);
 `;

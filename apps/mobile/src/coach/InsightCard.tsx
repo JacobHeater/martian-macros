@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { coachAnalysisWords } from '../format/coachAnalysisWords';
-import { coachFindingText } from '../format/coachFindingText';
+import { coachFindingText } from '../format/coach/coachFindingText';
 import { Fmt } from '../format/Fmt';
 import { insightText } from '../format/insightText';
 import { useApp } from '../app/useApp';
