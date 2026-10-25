@@ -36,7 +36,7 @@ export function checkPlan(args: readonly string[]): CheckPlan | string {
   }
   const tests: CheckStep = {
     name: 'tests',
-    web: ['npx', 'vitest', 'run', '--project', 'rules', '--project', 'screens', ...(shard === undefined ? [] : [`--shard=${shard}`])],
+    web: ['npx', 'vitest', 'run', '--project', 'rules', '--project', 'screens', '--project', 'screens-css', ...(shard === undefined ? [] : [`--shard=${shard}`])],
   };
   const staticSteps: CheckStep[] = [
     { name: 'req' },
