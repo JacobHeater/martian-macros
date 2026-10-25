@@ -94,6 +94,10 @@ export default defineConfig({
           // These draw the whole app and walk through it; several screens' worth
           // takes longer than the default on a busy machine.
           testTimeout: 20000,
+          // MM-619, temporary: CI's profile job sets MM_PROFILE_DIR to get each test worker's CPU profile.
+          ...(process.env['MM_PROFILE_DIR'] === undefined
+            ? {}
+            : { execArgv: ['--cpu-prof', `--cpu-prof-dir=${process.env['MM_PROFILE_DIR']}`], pool: 'forks' as const }),
         },
       },
       {
@@ -105,7 +109,8 @@ export default defineConfig({
           include: ['test/gallery/stories/*.test.tsx'],
           setupFiles: ['test/setup.ts'],
           css: true,
-          testTimeout: 20000,
+          // Drawn under coverage (MM-321), a story with a long walk takes longer than a screen test does bare.
+          testTimeout: 30000,
         },
       },
     ],

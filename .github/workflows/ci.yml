@@ -109,9 +109,9 @@ jobs:
       - name: Profile
         working-directory: apps/mobile
         env:
-          NODE_OPTIONS: --cpu-prof --cpu-prof-dir=${{ github.workspace }}/prof
+          MM_PROFILE_DIR: ${{ github.workspace }}/prof
         run: >
-          npx vitest run --project screens --pool=forks --reporter=verbose
+          npx vitest run --project screens --reporter=verbose
           test/train/workoutTimes.test.tsx test/train/progression.test.tsx
           test/settings/healthConnect.test.tsx test/settings/foodDatabase.test.tsx || true
       - uses: actions/upload-artifact@v4
