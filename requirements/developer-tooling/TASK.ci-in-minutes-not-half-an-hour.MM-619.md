@@ -60,3 +60,34 @@ Scenario: Faster
   Given the run measured on 2026-10-25 (about 27 minutes for a green run)
   Then a green run takes 12 minutes or less from push to the last job
 ```
+
+## Progress
+Built 2026-10-25, measured in CI (nothing run locally).
+
+| Run | Change | Push to last job |
+|---|---|---|
+| 40158233027 (before) | one job: the test phase alone took 22.4 min, the stories drawn twice | about 27 min green |
+| 40162469689 | parallel jobs, stories once in 8 shards | 8.1 min (stories 8 min) |
+| 40163095361 | screens and stories without stylesheets | 4.2 min (stories 4 min) |
+| 40163517596 | `getComputedStyle` from the element alone | about 3 min (Android's build 2.9 min is now the longest) |
+
+- **Parallel jobs:** `mm check --part static|tests|stories [--shard i/n]` (`tool/src/checkPlan.ts`, tested in
+  `tool/test/checkPlan.test.ts`). CI runs static, three test shards, stories and Android at the same time, with a newer
+  push cancelling an older run. `mm check` alone still runs every part in order.
+- **Stories once:** a `stories` vitest project of 8 shard files (`test/gallery/stories/`, drawing through
+  `test/support/storyCases.tsx`), run only by `npm run unseen` under coverage. The register's checks moved to
+  `test/gallery/storyRegister.test.tsx`. Under coverage a story gets 30 s.
+- **Why a screen test took 1.4 s:** CI's CPU profiles of the test workers (a temporary job, since removed).
+  - **The stylesheets:** about 90% of worker time was jsdom matching CSS rules for the visibility checks of role queries and
+    user-event's pointer-events checks. React and the app came to under 5%.
+    - Screens and stories now load no stylesheets (`css: false`).
+    - The ten tests whose assertions read CSS (`toBeVisible` and the like) run in `screens-css`, with them.
+    - That took a screen test from 1.4 s to 0.83 s.
+  - **The cascade itself:** jsdom's `getComputedStyle` still ran the whole cascade on every call. `test/fastComputedStyle.ts`
+    answers `display`, `visibility` and `pointer-events` from the element's `hidden` attribute and inline style, which is all
+    a page without stylesheets can say. It covers screens and stories, not `screens-css`.
+- **One open question:** `test/food/searchMoreResults.test.tsx` passes with jsdom's own styles. With
+  `fastComputedStyle` its "7 more results, every match listed" status never appears, even after a 15 s wait, though all 27 rows
+  do. The component's `firstNew` is pure state and reads no style, so the cause was not found without running the test, which
+  the owner's rule keeps off the dev machine. The file runs in `screens-css` (real styles, still every run) until it is found.
+  The test now waits for the status and the focus rather than looking in the same tick, which is right either way.

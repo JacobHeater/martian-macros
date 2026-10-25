@@ -50,6 +50,8 @@ const styled = [
   'test/app/termsOfUse.test.tsx',
   'test/coach/headsUpSection.test.tsx',
   'test/food/emptyDayCruft.test.tsx',
+  // Fails with test/fastComputedStyle.ts, cause not yet found (MM-619's Progress): runs with jsdom's own styles.
+  'test/food/searchMoreResults.test.tsx',
   'test/food/waterAndMicros.test.tsx',
   'test/settings/appleHealth.test.tsx',
   'test/settings/privacyPolicy.test.tsx',
