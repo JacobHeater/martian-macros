@@ -108,7 +108,7 @@ export default defineConfig({
           // The stories are drawn once, under coverage, by `npm run unseen`; the tests that need the
           // stylesheets run in screens-css (MM-619).
           exclude: ['test/gallery/stories/**', ...styled, 'node_modules/**'],
-          setupFiles: ['test/setup.ts'],
+          setupFiles: ['test/setup.ts', 'test/fastComputedStyle.ts'],
           // MM-619: no stylesheets. With them, nine tenths of a screen test's time went to jsdom
           // matching every CSS rule for each role query's visibility check (CI's CPU profile, 2026-10-25).
           css: false,
@@ -140,7 +140,7 @@ export default defineConfig({
           name: 'stories',
           environment: 'jsdom',
           include: ['test/gallery/stories/*.test.tsx'],
-          setupFiles: ['test/setup.ts'],
+          setupFiles: ['test/setup.ts', 'test/fastComputedStyle.ts'],
           // The stories are looked at for their words, not their styles (MM-619).
           css: false,
           // Drawn under coverage (MM-321), a story with a long walk takes longer than a screen test does bare.
