@@ -2958,7 +2958,8 @@
           "MM-609",
           "MM-610",
           "MM-606",
-          "MM-604"
+          "MM-604",
+          "MM-620"
         ],
         "remaining": [
           "MM-145",
@@ -3130,6 +3131,13 @@
           "title": "Spike: a small on-device model phrases the coach, permissive licenses only (the owner, 2026-10-24, MM-618)",
           "tickets": [
             "MM-618"
+          ]
+        },
+        {
+          "step": 18,
+          "title": "The span switcher hides without saying why: offered on any span past 1d, what opens 7d said, and the section named \"Coach's feedback\" (the owner, 2026-10-25, MM-620)",
+          "tickets": [
+            "MM-620"
           ]
         }
       ],

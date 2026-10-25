@@ -29,6 +29,7 @@ import type { TradeCatalog } from '../engine/analysis/TradeCatalog';
 import type { TrainingAnalysisInput } from '../engine/analysis/TrainingAnalysisInput';
 import type { UnjudgedArea } from '../engine/analysis/UnjudgedArea';
 import { unjudgedTrainingAreas } from '../engine/analysis/unjudgedTrainingAreas';
+import { weekSpanProgress } from '../engine/analysis/weekSpanProgress';
 import { hasHardSet } from '../engine/hasHardSet';
 import type { FindingDismissal } from '../engine/trends/FindingDismissal';
 import type { TrendAnnouncement } from '../engine/trends/TrendAnnouncement';
@@ -95,6 +96,8 @@ interface AnalysisRead {
   /** The fully logged days before today, by epoch day. */
   readonly wholeDays: ReadonlySet<number>;
   readonly spans: readonly AnalysisSpan[];
+  /** How far the data is from 7d, while only 1d is offered (MM-620). */
+  readonly weekProgress: CoachAnalysisView['weekProgress'];
   /** The food analysis's input, the trade catalog left out. */
   readonly food: FoodAnalysisInput;
   /** The training analysis's input, once everything it reads is in. */
@@ -329,6 +332,7 @@ export class CoachAnalysis {
     let firstEntryOn: CalendarDate | undefined;
     for (const e of entries) if (firstEntryOn === undefined || e.date.isBefore(firstEntryOn)) firstEntryOn = e.date;
     const spans = supportedAnalysisSpans({ firstEntryOn, wholeDays, today });
+    const weekProgress = spans.length === 1 ? weekSpanProgress({ firstEntryOn, wholeDays, today }) : undefined;
     const training = inputs.trainingInput();
     const water = Loadable.valueOf(this.water.value);
     const wholeForTraining = inputs.wholeDays();
@@ -337,6 +341,7 @@ export class CoachAnalysis {
       entries,
       wholeDays,
       spans,
+      weekProgress,
       // Foods snoozed inline are never an X or a Y of a trade (MM-378, MM-607).
       food: { ...base, entries, intake, plannedShare, catalog: undefined, snoozed: inputs.snoozed() },
       training:
@@ -492,6 +497,7 @@ export class CoachAnalysis {
     return {
       span,
       spans,
+      weekProgress: read.weekProgress,
       from,
       to,
       fullyLoggedDays,
