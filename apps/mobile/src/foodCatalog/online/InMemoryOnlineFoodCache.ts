@@ -1,3 +1,4 @@
+import type { FoodGroup } from '../../domain/food/FoodGroup';
 import { CatalogFood } from '../CatalogFood';
 import type { CatalogServing } from '../CatalogServing';
 import type { PackEntry } from '../PackEntry';
@@ -20,7 +21,8 @@ export class InMemoryOnlineFoodCache implements OnlineFoodCache {
       if (sameBarcode || sameRecord) this.entries.delete(id);
     }
     const id = this.nextId++;
-    const food = new CatalogFood({ ...entry.food, id, packId: onlinePackId, brand: entry.food.brand });
+    // Kept as the database keeps it: without a group (MM-616).
+    const food = new CatalogFood({ ...entry.food, id, packId: onlinePackId, brand: entry.food.brand, group: undefined });
     this.entries.set(id, { ...entry, food });
     return food;
   }
@@ -33,9 +35,13 @@ export class InMemoryOnlineFoodCache implements OnlineFoodCache {
     this.entries.clear();
   }
 
-  async search(query: string, { limit = 25, offset = 0 }: { limit?: number; offset?: number } = {}): Promise<SearchHit[]> {
+  async search(
+    query: string,
+    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+  ): Promise<SearchHit[]> {
     const words = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
-    if (words.length === 0) return [];
+    // A food found online carries no group (MM-616), so it is in none.
+    if (words.length === 0 || group !== undefined) return [];
     const hits: SearchHit[] = [];
     for (const { food } of this.entries.values()) {
       const name = food.name.toLowerCase();

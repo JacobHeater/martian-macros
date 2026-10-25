@@ -2,6 +2,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { customExerciseRepositoryContract } from '../contracts/customExerciseRepositoryContract';
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
+import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
 import { foodRepositoryContract } from '../contracts/foodRepositoryContract';
@@ -19,6 +20,8 @@ import { setupRepositoryContract } from '../contracts/setupRepositoryContract';
 import { sleepRepositoryContract } from '../contracts/sleepRepositoryContract';
 import { targetShapeRepositoryContract } from '../contracts/targetShapeRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
+import { trendLogRepositoryContract } from '../contracts/trendLogRepositoryContract';
+import { coachAdviceRecordRepositoryContract } from '../contracts/coachAdviceRecordRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { onlineFoodCacheContract } from '../contracts/onlineFoodCacheContract';
 import { InMemoryOnlineFoodCache } from '../../src/foodCatalog/online/InMemoryOnlineFoodCache';
@@ -49,11 +52,14 @@ preferencesRepositoryContract('In-memory', () => new InMemoryRepositories().pref
 foodRepositoryContract('In-memory', () => new InMemoryRepositories().food);
 customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().customFoods);
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
+dayKindRepositoryContract('In-memory', () => new InMemoryRepositories().dayKinds);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
 targetShapeRepositoryContract('In-memory', () => new InMemoryRepositories().targetShapes);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);
 inlineInsightLogRepositoryContract('In-memory', () => new InMemoryRepositories().inlineInsightLog);
 insightSnoozeRepositoryContract('In-memory', () => new InMemoryRepositories().insightSnoozes);
+trendLogRepositoryContract('In-memory', () => new InMemoryRepositories().trendLog);
+coachAdviceRecordRepositoryContract('In-memory', () => new InMemoryRepositories().adviceRecord);
 // MM-36: not in `InMemoryRepositories` until its table (MM-507) puts it in the app.
 goalBodyFatRepositoryContract('In-memory', () => new InMemoryGoalBodyFatRepository());
 weighInWindowContract('In-memory', () => new InMemoryRepositories().weighInWindow);
@@ -78,6 +84,9 @@ dataEraserContract('In-memory', () => {
     targets: r.targets,
     targetShapes: r.targetShapes,
     goalBodyFat: r.goalBodyFat,
+    dayKinds: r.dayKinds,
+    trendLog: r.trendLog,
+    adviceRecord: r.adviceRecord,
     measurements: r.measurements,
     measurementSettings: r.measurementSettings,
     preferences: r.preferences,

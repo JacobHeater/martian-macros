@@ -1,0 +1,14 @@
+{
+  "scenario": "Two weeks: biscuits and gravy at breakfast on 9 of 14 days drive calories over",
+  "facts": {
+    "period": "the last 14 days",
+    "goal": "fat loss",
+    "items": [
+      {"type": "over_target_days", "days_over": 9, "days": 14, "average_over_kcal": 420, "cause_food": "biscuits and gravy", "cause_meal": "breakfast", "cause_days": 9, "cause_kcal_each": 830},
+      {"type": "swap", "food": "biscuits and gravy", "kcal": 830, "fat_g": 48, "replacement": "Greek yogurt with berries and granola", "replacement_kcal": 350, "replacement_protein_g": 24, "order": "swap it on weekdays", "saved_kcal_per_day": 286},
+      {"type": "protein_short", "met_days": 6, "days": 14, "minimum_g": 140, "average_short_g": 28, "order": "a protein food at breakfast, every day"},
+      {"type": "holding_up", "what": "training", "sessions": 8, "days": 14},
+      {"type": "tomorrow", "target_kcal": 2200, "order": "back to plan"}
+    ]
+  }
+}

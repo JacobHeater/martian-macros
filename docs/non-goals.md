@@ -74,6 +74,11 @@ should read this list as closely as any feature.
 - **Why:** The app sets numbers and the user chooses food. Meal plans are
   low-adherence and stray into dietetic practice. *(panel)*
 - **Reopen if:** A registered dietitian is part of the product.
+- **Overruled in part by the product owner (2026-10-24, MM-607, MM-608):**
+  the coach's analysis may offer a single food as a trade for one the person
+  logs, at about the same calories. It offers foods the person logs first, and
+  a catalog food of the same group after. Meal plans, prescribed menus or
+  portions, and any food offered other than as a trade stay non-goals.
 
 ### No fasting windows, meal-frequency rules or nutrient-timing requirements
 

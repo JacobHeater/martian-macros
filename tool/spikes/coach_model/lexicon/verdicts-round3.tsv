@@ -1,0 +1,44 @@
+# MM-617 third hand-check pass (seed "final", renamed round3), against the lexicon after the second round of fixes.
+# Historical. Reviewed at 159 of 200 names with every tag right (79.5%), 48 wrong tags. Only the wrong names are listed.
+# Verdict: the wrong tags marked "-tag" (missing ones "+tag" do not count against precision).
+BEEF STEW WITH ONIONS, PAPRIKA & TOMATO SEASONING MIX, BEEF STEW	-fattyMeat -vegetable -soup
+DICKEY'S BARBECUE PIT, BARBECUE RIB RUB, ORIGINAL	-sauced
+WEIS QUALITY, HAMBURGER RELISH	-fattyMeat -refinedGrain
+Quiznos, Cheese, For Black Angus Steak, 4&quot;	-fattyMeat
+BANANA BREAD ORGANIC DARK CHOCOLATE BITES WITH CARAMELIZED BANANA FILLING, BANANA BREAD	-refinedGrain +candy
+Salsa verde hot sauce	-vegetable
+STRAWBERRY ROSE LIVING VINEGAR	-fruit
+Signature kitchens, treasure chips, chocolate chips cookies	-fried
+SEMI-SWEET STYLE BAKING CHIPS, SEMI-SWEET STYLE	-fried -snackFood +candy
+Orange Cream Minis	-fruit
+FROZEN GREEK YOGURT GELATO	-leanProtein
+All-In-One Protein Smoothie Powder Blueberry Muffin	-refinedGrain -pastry -sugaryDrink
+Frozen mocha coffee drink, with non-dairy milk and whipped cream	-dessert +sugaryDrink
+ROUNDY'S, SELECT, SIRLOIN BURGER SOUP	-refinedGrain
+Fruit juice drink, diet	-sugaryDrink +dietDrink
+Strawberry Oatmeal Crumble	-wholeGrain
+RED WINE SHALLOT SAUCE, RED WINE SHALLOT	-vegetable
+CHICKEN BUN LENGTH FRANKS, CHICKEN	-refinedGrain
+MILK CHOCOLATE + CURRANTS CRISPY QUINOA LIGHTLY COVERED WITH PREMIUM CHOCOLATE, MILK CHOCOLATE + CURRANTS	-wholeGrain +candy
+SMOKY BOURBON BBQ PULLED PORK SLOW COOKER SAUCE, SMOKY BOURBON BBQ PULLED PORK	-fattyMeat
+bud light seltzer sangria splash	-dietDrink
+FROZEN YOGURT, WILD CHERRY CHOCO CHIP	-fried
+GRILLED STICKIES A LA MODE VITAMIN D WHOLE MILK, GRILLED STICKIES A LA MODE	-grilled
+SIMPLY BALANCED, FRUIT & GRAIN BARS, STRAWBERRY, STRAWBERRY	-fruit +snackFood
+Spritz Valencia Orange	-fruit
+NATURAL LEMON FLAVOR WITH STEVIA ICED TEA MIX, LEMON	-sugaryDrink
+THE GOOD TABLE, SAUCE & CRUST MIX FOR FISH, LEMON & HERB	-refinedGrain
+Swedish meatballs with cream or white sauce	-dairy
+COCONUT LEMONGRASS CHICKEN TENDER WHITE MEAT CHICKEN WITH JASMINE RICE, BROCCOLI, SNAP PEAS AND CARROTS - ALL COMBINED WITH AN INSANELY TASTY LEMONGRASS SAUCE AND TOPPED WITH SHAVED COCONUT, COCONUT LEMONGRASS CHICKEN	-fried -breaded
+Pepperidge Farm Goldfish Cheddar Crackers, 6 oz. Multi-pack Tray, 6-count 1 oz. Single-Serve Snack Packs	-dessert
+MINT LIME MOJITO MIX A KOMBUCHA COCKTAIL MIXER, MINT LIME	-alcohol
+VANILLA POMEGRANATE BALSAMIC VINEGAR	-fruit
+Diet Juice Cocktail, Cranberry Grape	-sugaryDrink +dietDrink
+Live Resin Sour Belt (Sativa, Strawberry)	-fruit
+Fish, herring eggs on giant kelp, Pacific (Alaska Native)	-egg
+ORGANIC RESTAURANT STYLE SALSA, MEDIUM	-restaurant
+Rennin, chocolate, dry mix, prepared with whole milk	-candy +dessert
+SIMPLY ROUNDY'S, ORGANIC TOMATO KETCHUP	-vegetable
+MEDIUM ROAST ROASTED WITH PROBIOTICS 100% ARABICA DRIP COFFEE, MEDIUM	-roasted
+Firehouse Subs, Pibb Zero Raspberry Vanilla, 22 Fl Oz	-fruit +dietDrink
+MUSCLE MLK PRO STRAWBERRY 2.54OZ, STRAWBERRY	-fruit

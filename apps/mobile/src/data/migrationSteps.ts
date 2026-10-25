@@ -366,4 +366,63 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       await db.execute('ALTER TABLE food_entries ADD COLUMN evidence_citation TEXT NULL');
     },
   ],
+  // 26 to 27 (MM-611): the days marked a Refeed or a Day off, a row for each; none yet, so every day is unmarked.
+  [
+    26,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "day_kinds" (' +
+          '"epoch_day" INTEGER NOT NULL, ' +
+          '"kind" TEXT NOT NULL CHECK ("kind" IN (\'refeed\', \'dayOff\')), ' +
+          'PRIMARY KEY ("epoch_day"))',
+      );
+    },
+  ],
+  // 27 to 28 (MM-605): the trend engine's append-only announcement log, a row for each entry with its figures, and the
+  // coach's findings dismissed, a row for each finding and day; none yet, so nothing has been said or dismissed.
+  [
+    27,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "trend_announcements" (' +
+          '"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, ' +
+          '"trend_key" TEXT NOT NULL, ' +
+          '"transition" TEXT NOT NULL CHECK ("transition" IN (\'new\', \'continuing\', \'update\', \'reversed\', \'held\', \'resolved\', \'backAgain\')), ' +
+          '"on_epoch_day" INTEGER NOT NULL, ' +
+          '"direction" TEXT NOT NULL CHECK ("direction" IN (\'down\', \'up\')), ' +
+          '"onset_epoch_day" INTEGER NULL, ' +
+          '"effect" REAL NOT NULL, ' +
+          '"unit" TEXT NOT NULL, ' +
+          '"n" INTEGER NOT NULL, ' +
+          '"k" INTEGER NOT NULL, ' +
+          '"span_days" INTEGER NOT NULL CHECK ("span_days" IN (7, 14, 30, 90)), ' +
+          '"coverage" REAL NOT NULL, ' +
+          '"tier" TEXT NOT NULL CHECK ("tier" IN (\'silent\', \'clear\', \'strong\')), ' +
+          '"rules_version" INTEGER NOT NULL)',
+      );
+      await db.execute(
+        'CREATE TABLE "finding_dismissals" (' +
+          '"finding_id" TEXT NOT NULL, ' +
+          '"dismissed_epoch_day" INTEGER NOT NULL, ' +
+          'PRIMARY KEY ("finding_id", "dismissed_epoch_day"))',
+      );
+    },
+  ],
+  // 28 to 29 (MM-617): the coach's record of the advice it showed, a row for each food key, kind and day; none yet, so
+  // nothing has been said to follow up on.
+  [
+    28,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "coach_advice_given" (' +
+          '"food_key" TEXT NOT NULL, ' +
+          '"kind" TEXT NOT NULL CHECK ("kind" IN (\'skip\', \'halve\', \'swap\', \'taken\')), ' +
+          '"given_epoch_day" INTEGER NOT NULL, ' +
+          '"food_name" TEXT NOT NULL, ' +
+          '"replacement_name" TEXT NULL, ' +
+          '"kcal" REAL NOT NULL, ' +
+          'PRIMARY KEY ("food_key", "kind", "given_epoch_day"))',
+      );
+    },
+  ],
 ]);

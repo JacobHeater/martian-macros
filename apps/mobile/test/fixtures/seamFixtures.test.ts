@@ -14,6 +14,7 @@ import { InMemoryPrivateScreen } from '../../src/fixtures/InMemoryPrivateScreen'
 import { InMemoryEntitlement } from '../../src/fixtures/InMemoryEntitlement';
 import { InMemoryExactAlarms } from '../../src/fixtures/InMemoryExactAlarms';
 import { InMemoryFoodCatalog } from '../../src/fixtures/InMemoryFoodCatalog';
+import { InMemoryTradeCatalog } from '../../src/fixtures/InMemoryTradeCatalog';
 import { backupStorageContract } from '../contracts/backupStorageContract';
 import { clockContract } from '../contracts/clockContract';
 import { deviceLockContract } from '../contracts/deviceLockContract';
@@ -23,6 +24,7 @@ import { entitlementReaderContract } from '../contracts/entitlementReaderContrac
 import { exactAlarmsContract } from '../contracts/exactAlarmsContract';
 import { foodBarcodeLookupContract } from '../contracts/foodBarcodeLookupContract';
 import { foodSearchContract } from '../contracts/foodSearchContract';
+import { tradeCatalogContract } from '../contracts/tradeCatalogContract';
 import { first } from '../support/first';
 
 /**
@@ -32,6 +34,16 @@ import { first } from '../support/first';
  */
 foodSearchContract('In-memory', (items) => new InMemoryFoodCatalog(items));
 foodBarcodeLookupContract('In-memory', (items) => new InMemoryFoodCatalog(items));
+// MM-607: a food with no group is not held, since it is never offered.
+tradeCatalogContract(
+  'In-memory',
+  (seeds) =>
+    new InMemoryTradeCatalog(
+      seeds.flatMap(({ packId, foodId, group, ...food }) =>
+        group === undefined ? [] : [{ packId, foodId, food: { ...food, group, fiberG: undefined, alcoholG: undefined, grade: undefined } }],
+      ),
+    ),
+);
 backupStorageContract('In-memory', () => new InMemoryBackupStorage());
 entitlementReaderContract('In-memory', () => new InMemoryEntitlement());
 exactAlarmsContract('In-memory, allowed', () => new InMemoryExactAlarms());

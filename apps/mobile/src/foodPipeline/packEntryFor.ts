@@ -5,6 +5,7 @@ import type { TrustTier } from '../foodCatalog/TrustTier';
 import { StateError } from '../lang/StateError';
 import type { CandidateFood } from './CandidateFood';
 import { communityCheckThisReason } from './communityCheckThisReason';
+import { foodGroupOf } from './foodGroupOf';
 import { plausibleMicros } from './plausibleMicros';
 
 /** What a community record that is complete and comfortably consistent is (MM-153): a label, transcribed by a contributor. */
@@ -93,6 +94,7 @@ export function packEntryFor(
       sourceId: food.sourceId,
       tier,
       tierReason: reason,
+      group: foodGroupOf(food.category, food.name),
     }),
     servings: food.servings,
     barcodes: gtin14 === undefined ? [] : [gtin14],

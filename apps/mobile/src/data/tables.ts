@@ -31,4 +31,8 @@ export const tables = [
   'deleted_platform_workouts',
   'body_measurements',
   'measurement_settings',
+  'day_kinds',
+  'trend_announcements',
+  'finding_dismissals',
+  'coach_advice_given',
 ] as const;

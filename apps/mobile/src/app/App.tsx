@@ -69,6 +69,9 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
   // Reminders follow the plan for as long as the app is open (MM-146).
   useEffect(() => state.keepRemindersScheduled(), [state]);
 
+  // The coach's announcement log is written once a day for as long as the app is open (MM-605).
+  useEffect(() => state.coachAnalysis.keepAnnouncing(), [state]);
+
   // The health platform is read when the app opens (MM-68), always (MM-72).
   useEffect(() => {
     void state.syncHealth('opened');

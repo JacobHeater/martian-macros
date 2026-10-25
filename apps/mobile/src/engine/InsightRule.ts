@@ -11,17 +11,17 @@ const rules = {
   /** Progress has stalled, with its diagnosis (MM-140). */
   stall: { priority: 'coaching', aboutWeight: true, otherIntake: false },
   /** The protein minimum is met on fewer than half of whole days (MM-121). */
-  proteinShort: { priority: 'pattern', aboutWeight: false, otherIntake: false },
+  proteinShort: { priority: 'pattern', aboutWeight: false, otherIntake: false, analysisSignal: 'proteinMinimum' },
   /**
    * Known sodium over the limit the user set on more than half of the days
    * that can be judged (MM-312). After protein: the limit is opt-in.
    */
-  sodiumOverLimit: { priority: 'pattern', aboutWeight: false, otherIntake: true },
+  sodiumOverLimit: { priority: 'pattern', aboutWeight: false, otherIntake: true, analysisSignal: 'sodium' },
   /**
    * On days the protein minimum is missed, one meal has almost none
    * (MM-125). Advice about reaching the total, not about timing.
    */
-  proteinByMeal: { priority: 'education', aboutWeight: false, otherIntake: false },
+  proteinByMeal: { priority: 'education', aboutWeight: false, otherIntake: false, analysisSignal: 'proteinByMeal' },
   // The three below came later (2026-10-19) and sit after the panel-ordered rules above; sorting is by priority first.
   /**
    * Weekend days average a fifth of the target or more above weekdays
@@ -58,7 +58,7 @@ const rules = {
   weighProtein: { priority: 'dataQuality', aboutWeight: false, otherIntake: false },
 } as const satisfies Record<
   string,
-  { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean; quietDaysAfterShown?: number }
+  { priority: InsightPriority; aboutWeight: boolean; otherIntake: boolean; quietDaysAfterShown?: number; analysisSignal?: string }
 >;
 
 /**
@@ -91,6 +91,17 @@ export const InsightRule = {
   quietDaysAfterShown(rule: InsightRule): number {
     const r = rules[rule];
     return 'quietDaysAfterShown' in r ? r.quietDaysAfterShown : 0;
+  },
+
+  /**
+   * The coach's analysis signal that says what this rule said (MM-606), so
+   * the Dashboard's card takes the analysis's finding instead (MM-610);
+   * undefined for a rule the analysis has no equivalent of, which the card
+   * keeps.
+   */
+  analysisSignal(rule: InsightRule): string | undefined {
+    const r = rules[rule];
+    return 'analysisSignal' in r ? r.analysisSignal : undefined;
   },
 
   /** The place of a rule in the catalog: 0 is first. */

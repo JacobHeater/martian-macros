@@ -43,6 +43,14 @@ import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
+import { analysisBalancedScenario } from './analysisBalancedScenario';
+import { analysisFatWeekScenario } from './analysisFatWeekScenario';
+import { analysisSeasonScenario } from './analysisSeasonScenario';
+import { analysisTodayTradeScenario } from './analysisTodayTradeScenario';
+import { buffetDayScenario } from './buffetDayScenario';
+import { firstMorningScenario } from './firstMorningScenario';
+import { nothingLoggedScenario } from './nothingLoggedScenario';
+import { quietWeekScenario } from './quietWeekScenario';
 
 /**
  * What the coach believes, why, and what it will do next. Before MM-256
@@ -1060,4 +1068,207 @@ export const CoachWeightHidden = screenStory({
   shows: 'Against your plan’s pace',
   scenario: weightDisplayScenario('hidden'),
   open: ({ state }) => state.homeTab.put('coach'),
+});
+
+// ---- MM-610: "What your data says", under the one thing to do ----
+
+/** MM-610, MM-612: onboarded this morning with breakfast logged: the analysis reads today so far, with no switcher. */
+export const CoachAnalysisFirstDay = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Today so far',
+  scenario: firstMorningScenario,
+  open: onCoach,
+});
+
+/** MM-610: a week of food and the first week of training: 7d cannot judge training or strength yet, and says what each needs. */
+export const CoachAnalysisNotEnoughData = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Training · needs 4 weeks',
+  scenario: quietWeekScenario({ trained: true }),
+  open: onCoach,
+  walk: pressOnCoach('7d'),
+});
+
+/** MM-610: a week read and nothing stands out: it says so, with the areas it checked. */
+export const CoachAnalysisNothingFound = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Nothing stands out\. Checked: food\.$/,
+  scenario: quietWeekScenario(),
+  open: onCoach,
+  walk: pressOnCoach('7d'),
+});
+
+/** MM-610, MM-606, MM-617: the owner's fat week over 2w: the headline names the fat line and peanut butter; fat and the protein it displaced lead "Worth changing", ending in the swap. */
+export const CoachAnalysisFatWeek = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Worth changing',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: pressOnCoach('2w'),
+});
+
+/** MM-610: the fat week at Full detail with little fiber and a sodium limit: past three, the rest folds under "N more". */
+export const CoachAnalysisMoreFromYourData = screenStory({
+  covers: ['CoachScreen'],
+  shows: /more from your data$/,
+  scenario: analysisFatWeekScenario({ busy: true }),
+  open: onCoach,
+  walk: pressOnCoach('2w'),
+});
+
+/** MM-610: a finding dismissed: the fold counts it, the snack says until when, and the focus goes to the next title. */
+export const CoachAnalysisDismissed = screenStory({
+  covers: ['CoachScreen'],
+  shows: '1 finding hidden',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('2w')(canvas);
+    const [first] = await within(canvas).findAllByRole('button', { name: /^Dismiss: / }, { timeout: 5000 });
+    if (first === undefined) return;
+    reveal(first);
+    await userEvent.click(first);
+  },
+});
+
+/** MM-610: the 1d analysis of the same person: what is left today, and the morning's fat named. */
+export const CoachAnalysisToday = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Today so far',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+});
+
+/** MM-610, MM-114: logged days far under the floor: the section opens by pointing to the notice above it. */
+export const CoachAnalysisUnderEating = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^Start with “About your logged days” at the top/,
+  scenario: weightLossMedicationScenario(),
+  open: onCoach,
+});
+
+/** MM-610, MM-141: the fat week with an eating-disorder history: the protein minimum only, no food named, no trade. */
+export const CoachAnalysisEatingDisorderHistory = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Worth changing',
+  scenario: analysisFatWeekScenario({ eatingDisorderHistory: true }),
+  open: onCoach,
+  walk: pressOnCoach('2w'),
+});
+
+/** MM-610, MM-118: the fat week with the weight hidden: no weight figure in any finding or its numbers. */
+export const CoachAnalysisHiddenWeight = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Worth changing',
+  scenario: analysisFatWeekScenario({ weightDisplay: 'hidden' }),
+  open: onCoach,
+  walk: pressOnCoach('2w'),
+});
+
+/** MM-610: a span chosen, its numbers opened: the span, the days counted and left out, each figure and the rule. */
+export const CoachAnalysisSpanChosen = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Rule',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('7d')(canvas);
+    const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
+    if (numbers === undefined) return;
+    reveal(numbers);
+    await userEvent.click(numbers);
+  },
+});
+
+// ---- MM-610's review fixes, 2026-10-24: every state of the section drawn ----
+
+/** MM-610 (PD-1): a season logged, on a 360 px phone: all five spans under "Days shown", 3m chosen, none clipped. */
+export const CoachAnalysisAllSpansSmallPhone = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^90 days through yesterday/,
+  scenario: analysisSeasonScenario,
+  open: onCoach,
+  viewport: 'smallPhone',
+  walk: pressOnCoach('3m'),
+});
+
+/** MM-610 (PD-2): past three of each, "N more from your data" opened: its fixes and its strengths in two groups, each marked. */
+export const CoachAnalysisMoreBothKinds = screenStory({
+  covers: ['CoachScreen'],
+  shows: /more from your data$/,
+  scenario: analysisBalancedScenario,
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('2w')(canvas);
+    await pressOnCoach(/more from your data$/)(canvas);
+  },
+});
+
+/** MM-610 (F13): the hidden fold opened: each hidden finding's title with the day it shows again. */
+export const CoachAnalysisHiddenOpened = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^shows again /,
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    await pressOnCoach('2w')(canvas);
+    const [first] = await within(canvas).findAllByRole('button', { name: /^Dismiss: / }, { timeout: 5000 });
+    if (first === undefined) return;
+    reveal(first);
+    await userEvent.click(first);
+    await pressOnCoach('1 finding hidden')(canvas);
+  },
+});
+
+/** MM-612 (F8): 1d's numbers opened: what is left today against the day's targets, and the rule. */
+export const CoachAnalysisTodayNumbers = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'What is left today',
+  scenario: analysisFatWeekScenario(),
+  open: onCoach,
+  walk: async (canvas) => {
+    const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
+    if (numbers === undefined) return;
+    reveal(numbers);
+    await userEvent.click(numbers);
+  },
+});
+
+/** MM-612, MM-607, MM-617: a trade on 1d as an order: today's cheese and crackers, swapped for the cottage cheese logged at lunch. */
+export const CoachAnalysisTodayTrade = screenStory({
+  covers: ['CoachScreen'],
+  shows: /(Swap it for|Have) cottage cheese with fruit( instead)?, which you log at lunch/,
+  scenario: analysisTodayTradeScenario,
+  open: onCoach,
+});
+
+/**
+ * MM-617: the owner's buffet day, the coach's voice standard, from the analysis's own fixture (`buffetDayFoods`):
+ * the headline ("1,054 kcal over. The buffet did it."), what is left ("You're done eating for today…"), every fix
+ * with its orders (the buffet's General Tso's chicken skipped or one spoonful, with what the day would be without
+ * it; sodium, water and sauce on the side; the biscuit swapped for two eggs on an English muffin; cookie butter
+ * skipped; fiber, two cups at dinner, from 6 pm), protein holding up, and the close ("Tomorrow: back to 2,175.").
+ * Drawn on the stories' day, so its phrasings are that day's.
+ */
+export const CoachAnalysisBuffetDay = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^(1,054 kcal over|Over by 1,054 kcal|1,054 kcal over your target)\. (The buffet did it|That was the buffet|The buffet put you there)\.$/,
+  scenario: buffetDayScenario,
+  open: onCoach,
+});
+
+/** MM-610: nothing ever logged: the section asks for a food, and nothing else. */
+export const CoachAnalysisNothingLogged = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Log a food and the coach reads it here.',
+  scenario: nothingLoggedScenario,
+  open: onCoach,
+});
+
+/** MM-612 (F5): a week logged, nothing yet today: it says so, points to 7d, and shows what is left at the full targets. */
+export const CoachAnalysisNothingToday = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Nothing logged today yet. 7d reads the last week.',
+  scenario: quietWeekScenario(),
+  open: onCoach,
 });

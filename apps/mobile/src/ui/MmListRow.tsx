@@ -24,7 +24,7 @@ interface MmListRowProps {
   /** Takes focus when it first draws: the first row a "more" control added, so a reader goes on from it (MM-410). */
   autoFocus?: boolean;
   dense?: boolean;
-  /** No horizontal padding, for use inside a padded surface. */
+  /** No horizontal padding, for use inside a padded surface; an `entry` row too. */
   flush?: boolean;
   /**
    * A control the row holds under its title (a number to enter): the row
@@ -52,7 +52,7 @@ export function MmListRow({
 }: MmListRowProps) {
   if (entry !== undefined) {
     return (
-      <div className="mm-list-row mm-list-row-entry">
+      <div className={`mm-list-row mm-list-row-entry${flush ? ' mm-list-row-flush' : ''}`}>
         {leadingIcon === undefined ? null : (
           <span className="mm-list-row-leading">
             <MmIcon name={leadingIcon} />

@@ -1,3 +1,4 @@
+import type { FoodGroup } from '../domain/food/FoodGroup';
 import type { CatalogBarcodeLookup } from './CatalogBarcodeLookup';
 import type { CatalogFood } from './CatalogFood';
 import type { CatalogFoodLookup } from './CatalogFoodLookup';
@@ -54,10 +55,13 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
     return this.packs.filter((pack) => pack.packId !== onlinePackId);
   }
 
-  async search(query: string, { limit = 25, offset = 0 }: { limit?: number; offset?: number } = {}): Promise<SearchHit[]> {
+  async search(
+    query: string,
+    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+  ): Promise<SearchHit[]> {
     const hits: SearchHit[] = [];
     for (const pack of this.packs) {
-      hits.push(...(await pack.search(query, { limit: limit + offset })));
+      hits.push(...(await pack.search(query, { limit: limit + offset, group })));
     }
     return hits.sort(byReliabilityThenMatch).slice(offset, offset + limit);
   }

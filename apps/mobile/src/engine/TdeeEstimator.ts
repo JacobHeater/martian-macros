@@ -4,6 +4,7 @@ import { clamp } from '../lang/clamp';
 import type { SettlingWindow } from './SettlingWindow';
 import { TdeeEstimate } from './TdeeEstimate';
 import type { TdeePrior } from './TdeePrior';
+import { styleSwitchOf } from './styleSwitchOf';
 import { usableIntakeDays } from './usableIntakeDays';
 import type { WeightTrendPoint } from './WeightTrendPoint';
 
@@ -22,21 +23,6 @@ interface TdeeEstimatorInit {
 type Segment = readonly [from: CalendarDate, to: CalendarDate];
 
 const sq = (x: number) => x * x;
-
-const mean = (days: readonly IntakeDay[], share: (d: IntakeDay) => number) =>
-  days.reduce((sum, d) => sum + share(d), 0) / days.length;
-
-/**
- * How far apart two runs of days are in logging style (MM-27, MM-46): half
- * the summed change in the shares weighed, by hand and the rest (label
- * servings, measures, estimates). With no hand portions this is the change
- * in weighed share; hand portions to a scale or to labels each count in full.
- */
-function styleChange(before: readonly IntakeDay[], after: readonly IntakeDay[]): number {
-  const weighed = mean(after, (d) => d.weighedShare) - mean(before, (d) => d.weighedShare);
-  const hand = mean(after, (d) => d.handShare) - mean(before, (d) => d.handShare);
-  return (Math.abs(weighed) + Math.abs(hand) + Math.abs(weighed + hand)) / 2;
-}
 
 /**
  * Windowed energy-balance TDEE estimator.
@@ -287,16 +273,6 @@ export class TdeeEstimator {
    * styles (e.g. hand portions to a food scale) inside the window.
    */
   private styleSwitch(days: readonly IntakeDay[]): CalendarDate | undefined {
-    const m = this.minDaysPerStyleSegment;
-    let best: CalendarDate | undefined;
-    let bestChange = this.styleSwitchThreshold;
-    for (let i = m; i <= days.length - m; i++) {
-      const change = styleChange(days.slice(0, i), days.slice(i));
-      if (change > bestChange) {
-        bestChange = change;
-        best = (days[i] as IntakeDay).date;
-      }
-    }
-    return best;
+    return styleSwitchOf(days, this.styleSwitchThreshold, this.minDaysPerStyleSegment);
   }
 }

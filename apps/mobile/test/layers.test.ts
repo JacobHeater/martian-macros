@@ -12,7 +12,8 @@ const allowed: Record<string, readonly string[]> = {
   engine: ['lang', 'domain'],
   healthIngest: ['lang'],
   sql: ['lang'],
-  foodCatalog: ['lang', 'sql'],
+  // A catalog food carries its food group (MM-616), a domain type the coach reads too.
+  foodCatalog: ['lang', 'domain', 'sql'],
   foodPipeline: ['lang', 'domain', 'foodCatalog', 'sql'],
   // Foods looked up online (MM-58): the services behind the domain's JSON seam, mapped with the pipeline's own rules.
   foodOnline: ['lang', 'domain', 'foodCatalog', 'foodPipeline'],

@@ -1,3 +1,4 @@
+import { FoodGroup } from '../domain/food/FoodGroup';
 import { FormatError } from '../lang/FormatError';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { SqlRow } from '../sql/SqlRow';
@@ -82,15 +83,28 @@ export class SqliteFoodPack implements FoodPack {
     return this.header.packId;
   }
 
-  async search(query: string, { limit = 25, offset = 0 }: { limit?: number; offset?: number } = {}): Promise<SearchHit[]> {
+  async search(
+    query: string,
+    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+  ): Promise<SearchHit[]> {
     const words = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
-    if (words.length === 0) return [];
+    // A pack older than format 4 holds no groups, so none of its foods is in one (MM-616).
+    if (group !== undefined && this.header.formatVersion < 4) return [];
+    if (words.length === 0) {
+      if (group === undefined) return [];
+      const listed = await this.db.select(
+        `SELECT ${this.columns}, 0 AS score FROM foods f WHERE f.food_group = ? ORDER BY f.id LIMIT ? OFFSET ?`,
+        [group, limit, offset],
+      );
+      return listed.map((row) => ({ food: this.food(row), score: number(row['score'], 'score') }));
+    }
     const match = words.map((w) => `"${w}"*`).join(' ');
+    const inGroup = group === undefined ? '' : 'AND f.food_group = ? ';
     const rows = await this.db.select(
       `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score ` +
         'FROM foods_fts JOIN foods f ON f.id = foods_fts.rowid ' +
-        'WHERE foods_fts MATCH ? ORDER BY score, f.id LIMIT ? OFFSET ?',
-      [match, limit, offset],
+        `WHERE foods_fts MATCH ? ${inGroup}ORDER BY score, f.id LIMIT ? OFFSET ?`,
+      group === undefined ? [match, limit, offset] : [match, group, limit, offset],
     );
     return rows.map((row) => ({ food: this.food(row), score: number(row['score'], 'score') }));
   }
@@ -134,11 +148,16 @@ export class SqliteFoodPack implements FoodPack {
     return this.db.close();
   }
 
-  /** The columns a food is read from: format 2 adds the micronutrients (MM-307), format 3 sugar alcohols (MM-397). */
+  /**
+   * The columns a food is read from: format 2 adds the micronutrients
+   * (MM-307), format 3 sugar alcohols (MM-397), format 4 the food group (MM-616).
+   */
   private get columns(): string {
-    if (this.header.formatVersion < 2) return formatOneColumns;
+    const version = this.header.formatVersion;
+    if (version < 2) return formatOneColumns;
     const micros = [formatOneColumns, ...PackMicronutrient.values.map((n) => `f.${PackMicronutrient.column(n)}`)];
-    return (this.header.formatVersion < 3 ? micros : [...micros, 'f.sugar_alcohols']).join(', ');
+    if (version < 3) return micros.join(', ');
+    return [...micros, 'f.sugar_alcohols', ...(version < 4 ? [] : ['f.food_group'])].join(', ');
   }
 
   /** The micronutrient columns a format 2 pack has; a format 1 pack has none (MM-307). */
@@ -180,6 +199,8 @@ export class SqliteFoodPack implements FoodPack {
       sourceId: optionalText(row['source_id']),
       tier: TrustTier.fromCode(number(row['tier'], 'tier')),
       tierReason: text(row['tier_reason'], 'tier reason'),
+      // A group this code does not know is no group, never a misread one.
+      group: this.header.formatVersion < 4 ? undefined : FoodGroup.fromName(optionalText(row['food_group'])),
     });
   }
 }

@@ -2,6 +2,7 @@ import { InMemoryProgressPhotoRepository } from './InMemoryProgressPhotoReposito
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
+import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -29,12 +30,15 @@ import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetShapeRepository } from '../domain/repositories/TargetShapeRepository';
 import type { GoalBodyFatRepository } from '../domain/repositories/GoalBodyFatRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
+import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import { InMemoryHealthSampleStore } from '../healthIngest/testing/InMemoryHealthSampleStore';
 import { InMemoryCustomExerciseRepository } from './InMemoryCustomExerciseRepository';
 import { InMemoryCustomFoodRepository } from './InMemoryCustomFoodRepository';
 import { InMemoryDataEraser } from './InMemoryDataEraser';
+import { InMemoryDayKindRepository } from './InMemoryDayKindRepository';
 import { InMemoryDayMarkRepository } from './InMemoryDayMarkRepository';
 import { InMemoryExerciseProgressionRepository } from './InMemoryExerciseProgressionRepository';
 import { InMemoryFoodRepository } from './InMemoryFoodRepository';
@@ -51,6 +55,8 @@ import { InMemorySleepRepository } from './InMemorySleepRepository';
 import { InMemoryTargetShapeRepository } from './InMemoryTargetShapeRepository';
 import { InMemoryGoalBodyFatRepository } from './InMemoryGoalBodyFatRepository';
 import { InMemoryTargetsHistoryRepository } from './InMemoryTargetsHistoryRepository';
+import { InMemoryTrendLogRepository } from './InMemoryTrendLogRepository';
+import { InMemoryCoachAdviceRecordRepository } from './InMemoryCoachAdviceRecordRepository';
 import { InMemoryMenstruationRepository } from './InMemoryMenstruationRepository';
 import { InMemoryMeasurementRepository } from './InMemoryMeasurementRepository';
 import { InMemoryMeasurementSettingsRepository } from './InMemoryMeasurementSettingsRepository';
@@ -78,6 +84,8 @@ export class InMemoryRepositories {
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
+  /** The days marked a Refeed or a Day off (MM-611). */
+  readonly dayKinds: DayKindRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   readonly targetShapes: TargetShapeRepository;
@@ -88,6 +96,10 @@ export class InMemoryRepositories {
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
+  /** What the trend engine said, and the coach's findings dismissed (MM-605). */
+  readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -111,6 +123,7 @@ export class InMemoryRepositories {
     const food = new InMemoryFoodRepository();
     const customFoods = new InMemoryCustomFoodRepository();
     const dayMarks = new InMemoryDayMarkRepository();
+    const dayKinds = new InMemoryDayKindRepository();
     const targets = new InMemoryTargetsHistoryRepository();
     const targetShapes = new InMemoryTargetShapeRepository();
     const goalBodyFat = new InMemoryGoalBodyFatRepository();
@@ -118,6 +131,8 @@ export class InMemoryRepositories {
     const insightLog = new InMemoryInsightLogRepository();
     const inlineInsightLog = new InMemoryInlineInsightLogRepository();
     const insightSnoozes = new InMemoryInsightSnoozeRepository();
+    const trendLog = new InMemoryTrendLogRepository();
+    const adviceRecord = new InMemoryCoachAdviceRecordRepository();
     const pauses = new InMemoryPauseRepository();
     const reminders = new InMemoryReminderRepository();
     const recovery = new InMemoryRecoveryCheckInRepository();
@@ -139,6 +154,7 @@ export class InMemoryRepositories {
     this.food = food;
     this.customFoods = customFoods;
     this.dayMarks = dayMarks;
+    this.dayKinds = dayKinds;
     this.intake = new InMemoryIntakeReader(food, dayMarks);
     this.targets = targets;
     this.targetShapes = targetShapes;
@@ -148,6 +164,8 @@ export class InMemoryRepositories {
     this.insightLog = insightLog;
     this.inlineInsightLog = inlineInsightLog;
     this.insightSnoozes = insightSnoozes;
+    this.trendLog = trendLog;
+    this.adviceRecord = adviceRecord;
     this.pauses = pauses;
     this.reminders = reminders;
     this.recovery = recovery;
@@ -168,6 +186,7 @@ export class InMemoryRepositories {
       () => food.clear(),
       () => customFoods.clear(),
       () => dayMarks.clear(),
+      () => dayKinds.clear(),
       () => targets.clear(),
       () => targetShapes.clear(),
       () => goalBodyFat.clear(),
@@ -175,6 +194,8 @@ export class InMemoryRepositories {
       () => insightLog.clear(),
       () => inlineInsightLog.clear(),
       () => insightSnoozes.clear(),
+      () => trendLog.clear(),
+      () => adviceRecord.clear(),
       () => pauses.clear(),
       () => reminders.clear(),
       () => recovery.clear(),

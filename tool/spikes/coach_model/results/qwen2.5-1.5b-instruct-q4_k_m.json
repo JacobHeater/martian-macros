@@ -1,0 +1,298 @@
+{
+ "summary": {
+  "model": "qwen2.5-1.5b-instruct-q4_k_m",
+  "size_mb": 1066,
+  "passed": 1,
+  "runs": 21,
+  "pass_rate": 0.048,
+  "median_tokens_per_second": 18.8,
+  "median_seconds": 6.5
+ },
+ "runs": [
+  {
+   "scenario": "1-buffet-day",
+   "sample": 0,
+   "text": "You ate 1054 extra calories today, which is 50% more than your goal for the day. The biggest problem is the Chinese buffet lunch, where you consumed 2368 calories. The General Tso's chicken was the main culprit, with 744 calories and 33 grams of fat. This meal cost you 1054 extra calories and 33 grams of fat. To correct this, you should skip the General Tso's chicken next time or take one spoonful. If you're hungry, eat a lean protein and vegetables for dinner. Drink water tonight to help with sodium intake. Next time, get the sauce on the side to control sodium. Swap the sausage, egg, and cheese biscuit for two eggs on an English muffin with a slice of cheese. This will save you 291 calories and 45 grams of fat. Eat two cups of vegetables at dinner to meet your fiber goal. Skip the cookie butter. Drink water tomorrow to help with sodium. Back to plan tomorrow, no skipping meals",
+   "problems": [
+    "14 sentences",
+    "numbers not in facts: 291, 50"
+   ],
+   "pass": false,
+   "seconds": 26.0,
+   "tokens": 220,
+   "tokens_per_second": 16.3,
+   "prompt_tokens_per_second": 92.9
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 1,
+   "text": "You ate 1054 extra calories today, which is 52% of your daily goal. You should skip General Tso's chicken next time or take one spoonful. If you're hungry, eat a lean protein and vegetables for dinner under 400 kcal. Drink water tonight to avoid sodium overload. Next time, get your sauce on the side. Swap sausages, egg and cheese biscuits for two eggs on an English muffin with cheese. Swap out the cookie butter. Eat two cups of vegetables at dinner. Back to plan tomorrow; don't skip meals to make up for today.",
+   "problems": [
+    "9 sentences",
+    "numbers not in facts: 52"
+   ],
+   "pass": false,
+   "seconds": 7.3,
+   "tokens": 126,
+   "tokens_per_second": 17.4,
+   "prompt_tokens_per_second": 18.1
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 2,
+   "text": "You ate 3229 calories today, which is 1054 over your target of 2175. Your goal is fat loss, and you should be eating less to achieve it. The biggest problem is that you ate too much Chinese buffet food, specifically General Tso's chicken, which had 744 calories and 33 grams of fat. This meal cost you 310 calories if you had not eaten it. The next time, skip it or take one spoonful. You should eat steamed chicken with vegetables instead. You need to hold off on the sodium too, as you have 6923 mg of sodium, which is 3.8 times the limit of 1800 mg. Drink water tonight to stay hydrated, and next time, get your sauce on the side. You should swap the sausage, egg and cheese biscuit for two eggs on an English muffin with a slice of cheese. This will save you 291 calories and 45 grams of fat. You should also eat two",
+   "problems": [
+    "11 sentences",
+    "numbers not in facts: 291"
+   ],
+   "pass": false,
+   "seconds": 12.3,
+   "tokens": 220,
+   "tokens_per_second": 17.9,
+   "prompt_tokens_per_second": 18.1
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 0,
+   "text": "You ate 715 extra calories today, which is 33% of your goal for the day. You skipped the General Tso's chicken, but it's back. You're done eating for today. If you're hungry, have a lean protein and veggies under 400 kcal, no sauce. Back to plan tomorrow. Drink water.",
+   "problems": [
+    "6 sentences",
+    "numbers not in facts: 33"
+   ],
+   "pass": false,
+   "seconds": 6.7,
+   "tokens": 74,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 96.4
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 1,
+   "text": "You've eaten 715 extra calories today, which is 35% of your goal for the day. That's too much. The Chinese buffet had 1980 calories, which is way too much. You should have skipped the General Tso's chicken, which was 744 calories. It's back, so you're done eating for today. If you're hungry, have dinner with lean protein and vegetables, no sauce. Back to plan tomorrow. Drink water.",
+   "problems": [
+    "8 sentences",
+    "numbers not in facts: 35"
+   ],
+   "pass": false,
+   "seconds": 5.4,
+   "tokens": 102,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 18.9
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 2,
+   "text": "You ate 2890 calories today, which is 715 more than your goal of 2175. That's too much. The cause was your lunch, which had 1980 calories, including 744 from General Tso's chicken. You've had this mistake three times in the past week, so it's back. For today, you're done eating. If you're hungry, have a lean protein and veggies under 400 calories, no sauce. Tomorrow, back to plan, no skipping meals to make up for today. Drink water.",
+   "problems": [
+    "8 sentences"
+   ],
+   "pass": false,
+   "seconds": 6.6,
+   "tokens": 124,
+   "tokens_per_second": 18.9,
+   "prompt_tokens_per_second": 18.9
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 0,
+   "text": "You've been overeating by 420 calories a day for the last 14 days, eating biscuits and gravy for breakfast. This has caused you to lose 9 pounds, which is 830 calories each day. You've been doing this for 9 days. Your goal is to lose fat, but you've been eating too much to reach it. You've saved 286 calories per day by swapping biscuits and gravy for Greek yogurt with berries and granola. You've been missing your protein goals, with only 28 grams of protein each day. This is affecting your training sessions, which are 8 days in a row. You should add a protein food at breakfast every day to meet your goal. Your plan is to back to plan tomorrow.",
+   "problems": [
+    "9 sentences"
+   ],
+   "pass": false,
+   "seconds": 12.6,
+   "tokens": 160,
+   "tokens_per_second": 18.0,
+   "prompt_tokens_per_second": 89.7
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 1,
+   "text": "You've been over your target days by 9, eating 830 kcal of biscuits and gravy on average, and that's caused you to lose 420 kcal over the last 14 days. You should swap that for Greek yogurt with berries and granola, which is 350 kcal and provides 24g of protein. This saves you 286 kcal per day. Your goal is fat loss, so you should aim to eat less, not more. Your training sessions are important, but your goal is to lose fat, not gain muscle. Back to plan tomorrow.",
+   "problems": [
+    "6 sentences"
+   ],
+   "pass": false,
+   "seconds": 6.7,
+   "tokens": 125,
+   "tokens_per_second": 18.6,
+   "prompt_tokens_per_second": 19.1
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 2,
+   "text": "You've been eating too much biscuits and gravy for the last 14 days, which is causing you to gain 420 extra calories. You should have eaten Greek yogurt with berries and granola instead, which saved you 286 calories per day. You need to swap out the biscuits and gravy for Greek yogurt with berries and granola on weekdays. Your goal of fat loss is still on track, but you need to make sure you're eating enough protein and getting enough rest. Your training sessions are fine, but you need to add more protein to your diet. Remember, tomorrow is back to plan. Drink water and back to your original plan.",
+   "problems": [
+    "7 sentences",
+    "leads without the first fact (9)"
+   ],
+   "pass": false,
+   "seconds": 7.2,
+   "tokens": 135,
+   "tokens_per_second": 18.6,
+   "prompt_tokens_per_second": 19.1
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 0,
+   "text": "You've been eating too much peanut butter, which is costing you 35% of your goal. You've been swapping it for Greek yogurt, but that's not enough. You've been holding up your calories for 12 days, which is too much. You've been missing out on 10 days of fat loss. Drink water and back to plan.",
+   "problems": [],
+   "pass": true,
+   "seconds": 6.5,
+   "tokens": 76,
+   "tokens_per_second": 18.4,
+   "prompt_tokens_per_second": 105.4
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 1,
+   "text": "You've been eating too much peanut butter for the last 14 days. You've gained 98 grams of fat, which is 35% of your goal. You should cut it to one tablespoon or swap it for Greek yogurt. Skipping meals won't help you reach your goal. Drink water and back to plan.",
+   "problems": [
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 3.6,
+   "tokens": 68,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 17.7
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 2,
+   "text": "You've been eating too much peanut butter, which is costing you 35% of your goal of fat loss. You've had too much protein short, which is slowing down your progress. You've swapped out peanut butter for Greek yogurt, but you're holding up your calorie intake. Skip the peanut butter, halve the protein short, swap it for Greek yogurt, and watch your progress improve. Drink water and back to plan.",
+   "problems": [
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 4.7,
+   "tokens": 89,
+   "tokens_per_second": 18.9,
+   "prompt_tokens_per_second": 19.4
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 0,
+   "text": "You've dropped two training sessions in the last 14 days, which is too much. You need at least two sessions a week to hold your strength. Get back in the gym today and make sure you're getting at least 150 grams of protein per day.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 4.5,
+   "tokens": 57,
+   "tokens_per_second": 19.2,
+   "prompt_tokens_per_second": 97.2
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 1,
+   "text": "You've dropped two sessions in the last 14 days. That's too much. You need to get back in the gym and get two sessions in this week. One heavy session a week is the minimum that holds your strength. You didn't get back in the gym last Monday, so you missed 12 days. You need to eat 150 grams of protein a day to protect your muscle mass. Drink water and back to plan.",
+   "problems": [
+    "7 sentences",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 4.9,
+   "tokens": 93,
+   "tokens_per_second": 18.9,
+   "prompt_tokens_per_second": 19.7
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 2,
+   "text": "You've dropped your training for the last 14 days. That's too much. You should get two sessions in this week; one heavy session a week is the minimum that holds your strength. You said you'd get back in the gym last Monday, but you didn't. You're holding up on your protein intake for the last 12 days, which is too much. You need to get back on track with your protein intake. Drink water and back to plan.",
+   "problems": [
+    "7 sentences",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 5.2,
+   "tokens": 98,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 19.2
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 0,
+   "text": "You've eaten 2150 calories today, which is 25 calories over your goal. You've also missed out on 1400 calories due to the sausage, egg, and cheese biscuit you skipped. Your protein intake is 192 grams, which is 4 grams short of your minimum of 149 grams. To reach your goal of fat loss, you need to add a cup of vegetables tomorrow to ensure you meet your target of 2175 calories. Skipping meals is not an option. Drink water to stay hydrated. Back to plan.",
+   "problems": [
+    "7 sentences",
+    "numbers not in facts: 25, 4"
+   ],
+   "pass": false,
+   "seconds": 8.6,
+   "tokens": 122,
+   "tokens_per_second": 19.0,
+   "prompt_tokens_per_second": 104.1
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 1,
+   "text": "You've eaten 2150 calories today, which is 25 fewer than your target of 2175. You've also skipped 3 days of protein, which is 43 grams short of your minimum of 48 grams. You saved 1400 calories by skipping meals, which is great progress. However, you're still 24 grams short of your fiber goal of 30 grams. To make up for today, add a cup of vegetables to your next meal. Drink water and back to plan tomorrow.",
+   "problems": [
+    "6 sentences",
+    "numbers not in facts: 25, 43, 48"
+   ],
+   "pass": false,
+   "seconds": 6.2,
+   "tokens": 115,
+   "tokens_per_second": 18.6,
+   "prompt_tokens_per_second": 19.1
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 2,
+   "text": "You've eaten too much today, which is causing you to hold up your goal of fat loss. You've had 2150 calories, which is 215 calories more than your target of 2175. You've also had 192g of protein, which is 43g too much. You skipped 3 days of food, saving you 1400 calories. To fix this, you should add a cup of vegetables to your diet tomorrow. Your goal is to lose fat, not to eat less. Drink water to stay hydrated. Back to plan.",
+   "problems": [
+    "8 sentences",
+    "numbers not in facts: 215, 43"
+   ],
+   "pass": false,
+   "seconds": 8.0,
+   "tokens": 125,
+   "tokens_per_second": 15.7,
+   "prompt_tokens_per_second": 17.6
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 0,
+   "text": "You've already protected yourself from protein today. That's great. Now, let's adjust your meal plan. You're at the minimum protein intake for maintenance. Next time, add this: protein, 149 g. Back to plan. Drink water.",
+   "problems": [
+    "7 sentences",
+    "leads without the first fact (155)"
+   ],
+   "pass": false,
+   "seconds": 3.8,
+   "tokens": 54,
+   "tokens_per_second": 19.1,
+   "prompt_tokens_per_second": 90.7
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 1,
+   "text": "You've hit your protein goal for the day, but you're holding up your maintenance goal. You've got 6 g of protein left to eat, but you've already had 149 g. You need to swap this protein for something else that will help you reach your goal. Drink water to stay hydrated. Back to plan.",
+   "problems": [
+    "numbers not in facts: 6",
+    "leads without the first fact (155)"
+   ],
+   "pass": false,
+   "seconds": 3.6,
+   "tokens": 70,
+   "tokens_per_second": 19.6,
+   "prompt_tokens_per_second": 18.2
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 2,
+   "text": "You've hit a snag today. You've been holding up at 155g of protein, which is 6g over your goal of 149g. That's a cost of 155g. You've been keeping a protein food at each meal, which is too much. You need to keep a protein food at each meal, but not too much. Drink water to stay hydrated. Back to plan.",
+   "problems": [
+    "7 sentences",
+    "numbers not in facts: 6"
+   ],
+   "pass": false,
+   "seconds": 4.6,
+   "tokens": 90,
+   "tokens_per_second": 19.6,
+   "prompt_tokens_per_second": 19.6
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+  "scenario": "Accountability: the coach said on Tuesday to skip the General Tso's chicken; Thursday it is back",
+  "facts": {
+    "period": "today so far",
+    "goal": "fat loss",
+    "items": [
+      {"type": "over_target", "eaten_kcal": 2890, "target_kcal": 2175, "over_kcal": 715, "cause_meal": "lunch", "cause_name": "Chinese buffet", "cause_kcal": 1980},
+      {"type": "said_before", "on": "Tuesday", "order_given": "skip the General Tso's chicken", "food": "General Tso's chicken", "kcal": 744, "repeat": "it is back"},
+      {"type": "repeat_count", "what": "days over target by 500 kcal or more", "count": 3, "window": "this week"},
+      {"type": "rest_of_today", "order": "you are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce"},
+      {"type": "tomorrow", "target_kcal": 2175, "order": "back to plan; do not skip meals to make up for today"}
+    ]
+  }
+}

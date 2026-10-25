@@ -21,6 +21,7 @@ interface CandidateFoodInit {
   servings?: readonly CatalogServing[];
   versionKey?: number;
   updatedAt?: number;
+  category?: string | undefined;
 }
 
 /**
@@ -62,6 +63,15 @@ export class CandidateFood {
    */
   readonly updatedAt: number;
 
+  /**
+   * The source's own category (MM-616): `food_category` for Foundation and
+   * SR Legacy foods, the WWEIA category for FNDDS foods,
+   * `branded_food_category` for branded products; undefined for Open Food
+   * Facts and wherever the source gives none. The pipeline maps it to a
+   * food group.
+   */
+  readonly category: string | undefined;
+
   constructor(init: CandidateFoodInit) {
     this.source = init.source;
     this.sourceId = init.sourceId;
@@ -81,5 +91,6 @@ export class CandidateFood {
     this.servings = init.servings ?? [];
     this.versionKey = init.versionKey ?? 0;
     this.updatedAt = init.updatedAt ?? 0;
+    this.category = init.category;
   }
 }

@@ -1,3 +1,4 @@
+import type { FoodGroup } from '../domain/food/FoodGroup';
 import type { PackMicros } from './PackMicros';
 import type { PreparationState } from './PreparationState';
 import type { TrustTier } from './TrustTier';
@@ -23,6 +24,7 @@ interface CatalogFoodInit {
   pairedFoodId?: number | undefined;
   densityGPerMl?: number | undefined;
   sourceId?: string | undefined;
+  group?: FoodGroup | undefined;
 }
 
 /** One food as a pack states it, per 100 g. */
@@ -58,6 +60,13 @@ export class CatalogFood {
    * `code`), so a pack entry can be traced back to where it came from.
    */
   readonly sourceId: string | undefined;
+
+  /**
+   * What kind of food it is (MM-616), mapped by the pipeline from the
+   * source's category. Undefined when the category maps to no group, or the
+   * pack is older than format 4.
+   */
+  readonly group: FoodGroup | undefined;
   readonly tier: TrustTier;
 
   /** Why it has that tier, in a sentence. */
@@ -84,5 +93,6 @@ export class CatalogFood {
     this.pairedFoodId = init.pairedFoodId;
     this.densityGPerMl = init.densityGPerMl;
     this.sourceId = init.sourceId;
+    this.group = init.group;
   }
 }

@@ -218,6 +218,9 @@ export * from './TrainingLapse';
 export * from './TrainingLapseKind';
 export * from './assessTrainingLapse';
 export * from './trainingSuspended';
+// A session is a workout with a hard set (MM-609).
+export * from './hasHardSet';
+export * from './isHardSet';
 export * from './CycleRule';
 export * from './cycleWindows';
 export * from './MaintenanceStatus';
@@ -257,6 +260,10 @@ export * from './TdeeEstimate';
 export * from './TdeeEstimator';
 export * from './TdeePrior';
 export * from './TdeeStatus';
+// The trend engine (MM-605) and the logging-style switch it shares with the estimator.
+export * from './styleSwitchOf';
+export * from './trends';
+export * from './analysis';
 export * from './TimedSet';
 export * from './timedSetsOf';
 export * from './TimeSpanProblem';

@@ -115,6 +115,13 @@ const tablesAddedSince: readonly string[] = [
   // Version 23 (MM-156): every body measurement by site, and which sites are measured.
   'body_measurements',
   'measurement_settings',
+  // Version 27 (MM-611): the days marked a Refeed or a Day off.
+  'day_kinds',
+  // Version 28 (MM-605): the trend engine's announcement log, and the coach's findings dismissed.
+  'trend_announcements',
+  'finding_dismissals',
+  // Version 29 (MM-617): the coach's record of the advice it showed.
+  'coach_advice_given',
 ];
 
 /** The Dart database's tables since removed. */

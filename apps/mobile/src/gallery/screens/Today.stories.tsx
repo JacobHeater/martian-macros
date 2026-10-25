@@ -3,6 +3,7 @@ import { FoodEntry } from '../../domain/FoodEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
+import { analysisFatWeekScenario } from './analysisFatWeekScenario';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { fiberLowScenario } from './fiberLowScenario';
@@ -350,13 +351,29 @@ export const InsightWaistAgainstWeight = screenStory({
   },
 });
 
-/** MM-126: on a cut, fiber well under the guide and hunger hard: fullness, in foods already logged, at most monthly. */
+/**
+ * MM-126: on a cut, fiber well under the guide and hunger hard: fullness, in foods already logged, at most monthly.
+ * On the card since two days ago, so it keeps its place over the analysis's own fiber line, new as of yesterday (MM-610).
+ */
 export const InsightFiberForFullness = screenStory({
   covers: ['DashboardScreen'],
   shows: 'Fiber, and staying full on a deficit',
   scenario: fiberLowScenario,
   walk: async (canvas) => {
     reveal(await within(canvas).findByText('Fiber, and staying full on a deficit'));
+  },
+});
+
+/**
+ * MM-610: the card from the coach's analysis: the owner's fat week, announced new as of yesterday, in the Coach tab's
+ * own words, with the numbers one tap down and the way to that section on Coach.
+ */
+export const InsightFromAnalysis = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'Fat averaged 90 g against 70 g',
+  scenario: analysisFatWeekScenario(),
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: /^Open on Coach/ }));
   },
 });
 

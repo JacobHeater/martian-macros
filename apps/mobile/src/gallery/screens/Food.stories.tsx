@@ -798,6 +798,36 @@ export const DayCompleteness = screenStory({
   },
 });
 
+/** MM-611: today marked a Refeed: the neutral chip in the day's header, beside the "Mark day" action. */
+export const DayMarkedRefeed = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Refeed',
+  scenario: demoWith({ then: async (repos, today) => repos.dayKinds.setDayKind(today, 'refeed') }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-611: yesterday marked a Day off on a 360 px phone: the chip goes under the day rather than past the bar's edge. */
+export const DayMarkedDayOffSmallPhone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Day off',
+  scenario: demoWith({ then: async (repos, today) => repos.dayKinds.setDayKind(today.addDays(-1), 'dayOff') }),
+  open: ({ state, today }) => {
+    state.homeTab.put('food');
+    state.selectedDay.put(today.addDays(-1));
+  },
+  viewport: 'smallPhone',
+});
+
+/** MM-611: "Mark day" pressed: Refeed, Day off, and the way to clear a mark. */
+export const MarkDay = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'No mark',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Mark day' }));
+  },
+});
+
 /** MM-321, MM-336: a glass of wine today at Full detail: the alcohol's energy and the fiber as rows of the hero. */
 export const FoodWithAlcohol = screenStory({
   covers: ['FoodScreen'],
