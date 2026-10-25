@@ -1072,7 +1072,7 @@ export const CoachWeightHidden = screenStory({
 
 // ---- MM-610: "What your data says", under the one thing to do ----
 
-/** MM-610, MM-612: onboarded this morning with breakfast logged: the analysis reads today so far, with no switcher. */
+/** MM-610, MM-612: onboarded this morning with breakfast logged: the analysis reads today so far, 7d offered already (MM-621). */
 export const CoachAnalysisFirstDay = screenStory({
   covers: ['CoachScreen'],
   shows: 'Today so far',

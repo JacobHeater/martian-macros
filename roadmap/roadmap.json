@@ -2959,7 +2959,8 @@
           "MM-610",
           "MM-606",
           "MM-604",
-          "MM-620"
+          "MM-620",
+          "MM-621"
         ],
         "remaining": [
           "MM-145",
@@ -3138,6 +3139,13 @@
           "title": "The span switcher hides without saying why: offered on any span past 1d, what opens 7d said, and the section named \"Coach's feedback\" (the owner, 2026-10-25, MM-620)",
           "tickets": [
             "MM-620"
+          ]
+        },
+        {
+          "step": 19,
+          "title": "7d reads every day logged in the last 7, today included, partial or not (the owner, 2026-10-25, MM-621)",
+          "tickets": [
+            "MM-621"
           ]
         }
       ],

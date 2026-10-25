@@ -22,7 +22,7 @@ By the product owner, 2026-10-25: the section's heading is "Coach's feedback", n
 
 Choices made without asking (say if any is wrong):
 - The switcher shows once any span beyond 1d is supported, not only 7d.
-- While only 1d is offered, a caption under the period line says what opens 7d, on the switcher's own rule: "7d opens a week
+- (Removed by MM-621, where 7d waits on nothing.) While only 1d is offered, a caption under the period line says what opens 7d, on the switcher's own rule: "7d opens a week
   after your first entry · 3 days to go", or "7d opens once 5 of the last 7 days are fully logged · 3 so far".
 - The coverage rule itself (MM-605's 60%) is unchanged.
 

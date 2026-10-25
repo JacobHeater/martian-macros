@@ -27,7 +27,7 @@ Choices made without asking (from the coaching panel; say if any is wrong):
   - The analysis opens on **1d** (today, MM-612), with an `MmSegmented` switcher `1d | 7d | 2w | 1m | 3m` like Progress's 30d and
     90d.
   - A span appears in the switcher only when the data supports it: the days since the first entry reach the span, and its days
-    meet MM-605's coverage rule (≥ 60% eligible). The switcher itself appears only when 7d does (MM-620: once any span past 1d does).
+    meet MM-605's coverage rule (≥ 60% eligible). 7d is overruled by MM-621: the last 7 days with today, every logged day. The switcher itself appears only when 7d does (MM-620: once any span past 1d does).
   - The tab opens on 1d each time.
   - 7d to 3m run MM-605's detectors over that span, through yesterday. A change inside the span is dated ("since 12 Oct").
 - **Layout, top to bottom:**
