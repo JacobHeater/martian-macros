@@ -87,10 +87,24 @@ export default defineConfig({
           name: 'screens',
           environment: 'jsdom',
           include: ['src/**/*.test.tsx', 'test/**/*.test.tsx'],
+          // The stories are drawn once, under coverage, by `npm run unseen` (MM-619).
+          exclude: ['test/gallery/stories/**', 'node_modules/**'],
           setupFiles: ['test/setup.ts'],
           css: true,
           // These draw the whole app and walk through it; several screens' worth
           // takes longer than the default on a busy machine.
+          testTimeout: 20000,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          // Every story drawn and walked (MM-237), in shards so they spread over the workers (MM-619).
+          name: 'stories',
+          environment: 'jsdom',
+          include: ['test/gallery/stories/*.test.tsx'],
+          setupFiles: ['test/setup.ts'],
+          css: true,
           testTimeout: 20000,
         },
       },

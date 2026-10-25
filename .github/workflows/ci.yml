@@ -3,37 +3,119 @@ name: CI
 # Runs the same commands as a developer: `mm bootstrap` and `mm check`, then
 # the Android build of the shell. CI calls `mm`, never npm or gradle
 # directly, so local and CI behavior cannot drift (MM-7).
+#
+# MM-619: the parts of `mm check` run as jobs at the same time: the static
+# checks, the tests in three shards, and the stories under coverage. Android's
+# build is a job of its own. A person's `mm check` still runs every part.
 
 on:
   pull_request:
   push:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
-  check:
+  static:
+    name: Static (requirements, panel, tool tests, type check, build, offline, legal)
     runs-on: ubuntu-latest
-    # The tests alone take about 20 minutes now (2026-10-24), then the stories, the build and Android's.
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/mobile/package-lock.json
-
       - name: Bootstrap
         run: ./mm bootstrap
+      - name: Check (static)
+        run: ./mm check --part static
 
-      - name: Check (requirements, panel, tool tests, web)
-        run: ./mm check
+  tests:
+    name: Tests (shard ${{ matrix.shard }} of 3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Bootstrap
+        run: ./mm bootstrap
+      - name: Check (tests)
+        run: ./mm check --part tests --shard ${{ matrix.shard }}/3
 
+  stories:
+    name: Stories (drawn under coverage, and the unseen check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Bootstrap
+        run: ./mm bootstrap
+      - name: Check (stories)
+        run: ./mm check --part stories
+
+  android:
+    name: Build Android (debug)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Bootstrap
+        run: ./mm bootstrap
       # The Android shell (MM-232): the web app synced in and assembled.
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
-
       - name: Build Android (debug)
         run: ./mm build android
+
+  # MM-619, temporary: CPU profiles of the slowest screen tests, to find why a screen test takes over a second. Removed
+  # before this branch merges (it calls npx directly, which MM-7 keeps out of CI).
+  profile:
+    name: Profile slow screen tests (temporary)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/mobile/package-lock.json
+      - name: Bootstrap
+        run: ./mm bootstrap
+      - name: Profile
+        working-directory: apps/mobile
+        env:
+          NODE_OPTIONS: --cpu-prof --cpu-prof-dir=${{ github.workspace }}/prof
+        run: >
+          npx vitest run --project screens --pool=forks --reporter=verbose
+          test/train/workoutTimes.test.tsx test/train/progression.test.tsx
+          test/settings/healthConnect.test.tsx test/settings/foodDatabase.test.tsx || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cpu-profiles
+          path: prof/
+          retention-days: 3

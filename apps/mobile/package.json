@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run --project rules --project screens",
     "build": "vite build",
     "offline": "node scripts/check-offline.mjs",
     "legal": "node scripts/legal-page.mjs",
-    "unseen": "vitest run test/gallery/stories.test.tsx --project screens --coverage && node scripts/check-unseen.mjs",
+    "unseen": "vitest run --project stories --coverage && node scripts/check-unseen.mjs",
     "android": "vite build && cap telemetry off && cap sync android",
     "ios": "vite build && cap telemetry off && cap sync ios",
     "storybook": "storybook dev -p 6006 --no-version-updates",
