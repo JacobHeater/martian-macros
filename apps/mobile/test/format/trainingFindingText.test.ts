@@ -2,15 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { CoachFinding } from '../../src/engine/analysis/CoachFinding';
 import { coachFindingOf } from '../../src/engine/analysis/coachFindingOf';
+import { trainingAdviceOf } from '../../src/engine/analysis/trainingAdviceOf';
 import { Fmt } from '../../src/format/Fmt';
-import { trainingFindingText } from '../../src/format/trainingFindingText';
+import { trainingFindingText } from '../../src/format/coach/trainingFindingText';
+import { coachBannedWords } from '../support/coachBannedWords';
 
-/** MM-609's words: fixed templates, filled from a finding's figures. */
+/** MM-609's words, in the coach's voice (MM-617): the number, then the orders the engine gives (`trainingAdviceOf`). */
 const asOf = CalendarDate.of(2026, 10, 23);
 const fmt = new Fmt('metric');
 
-const finding = (signal: string, kind: CoachFinding['kind'], figures: Record<string, number>, subjects?: readonly string[]) =>
-  coachFindingOf({ signal, kind, span: 30, from: asOf.addDays(-29), to: asOf, priority: 'pattern', figures, subjects });
+const finding = (signal: string, kind: CoachFinding['kind'], figures: Record<string, number>, subjects?: readonly string[]): CoachFinding => {
+  const f = coachFindingOf({ signal, kind, span: 30, from: asOf.addDays(-29), to: asOf, priority: 'pattern', figures, subjects });
+  return { ...f, advice: trainingAdviceOf(f, false) };
+};
 
 const words = (f: CoachFinding) => {
   const [title, body, evidence] = trainingFindingText(f, fmt);
@@ -49,8 +53,9 @@ describe('training, water and sleep words', () => {
   it('training dropped: 2 sessions in 14 days against about 3 a week, and one heavy session a week holds strength', () => {
     const [title, body] = trainingFindingText(every[3] as CoachFinding, fmt);
     expect(title).toBe('2 sessions in 14 days');
-    expect(body).toContain('2 sessions in 14 days, against about 3 a week');
-    expect(body).toContain('One session a week with heavy sets holds strength');
+    expect(body).toMatch(/^2 sessions in 14 days(\. You usually do about 3 a week|, against about 3 a week before)\./);
+    expect(body).toMatch(/hold(s)? strength for most younger adults/);
+    expect(body).toMatch(/(Get three sessions in this week|Train three times this week|Three sessions this week\. Book them)\.$/);
   });
 
   it('strength held on a cut names the lift as held, and no stall', () => {
@@ -81,13 +86,23 @@ describe('training, water and sleep words', () => {
     expect(text).toContain('Deleted exercise');
     expect(text).toContain('5 h 40 m');
     expect(text).toContain('0.5% of body weight a week');
+    expect(text).toMatch(/(Keep the loads\. Cut sets before weight|Hold the weight on the bar\. Drop sets before load)\.$/);
   });
 
-  it('every finding has words: a title of 8 words or fewer, no "because", no verdict', () => {
+  it('every fix ends in its orders: two sessions, the sets to ten, one more set, the pace, sleep and protein', () => {
+    for (const f of every.filter((x) => x.kind === 'fix')) {
+      expect(f.advice?.length ?? 0, f.signal).toBeGreaterThan(0);
+      expect(trainingFindingText(f, fmt)[1], f.signal).toMatch(/\.$/);
+    }
+    expect(trainingFindingText(every[5] as CoachFinding, fmt)[1]).toMatch(/8 hard sets( more)? a week for hamstrings\.$/);
+    expect(trainingFindingText(every[8] as CoachFinding, fmt)[1]).toMatch(/one more set.* on Barbell bench press and Back squat\.$/i);
+  });
+
+  it("every finding has words: a title of 8 words or fewer, and the coach's list (MM-617)", () => {
     for (const f of every) {
       const [title] = trainingFindingText(f, fmt);
       expect(title.split(' ').length, title).toBeLessThanOrEqual(8);
-      expect(words(f)).not.toMatch(/because|should|too much|unhealthy|burn rate|lazy/i);
+      expect(coachBannedWords.filter(([, pattern]) => pattern.test(words(f))).map(([name]) => name), f.signal).toEqual([]);
     }
   });
 

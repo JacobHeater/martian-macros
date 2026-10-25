@@ -1653,6 +1653,8 @@ export class AppState {
       intake: s.intake,
       water: s.water,
       trendLog: s.trendLog,
+      adviceRecord: s.adviceRecord,
+      nowMinute: () => minuteOfDayNow(s.clock),
       catalog: () => of(this.foodCatalog),
       pauses: () => of(this.pauses),
       plannedShare: () => this.plannedShare(),

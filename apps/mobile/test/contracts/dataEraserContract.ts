@@ -29,6 +29,7 @@ import type { WeighInWindowWriter } from '../../src/healthIngest/WeighInWindowWr
 import type { TargetsHistoryRepository } from '../../src/engine/TargetsHistoryRepository';
 import { TargetsRecord } from '../../src/engine/TargetsRecord';
 import type { TrendLogRepository } from '../../src/engine/trends/TrendLogRepository';
+import type { CoachAdviceRecordRepository } from '../../src/engine/analysis/accountability/CoachAdviceRecordRepository';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 
@@ -43,6 +44,7 @@ interface Erasable {
   goalBodyFat: GoalBodyFatRepository;
   dayKinds: DayKindRepository;
   trendLog: TrendLogRepository;
+  adviceRecord: CoachAdviceRecordRepository;
   measurements: MeasurementRepository;
   measurementSettings: MeasurementSettingsRepository;
   preferences: PreferencesRepository;
@@ -105,6 +107,9 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
         },
       ]);
       await r.trendLog.dismissFinding('protein:level', day);
+      await r.adviceRecord.recordAdviceGiven([
+        { foodKey: 'biscuit', foodName: 'Biscuit', kind: 'skip', replacementName: undefined, kcal: 691, on: day },
+      ]);
       await r.measurements.saveMeasurement('thigh', day, 58);
       await r.measurementSettings.saveMeasurementSettings(new MeasurementSettings({ sites: ['thigh'], limbSide: 'left' }));
       await r.workouts.saveWorkout(
@@ -138,6 +143,8 @@ export function dataEraserContract(name: string, create: () => Erasable | Promis
       // MM-605: nothing the trend engine said is left, and no finding dismissed.
       expect(await first(r.trendLog.watchTrendAnnouncements())).toEqual([]);
       expect(await first(r.trendLog.watchFindingDismissals())).toEqual([]);
+      // MM-617: no advice the coach showed is left to follow up on.
+      expect(await first(r.adviceRecord.watchAdviceGivenSince(day.addDays(-30)))).toEqual([]);
       // MM-156: no measurement of any site, and no site chosen.
       expect(await first(r.measurements.watchMeasurements())).toEqual([]);
       expect([...(await first(r.measurementSettings.watchMeasurementSettings())).sites]).toEqual([]);

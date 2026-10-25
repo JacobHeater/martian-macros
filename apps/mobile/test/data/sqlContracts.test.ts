@@ -24,6 +24,7 @@ import { targetShapeRepositoryContract } from '../contracts/targetShapeRepositor
 import { goalBodyFatRepositoryContract } from '../contracts/goalBodyFatRepositoryContract';
 import { targetsHistoryRepositoryContract } from '../contracts/targetsHistoryRepositoryContract';
 import { trendLogRepositoryContract } from '../contracts/trendLogRepositoryContract';
+import { coachAdviceRecordRepositoryContract } from '../contracts/coachAdviceRecordRepositoryContract';
 import { menstruationRepositoryContract } from '../contracts/menstruationRepositoryContract';
 import { waistRepositoryContract } from '../contracts/waistRepositoryContract';
 import { measurementRepositoryContract } from '../contracts/measurementRepositoryContract';
@@ -71,6 +72,7 @@ insightLogRepositoryContract('SQLite', async () => (await open()).insightLog);
 inlineInsightLogRepositoryContract('SQLite', async () => (await open()).inlineInsightLog);
 insightSnoozeRepositoryContract('SQLite', async () => (await open()).insightSnoozes);
 trendLogRepositoryContract('SQLite', async () => (await open()).trendLog);
+coachAdviceRecordRepositoryContract('SQLite', async () => (await open()).adviceRecord);
 pauseRepositoryContract('SQLite', async () => (await open()).pauses);
 reminderRepositoryContract('SQLite', async () => (await open()).reminders);
 recoveryCheckInRepositoryContract('SQLite', async () => (await open()).recovery);
@@ -96,6 +98,7 @@ dataEraserContract('SQLite', async () => {
     goalBodyFat: r.goalBodyFat,
     dayKinds: r.dayKinds,
     trendLog: r.trendLog,
+    adviceRecord: r.adviceRecord,
     measurements: r.measurements,
     measurementSettings: r.measurementSettings,
     preferences: r.preferences,

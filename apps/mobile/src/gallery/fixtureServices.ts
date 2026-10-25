@@ -97,6 +97,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     inlineInsightLog: repos.inlineInsightLog,
     insightSnoozes: repos.insightSnoozes,
     trendLog: repos.trendLog,
+    adviceRecord: repos.adviceRecord,
     pauses: repos.pauses,
     reminders: repos.reminders,
     recovery: repos.recovery,

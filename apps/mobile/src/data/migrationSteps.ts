@@ -408,4 +408,21 @@ export const migrationSteps: ReadonlyMap<number, MigrationStep> = new Map<number
       );
     },
   ],
+  // 28 to 29 (MM-617): the coach's record of the advice it showed, a row for each food key, kind and day; none yet, so
+  // nothing has been said to follow up on.
+  [
+    28,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "coach_advice_given" (' +
+          '"food_key" TEXT NOT NULL, ' +
+          '"kind" TEXT NOT NULL CHECK ("kind" IN (\'skip\', \'halve\', \'swap\', \'taken\')), ' +
+          '"given_epoch_day" INTEGER NOT NULL, ' +
+          '"food_name" TEXT NOT NULL, ' +
+          '"replacement_name" TEXT NULL, ' +
+          '"kcal" REAL NOT NULL, ' +
+          'PRIMARY KEY ("food_key", "kind", "given_epoch_day"))',
+      );
+    },
+  ],
 ]);

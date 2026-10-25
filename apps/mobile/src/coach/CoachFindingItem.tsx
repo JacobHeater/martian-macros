@@ -1,6 +1,6 @@
 import type { CoachFinding } from '../engine/analysis/CoachFinding';
 import { coachAnalysisWords } from '../format/coachAnalysisWords';
-import { coachFindingText } from '../format/coachFindingText';
+import { coachFindingText } from '../format/coach/coachFindingText';
 import { findingControlName } from '../format/findingControlName';
 import type { Fmt } from '../format/Fmt';
 import { MmButton } from '../ui/MmButton';

@@ -2,6 +2,11 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { WaterEntry } from '../domain/water/WaterEntry';
+import type { CoachAdviceGiven } from '../engine/analysis/accountability/CoachAdviceGiven';
+import { coachAdviceGivenOf } from '../engine/analysis/accountability/coachAdviceGivenOf';
+import { coachFollowUpsOf } from '../engine/analysis/accountability/coachFollowUpsOf';
+import { CoachFollowUpRule } from '../engine/analysis/accountability/CoachFollowUpRule';
+import { withCoachFollowUps } from '../engine/analysis/accountability/withCoachFollowUps';
 import type { AnalysisArea } from '../engine/analysis/AnalysisArea';
 import type { AnalysisSpan } from '../engine/analysis/AnalysisSpan';
 import { arrangeCoachFindings } from '../engine/analysis/arrangeCoachFindings';
@@ -61,7 +66,7 @@ const just = <T>(value: T): Watched<T> => ({
 });
 
 /** Runs an analysis, treating figures it refuses (an `ArgumentError`) as nothing to say, as the inline insights do. */
-const safely = (analyse: () => CoachFinding[]): CoachFinding[] => {
+const safely = <T>(analyse: () => T[]): T[] => {
   try {
     return analyse();
   } catch (error) {
@@ -121,6 +126,12 @@ interface CanonicalRead {
  * 1d is never logged (MM-612). The card (`dashboard`) is the top said
  * finding of that span under MM-141's ration, or a catalog rule the
  * analysis has no equivalent of (`selectDashboardInsight`).
+ *
+ * The coach keeps a record of the advice it showed (MM-617): while the tab
+ * shows the section (`keepRecording`), each order about a food is recorded
+ * the first time it is shown on a day, 1d and spans alike. 1d reads the
+ * record back for its follow-ups (`coachFollowUpsOf`, `withCoachFollowUps`),
+ * and reads the minutes of the day from the app's clock (`nowMinute`).
  */
 export class CoachAnalysis {
   /** The span chosen on the switcher: 1d unless chosen, and 1d again each time the tab opens (`open`). Not kept. */
@@ -141,6 +152,8 @@ export class CoachAnalysis {
   private readonly water: StreamCell<WaterEntry[]>;
   private readonly dismissals: StreamCell<FindingDismissal[]>;
   private readonly announcements: StreamCell<TrendAnnouncement[]>;
+  /** The coach's record of the advice it showed, as far back as its follow-ups read (MM-617). */
+  private readonly given: StreamCell<CoachAdviceGiven[]>;
   private readonly catalogEntries: Cell<readonly FoodEntry[] | undefined>;
   private readonly tradeCatalog: StreamCell<TradeCatalog | undefined>;
   private readonly read: Cell<AnalysisRead | undefined>;
@@ -159,6 +172,7 @@ export class CoachAnalysis {
     this.water = new StreamCell(() => inputs.water.watchWaterSince(today().addDays(-waterWindowDays)));
     this.dismissals = new StreamCell(() => inputs.trendLog.watchFindingDismissals());
     this.announcements = new StreamCell(() => inputs.trendLog.watchTrendAnnouncements());
+    this.given = new StreamCell(() => inputs.adviceRecord.watchAdviceGivenSince(today().addDays(-CoachFollowUpRule.saidBeforeDays)));
 
     // One entry per catalog food logged, the same list while that set is the same, so the catalog is not read again on every log.
     let lastKey: string | undefined;
@@ -264,6 +278,31 @@ export class CoachAnalysis {
       stopDay?.();
       stopDay = undefined;
     };
+  }
+
+  /**
+   * Records the advice the section shows (MM-617) for as long as it is
+   * shown: each order about a food to skip, halve or swap, and each advice
+   * taken said, once a day (`coachAdviceGivenOf`), on whatever span is
+   * chosen. The record keeps one for each food, kind and day, so showing it
+   * again changes nothing. A write that fails is tried again on the next
+   * view. Gives the way to stop.
+   */
+  keepRecording(): () => void {
+    const written = new Set<string>();
+    return this.view.subscribe((view) => {
+      if (view === undefined) return;
+      const today = this.inputs.today.peek();
+      const { worthChanging, holdingUp, more, left, close } = view.sections;
+      const shown = [...worthChanging, ...holdingUp, ...more, ...(left === undefined ? [] : [left]), ...(close === undefined ? [] : [close])];
+      const idOf = (g: CoachAdviceGiven) => `${g.on.epochDay}\u0000${g.kind}\u0000${g.foodKey}`;
+      const fresh = coachAdviceGivenOf(shown, today).filter((g) => !written.has(idOf(g)));
+      if (fresh.length === 0) return;
+      for (const g of fresh) written.add(idOf(g));
+      void this.inputs.adviceRecord.recordAdviceGiven(fresh).catch(() => {
+        for (const g of fresh) written.delete(idOf(g));
+      });
+    });
   }
 
   /** Dismisses a finding: hidden for 28 days, and counted under "hidden" with the day it shows again. */
@@ -391,7 +430,9 @@ export class CoachAnalysis {
     // them, MM-605) and a dismissed finding would show for a moment. A read that failed ranks and hides nothing.
     const announced = this.announcements.value;
     const dismissed = this.dismissals.value;
-    if (stillReading(announced) || stillReading(dismissed)) return undefined;
+    // The record of advice shown is waited for too, so 1d's follow-ups do not arrive a moment after the rest.
+    const given = this.given.value;
+    if (stillReading(announced) || stillReading(dismissed) || stillReading(given)) return undefined;
     const { today, entries, spans } = read;
     const chosen = this.span.value;
     // A span the data no longer supports (an entry deleted) falls back to today.
@@ -410,7 +451,11 @@ export class CoachAnalysis {
     if (span === 1) {
       from = today;
       to = today;
-      findings = safely(() => analyseFoodDay(foodInput, today));
+      // The evening fiber line (MM-617) comes by the clock, not only once dinner is logged.
+      const day = safely(() => analyseFoodDay(foodInput, today, { nowMinute: inputs.nowMinute() }));
+      // The coach's follow-ups on its own record (MM-617); a record that failed to read follows up on nothing.
+      const followUps = safely(() => coachFollowUpsOf({ food: foodInput, given: Loadable.valueOf(given) ?? [], today }));
+      findings = withCoachFollowUps(day, followUps, today);
       if (entries.some((e) => e.date === today)) checked.push('food');
     } else {
       to = today.addDays(-1);

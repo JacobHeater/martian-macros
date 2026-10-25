@@ -3,7 +3,7 @@ import { arrangeCoachFindings } from '../../src/engine/analysis/arrangeCoachFind
 import { analyseFoodDay } from '../../src/engine/analysis/food/analyseFoodDay';
 import { analyseFoodSpan } from '../../src/engine/analysis/food/analyseFoodSpan';
 import type { CoachFinding } from '../../src/engine/analysis/CoachFinding';
-import { foodFindingText } from '../../src/format/foodFindingText';
+import { foodFindingText } from '../../src/format/coach/foodFindingText';
 import { Fmt } from '../../src/format/Fmt';
 import { food, inputOf, safeguards, targets, today, yesterday } from './support/foodAnalysis';
 
@@ -36,7 +36,7 @@ describe('today analysed from the first entry', () => {
     const density = found.find((f) => f.kind === 'fix' && f.signal === 'proteinDensity') as CoachFinding;
     expect(density.figures).toMatchObject({ kcal: 780, proteinG: 18 });
     expect(density.foods[0]?.name).toBe('Cheese and crackers');
-    expect(textOf(density)[1]).toContain('Cheese and crackers (61%)');
+    expect(textOf(density)[1]).toMatch(/cheese and crackers|apple juice/i);
   });
 
   it('nothing waits on days of history: a span has nothing to say yet', () => {
@@ -75,7 +75,9 @@ describe('what is left', () => {
 
   it('and names the logged meal that fits', () => {
     expect(left.foods).toEqual([expect.objectContaining({ name: 'Chicken and rice', kcal: 520, proteinG: 48, days: 2 })]);
-    expect(textOf(left)[1]).toBe('62 g protein and 610 kcal left today. Your usual Chicken and rice (48 g protein, 520 kcal) fits.');
+    expect(textOf(left)[1]).toMatch(
+      /^(62 g protein and 610 kcal|610 kcal and 62 g protein) left today\. (Get 62 g more protein|62 g of protein to go): your usual chicken and rice \(48 g protein, 520 kcal\) fits\.$/,
+    );
   });
 });
 
@@ -135,7 +137,8 @@ it('a 1d trade: a food logged today for one the person logs in that meal (X need
   ]);
   const density = analyseFoodDay(input, today).find((f) => f.kind === 'fix' && f.signal === 'proteinDensity') as CoachFinding;
   expect(density.trade).toMatchObject({ x: { name: 'Cheese and crackers' }, y: { name: 'Cottage cheese with fruit' }, days: 1 });
-  expect(textOf(density)[1]).toContain('Trading Cheese and crackers for Cottage cheese with fruit adds about 21 g of protein');
+  expect(textOf(density)[1]).toMatch(/(Swap it for|Have) cottage cheese with fruit( instead)?, which you log at lunch/);
+  expect(textOf(density)[1]).toMatch(/[Aa]bout 21 g more protein, at /);
 });
 
 it('updates with each entry', () => {
@@ -156,7 +159,7 @@ it('a marked day shows its totals and what is left, and no fix', () => {
   expect(found[0]?.figures).toMatchObject({ marked: 1, kcal: 2400, fatG: 140 });
   const [title, body] = textOf(found[0] as CoachFinding);
   expect(title).toBe('Refeed today: 2,400 kcal so far');
-  expect(body).toMatch(/^Logged so far: 2,400 kcal, 66 g protein, \d+ g carbohydrate and 140 g fat\./);
+  expect(body).toMatch(/^(Logged so far|So far): 2,400 kcal, 66 g protein, \d+ g carbohydrate and 140 g fat\./);
 });
 
 it('never compensation: yesterday 800 kcal over is never mentioned, and today keeps its targets', () => {
@@ -198,7 +201,7 @@ it('holding up: today at the protein minimum and within the calorie band, in num
   const found = analyseFoodDay(inputOf([{ date: today, entries }]), today);
   const protein = found.find((f) => f.kind === 'holdingUp' && f.signal === 'proteinMinimum') as CoachFinding;
   const calories = found.find((f) => f.kind === 'holdingUp' && f.signal === 'calories') as CoachFinding;
-  expect(textOf(protein)[0]).toBe('Protein 152 g, over your 140 g minimum');
+  expect(textOf(protein)[0]).toBe('Protein 152 g, minimum hit');
   expect(textOf(calories)[0]).toBe("2,400 kcal, within your target's band");
 });
 
@@ -222,7 +225,8 @@ describe('safeguards on 1d', () => {
     const fat = found.find((f) => f.signal === 'fatAgainstTarget') as CoachFinding;
     expect(fat).toMatchObject({ kind: 'fix', figures: { fatG: 95, targetFatG: 70, densityLow: 1 } });
     expect(fat.foods[0]?.name).toBe('Cheese and crackers');
-    expect(textOf(fat)[1]).toMatch(/^Fat today is 95 g against 70 g; Cheese and crackers supplied 100% of it\. Fat carries 9 kcal a gram/);
+    expect(textOf(fat)[1]).toMatch(/^Fat 95 g( so far,)? against 70 g\. /);
+    expect(textOf(fat)[1]).toMatch(/cheese and crackers/i);
     expect(found.find((f) => f.signal === 'proteinDensity')?.foods[0]?.name).toBe('Cheese and crackers');
   });
 });

@@ -7,8 +7,8 @@ import { analyseFoodSpan } from '../../src/engine/analysis/food/analyseFoodSpan'
 import { analyseTrainingSpan } from '../../src/engine/analysis/analyseTrainingSpan';
 import { evaluateSignal } from '../../src/engine/trends/evaluateSignal';
 import { coachAnalysisWords } from '../../src/format/coachAnalysisWords';
-import { coachFindingText } from '../../src/format/coachFindingText';
-import { coachHeadlineText } from '../../src/format/coachHeadlineText';
+import { coachFindingText } from '../../src/format/coach/coachFindingText';
+import { coachHeadlineText } from '../../src/format/coach/coachHeadlineText';
 import { coachPeriodText } from '../../src/format/coachPeriodText';
 import { Fmt } from '../../src/format/Fmt';
 import { findingControlName } from '../../src/format/findingControlName';
@@ -23,39 +23,13 @@ import { food, inputOf, ownersFatWeek, today, yesterday } from '../engine/suppor
 import { trainingInput } from '../engine/support/trainingInput';
 import { trendDays } from '../engine/support/trendDays';
 import { trendSignal } from '../engine/support/trendSignal';
+import { coachBannedWords } from '../support/coachBannedWords';
 
-/** MM-610's words: the period line, the headline, the folds, the rows and the empty states, and no verdict anywhere. */
+/** MM-610's words: the period line, the headline (MM-617's verdict), the folds, the rows and the empty states, in the coach's voice. */
 const fmt = new Fmt('metric');
 
-/** MM-108's list and MM-610's verdicts, as the food words' test has them. */
-const banned = [
-  'good',
-  'bad',
-  'clean',
-  'junk',
-  'guilt',
-  'cheat',
-  'oops',
-  'earn',
-  'burn off',
-  'lbs',
-  'sinful',
-  'naughty',
-  'indulg',
-  'deserve',
-  'too',
-  'too much',
-  'unhealthy',
-  'fattening',
-  'empty calories',
-  'avoid',
-  'cut out',
-  'failed',
-  'should',
-  'because',
-  'burn rate',
-];
-const verdictsIn = (text: string) => banned.filter((word) => new RegExp(`\\b${word}\\b`, 'i').test(text));
+/** The coach's list (MM-617): its verdicts on choices are allowed, profanity and words about the person are not. */
+const verdictsIn = (text: string) => coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
 
 describe('the lines', () => {
   it('the period line: today so far, or the span through yesterday with the days fully logged', () => {
@@ -99,12 +73,25 @@ describe('the lines', () => {
     expect(moreFindingsText(4)).toBe('4 more from your data');
   });
 
-  it('the headline pairs the strength with the fix by their subjects, not repeating the first title', () => {
+  it("the headline is the span's verdict: the top fix, and the food that did it (MM-617)", () => {
     const sections = arrangeCoachFindings(analyseFoodSpan(inputOf(ownersFatWeek()), 14, yesterday), { today });
-    const headline = sections.headline;
-    expect(headline).toBeDefined();
-    if (headline === undefined) return;
-    expect(coachHeadlineText(headline)).toMatch(/^[A-Z][a-z]+( [a-z0-9]+)* (is|are) holding up; fat is worth changing\.$/);
+    const verdict = sections.verdict;
+    expect(verdict?.kind).toBe('fix');
+    if (verdict === undefined) return;
+    expect(coachHeadlineText(verdict, fmt)).toMatch(
+      /^Fat averaged 90 g against 70 g\. (Peanut butter did it|That was peanut butter|Peanut butter put you there)\.$/,
+    );
+  });
+
+  it('with no problem, the headline is the biggest strength, said bluntly', () => {
+    const strength = analyseFoodDay(
+      inputOf([{ date: today, entries: [food(today, 'breakfast', 'Oats and whey', 600, 45, 12), food(today, 'lunch', 'Chicken salad', 800, 55, 30), food(today, 'dinner', 'Salmon and potatoes', 1000, 52, 34)] }]),
+      today,
+    );
+    const verdict = arrangeCoachFindings(strength, { today }).verdict;
+    expect(verdict?.kind).toBe('holdingUp');
+    if (verdict === undefined) return;
+    expect(coachHeadlineText(verdict, fmt)).toMatch(/^Protein 152 g(\. Minimum (hit|met)|, minimum hit)\. (Keep that|Keep it there|Same again next time)\.$/);
   });
 });
 
@@ -148,7 +135,9 @@ describe('numbers behind a span’s finding', () => {
       trend: undefined,
     };
     const [, body, evidence] = coachFindingText(n1, fmt);
-    expect(body).toContain('it was met on 5 of 6 training days and 1 of 8 rest days, lower on rest days; the minimum is the same every day.');
+    expect(body).toMatch(
+      /Training days: 5 of 6 at the minimum\. Rest days: 1 of 8\. Rest days are the gap; the minimum is the same every day\.|At the minimum on 5 of 6 training days and 1 of 8 rest days, lower on rest days; the minimum is the same every day\./,
+    );
     expect(new Map(evidence).get('Rest days at the minimum')).toBe('1 of 8');
     expect(evidence[evidence.length - 1]?.[0]).toBe('Rule');
   });
@@ -204,7 +193,7 @@ describe('words', () => {
     const sections = arrangeCoachFindings(findings, { today });
     const lines = [
       ...texts,
-      ...(sections.headline === undefined ? [] : [coachHeadlineText(sections.headline)]),
+      ...(sections.verdict === undefined ? [] : [coachHeadlineText(sections.verdict, fmt)]),
       ...Object.values(coachAnalysisWords),
       coachPeriodText({ span: 14, fullyLoggedDays: 12 }),
       nothingFoundText(['food', 'training', 'water']),

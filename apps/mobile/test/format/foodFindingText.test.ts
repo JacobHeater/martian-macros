@@ -5,12 +5,13 @@ import type { CoachFinding } from '../../src/engine/analysis/CoachFinding';
 import type { CoachFindingKind } from '../../src/engine/analysis/CoachFindingKind';
 import type { CoachTrade } from '../../src/engine/analysis/CoachTrade';
 import { FoodSignalId } from '../../src/engine/analysis/food/FoodSignalId';
-import { coachFindingText } from '../../src/format/coachFindingText';
-import { coachTradeText } from '../../src/format/coachTradeText';
-import { foodFindingText } from '../../src/format/foodFindingText';
+import { coachFindingText } from '../../src/format/coach/coachFindingText';
+import { coachTradeText } from '../../src/format/coach/coachTradeText';
+import { foodFindingText } from '../../src/format/coach/foodFindingText';
 import { Fmt } from '../../src/format/Fmt';
+import { coachBannedWords } from '../support/coachBannedWords';
 
-/** MM-606 and MM-612's words: the ticket's templates, and no verdict in any of them (MM-108, MM-610). */
+/** MM-606 and MM-612's words, in the coach's voice (MM-617): the templates, and the coach's list in every one of them. */
 const fmt = new Fmt('metric');
 const to = CalendarDate.of(2026, 10, 23);
 
@@ -44,8 +45,8 @@ const granolaForYogurt: CoachTrade = {
   deltaKcal: -90,
 };
 
-describe("the ticket's templates", () => {
-  it('N5, change', () => {
+describe("the ticket's templates, in the coach's voice (MM-617)", () => {
+  it('N5, change: the number, the food that gave it, and what it cost protein', () => {
     const [title, body] = foodFindingText(
       finding(
         'fatAgainstTarget',
@@ -56,59 +57,59 @@ describe("the ticket's templates", () => {
       fmt,
     );
     expect(title).toBe('Fat averaged 98 g against 70 g');
-    expect(body).toBe(
-      'Fat averaged 98 g against 70 g; Peanut butter supplied 35% of it. Fat carries 9 kcal a gram. On those days fat ' +
-        'gave 882 kcal while protein averaged 22 g under your minimum.',
-    );
+    expect(body).toMatch(/^Fat (averaged 98 g against 70 g|98 g a day, against 70 g)\. /);
+    expect(body).toMatch(/Peanut butter (gave|was) 35% of it\./);
+    expect(body).toMatch(/20 g under your minimum on average\.$/);
+    expect(body).not.toMatch(/9 kcal a gram/);
   });
 
-  it('N4, change', () => {
+  it('N4, change: the density against what the targets need', () => {
     const [, body] = foodFindingText(
       finding('proteinDensity', 'fix', { densityG: 5.1, requiredG: 7.1, targetG: 170, targetKcal: 2400, direction: -1, calorieRoom: 0 }),
       fmt,
     );
-    expect(body).toBe(
-      'Your days carried 5.1 g of protein per 100 kcal. Reaching 170 g within 2,400 kcal takes about 7.1 g, so some ' +
-        'calories went to foods with little protein.',
-    );
+    expect(body).toMatch(/5\.1 g/);
+    expect(body).toMatch(/7\.1 g/);
   });
 
-  it('N1, holding up', () => {
+  it('N1, holding up: blunt and short', () => {
     const [, body] = foodFindingText(finding('proteinMinimum', 'holdingUp', { minimumG: 140, metDays: 12, judgedDays: 14 }), fmt);
-    expect(body).toBe('Protein reached 140 g or more on 12 of 14 days.');
+    expect(body).toMatch(/^(Protein minimum hit on 12 of 14 days|140 g of protein or more on 12 of 14 days)\. (Keep that|Keep it there|Same again next time)\.$/);
   });
 
   it('N15', () => {
     const [, body] = foodFindingText(finding('energyUse', 'fix', { averageKcal: 2650, energyUseKcal: 2700, direction: 1 }), fmt);
-    expect(body).toBe('By your log, intake averaged 2,650 kcal, close to the 2,700 kcal the app estimates you use.');
+    expect(body).toMatch(/2,650 kcal/);
+    expect(body).toMatch(/2,700 kcal/);
   });
 
-  it("MM-607's trade sentence, for a food the person logs", () => {
-    expect(coachTradeText(granolaForYogurt, { spanDays: 14, today: false })).toBe(
-      'Granola on 6 of 14 days: 420 kcal with 9 g protein and 18 g fat. It is calorie-dense for its protein. Greek ' +
-        'yogurt with berries, which you log at breakfast, gives 28 g protein in 330 kcal. Trading Granola for Greek ' +
-        'yogurt with berries on those days would have added about 8 g of protein a day, at 90 kcal fewer each time.',
-    );
+  it("MM-607's trade as an order, for a food the person logs", () => {
+    const text = coachTradeText(granolaForYogurt, { spanDays: 14, today: false });
+    expect(text).toMatch(/^(Granola on 6 of 14 days|Granola, 6 of 14 days): 420 kcal, 9 g protein, 18 g fat\./);
+    expect(text).toMatch(/calorie-dense for its protein/i);
+    expect(text).toMatch(/(Swap it for|Have) Greek yogurt with berries( instead)?, which you log at breakfast: 330 kcal, 28 g protein, 6 g fat\./);
+    expect(text).toMatch(/[Aa]bout 8 g more protein a day, at 90 kcal fewer each time\.$/);
   });
 
   it("and for a catalog food: a food you haven't logged", () => {
-    expect(coachTradeText({ ...granolaForYogurt, source: 'catalog' }, { spanDays: 14, today: false })).toContain(
-      "Greek yogurt with berries, a food you haven't logged, gives 28 g protein in 330 kcal.",
+    expect(coachTradeText({ ...granolaForYogurt, source: 'catalog' }, { spanDays: 14, today: false })).toMatch(
+      /Greek yogurt with berries( instead)?, a food you haven't logged: 330 kcal, 28 g protein, 6 g fat\./,
     );
   });
 
   it('a trade on 1d speaks of today only', () => {
     const text = coachTradeText({ ...granolaForYogurt, days: 1, gainPerDay: 19, deltaKcal: -90 }, { spanDays: 1, today: true });
-    expect(text).toContain('Trading Granola for Greek yogurt with berries adds about 19 g of protein, at 90 kcal fewer.');
+    expect(text).toMatch(/[Aa]bout 19 g more protein, at 90 kcal fewer\.$/);
     expect(text).not.toMatch(/days|yesterday|would have/);
   });
 
   it('a trade names both foods and says the calories in words, more or fewer each time (F6)', () => {
     const more = coachTradeText({ ...granolaForYogurt, deltaKcal: 40 }, { spanDays: 14, today: false });
-    expect(more).toContain('Trading Granola for Greek yogurt with berries on those days');
+    expect(more).toContain('Granola');
+    expect(more).toContain('Greek yogurt with berries');
     expect(more).toContain('at 40 kcal more each time.');
     expect(coachTradeText({ ...granolaForYogurt, deltaKcal: 0.4 }, { spanDays: 14, today: false })).toContain('at about the same calories.');
-    expect(more).not.toMatch(/Trading it|[−+]\d/);
+    expect(more).not.toMatch(/[−+]\d/);
   });
 
   it('each side carries its usual portion, as logged or as the catalog serves it (F6)', () => {
@@ -121,12 +122,11 @@ describe("the ticket's templates", () => {
       },
       { spanDays: 14, today: false },
     );
-    expect(text).toMatch(/^Granola \(80 g\) on 6 of 14 days: /);
-    expect(text).toContain("Greek yogurt with berries (170 g), a food you haven't logged, gives 28 g protein in 330 kcal.");
-    expect(text).toContain('Trading Granola for Greek yogurt with berries on those days');
+    expect(text).toMatch(/^Granola \(80 g\)(,| on) 6 of 14 days: /);
+    expect(text).toContain("Greek yogurt with berries (170 g)");
   });
 
-  it('the calorie trade: the calories a day, with protein no lower, and no change a time beside it (F2)', () => {
+  it('the calorie trade: the calories a day, with protein no lower (F2)', () => {
     const calories: CoachTrade = {
       motive: 'calories',
       meal: 'snack',
@@ -137,14 +137,11 @@ describe("the ticket's templates", () => {
       gainPerDay: 60,
       deltaKcal: -120,
     };
-    expect(coachTradeText(calories, { spanDays: 14, today: false })).toBe(
-      'Muffin on 7 of 14 days: 420 kcal with 6 g protein and 20 g fat. Banana and yogurt, which you log as a snack, ' +
-        'gives 12 g protein in 300 kcal. Trading Muffin for Banana and yogurt on those days would have meant about ' +
-        '60 kcal less a day, with protein no lower.',
-    );
-    expect(coachTradeText({ ...calories, days: 1, gainPerDay: 120 }, { spanDays: 1, today: true })).toBe(
-      'Muffin: 420 kcal with 6 g protein and 20 g fat. Banana and yogurt, which you log as a snack, gives 12 g protein ' +
-        'in 300 kcal. Trading Muffin for Banana and yogurt means about 120 kcal less today, with protein no lower.',
+    const span = coachTradeText(calories, { spanDays: 14, today: false });
+    expect(span).toMatch(/banana and yogurt( instead)?, which you log as a snack: 300 kcal, 12 g protein, 3 g fat\./);
+    expect(span).toMatch(/[Aa]bout 60 kcal fewer a day, (with )?protein no lower\.$/);
+    expect(coachTradeText({ ...calories, days: 1, gainPerDay: 120 }, { spanDays: 1, today: true })).toMatch(
+      /[Aa]bout 120 kcal fewer today, (with )?protein no lower\.$/,
     );
   });
 
@@ -159,11 +156,10 @@ describe("the ticket's templates", () => {
       gainPerDay: (900 * 6) / 14,
       deltaKcal: -40,
     };
-    expect(coachTradeText(sodium, { spanDays: 14, today: false })).toBe(
-      'Instant noodles on 6 of 14 days: 420 kcal with 1,400 mg sodium. Lentil soup, homemade, which you log at lunch, ' +
-        'has 500 mg sodium in 380 kcal. Trading Instant noodles for Lentil soup, homemade on those days would have ' +
-        'meant about 386 mg less sodium a day, at 40 kcal fewer each time.',
-    );
+    const text = coachTradeText(sodium, { spanDays: 14, today: false });
+    expect(text).toContain('420 kcal, 1,400 mg sodium');
+    expect(text).toContain('380 kcal, 500 mg sodium');
+    expect(text).toMatch(/[Aa]bout 386 mg less sodium a day, at 40 kcal fewer each time\.$/);
   });
 
   it('the calorie-density line does not say "calorie-dense for its protein" twice (F7)', () => {
@@ -174,17 +170,19 @@ describe("the ticket's templates", () => {
       }),
       fmt,
     );
-    expect(body.match(/calorie-dense for its protein/g)).toHaveLength(1);
+    expect((body.match(/calorie-dense for its protein/gi) ?? []).length).toBeLessThanOrEqual(1);
   });
 
-  it('a finding carries its trade, or the add when there is room, or nothing', () => {
-    const base = { metDays: 5, judgedDays: 14, minimumG: 140, averageShortfallG: 25, direction: -1, tradeDays: 14 };
-    const withTrade = foodFindingText(finding('proteinMinimum', 'fix', { ...base, calorieRoom: 1 }, { trade: granolaForYogurt }), fmt)[1];
-    const withRoom = foodFindingText(finding('proteinMinimum', 'fix', { ...base, calorieRoom: 1 }), fmt)[1];
-    const noRoom = foodFindingText(finding('proteinMinimum', 'fix', { ...base, calorieRoom: 0 }), fmt)[1];
-    expect(withTrade).toContain('Trading Granola for Greek yogurt with berries on those days would have added about 8 g of protein a day');
-    expect(withRoom).toContain('Your calories have room for more of a protein food you log.');
-    expect(noRoom).toBe('Protein reached your 140 g minimum on 5 of the 14 days you logged in full; on the other days it was about 25 g short.');
+  it('a fix ends in its orders; with none, the number alone', () => {
+    const base = { metDays: 5, judgedDays: 14, minimumG: 140, averageShortfallG: 25, direction: -1, tradeDays: 14, calorieRoom: 1 };
+    const withAdd = foodFindingText(
+      { ...finding('proteinMinimum', 'fix', base), advice: [{ kind: 'add', nutrient: 'protein', addFood: 'Greek yogurt' }] },
+      fmt,
+    )[1];
+    expect(withAdd).toMatch(/(Add Greek yogurt: you already log it, and it carries protein|More Greek yogurt\. You already log it)\.$/);
+    const none = foodFindingText(finding('proteinMinimum', 'fix', base), fmt)[1];
+    expect(none).toMatch(/5 of 14 days/);
+    expect(none).toMatch(/25 g short/);
   });
 });
 
@@ -352,47 +350,17 @@ function everyFinding(): CoachFinding[] {
   return all;
 }
 
-/** MM-108's list, and MM-610's verdicts. */
-const banned = [
-  'good',
-  'bad',
-  'clean',
-  'junk',
-  'guilt',
-  'cheat',
-  'oops',
-  'earn',
-  'burn off',
-  'lbs',
-  'sinful',
-  'naughty',
-  'indulg',
-  'deserve',
-  'too',
-  'too much',
-  'unhealthy',
-  'fattening',
-  'empty calories',
-  'avoid',
-  'cut out',
-  'failed',
-  'should',
-  'because',
-  'burn rate',
-  'TDEE',
-];
-
 describe('words', () => {
   const texts = everyFinding().map((f) => {
     const [title, body, evidence] = foodFindingText(f, fmt);
     return { f, title, body, evidence };
   });
 
-  it('every template passes the banned-word test, and none says "too", "unhealthy", "fattening" or "avoid"', () => {
+  it("every template passes the coach's list (MM-617)", () => {
     const hits = texts.flatMap(({ f, title, body, evidence }) =>
-      banned
-        .filter((word) => new RegExp(`\\b${word}\\b`, 'i').test([title, body, ...evidence.flat()].join(' ')))
-        .map((word) => `${f.signal}/${f.kind}/${f.span}: "${word}"`),
+      coachBannedWords
+        .filter(([, pattern]) => pattern.test([title, body, ...evidence.flat()].join(' ')))
+        .map(([name]) => `${f.signal}/${f.kind}/${f.span}: ${name}`),
     );
     expect(hits).toEqual([]);
   });

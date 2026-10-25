@@ -3,8 +3,8 @@ import type { Meal } from '../../domain/Meal';
 
 /**
  * The order a 'fix' finding ends in (MM-617): what to do, as data. The
- * words are `format/coachAdviceText`, so the owner can change a sentence
- * without touching the engine. Every fix carries at least one; the
+ * words are `format/coach/coachAdviceText`, so the owner can change a
+ * sentence without touching the engine. Every fix carries at least one; the
  * safeguards strip what they forbid (`adviceAllowed`).
  *
  * The food keys are `foodKeyOf`'s (the name, trimmed and in lower case), so
@@ -63,9 +63,10 @@ export interface CoachAdvice {
     | undefined;
   /**
    * What to eat in its place, a time: a food the person logs or saved, a
-   * catalog food (MM-607's trade), or a row of the coach's swap table, whose
-   * `name` is then the row's key (`coachSwapTable`) and whose words are in
-   * `format/`.
+   * catalog food (MM-607's trade), or a replacement from the coach's swap
+   * table (`coachSwapTable`), whose `name` is then already words for the
+   * person, said as they are ("two eggs on an English muffin with a slice
+   * of cheese"), not a row key.
    */
   readonly replacement?:
     | {

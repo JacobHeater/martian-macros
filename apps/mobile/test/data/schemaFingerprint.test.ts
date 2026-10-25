@@ -53,6 +53,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   27: '845de30559ea783461b8cbd0b894ce15fb119fd37b14835ec821fbf02dafbad9',
   // MM-605: the trend engine's announcement log, and the coach's findings dismissed.
   28: '7aa93f2312df5aa82daca1ee7761a8dabd91d0ce8806c39fefc2355ab7ca1822',
+  // MM-617: the coach's record of the advice it showed.
+  29: '402fbe7fa3a7cf8bacc4bceb69377128ede96caa65104d51c6518d528fec98bb',
 };
 
 it('the schema is the one recorded for its version', () => {

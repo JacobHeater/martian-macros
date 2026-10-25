@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { InsightPriority } from '../InsightPriority';
 import type { TrendFinding } from '../trends/TrendFinding';
+import type { CoachFollowUp } from './accountability/CoachFollowUp';
 import type { AnalysisSpan } from './AnalysisSpan';
 import type { CoachAdvice } from './CoachAdvice';
 import type { CoachCause } from './CoachCause';
@@ -39,7 +40,7 @@ export interface CoachFinding {
   /**
    * What to do about it (MM-617): every 'fix' carries at least one order,
    * and 1d's "what is left" and closing line carry theirs. The words are
-   * `format/coachAdviceText`. Absent is none.
+   * `format/coach/coachAdviceText`. Absent is none.
    */
   readonly advice?: readonly CoachAdvice[] | undefined;
   /**
@@ -49,4 +50,10 @@ export interface CoachFinding {
    * can be named.
    */
   readonly cause?: CoachCause | undefined;
+  /**
+   * The coach's accountability on 1d (MM-617): what it said before about
+   * the same food, the repeats, and advice taken (`withCoachFollowUps`).
+   * The words are in `format/`. Absent is none.
+   */
+  readonly followUps?: readonly CoachFollowUp[] | undefined;
 }

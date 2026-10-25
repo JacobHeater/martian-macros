@@ -47,6 +47,7 @@ import { analysisBalancedScenario } from './analysisBalancedScenario';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
 import { analysisSeasonScenario } from './analysisSeasonScenario';
 import { analysisTodayTradeScenario } from './analysisTodayTradeScenario';
+import { buffetDayScenario } from './buffetDayScenario';
 import { firstMorningScenario } from './firstMorningScenario';
 import { nothingLoggedScenario } from './nothingLoggedScenario';
 import { quietWeekScenario } from './quietWeekScenario';
@@ -1097,7 +1098,7 @@ export const CoachAnalysisNothingFound = screenStory({
   walk: pressOnCoach('7d'),
 });
 
-/** MM-610, MM-606: the owner's fat week over 2w: fat and the protein it displaced lead "Worth changing", with peanut butter and a trade. */
+/** MM-610, MM-606, MM-617: the owner's fat week over 2w: the headline names the fat line and peanut butter; fat and the protein it displaced lead "Worth changing", ending in the swap. */
 export const CoachAnalysisFatWeek = screenStory({
   covers: ['CoachScreen'],
   shows: 'Worth changing',
@@ -1233,11 +1234,26 @@ export const CoachAnalysisTodayNumbers = screenStory({
   },
 });
 
-/** MM-612, MM-607: a trade on 1d: today's cheese and crackers for the cottage cheese logged at lunch, both named. */
+/** MM-612, MM-607, MM-617: a trade on 1d as an order: today's cheese and crackers, swapped for the cottage cheese logged at lunch. */
 export const CoachAnalysisTodayTrade = screenStory({
   covers: ['CoachScreen'],
-  shows: /Trading Cheese and crackers for Cottage cheese with fruit adds about/,
+  shows: /(Swap it for|Have) cottage cheese with fruit( instead)?, which you log at lunch/,
   scenario: analysisTodayTradeScenario,
+  open: onCoach,
+});
+
+/**
+ * MM-617: the owner's buffet day, the coach's voice standard, from the analysis's own fixture (`buffetDayFoods`):
+ * the headline ("1,054 kcal over. The buffet did it."), what is left ("You're done eating for today…"), every fix
+ * with its orders (the buffet's General Tso's chicken skipped or one spoonful, with what the day would be without
+ * it; sodium, water and sauce on the side; the biscuit swapped for two eggs on an English muffin; cookie butter
+ * skipped; fiber, two cups at dinner, from 6 pm), protein holding up, and the close ("Tomorrow: back to 2,175.").
+ * Drawn on the stories' day, so its phrasings are that day's.
+ */
+export const CoachAnalysisBuffetDay = screenStory({
+  covers: ['CoachScreen'],
+  shows: /^(1,054 kcal over|Over by 1,054 kcal|1,054 kcal over your target)\. (The buffet did it|That was the buffet|The buffet put you there)\.$/,
+  scenario: buffetDayScenario,
   open: onCoach,
 });
 

@@ -402,3 +402,147 @@ Choices made without asking (say if any is wrong):
 
 Remaining:
 - precision at 95%: more review rounds on fresh samples, on the misses above.
+
+The accountability, 2026-10-24. Not run locally; CI validates.
+
+- **The record of advice shown** (schema 29, table `coach_advice_given`): a row for each food key, kind and day, with
+  the food's name, the replacement's name (a swap), the food's calories a time and the day. Kinds: `skip`, `halve`,
+  `swap`, and `taken` (the coach said the advice was taken, so it is said once).
+  - `CoachAdviceRecordRepository` (`engine/analysis/accountability/`): `watchAdviceGivenSince(since)`, oldest first;
+    `recordAdviceGiven(entries)`, idempotent per food key, kind and day, the first kept. `SqlCoachAdviceRecordRepository`,
+    `InMemoryCoachAdviceRecordRepository`, the contract `coachAdviceRecordRepositoryContract` on both; erased with
+    everything and kept in a backup.
+  - Written by `CoachAnalysis.keepRecording()`, which the Coach tab's section runs while it is shown: each order about
+    a food to skip, halve or swap on the span shown (1d and spans), and each advice taken said, once a day
+    (`coachAdviceGivenOf`).
+- **The follow-ups** (`coachFollowUpsOf`, pure, `CoachFollowUpRule`): `CoachFollowUp` data in the style of
+  `CoachAdvice`, on `CoachFinding.followUps`:
+  - `saidBefore`: a food told to skip or swap on day D within the last 14 days, eaten today: `food` (today's portion),
+    `order`, `replacementName`, `givenOn`, `byWeekday` (within 6 days), `givenKcal`;
+  - `repeatOver`: days this calendar week (Monday first) over target by 500 kcal or more, today among them, from 2:
+    `days`, `overByKcal`, and the worst `food` of the biggest meal on 2 of them or more, else that `meal`, with
+    `drivenDays`;
+  - `repeatFat` (fat over by 1d's margin on 3 of the last 7 days, today among them) and `repeatProteinShort` (protein
+    under its minimum on 3 of the 7 whole days before today): `days`, `ofDays`;
+  - `adviceTaken`: a food told to skip, eaten on 3 or more of the 14 days before that advice and not for 3 whole days
+    running since, nor today: `food` (median a day), `order`, `givenOn`, `days`, `beforeDays`, `ofDays`, `savedKcal`
+    (the median times the days it would have been eaten at its old rate, rounded to whole days). Not said again on a
+    later day once the record says `taken` since that advice.
+  - None on a Refeed or a Day off, and none of a marked day counted.
+- **Where they go** (`withCoachFollowUps`): on the finding about the same food or meal (said before: the fix whose
+  order or cause names the food; repeats: the calorie line, else the fix about the driver, else the closing line;
+  fat: the fat line; protein: a protein line, else what is left today; advice taken: the finding whose order names
+  the food), else a finding of its own, today's, of kind 'fix' (signals `saidBefore`, `repeatOver`) or 'holdingUp'
+  (`adviceTaken`), id `day:<epochDay>:<signal>:<kind>:<follow-up>[:<food key>]`, priority pattern.
+- **Safeguards** (`followUpAllowed`): nothing after bariatric surgery; under 18, paused, an eating-disorder history or
+  the under-eating finding, only advice taken of a protein add (the record holds no adds yet, so nothing shows);
+  pregnancy, breastfeeding, underweight or low body weight, only protein short; kidney disease, nothing for more
+  protein.
+- **The clock:** `CoachAnalysisInputs.nowMinute` (`minuteOfDayNow` of the app's clock) reaches `analyseFoodDay`, so the
+  evening fiber fix comes at 6 pm without dinner logged.
+- **Evidence:** a row for each `CoachFollowUpRule` figure; `coachAnalysisEvidence.test.ts` checks them.
+- **Tests:** `test/engine/coachFollowUps.test.ts` (Tuesday → Thursday, the weekday and the date, the 14 days, the buffet
+  day's calorie line; the third day this week, the driver food and meal, the calendar week, a Refeed, fat over,
+  protein short on what is left; skipped three days running, 1,400 kcal, the 5-of-14 scenario, said once; follow-ups
+  of their own; the record of the buffet day; every safeguard); `test/state/coachAccountability.test.ts` (nothing
+  recorded unless shown, recorded once a day, the follow-up the next day on the calorie line, fiber at 7:40 pm and not
+  at noon); the contract on both implementations; the version 28 upgrade, the fingerprint and the table list.
+
+Choices made without asking (say if any is wrong):
+- **`taken` is a kind of the record**, so "advice taken" is said once per piece of advice across app launches.
+- **A repeat is said only on a day that is one of them** (today over by 500, today's fat over), so it rides on
+  today's line. Protein short counts the whole days before today, as today is still being eaten.
+- **Repeats of fat use 1d's margin** (1.25× the target and 15 g over), so "fat over" means what the fat line means.
+- **"The days it would have been eaten" are rounded to whole days**, at least one: 10 of 14 days for 3 days is 2 days,
+  so a 700 kcal biscuit gives 1,400 kcal.
+
+Remaining:
+- the words for the follow-ups in `format/`, including the three signals of their own (`saidBefore`, `repeatOver`,
+  `adviceTaken`), which `foodFindingText` has no template for yet.
+
+The coach's voice, 2026-10-24. Not run locally; CI validates.
+
+- **Where:** `apps/mobile/src/format/coach/`, one declaration per file. Every coach analysis template moved there and
+  was rewritten on the grammar: `foodFindingText`, `trainingFindingText`, `coachTradeText`, `coachHeadlineText` (now
+  from `CoachVerdict`), `coachFindingText`, what is left today and the closing line; `findingSubjectText` (the old
+  "X is holding up; Y is worth changing" headline) is gone. The Coach tab's section draws the verdict as the headline
+  and the closing line last.
+- **The grammar:**
+  - **Slots** (`coachPhrasings`, 185 slots, 410 phrasings, 2 to 4 a slot): the lead (the number and the verdict), the
+    cause (meal and food, `coachCauseText`), the orders, one sentence each with what each needs around it
+    (`coachAdviceText`: the worst food, skip or one spoonful, fill the plate, the swap, then "Without the … you'd be
+    … over, not …"), the consequence, the close, holding up, what is left, data quality, training, MM-607's trade and
+    the follow-ups.
+  - **The choice** (`coachPhrase`, `phrasingIndex`, `coachPhraseKey`): FNV-1a over the slot, the finding's id and its
+    last day, so a day reads the same each time and the next day's like finding may read another.
+  - **Helpers:** `listText` ("A, B and C"), `pluralText`, `countWord` ("two cups"), `multipleText` ("3.8×"),
+    `roughAmount` (an average said to the nearest 5 under 100, 10 from it), `sentenceCase` (a food name that opens a
+    sentence is capitalized; a number is left alone), `possessiveText` ("General Tso's" stays), `readableFoodName`
+    (brackets, sizes and containers go; a catalog name in capitals keeps its first part in sentence case: "COOKIE
+    BUTTER, CRUNCHY (LOTUS)" is "Cookie butter", "Diet Pepsi Cola 12 Fluid Ounce Aluminum Can (Pepsi)" is "Diet Pepsi
+    Cola"), `foodInSentence` (lower case mid-sentence unless the name opens with a proper word: "the sausage egg and
+    cheese biscuit", "Chinese buffet"), `coachCauseWords` ("the buffet"), `coachMealWords`.
+  - **The protected path:** the eating-disorder history and the other protein-only safeguards say protein only,
+    calmly ("32 g of protein left today. A protein food at your next meal covers it.").
+- **The owner's buffet day reads** (headline, then each line as the tab shows it; its fixture at 7:40 pm):
+  - "1,054 kcal over. The buffet did it."
+  - What is left ("No calories left: 1,054 kcal over"): "You're done eating for today. If you're hungry, dinner under
+    400 kcal: lean protein and vegetables. No sauce."
+  - The calorie line ("1,054 kcal over today"): "Lunch was the problem. The Chinese buffet: 2,368 kcal, more than your
+    whole day's 2,175. General Tso's chicken was the worst of it: 744 kcal, 33 g fat. Skip it next time, or take one
+    spoonful. Fill the plate with steamed chicken with vegetables first. Swap in steamed chicken with mixed vegetables,
+    sauce on the side: about 265 kcal, 35 g protein, 4 g fat. Without the General Tso's chicken you'd be 310 kcal over,
+    not 1,054."
+  - Protein per 100 kcal ("155 g protein in 3,229 kcal so far"): "4.8 g protein per 100 kcal. You need 8.6 g.
+    Breakfast: the sausage egg and cheese biscuit with extra eggs, 691 kcal, 45 g fat. Swap it for two eggs on an
+    English muffin with a slice of cheese: about 390 kcal, 24 g protein, less than half the fat. Cookie butter: 170 kcal,
+    1 g protein. Does nothing for your goal. Skip it."
+  - Sodium ("Sodium 6,923 mg so far, over 1,800 mg"): "Sodium 6,923 mg, 3.8× your 1,800 limit. General Tso's chicken did
+    it. Drink water tonight. Next time: sauce on the side."
+  - Fiber ("Fiber 14 g of 30 g", under "1 more from your data"): "Fiber 14 g of 30. You ate almost no vegetables. Two
+    cups at dinner."
+  - Holding up ("Protein 155 g, minimum hit"): "Protein 155 g. Minimum hit. Keep that."
+  - Last: "Tomorrow: back to 2,175. Don't skip meals to make up for today."
+- **The follow-ups** (`coachFollowUpText`, `followUpFindingText`): riding on a finding, said right after its lead; on
+  their own, signals `saidBefore`, `repeatOver` and `adviceTaken` are routed by `coachFindingText` (and
+  `foodFindingText`) and never throw. "Tuesday I told you to skip the General Tso's chicken. It's back: 744 kcal
+  again." "Third day this week over by 500 or more. Lunch keeps doing it." "Peanut butter again: 2 of the 3 days."
+  "Fat over target 3 of the last 7 days." "You skipped the biscuit three days running. That's 1,400 kcal you didn't
+  eat." A stand-alone fix ends in an order ("Skip it next time.", "Halve the added fats…"); advice taken in "Keep that."
+- **The voice test:** `test/voice.test.ts` keeps MM-108's list for the rest of the app; `format/coach/` is held to the
+  coach's list instead (`test/support/coachBannedWords.ts`: profanity, "fat" aimed at the person, lazy, weak,
+  disgusting, pathetic, worthless, cheat, sinful, deserve, earn, burn off), so verdicts about choices are allowed there
+  and banned elsewhere, with its own tests.
+- **Cleanup:** `food/ownMealSwapOf.ts` deleted; `CoachAdvice.replacement`'s doc says a table replacement's `name` is
+  words; `spanAdviceOf` already swaps through `swapFor` (with its limits) from `foodSpanAnalysisOf`, the only path to
+  `tableSwapOf`; an evidence row for each of the 25 `CoachAdviceRule` figures (`sleepMinutes` from the AASM and SRS
+  consensus, the rest judgement), required by `coachAnalysisEvidence.test.ts`.
+- **Stories:** `CoachAnalysisBuffetDay` (`buffetDayScenario`, from `buffetDayFoods`, the same foods as the test
+  fixture); `CoachAnalysisTodayTrade` shows the trade as an order; the fat week's headline is the verdict.
+- **Tests:** `test/format/buffetDayText.test.ts` (each phrasing the day picks pinned, one exact line per sentence of the
+  voice standard, each whole line and title, every fix ending in its orders, the eating-disorder day);
+  `coachPhrasings.test.ts` (every phrasing of every slot: 2 to 4, the coach's list, no exclamation mark, full stops;
+  the text over the buffet day, the fat week and simulated users on 1d and every span: every fix carries each order
+  sentence and ends in one; the same day reads the same); `coachGrammar.test.ts` (the helpers and food names);
+  `coachFollowUpText.test.ts` (each accountability scenario's exact line; every kind, riding on every finding of the
+  buffet day and on its own, never throws); `voice.test.ts`'s coach list. Changed: `foodFindingText.test.ts`,
+  `trainingFindingText.test.ts`, `coachAnalysisText.test.ts`, `foodDay.test.ts`, `foodSignals.test.ts`,
+  `coach/whatYourDataSays.test.tsx`, `coachAnalysisEvidence.test.ts`, `engine/support/buffetDay.ts`.
+
+Choices made without asking (say if any is wrong):
+- **"Fill the plate with steamed chicken with vegetables first."** The standard's "and steamed vegetables" is left out
+  when the food to keep already has its vegetables, so it is not said twice.
+- **The biscuit is named as logged**, "the sausage egg and cheese biscuit with extra eggs", not the standard's
+  "the sausage, egg and cheese biscuit": the coach does not rewrite a name beyond making it readable.
+- **"Without the General Tso's chicken you'd be 310 kcal over, not 1,054"**: the whole name and the unit, as the
+  Decisions have it, where the standard wrote "the General Tso's" and "{x} over".
+- **The density line leads with its number** ("4.8 g protein per 100 kcal. You need 8.6 g."), which the standard does
+  not have: every fix opens with the number, then the orders.
+- **The swap of General Tso's chicken is said** ("Swap in steamed chicken with mixed vegetables…") between the plate
+  and the consequence; the standard has no swap there.
+- **"Peanut butter again: 9 of the last 14 days"** has no follow-up of its own in the data; it is said as the driver of
+  the repeats ("Peanut butter again: 2 of the 3 days").
+- **The story is drawn on the stories' day** (Oct 12), so its phrasings are that day's, not the fixture's.
+
+Remaining:
+- none for the words; the owner's review of the voice.
