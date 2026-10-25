@@ -32,9 +32,11 @@ const fmt = new Fmt('metric');
 const verdictsIn = (text: string) => coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
 
 describe('the lines', () => {
-  it('the period line: today so far, or the span through yesterday with the days fully logged', () => {
+  it('the period line: today so far, the last 7 days with today and the days logged (MM-621), or the span through yesterday with the days fully logged', () => {
     expect(coachPeriodText({ span: 1, fullyLoggedDays: 0 })).toBe('Today so far');
-    expect(coachPeriodText({ span: 7, fullyLoggedDays: 6 })).toBe('7 days through yesterday · 6 fully logged');
+    expect(coachPeriodText({ span: 7, fullyLoggedDays: 6 })).toBe('Last 7 days with today · 6 days logged');
+    expect(coachPeriodText({ span: 7, fullyLoggedDays: 1 })).toBe('Last 7 days with today · 1 day logged');
+    expect(coachPeriodText({ span: 14, fullyLoggedDays: 12 })).toBe('14 days through yesterday · 12 fully logged');
   });
 
   it('an area a span cannot judge, with what it needs', () => {

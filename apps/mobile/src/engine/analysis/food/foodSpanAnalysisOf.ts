@@ -111,17 +111,27 @@ interface Candidate {
  * With the findings come the keys whose exit threshold does not hold yet
  * (`unresolved`), which MM-605's state machine reads: N1 is over only once
  * the minimum is met on 65% of judged days, though it is said only under 50%.
+ *
+ * With `everyLoggedDay` (7d, today included, the owner, MM-621) every logged
+ * day is read, partial or not, and the rules read from a single day: there
+ * are no partial days and no minimum. The trend engine keeps its coverage
+ * rule, so a short or thin week is read by the level rules alone.
  */
-export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, asOf: CalendarDate): FoodSpanAnalysis {
+export function foodSpanAnalysisOf(
+  input: FoodAnalysisInput,
+  span: TrendSpan,
+  asOf: CalendarDate,
+  { everyLoggedDay = false }: { everyLoggedDay?: boolean } = {},
+): FoodSpanAnalysis {
   const limits = foodLimitsOf(input.safeguards);
   if (limits.nothing) return { findings: [], unresolved: new Set() };
   const from = asOf.addDays(1 - span);
   const lookFrom = from.addDays(-TrendRule.baselineLookbackDays);
-  const days = foodDaysOf(input, lookFrom, asOf);
+  const days = foodDaysOf(input, lookFrom, asOf).map((d) => (everyLoggedDay ? { ...d, whole: d.intake !== undefined } : d));
   const spanDays = days.filter((d) => !d.date.isBefore(from));
   const recordOn = recordOnOf(input.history);
   const goal: GoalMode | undefined = recordOn(asOf)?.mode;
-  const enough = Math.max(R.minimumJudgedDays, Math.ceil(TrendRule.coverageMinimum * span));
+  const enough = everyLoggedDay ? 1 : Math.max(R.minimumJudgedDays, Math.ceil(TrendRule.coverageMinimum * span));
 
   const make = (
     signal: string,
@@ -199,7 +209,7 @@ export function foodSpanAnalysisOf(input: FoodAnalysisInput, span: TrendSpan, as
   // 3. The level rules, and the gates.
   const judged = spanDays.filter((d) => d.whole && d.record !== undefined);
   if (goal === undefined || judged.length < enough) return { findings: shownQuality, unresolved: new Set() };
-  const readings = readFoodSignals({ input, days: spanDays, from, to: asOf, goal });
+  const readings = readFoodSignals({ input, days: spanDays, from, to: asOf, goal, ...(everyLoggedDay ? { minimumDays: 1, sodiumMinimumDays: 1 } : {}) });
   // N1's exit (MM-606): a protein-minimum fix is over only once the minimum is met on 65% of judged days.
   const unresolved = new Set<string>();
   const minimumRead = readings.get('proteinMinimum')?.figures;
