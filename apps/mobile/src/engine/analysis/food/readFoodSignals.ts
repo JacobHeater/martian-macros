@@ -49,7 +49,9 @@ const reading = (
  * here, since a signal is also in change when the trend engine finds it so.
  *
  * `from` and `to` bound the span; `days` are its judged days (whole, with
- * targets); `goal` is the goal in force on `to`.
+ * targets); `goal` is the goal in force on `to`. `minimumDays` is the
+ * fewest judged days a rule reads, and `sodiumMinimumDays` sodium's (7d
+ * reads both from one, MM-621).
  */
 export function readFoodSignals({
   input,
@@ -57,12 +59,16 @@ export function readFoodSignals({
   from,
   to,
   goal,
+  minimumDays = R.minimumJudgedDays,
+  sodiumMinimumDays = R.sodiumMinimumDays,
 }: {
   input: FoodAnalysisInput;
   days: readonly FoodDay[];
   from: CalendarDate;
   to: CalendarDate;
   goal: GoalMode;
+  minimumDays?: number;
+  sodiumMinimumDays?: number;
 }): ReadonlyMap<FoodSignalId, FoodSignalReading> {
   const judged = days.filter(
     (d): d is Judged => d.whole && d.record !== undefined && d.kcalTarget !== undefined && d.intake !== undefined,
@@ -81,7 +87,7 @@ export function readFoodSignals({
   const minimumOf = (d: Judged) => d.record.targets.proteinMinimumG as number;
   const missed = withMinimum.filter((d) => d.intake.proteinG < minimumOf(d));
   const met = withMinimum.length - missed.length;
-  if (withMinimum.length >= R.minimumJudgedDays) {
+  if (withMinimum.length >= minimumDays) {
     put(
       reading(
         'proteinMinimum',
@@ -100,7 +106,7 @@ export function readFoodSignals({
 
   // N2: the gap to the protein target, where the target stands well above the minimum.
   const withTarget = withMinimum.filter((d) => d.record.targets.proteinG >= minimumOf(d) + R.proteinTargetAboveMinimumG);
-  if (withTarget.length >= R.minimumJudgedDays) {
+  if (withTarget.length >= minimumDays) {
     const short = withTarget.filter((d) => d.intake.proteinG <= (1 - R.proteinTargetShortFraction) * d.record.targets.proteinG);
     const close = withTarget.filter((d) => d.intake.proteinG >= (1 - R.proteinTargetHoldingFraction) * d.record.targets.proteinG);
     put(
@@ -123,7 +129,7 @@ export function readFoodSignals({
   // N3: protein by meal. A day without entries says nothing of its meals.
   const withEntries = judged.filter((d) => d.entries.length > 0);
   const missedWithEntries = missed.filter((d) => d.entries.length > 0);
-  if (withEntries.length >= R.minimumJudgedDays) {
+  if (withEntries.length >= minimumDays) {
     const lowMeal = mainMeals
       .map((meal) => ({ meal, low: missedWithEntries.filter((d) => proteinIn(d.entries, meal) < R.mealAlmostNoneG).length }))
       .find((m) => m.low * 2 > missedWithEntries.length && missedWithEntries.length > 0);
@@ -148,7 +154,7 @@ export function readFoodSignals({
     );
   }
 
-  if (n < R.minimumJudgedDays) return found;
+  if (n < minimumDays) return found;
   const proteinTotal = sum(judged.map((d) => d.intake.proteinG));
   const requiredG = mean(judged.map(requiredOf));
 
@@ -338,7 +344,7 @@ export function readFoodSignals({
       else under++;
     }
     const judgedSodium = over + under;
-    const enough = judgedSodium >= R.sodiumMinimumDays;
+    const enough = judgedSodium >= sodiumMinimumDays;
     put(
       reading(
         'sodium',

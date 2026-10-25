@@ -17,7 +17,6 @@ import { nothingFoundText } from '../format/nothingFoundText';
 import { showsAgainText } from '../format/showsAgainText';
 import { underEatingPointerText } from '../format/underEatingPointerText';
 import { unjudgedAreaText } from '../format/unjudgedAreaText';
-import { weekSpanProgressText } from '../format/weekSpanProgressText';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
@@ -149,7 +148,6 @@ export function WhatYourDataSaysSection() {
       <p className="app-caption coach-analysis-period" aria-live="polite">
         {coachPeriodText(view)}
       </p>
-      {view.weekProgress === undefined ? null : <p className="app-caption">{weekSpanProgressText(view.weekProgress)}</p>}
       {verdict === undefined ? null : <p className="app-text coach-analysis-headline">{coachHeadlineText(verdict, fmt)}</p>}
       {nothingEver ? <p className="app-text">{coachAnalysisWords.nothingLogged}</p> : null}
       {nothingToday ? (
