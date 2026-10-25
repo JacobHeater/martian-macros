@@ -102,6 +102,7 @@ builds a separate read-only pack database with its own format.
 - Placed 2026-10-21 (step 8): MM-536 (screenshot the iPhone through the app).
 - Placed 2026-10-21 (step 8): MM-550 (the progress page tells committed work from future vision, done).
 - Built 2026-10-19 (step 4): MM-8, the three identities `com.martianmacros`, `.dev` and `.demo` on both platforms (Android flavors, iOS build settings), the owner's decision on the Mac.
+- Added 2026-10-25 (step 9): MM-619 (CI in minutes, not half an hour).
 
 ## Notes for whoever builds it
 - The first real migration will come from whichever of WS-05 step 2, WS-06

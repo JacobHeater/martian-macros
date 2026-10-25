@@ -155,7 +155,7 @@ seconds unless it is focused or pointed at (MM-272).
 ## How a component gets its story and its tests
 
 - Every component of `src/ui` is imported by a file under `src/gallery`,
-  or `test/gallery/stories.test.tsx` fails. The Components, Fields and
+  or `test/gallery/storyRegister.test.tsx` fails. The Components, Fields and
   Charts catalogs show it in use; the States catalog shows each of its
   states (rest, pressed through `.mm-pressed`, disabled, selected, error);
   the Overlays catalog opens each overlay on its own.

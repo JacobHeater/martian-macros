@@ -8,6 +8,7 @@ import { runFood } from './src/food.ts';
 import { choosePhone, cleanIos, pairedPhones, runIosApp, runIosBuild, runSimulator, simulatorScreenshot, temporaryScreenshot } from './src/ios.ts';
 import { runPanel } from './src/panelCommand.ts';
 import { phoneScreenshot } from './src/phoneScreenshot.ts';
+import { checkPlan } from './src/checkPlan.ts';
 import { capture, run } from './src/proc.ts';
 import { runRequirements } from './src/requirements.ts';
 import { runRoadmapReport } from './src/roadmap.ts';
@@ -43,15 +44,19 @@ async function bootstrap(): Promise<number> {
   return run(['npx', 'cap', 'telemetry', 'off'], { cwd: webApp });
 }
 
-async function check(): Promise<number> {
-  const steps: [string, Command][] = [
-    ['req', (a) => runRequirements(repoRoot, a)],
-    ['panel', (a) => runPanel(repoRoot, a)],
-    ['tool', () => test(['--tool'])],
-    ['web', web],
-  ];
-  for (const [, step] of steps) {
-    const code = await step([]);
+async function check(args: readonly string[]): Promise<number> {
+  const plan = checkPlan(args);
+  if (typeof plan === 'string') {
+    stderr.write(`${plan}\nUsage: mm check [--part static|tests|stories] [--shard i/n]\n`);
+    return 64;
+  }
+  const inTool: Record<string, Command> = {
+    req: (a) => runRequirements(repoRoot, a),
+    panel: (a) => runPanel(repoRoot, a),
+    tool: () => test(['--tool']),
+  };
+  for (const step of plan.steps) {
+    const code = step.web === undefined ? await inTool[step.name]!([]) : await run([...step.web], { cwd: webApp });
     if (code !== 0) return code;
   }
   stdout.write('\nAll checks passed.\n');
@@ -127,7 +132,7 @@ async function screenshot(args: readonly string[]): Promise<number> {
 const commands: Record<string, [string, Command]> = {
   doctor: ['Check the toolchain', doctor],
   bootstrap: ['Install the exact dependencies from the lock file, and opt this machine out of Capacitor telemetry', bootstrap],
-  check: ['CI gate: requirements, panel, tool tests, web (type check, tests, build, offline)', check],
+  check: ['CI gate: requirements, panel, tool tests, web (type check, tests, stories, build, offline); --part static|tests|stories [--shard i/n] for one CI job (MM-619)', check],
   web: ['Check the React app: type check, tests, build, offline, legal page', web],
   legal: ['The public page of the terms and the privacy policy (MM-247): mm legal [out-dir]', (a) => run(['npm', 'run', 'legal', '--', ...a], { cwd: webApp })],
   storybook: ['The design register, live: mm storybook [build] (MM-237)', (a) => run(['npm', 'run', a[0] === 'build' ? 'build-storybook' : 'storybook'], { cwd: webApp })],

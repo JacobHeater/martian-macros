@@ -93,6 +93,27 @@ winners stated fewer of the grade's inputs than their loser, the FNDDS
 portion text, the Open Food Facts micronutrient shares, and the pack size
 with thirteen integer columns over 464k rows.
 
+## The build of 2026-10-25 (done, release published)
+
+Format 4, the first with food groups (MM-616), built on the dev Mac from main after PR #313: `./mm food fetch`,
+`./mm food build`, `./mm food package --base-url https://github.com/JacobHeater/martian-macros-food-data/releases/download/2026-10-25/`,
+then `gh release create 2026-10-25 … --latest` with the two packs, `manifest.json`, and the build's own `report.txt` and
+`coverage.txt` (the publish folder still held 2026-10-19's copies of those two; the fresh ones are in `.food_cache/packs/`).
+
+| Pack | Foods | gzip |
+|---|---|---|
+| `generic` | 13,285 | 1.6 MB |
+| `barcode_us` | 520,988 | 57.1 MB |
+
+The same 534,273 foods as 2026-10-19. Groups:
+- 387,814 grouped: snacks and sweets 132,960; spreads and sauces 42,820; prepared meals 40,812; drinks 39,539; dairy and
+  yogurt 31,432; breads and grains 26,004; meat and poultry 22,396; vegetables 13,582; breakfast cereals 9,822; fish 8,155;
+  fats and oils 5,902; fruit 5,691; legumes 4,869; nuts and seeds 2,792; eggs 1,038.
+- 146,459 without a group: Open Food Facts products, which carry no category yet, and the categories reviewed as no group.
+- 0 unmapped source categories.
+
+The latest manifest serves format 4. The owner pulled both packs from Settings > Food database on 2026-10-25.
+
 ## The build of 2026-10-19 (done, release published)
 
 Run on the owner's Mac (zsh, DuckDB 1.5.6) after three fixes to the

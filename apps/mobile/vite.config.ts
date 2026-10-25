@@ -40,6 +40,26 @@ if (!['prod', 'dev', 'demo'].includes(identity)) throw new Error(`MM_IDENTITY mu
 const demoSeed = process.env['MM_DEMO_SEED'] === '1';
 if (demoSeed && identity !== 'demo') throw new Error('Only the demo identity may seed itself (MM-177).');
 
+/**
+ * MM-619: the screen tests whose assertions depend on the stylesheets
+ * (`toBeVisible` and the like, where CSS hides or shows a part). Only these
+ * load the CSS; every other screen test runs without it.
+ */
+const styled = [
+  'test/app.test.tsx',
+  'test/app/termsOfUse.test.tsx',
+  'test/coach/headsUpSection.test.tsx',
+  'test/food/emptyDayCruft.test.tsx',
+  // Fails with test/fastComputedStyle.ts, cause not yet found (MM-619's Progress): runs with jsdom's own styles.
+  'test/food/searchMoreResults.test.tsx',
+  'test/food/waterAndMicros.test.tsx',
+  'test/settings/appleHealth.test.tsx',
+  'test/settings/privacyPolicy.test.tsx',
+  'test/settings/settingsAccordion.test.tsx',
+  'test/ui/components.test.tsx',
+  'test/ui/section.test.tsx',
+];
+
 export default defineConfig({
   base: './',
   define: {
@@ -87,11 +107,42 @@ export default defineConfig({
           name: 'screens',
           environment: 'jsdom',
           include: ['src/**/*.test.tsx', 'test/**/*.test.tsx'],
-          setupFiles: ['test/setup.ts'],
-          css: true,
+          // The stories are drawn once, under coverage, by `npm run unseen`; the tests that need the
+          // stylesheets run in screens-css (MM-619).
+          exclude: ['test/gallery/stories/**', ...styled, 'node_modules/**'],
+          setupFiles: ['test/setup.ts', 'test/fastComputedStyle.ts'],
+          // MM-619: no stylesheets. With them, nine tenths of a screen test's time went to jsdom
+          // matching every CSS rule for each role query's visibility check (CI's CPU profile, 2026-10-25).
+          css: false,
           // These draw the whole app and walk through it; several screens' worth
           // takes longer than the default on a busy machine.
           testTimeout: 20000,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          // MM-619: the screen tests whose assertions read the stylesheets (visibility set by CSS).
+          name: 'screens-css',
+          environment: 'jsdom',
+          include: styled,
+          setupFiles: ['test/setup.ts'],
+          css: true,
+          testTimeout: 20000,
+        },
+      },
+      {
+        extends: true,
+        test: {
+          // Every story drawn and walked (MM-237), in shards so they spread over the workers (MM-619).
+          name: 'stories',
+          environment: 'jsdom',
+          include: ['test/gallery/stories/*.test.tsx'],
+          setupFiles: ['test/setup.ts', 'test/fastComputedStyle.ts'],
+          // The stories are looked at for their words, not their styles (MM-619).
+          css: false,
+          // Drawn under coverage (MM-321), a story with a long walk takes longer than a screen test does bare.
+          testTimeout: 30000,
         },
       },
     ],
