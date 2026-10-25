@@ -17,6 +17,7 @@ import { nothingFoundText } from '../format/nothingFoundText';
 import { showsAgainText } from '../format/showsAgainText';
 import { underEatingPointerText } from '../format/underEatingPointerText';
 import { unjudgedAreaText } from '../format/unjudgedAreaText';
+import { weekSpanProgressText } from '../format/weekSpanProgressText';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
@@ -29,7 +30,7 @@ import { CoachFindingItem } from './CoachFindingItem';
 import './coach.css';
 
 /**
- * "What your data says" on the Coach tab (MM-610), under the one thing to
+ * "Coach’s feedback" on the Coach tab (MM-610), under the one thing to
  * do and above the targets; the safeguards stay above it. It opens on 1d,
  * today so far, and offers 7d to 3m as the data supports each, in an
  * `MmSegmented` under its row's label, as the Goal section's rows hold
@@ -123,7 +124,7 @@ export function WhatYourDataSaysSection() {
           <Notice text={underEatingPointerText(view.underEatingNoticeShown)} />
         </div>
       ) : null}
-      {view.spans.includes(7) ? (
+      {view.spans.length > 1 ? (
         // On the section's list group, as every row that holds a control is: never bare on the canvas (MM-291).
         <MmListGroup>
           <MmListRow
@@ -148,6 +149,7 @@ export function WhatYourDataSaysSection() {
       <p className="app-caption coach-analysis-period" aria-live="polite">
         {coachPeriodText(view)}
       </p>
+      {view.weekProgress === undefined ? null : <p className="app-caption">{weekSpanProgressText(view.weekProgress)}</p>}
       {verdict === undefined ? null : <p className="app-text coach-analysis-headline">{coachHeadlineText(verdict, fmt)}</p>}
       {nothingEver ? <p className="app-text">{coachAnalysisWords.nothingLogged}</p> : null}
       {nothingToday ? (
