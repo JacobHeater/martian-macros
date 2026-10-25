@@ -59,6 +59,8 @@ const notShown = [
   'foodPipeline/',
   'healthIngest/testing/',
   'domain/training/builtInExercises.ts',
+  // MM-617: the food-language lexicon matches food names ("baked good"); none of it is shown.
+  'engine/analysis/language/lexicon/',
 ];
 
 const quoted = [/'((?:[^'\\\n]|\\.)+)'/g, /"((?:[^"\\\n]|\\.)+)"/g, /`((?:[^`\\]|\\.)+)`/g];

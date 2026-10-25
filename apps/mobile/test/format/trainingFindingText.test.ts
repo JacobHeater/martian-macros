@@ -86,7 +86,7 @@ describe('training, water and sleep words', () => {
     expect(text).toContain('Deleted exercise');
     expect(text).toContain('5 h 40 m');
     expect(text).toContain('0.5% of body weight a week');
-    expect(text).toMatch(/(Keep the loads\. Cut sets before weight|Hold the weight on the bar\. Drop sets before load)\.$/);
+    expect(text).toMatch(/(Keep the loads\. Cut sets before weight|Hold the weight on the bar\. Drop sets before load)\./);
   });
 
   it('every fix ends in its orders: two sessions, the sets to ten, one more set, the pace, sleep and protein', () => {

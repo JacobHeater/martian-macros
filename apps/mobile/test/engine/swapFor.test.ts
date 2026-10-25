@@ -264,7 +264,7 @@ describe('swapFor (MM-617)', () => {
       expect(swap?.source).toBe('table');
     });
 
-    it('a better preparation is required: sauce-free for sauced, over a nearer name', () => {
+    it('a better preparation ranks first: sauce-free over a sauced, nearer name', () => {
       const sauced: Food = { name: 'Chicken in teriyaki sauce', meal: 'dinner', kcal: 400, proteinG: 30, carbsG: 30, fatG: 18 };
       const catalog = catalogOf(
         catalogFood('Chicken in teriyaki sauce', 'meatAndPoultry', 400, 30, 30, 18),
