@@ -29,7 +29,6 @@ import type { TradeCatalog } from '../engine/analysis/TradeCatalog';
 import type { TrainingAnalysisInput } from '../engine/analysis/TrainingAnalysisInput';
 import type { UnjudgedArea } from '../engine/analysis/UnjudgedArea';
 import { unjudgedTrainingAreas } from '../engine/analysis/unjudgedTrainingAreas';
-import { weekSpanProgress } from '../engine/analysis/weekSpanProgress';
 import { hasHardSet } from '../engine/hasHardSet';
 import type { FindingDismissal } from '../engine/trends/FindingDismissal';
 import type { TrendAnnouncement } from '../engine/trends/TrendAnnouncement';
@@ -95,9 +94,10 @@ interface AnalysisRead {
   readonly entries: readonly FoodEntry[];
   /** The fully logged days before today, by epoch day. */
   readonly wholeDays: ReadonlySet<number>;
+  /** The spans the trend engine's coverage rule supports (`supportedAnalysisSpans`): the canonical span is chosen from these. */
   readonly spans: readonly AnalysisSpan[];
-  /** How far the data is from 7d, while only 1d is offered (MM-620). */
-  readonly weekProgress: CoachAnalysisView['weekProgress'];
+  /** The spans the switcher offers: those, with 7d once anything is logged (MM-621). */
+  readonly offered: readonly AnalysisSpan[];
   /** The food analysis's input, the trade catalog left out. */
   readonly food: FoodAnalysisInput;
   /** The training analysis's input, once everything it reads is in. */
@@ -140,7 +140,7 @@ export class CoachAnalysis {
   /** The span chosen on the switcher: 1d unless chosen, and 1d again each time the tab opens (`open`). Not kept. */
   readonly span = new ValueCell<AnalysisSpan>(1);
 
-  /** The spans the data supports (1d always); the switcher shows once 7d is among them. */
+  /** The spans offered (1d always; 7d once anything is logged, MM-621); the switcher shows once any span past 1d is among them. */
   readonly spans: Cell<readonly AnalysisSpan[]>;
 
   /** The section's content for the span chosen; undefined while what it rests on is read. */
@@ -332,7 +332,8 @@ export class CoachAnalysis {
     let firstEntryOn: CalendarDate | undefined;
     for (const e of entries) if (firstEntryOn === undefined || e.date.isBefore(firstEntryOn)) firstEntryOn = e.date;
     const spans = supportedAnalysisSpans({ firstEntryOn, wholeDays, today });
-    const weekProgress = spans.length === 1 ? weekSpanProgress({ firstEntryOn, wholeDays, today }) : undefined;
+    // 7d is the last 7 days, today included, read from whatever is logged in them: no coverage rule (the owner, MM-621).
+    const offered: AnalysisSpan[] = entries.length > 0 && !spans.includes(7) ? [1, 7, ...spans.slice(1)] : spans;
     const training = inputs.trainingInput();
     const water = Loadable.valueOf(this.water.value);
     const wholeForTraining = inputs.wholeDays();
@@ -341,7 +342,7 @@ export class CoachAnalysis {
       entries,
       wholeDays,
       spans,
-      weekProgress,
+      offered,
       // Foods snoozed inline are never an X or a Y of a trade (MM-378, MM-607).
       food: { ...base, entries, intake, plannedShare, catalog: undefined, snoozed: inputs.snoozed() },
       training:
@@ -438,7 +439,8 @@ export class CoachAnalysis {
     // The record of advice shown is waited for too, so 1d's follow-ups do not arrive a moment after the rest.
     const given = this.given.value;
     if (stillReading(announced) || stillReading(dismissed) || stillReading(given)) return undefined;
-    const { today, entries, spans } = read;
+    const { today, entries } = read;
+    const spans = read.offered;
     const chosen = this.span.value;
     // A span the data no longer supports (an entry deleted) falls back to today.
     const span: AnalysisSpan = spans.includes(chosen) ? chosen : 1;
@@ -463,11 +465,15 @@ export class CoachAnalysis {
       findings = withCoachFollowUps(day, followUps, today);
       if (entries.some((e) => e.date === today)) checked.push('food');
     } else {
-      to = today.addDays(-1);
+      // 7d ends today (MM-621); the longer spans end yesterday, as MM-605's detectors read whole days.
+      to = span === 7 ? today : today.addDays(-1);
       from = to.addDays(1 - span);
       const within = (date: CalendarDate) => !date.isBefore(from) && !date.isAfter(to);
-      for (let date = from; !date.isAfter(to); date = date.addDays(1)) if (read.wholeDays.has(date.epochDay)) fullyLoggedDays++;
-      findings = safely(() => analyseFoodSpan(foodInput, span, to));
+      // 7d counts every day logged, today and partial days too (MM-621); the longer spans their fully logged days.
+      const counted = (date: CalendarDate) =>
+        span === 7 ? entries.some((e) => e.date === date) : read.wholeDays.has(date.epochDay);
+      for (let date = from; !date.isAfter(to); date = date.addDays(1)) if (counted(date)) fullyLoggedDays++;
+      findings = safely(() => analyseFoodSpan(foodInput, span, to, { everyLoggedDay: span === 7 }));
       if (entries.some((e) => within(e.date))) checked.push('food');
       const trainingInput = read.training;
       const water = read.water;
@@ -479,7 +485,7 @@ export class CoachAnalysis {
       }
       // The state machine's word on each key as of yesterday (MM-605): the canonical span's log, read for every span.
       for (const entry of Loadable.valueOf(announced) ?? []) {
-        if (entry.on === to) transitions.set(entry.key, entry.transition);
+        if (entry.on === today.addDays(-1)) transitions.set(entry.key, entry.transition);
       }
     }
 
@@ -497,7 +503,6 @@ export class CoachAnalysis {
     return {
       span,
       spans,
-      weekProgress: read.weekProgress,
       from,
       to,
       fullyLoggedDays,

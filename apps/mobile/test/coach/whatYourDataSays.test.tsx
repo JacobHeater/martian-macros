@@ -66,12 +66,24 @@ describe("the owner's fat week on the tab", () => {
 });
 
 describe('opens on today', () => {
-  it('a person whose first entry was this morning sees 1d for today, no switcher, and what opens 7d (MM-620)', async () => {
+  it('a person whose first entry was this morning opens on 1d for today, with 7d offered already (MM-621)', async () => {
     await onCoach(firstMorningScenario);
     const s = await section();
     expect(await s.findByText('Today so far')).toBeInTheDocument();
-    expect(s.getByText('7d opens a week after your first entry · 7 days to go')).toBeInTheDocument();
-    expect(s.queryByRole('group', { name: 'Days shown' })).not.toBeInTheDocument();
+    expect(s.getByRole('button', { name: '7d' })).toBeInTheDocument();
+    expect(s.queryByRole('button', { name: '2w' })).not.toBeInTheDocument();
+  });
+
+  it('7d there reads the one day logged, today, with no minimum (MM-621)', async () => {
+    await onCoach(firstMorningScenario);
+    await choose('7d');
+    expect(await (await section()).findByText('Last 7 days with today · 1 day logged')).toBeInTheDocument();
+  });
+
+  it('nothing logged at all: no switcher', async () => {
+    await onCoach(nothingLoggedScenario);
+    const s = await section();
+    expect(await s.findByText('Log a food and the coach reads it here.')).toBeInTheDocument();
     expect(s.queryByRole('button', { name: '7d' })).not.toBeInTheDocument();
   });
 
@@ -93,16 +105,15 @@ describe('spans appear with data', () => {
     expect(s.getByRole('button', { name: '2w' })).toBeInTheDocument();
     expect(s.queryByRole('button', { name: '1m' })).not.toBeInTheDocument();
     expect(s.queryByRole('button', { name: '3m' })).not.toBeInTheDocument();
-    expect(s.queryByText(/^7d opens/)).not.toBeInTheDocument();
   });
 });
 
 describe("a span's analysis", () => {
-  it('7d reads the last 7 days through yesterday, and the period line says how many were fully logged', async () => {
+  it('7d reads the last 7 days with today, part-logged today included, and the period line says how many were logged (MM-621)', async () => {
     await onCoach(analysisFatWeekScenario());
     await choose('7d');
     const s = await section();
-    expect(await s.findByText('7 days through yesterday · 7 fully logged')).toBeInTheDocument();
+    expect(await s.findByText('Last 7 days with today · 7 days logged')).toBeInTheDocument();
     expect(s.getByText('Worth changing')).toBeInTheDocument();
   });
 });

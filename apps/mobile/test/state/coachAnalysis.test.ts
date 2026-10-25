@@ -48,14 +48,14 @@ describe('the spans offered', () => {
     expect(view.spans).toEqual([1, 7]);
   });
 
-  it('a first entry this morning: 1d only, today so far', async () => {
+  it('a first entry this morning: opens on 1d, today so far, with 7d offered already (MM-621)', async () => {
     const repos = new InMemoryRepositories();
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today, healthCheckConfirmedOn: today }));
     await repos.targets.saveTargets(storyTargets(today));
     await repos.weights.saveWeight(today, 86);
     await repos.food.addFood(foodOn(today, { meal: 'breakfast', kcal: 450, proteinG: 30, carbsG: 55, fatG: 10 }));
     const view = await viewOf(stateOf(repos), (v) => v.sections.left !== undefined);
-    expect(view.spans).toEqual([1]);
+    expect(view.spans).toEqual([1, 7]);
     expect(view.span).toBe(1);
     expect(view.from).toBe(today);
     expect(view.sections.left?.signal).toBe('left');
