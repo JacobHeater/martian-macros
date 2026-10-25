@@ -1,44 +1,16 @@
-import { composeStories } from '@storybook/react-vite';
-import { render, screen } from '@testing-library/react';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { ReactElement } from 'react';
 import { describe, expect, it } from 'vitest';
-import preview from '../../.storybook/preview';
-import { configure, getConfig } from 'storybook/test';
-
-/**
- * MM-394: a walk waits up to five seconds for what it presses, as `pressNamed`
- * does. The default second was too short under coverage (`npm run unseen`),
- * where a workout takes about 1.3 s to draw, so three walks failed on a
- * slower machine though nothing was wrong with them.
- */
-configure({ asyncUtilTimeout: 5000 });
+import { getConfig } from 'storybook/test';
+import { storyCases } from '../support/storyCases';
 
 /**
  * MM-237: Storybook is the design register, so a story that does not draw,
- * or a screen with no story, is a hole in it. Every story is drawn here as
- * Storybook draws it, walked to where it goes, and looked at for the words
- * it says it shows; every screen, sheet and step of the app has to be
- * covered by one.
+ * or a screen with no story, is a hole in it. Every screen, sheet and step of
+ * the app has to be covered by one. The stories themselves are drawn in
+ * shards, under coverage (`test/gallery/stories/`, `npm run unseen`, MM-619).
  */
-type StoriesModule = Parameters<typeof composeStories>[0];
-
-/** A story as Storybook composes it: something to draw, what it says of itself, and its walk. */
-interface ComposedStory {
-  (): ReactElement | null;
-  parameters: Record<string, unknown>;
-  play?: (context: { canvasElement: HTMLElement }) => Promise<void>;
-}
-
-const modules = import.meta.glob<StoriesModule>('../../src/**/*.stories.tsx', { eager: true });
-
-const stories = Object.entries(modules).flatMap(([path, module]) =>
-  Object.entries(composeStories(module, preview) as unknown as Record<string, ComposedStory>).map(([name, Story]) => ({
-    id: `${path.replace('../../src/', '')} › ${name}`,
-    Story,
-  })),
-);
+const stories = storyCases;
 
 /** Every file of `src` named for a screen, a sheet or a step, by its component's name. */
 function surfaces(folder: string): string[] {
@@ -75,16 +47,6 @@ function shownInGallery(folder = 'src/gallery'): Set<string> {
   }
   return shown;
 }
-
-describe('every story', () => {
-  it.each(stories)('$id draws, and shows what it says it shows', async ({ Story }) => {
-    const view = render(<Story />);
-    await Story.play?.({ canvasElement: view.container });
-    const shows = Story.parameters['shows'] as string | RegExp | undefined;
-    if (shows === undefined) expect(view.container).not.toBeEmptyDOMElement();
-    else expect((await screen.findAllByText(shows)).length).toBeGreaterThan(0);
-  });
-});
 
 describe('the register', () => {
   it('has a story for every screen, sheet and step of the app', () => {

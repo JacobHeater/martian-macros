@@ -78,8 +78,9 @@ it('twenty results and "More results", then every match, the first new row focus
   await userEvent.click(more);
   await waitFor(() => expect(yogurtRows()).toHaveLength(27), slowly);
   expect(screen.queryByRole('button', { name: 'More results' })).not.toBeInTheDocument();
-  expect(screen.getByText('7 more results, every match listed.')).toHaveAttribute('role', 'status');
-  expect(document.activeElement).toBe(yogurtRows()[20]);
+  // The status follows the rows by a render (MM-619: a faster run no longer hides the wait).
+  expect(await screen.findByText('7 more results, every match listed.', {}, slowly)).toHaveAttribute('role', 'status');
+  await waitFor(() => expect(document.activeElement).toBe(yogurtRows()[20]), slowly);
 }, twoPages);
 
 it('exactly a page of matches never offers more', async () => {
