@@ -42,7 +42,7 @@ You don't run these locally, but CI fails on them, so write code that passes:
   named `color`, `className` or `style`; no screen draws a row's chevron
   (`MmPressable` is the component for content pressed as a whole). Components
   take meaning (`kind="primary"`), never a color, radius or padding.
-- `test/gallery/stories.test.tsx`: every `*Screen.tsx`, `*Sheet.tsx` and
+- `test/gallery/storyRegister.test.tsx` and the story shards in `test/gallery/stories/` (MM-619): every `*Screen.tsx`, `*Sheet.tsx` and
   `*Step.tsx` has a story in `src/gallery/screens/` (`screenStory({ covers,
   shows, open, walk })`), and every story draws and walks.
 - `npm run unseen` (MM-321): markup that no story reaches fails, unless

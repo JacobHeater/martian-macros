@@ -1158,7 +1158,8 @@
           "MM-550"
         ],
         "remaining": [
-          "MM-1"
+          "MM-1",
+          "MM-619"
         ]
       },
       "sequence": [
@@ -1248,6 +1249,13 @@
           "tickets": [
             "MM-536",
             "MM-550"
+          ]
+        },
+        {
+          "step": 9,
+          "title": "CI in minutes, not half an hour: the stories run once in shards, parallel jobs through mm, slow screen tests fixed from CI's profile (the owner, 2026-10-25, MM-619)",
+          "tickets": [
+            "MM-619"
           ]
         }
       ],
