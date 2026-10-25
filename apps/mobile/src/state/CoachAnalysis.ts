@@ -483,6 +483,7 @@ export class CoachAnalysis {
       dismissals,
       transitions,
       previousOrder: this.orders.get(span) ?? [],
+      uncapped: span === 1,
     });
     this.orders.set(
       span,

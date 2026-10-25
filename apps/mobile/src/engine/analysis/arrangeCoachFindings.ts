@@ -12,7 +12,7 @@ import { foldTrainingProtein } from './foldTrainingProtein';
 import type { HiddenFinding } from './HiddenFinding';
 
 /** How many a list holds before the rest go under "N more from your data". */
-const listed = 3;
+const listedPerGroup = 3;
 
 /**
  * Places one span's findings in "What your data says" (MM-610).
@@ -46,8 +46,11 @@ export function arrangeCoachFindings(
     dismissals = [],
     transitions = new Map(),
     previousOrder = [],
+    uncapped = false,
   }: {
     today: CalendarDate;
+    /** Every finding listed, none folded under "N more": 1d, where the day's every order counts (MM-617). */
+    uncapped?: boolean;
     /** Every dismissal, oldest first (`TrendLogReader.watchFindingDismissals`). */
     dismissals?: readonly FindingDismissal[];
     /**
@@ -88,6 +91,7 @@ export function arrangeCoachFindings(
   const topHolding = holding[0];
   const topFix = fixes[0];
   const close = shown.find((f) => f.kind === 'close');
+  const listed = uncapped ? Number.POSITIVE_INFINITY : listedPerGroup;
   return {
     left: shown.find((f) => f.kind === 'left'),
     headline: topHolding === undefined || topFix === undefined ? undefined : { holdingUp: topHolding, fix: topFix },

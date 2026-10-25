@@ -146,7 +146,7 @@ export const coachPhrasings = {
     '{per} of protein or more at breakfast, lunch and dinner on {spread} of {judged} days.',
     'Protein in every main meal on {spread} of {judged} days.',
   ],
-  leadDensityHeld: ['{density} protein per 100 kcal, at or over the {required} you need.', 'Protein per 100 kcal: {density}. Enough.'],
+  leadDensityHeld: ['Your calories carried enough protein.', 'Protein kept up with your calories.'],
   leadFatHeld: ['Fat within 15% of {target} on {within} of {judged} days.', 'Fat on target on {within} of {judged} days.'],
   leadCarbohydrateHeld: ['Carbohydrate within 15% of {target} on {within} of {judged} days.', 'Carbohydrate on target on {within} of {judged} days.'],
   leadSplitHeld: ['Protein, carbohydrate and fat each within 5 points of the plan.', 'Your split is on plan.'],
@@ -157,8 +157,8 @@ export const coachPhrasings = {
   leadCaloriesDayHeld: ['{kcal}, inside the band around {target}.', '{kcal}. Inside the band.'],
   leadCaloriesHeld: ['Calories in the band on {within} of {judged} days.', 'On target on {within} of {judged} days.'],
   leadMealBalanceHeld: [
-    'Every big meal carried at least 70% of the {required} g of protein per 100 kcal you need.',
-    'Protein spread across your meals: each big one at 70% or more of the {required} g per 100 kcal you need.',
+    'Every big meal carried real protein.',
+    'Protein in every big meal.',
   ],
 
   // ---- The leads of a fix: the number and the verdict ----
@@ -175,9 +175,9 @@ export const coachPhrasings = {
     '{meal} carried under 10 g protein on {low} of {missed} short days.',
   ],
   leadDensity: [
-    '{density} protein per 100 kcal. You need {required}.',
-    'Protein per 100 kcal: {density}, against the {required} you need.',
-    '{density} protein per 100 kcal, short of the {required} you need.',
+    'Too many calories for too little protein.',
+    'Your calories bought too little protein.',
+    'Lots of calories, not enough protein.',
   ],
   leadFat: ['Fat averaged {average} against {target}.', 'Fat {average} a day, against {target}.'],
   leadFatDay: ['Fat {fat} so far, against {target}.', 'Fat {fat} against {target}.'],
@@ -195,8 +195,8 @@ export const coachPhrasings = {
     'The split: protein {protein}, carbohydrate {carbs}, fat {fat}, against {plannedProtein}, {plannedCarbs} and {plannedFat}.',
   ],
   leadCalorieDensity: [
-    '{food}: {kcalPerG} kcal a gram, {protein} protein per 100 kcal, {share} of your calories on {days}.',
-    '{food} on {days}: {kcalPerG} kcal a gram and {protein} protein per 100 kcal, {share} of your calories.',
+    '{food}: {share} of your calories on {days}, and almost no protein for it.',
+    '{food} on {days}: {share} of your calories, little protein to show for it.',
   ],
   calorieDenseVerdict: ['Calorie-dense for its protein.', 'It is calorie-dense for its protein: too many calories, too little protein.'],
   leadFiber: ['Fiber averaged {average} against {guide}.', 'Fiber {average} a day, against {guide}.'],
@@ -220,8 +220,8 @@ export const coachPhrasings = {
   leadEnergyUseLow: ['Intake averaged {average}; you use about {use}. No surplus.', 'You eat about {average} and use about {use}: no surplus.'],
   leadEnergyUse: ['Intake averaged {average}, about the {use} you use.', 'You eat about {average} and use about {use}.'],
   leadMealBalance: [
-    '{meal}: {share} of your calories at {density} protein per 100 kcal. You need {required} across the day.',
-    '{meal} gave {share} of your calories at only {density} protein per 100 kcal, against the {required} you need.',
+    '{meal}: {share} of your calories, and little protein in them.',
+    '{meal} gave {share} of your calories with almost no protein.',
   ],
 
   // ---- What is left today ----

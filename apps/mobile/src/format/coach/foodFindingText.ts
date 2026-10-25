@@ -275,13 +275,13 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
     case 'proteinDensity':
       if (f.kind === 'holdingUp') {
         return [
-          `${one('densityG')} g protein per 100 kcal`,
+          'Enough protein for your calories',
           held(say('leadDensityHeld', { density: `${one('densityG')} g`, required: `${one('requiredG')} g` })),
           evidence(['Protein per 100 kcal', `${one('densityG')} g`], ['Your targets need', `${one('requiredG')} g`]),
         ];
       }
       return [
-        today ? `${g('proteinG')} protein in ${kcal('kcal')} so far` : `${one('densityG')} against ${one('requiredG')} g protein per 100 kcal`,
+        today ? `${g('proteinG')} protein in ${kcal('kcal')} so far` : 'Too little protein for your calories',
         body(say('leadDensity', { density: `${one('densityG')} g`, required: `${one('requiredG')} g` }), since, foodsCause('causeFoodsLowProtein')),
         evidence(
           ['Protein per 100 kcal', `${one('densityG')} g`],
@@ -542,7 +542,7 @@ export function foodFindingText(f: CoachFinding, fmt: Fmt): readonly [title: str
         ];
       }
       return [
-        `${meal}: ${one('mealDensityG')} g protein per 100 kcal`,
+        `${meal}: big calories, little protein`,
         body(
           say('leadMealBalance', { meal, share: percent(x('mealShare')), density: `${one('mealDensityG')} g`, required: `${one('requiredG')} g` }),
           foodsCause('causeFoodsLowProtein'),

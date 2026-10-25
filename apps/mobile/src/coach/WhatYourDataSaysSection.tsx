@@ -105,6 +105,8 @@ export function WhatYourDataSaysSection() {
       </div>
     );
   const nothingEver = view.nothingLogged;
+  // A day over target says what caused it before how to finish it (MM-617's voice standard).
+  const leftAfterCause = verdict?.kind === 'over' && left !== undefined && worthChanging.length > 0 && !nothingEver;
   // History, but nothing logged today: 1d says so, with what is left at the whole of today's targets (MM-612).
   const nothingToday = !nothingEver && view.span === 1 && view.checked.length === 0;
   const nothingFound =
@@ -154,8 +156,10 @@ export function WhatYourDataSaysSection() {
         </p>
       ) : null}
       {nothingFound ? <p className="app-text">{nothingFoundText(view.checked)}</p> : null}
-      {left === undefined || nothingEver ? null : item(3)(left)}
-      {group(coachAnalysisWords.worthChanging, worthChanging)}
+      {left === undefined || nothingEver || leftAfterCause ? null : item(3)(left)}
+      {leftAfterCause && left !== undefined
+        ? group(coachAnalysisWords.worthChanging, [...worthChanging.slice(0, 1), left, ...worthChanging.slice(1)])
+        : group(coachAnalysisWords.worthChanging, worthChanging)}
       {group(coachAnalysisWords.holdingUp, holdingUp)}
       {more.length === 0 ? null : (
         <MmDisclosure title={moreFindingsText(more.length)}>
