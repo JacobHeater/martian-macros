@@ -170,7 +170,7 @@ independent of step 3.
 - Added 2026-10-14 (step 9): MM-312 (the sodium-over-the-limit insight, after MM-311).
 - Added 2026-10-19 (step 13): MM-405 (reminders on iOS).
 - Added 2026-10-24 (step 15): MM-614, MM-615 (two pattern rules that state patterns that are not there). (step 16): MM-604 (epic: the coach analyses your data), MM-605, MM-606, MM-607, MM-608, MM-609, MM-610, MM-612, MM-617 (the coach tells you straight). (step 17): MM-618 (spike: a small on-device model phrases the coach).
-- Added 2026-10-25 (step 18): MM-620 (the span switcher hides without saying why; the section named "Coach's feedback"). (step 19): MM-621 (7d reads every day logged in the last 7, today included).
+- Added 2026-10-25 (step 18): MM-620 (the span switcher hides without saying why; the section named "Coach's feedback"). (step 19): MM-621 (7d reads every day logged in the last 7, today included). (step 20): MM-622 ("sauce on the side" said when nothing had sauce).
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `nextTargets.ts`. Do not add branches

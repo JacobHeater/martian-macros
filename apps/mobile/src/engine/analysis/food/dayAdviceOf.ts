@@ -5,9 +5,11 @@ import type { FoodTag } from '../language/FoodTag';
 import { foodTagsOf } from '../language/foodTagsOf';
 import { adviceFoodOf } from './adviceFoodOf';
 import { allowedOrders } from './allowedOrders';
+import { countsAsFood } from './countsAsFood';
 import type { DayAdviceContext } from './DayAdviceContext';
 import type { DayUnit } from './DayUnit';
-import { saucedOrFried } from './saucedOrFried';
+import { foodKeyOf } from './foodKeyOf';
+import { sauced } from './sauced';
 import { tradeAdviceOf } from './tradeAdviceOf';
 
 const R = CoachAdviceRule;
@@ -33,16 +35,34 @@ const swapsMost = 2;
  *   100 kcal at 150 kcal or more skipped ("does nothing for your goal");
  *   else an add of protein.
  * - **Sodium**: at 1.5× the limit or more, drink water; sauce on the side
- *   when its foods were sauced or fried; under 1.5×, the top food swapped
- *   or halved.
+ *   when its foods were sauced (MM-622: not for fried or breaded food
+ *   without a sauce); under 1.5×, the top food swapped or halved, found
+ *   inside a meal logged as one when it is one of its foods.
  * - **Fiber**: two cups of vegetables, at dinner if it is not logged.
  * - **What is left**: over target, the rest of today's limit (dinner, or a
- *   snack once dinner is logged; "no sauce" after sauced or fried food);
+ *   snack once dinner is logged; "no sauce" after sauced food);
  *   under it, the protein left, with a food that fits.
  * - **The closing line**: back to the target tomorrow.
  */
 export function dayAdviceOf(finding: CoachFinding, c: DayAdviceContext, named: ReadonlySet<string> = new Set()): CoachAdvice[] {
-  const unitOf = (name: string): DayUnit | undefined => c.units.find((u) => u.food.key === name.trim().toLowerCase());
+  // A food named by a finding is a unit, or one of the foods of a meal logged as one (MM-622): then the order is about it alone.
+  const unitOf = (name: string): DayUnit | undefined => {
+    const key = name.trim().toLowerCase();
+    const unit = c.units.find((u) => u.food.key === key);
+    if (unit !== undefined) return unit;
+    for (const u of c.units) {
+      const e = u.entries.find((x) => foodKeyOf(x) === key && countsAsFood(x));
+      if (e === undefined) continue;
+      return {
+        food: { key, name: e.name.trim(), kcal: e.kcal, fatG: e.fatG, proteinG: e.proteinG, sodiumMg: e.sodiumMg },
+        carbsG: e.carbsG,
+        meal: e.meal,
+        mealName: e.loggedMeal?.name.trim(),
+        entries: [e],
+      };
+    }
+    return undefined;
+  };
   const density = (u: DayUnit) => (u.food.kcal > 0 ? (100 * u.food.proteinG) / u.food.kcal : 0);
   const swapOrHalve = (u: DayUnit | undefined): CoachAdvice[] => {
     if (u === undefined) return [];
@@ -123,11 +143,12 @@ export function dayAdviceOf(finding: CoachFinding, c: DayAdviceContext, named: R
       const multiple = limitMg > 0 ? sodiumMg / limitMg : 0;
       const orders: CoachAdvice[] = [];
       if (multiple >= R.sodiumMultipleFrom) orders.push({ kind: 'drinkWater', sodiumMultiple: multiple });
-      if (finding.foods.some((f) => saucedOrFried(f.name))) orders.push({ kind: 'sauceOnSide' });
+      if (finding.foods.some((f) => sauced(f.name))) orders.push({ kind: 'sauceOnSide' });
       if (multiple < R.sodiumMultipleFrom) {
         orders.push(...(trade.length > 0 ? trade : swapOrHalve(top === undefined ? undefined : unitOf(top.name))));
       }
-      return allowedOrders(c.limits, orders, [{ kind: 'drinkWater', sodiumMultiple: multiple }, { kind: 'sauceOnSide' }]);
+      // Nothing sauced is never told "sauce on the side" (MM-622), not even as the last resort.
+      return allowedOrders(c.limits, orders, [{ kind: 'drinkWater', sodiumMultiple: multiple }]);
     }
     case 'fiber':
       return allowedOrders(c.limits, [

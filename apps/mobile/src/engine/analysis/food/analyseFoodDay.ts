@@ -27,7 +27,7 @@ import { FoodSignalRule } from './FoodSignalRule';
 import { foodsThatFit } from './foodsThatFit';
 import { mealBreakdownOf } from './mealBreakdownOf';
 import { recordOnOf } from './recordOnOf';
-import { saucedOrFried } from './saucedOrFried';
+import { sauced } from './sauced';
 import { topContributors } from './topContributors';
 
 const R = FoodSignalRule;
@@ -303,7 +303,7 @@ export function analyseFoodDay(
     kcalLeft,
     proteinLeftG,
     fits,
-    sauced: entries.some((e) => saucedOrFried(e.name)),
+    sauced: entries.some((e) => sauced(e.name)),
     dinnerLogged,
     swap: (unit) =>
       swapFor({
