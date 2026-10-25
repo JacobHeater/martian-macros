@@ -1,6 +1,6 @@
 ---
 id: MM-619
-status: in-progress
+status: done
 component: developer-tooling
 related: [MM-7, MM-237, MM-321, MM-394]
 ---
@@ -70,6 +70,7 @@ Built 2026-10-25, measured in CI (nothing run locally).
 | 40162469689 | parallel jobs, stories once in 8 shards | 8.1 min (stories 8 min) |
 | 40163095361 | screens and stories without stylesheets | 4.2 min (stories 4 min) |
 | 40163517596 | `getComputedStyle` from the element alone | about 3 min (Android's build 2.9 min is now the longest) |
+| 40164100082 | the open question's file back on real styles | **2 min 41 s**, every job green |
 
 - **Parallel jobs:** `mm check --part static|tests|stories [--shard i/n]` (`tool/src/checkPlan.ts`, tested in
   `tool/test/checkPlan.test.ts`). CI runs static, three test shards, stories and Android at the same time, with a newer
