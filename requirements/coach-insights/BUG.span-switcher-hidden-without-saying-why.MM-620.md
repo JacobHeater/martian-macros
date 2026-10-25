@@ -1,6 +1,6 @@
 ---
 id: MM-620
-status: in-progress
+status: done
 component: coach-insights
 related: [MM-610, MM-612, MM-605]
 ---
