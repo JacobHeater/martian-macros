@@ -25,7 +25,7 @@ test('the tests run rules and screens, never the stories, and a shard is passed 
   const plan = checkPlan(['--part', 'tests', '--shard', '2/3']);
   assert.notEqual(typeof plan, 'string');
   if (typeof plan === 'string') return;
-  assert.deepEqual(plan.steps[0]?.web, ['npx', 'vitest', 'run', '--project', 'rules', '--project', 'screens', '--shard=2/3']);
+  assert.deepEqual(plan.steps[0]?.web, ['npx', 'vitest', 'run', '--project', 'rules', '--project', 'screens', '--project', 'screens-css', '--shard=2/3']);
 });
 
 test('a wrong part or shard is refused with what to say', () => {
