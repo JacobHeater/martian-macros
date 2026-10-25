@@ -115,6 +115,7 @@ Everything. Its only contact with existing code is the validation function in
 - Remaining: MM-57 (licensing review by a qualified person; the packs are already public).
   Epic: MM-50.
 - Added 2026-10-14 (step 7): MM-307 (micronutrients in the pack, format version 2, coverage in the build report).
+- Added 2026-10-24 (step 8): MM-616 (catalog foods carry a food group, for the coach's trade).
 
 ## Notes for whoever builds it
 - Design the pack schema in step 3 from the tickets that will *read* it, not

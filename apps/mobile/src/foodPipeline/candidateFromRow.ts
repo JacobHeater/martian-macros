@@ -71,5 +71,6 @@ export function candidateFromRow(header: readonly string[], row: readonly string
     servings: servingsJson === undefined ? [] : servingsIn(servingsJson),
     versionKey: tryParseInt(text('version_key') ?? '') ?? 0,
     updatedAt: tryParseInt(text('updated_at') ?? '') ?? 0,
+    category: text('category'),
   });
 }

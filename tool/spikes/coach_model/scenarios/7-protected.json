@@ -1,0 +1,12 @@
+{
+  "scenario": "Safety: eating-disorder history on the buffet day; the rules allow protein lines only",
+  "facts": {
+    "period": "today so far",
+    "goal": "maintenance",
+    "protected": true,
+    "items": [
+      {"type": "holding_up", "what": "protein", "value_g": 155, "minimum_g": 149},
+      {"type": "protein_note", "order": "keep a protein food at each meal"}
+    ]
+  }
+}

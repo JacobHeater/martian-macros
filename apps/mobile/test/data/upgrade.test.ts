@@ -146,8 +146,19 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 28 left it: no record of the advice the coach showed (MM-617). */
+const versionTwentyEight = currentSchema.replace(/CREATE TABLE "coach_advice_given" \([\s\S]*?\n\);\n/, '');
+
+/** The schema as version 27 left it: nothing the trend engine said, and no finding dismissed (MM-605). */
+const versionTwentySeven = versionTwentyEight
+  .replace(/CREATE TABLE "trend_announcements" \([\s\S]*?\n\);\n/, '')
+  .replace(/CREATE TABLE "finding_dismissals" \([\s\S]*?\n\);\n/, '');
+
+/** The schema as version 26 left it: no day marked a Refeed or a Day off (MM-611). */
+const versionTwentySix = versionTwentySeven.replace(/CREATE TABLE "day_kinds" \([\s\S]*?\n\);\n/, '');
+
 /** The schema as version 25 left it: no food is one of a meal, and none says where its numbers came from (MM-586, MM-587). */
-const versionTwentyFive = currentSchema.replace(
+const versionTwentyFive = versionTwentySix.replace(
   ',\n  "logged_meal_key" TEXT NULL,\n' +
     '  "logged_meal_name" TEXT NULL CHECK (("logged_meal_key" IS NULL) = ("logged_meal_name" IS NULL)),\n' +
     `  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN ('cited', 'matched', 'estimated', 'yours')),\n` +
@@ -892,4 +903,141 @@ it('a version 25 database comes up to date with its foods kept and in no meal, a
   expect(rice?.evidence).toEqual({ kind: 'cited', citation: 'USDA FDC 168878' });
   await expect(sql.execute("UPDATE food_entries SET logged_meal_name = NULL WHERE name = 'Rice'"), 'a key needs a name').rejects.toThrow();
   await expect(sql.execute("UPDATE food_entries SET evidence_kind = 'guessed'")).rejects.toThrow();
+});
+
+// MM-611: a version 26 database comes up to date with every day unmarked; a mark set from then on is kept, and
+// clearing it removes it. The table refuses any other kind of day.
+it('a version 26 database comes up to date with no day marked, and keeps a Refeed marked after', async () => {
+  expect(versionTwentySix).not.toContain('day_kinds');
+  expect(versionTwentySix).toContain('logged_meal_key');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 26, schema: versionTwentySix });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'day_kinds')).toEqual(['epoch_day', 'kind']);
+  expect(await first(repos.dayKinds.watchDayKind(day))).toBe('none');
+  await repos.dayKinds.setDayKind(day, 'refeed');
+  expect(await first(repos.dayKinds.watchDayKind(day))).toBe('refeed');
+  await repos.dayKinds.setDayKind(day, 'none');
+  expect(await first(repos.dayKinds.watchMarkedDays())).toEqual(new Map());
+  await expect(sql.execute("INSERT INTO day_kinds (epoch_day, kind) VALUES (1, 'holiday')")).rejects.toThrow();
+});
+
+// MM-605: a version 27 database comes up to date with nothing announced and nothing dismissed; what is appended and
+// dismissed from then on is kept. The tables refuse a transition that is never logged and a span not on the switcher.
+it('a version 27 database comes up to date with an empty trend log, and keeps what is appended after', async () => {
+  expect(versionTwentySeven).not.toContain('trend_announcements');
+  expect(versionTwentySeven).not.toContain('finding_dismissals');
+  expect(versionTwentySeven).toContain('day_kinds');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 27, schema: versionTwentySeven });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute("INSERT INTO day_kinds (epoch_day, kind) VALUES (?, 'refeed')", [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await first(repos.dayKinds.watchDayKind(day))).toBe('refeed');
+  expect(await columnsOf(sql, 'trend_announcements')).toEqual([
+    'id',
+    'trend_key',
+    'transition',
+    'on_epoch_day',
+    'direction',
+    'onset_epoch_day',
+    'effect',
+    'unit',
+    'n',
+    'k',
+    'span_days',
+    'coverage',
+    'tier',
+    'rules_version',
+  ]);
+  expect(await columnsOf(sql, 'finding_dismissals')).toEqual(['finding_id', 'dismissed_epoch_day']);
+  expect(await first(repos.trendLog.watchTrendAnnouncements())).toEqual([]);
+  expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([]);
+
+  const entry = {
+    key: 'protein:level',
+    transition: 'new',
+    on: day,
+    direction: 'down',
+    onsetDate: day.addDays(-9),
+    figures: { effect: -25, unit: 'g', n: 14, k: 11, span: 14, coverage: 0.86 },
+    tier: 'clear',
+    rulesVersion: 1,
+  } as const;
+  await repos.trendLog.appendTrendAnnouncements([entry]);
+  await repos.trendLog.dismissFinding('protein:level', day.addDays(1));
+  expect(await first(repos.trendLog.watchTrendAnnouncements())).toEqual([entry]);
+  expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([
+    { findingId: 'protein:level', dismissedOn: day.addDays(1) },
+  ]);
+
+  const insertEntry = (transition: string, span: number) =>
+    sql.execute(
+      'INSERT INTO trend_announcements (trend_key, transition, on_epoch_day, direction, effect, unit, n, k, span_days, coverage, tier, rules_version) ' +
+        "VALUES ('protein:level', ?, 1, 'up', 1, 'g', 7, 7, ?, 1, 'clear', 1)",
+      [transition, span],
+    );
+  await expect(insertEntry('none', 14), 'none is never logged').rejects.toThrow();
+  await expect(insertEntry('new', 10), 'a span not on the switcher').rejects.toThrow();
+});
+
+// MM-617: a version 28 database comes up to date with no advice recorded; what is recorded from then on is kept, once
+// for each food key, kind and day. The table refuses a kind it does not keep.
+it('a version 28 database comes up to date with no advice recorded, and keeps what is recorded after', async () => {
+  expect(versionTwentyEight).not.toContain('coach_advice_given');
+  expect(versionTwentyEight).toContain('finding_dismissals');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 28, schema: versionTwentyEight });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute('INSERT INTO finding_dismissals (finding_id, dismissed_epoch_day) VALUES (?, ?)', ['protein:level', day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([{ findingId: 'protein:level', dismissedOn: day }]);
+  expect(await columnsOf(sql, 'coach_advice_given')).toEqual(['food_key', 'kind', 'given_epoch_day', 'food_name', 'replacement_name', 'kcal']);
+  expect(await first(repos.adviceRecord.watchAdviceGivenSince(day.addDays(-30)))).toEqual([]);
+
+  const skip = {
+    foodKey: "general tso's chicken",
+    foodName: "General Tso's chicken",
+    kind: 'skip',
+    replacementName: undefined,
+    kcal: 744,
+    on: day,
+  } as const;
+  await repos.adviceRecord.recordAdviceGiven([skip]);
+  await repos.adviceRecord.recordAdviceGiven([{ ...skip, kcal: 800 }]);
+  expect(await first(repos.adviceRecord.watchAdviceGivenSince(day))).toEqual([skip]);
+  await expect(
+    sql.execute(
+      "INSERT INTO coach_advice_given (food_key, kind, given_epoch_day, food_name, kcal) VALUES ('biscuit', 'eatLess', 1, 'Biscuit', 400)",
+    ),
+    'a kind the record does not keep',
+  ).rejects.toThrow();
 });

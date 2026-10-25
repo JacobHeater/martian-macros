@@ -5,6 +5,7 @@ import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
+import type { DayKind } from '../domain/DayKind';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
@@ -76,13 +77,15 @@ import { missedPeriodQuestion } from '../engine/missedPeriodQuestion';
 import { findUnderEating } from '../engine/findUnderEating';
 import { allowedItemInsights } from '../engine/allowedItemInsights';
 import type { InlineInsightLogEntry } from '../engine/InlineInsightLogEntry';
+import type { Insight } from '../engine/Insight';
 import type { InsightLogEntry } from '../engine/InsightLogEntry';
+import { InsightRule } from '../engine/InsightRule';
 import type { InsightSafeguards } from '../engine/InsightSafeguards';
 import type { InsightSnooze } from '../engine/InsightSnooze';
 import type { ItemInsight } from '../engine/ItemInsight';
 import { itemInsightKinds } from '../engine/itemInsightKinds';
 import { InsightRationing } from '../engine/InsightRationing';
-import type { InsightSelection } from '../engine/InsightSelection';
+import { snoozedFoodNames } from '../engine/analysis/snoozedFoodNames';
 import type { LoggingStreak } from '../engine/LoggingStreak';
 import { loggingStreakOf } from '../engine/loggingStreakOf';
 import type { MonthlyReport } from '../engine/MonthlyReport';
@@ -108,7 +111,6 @@ import { reminderIgnoredStreak } from '../engine/reminderIgnoredStreak';
 import { ReminderRule } from '../engine/ReminderRule';
 import type { ReportPeriod } from '../engine/ReportPeriod';
 import { reportPeriods } from '../engine/reportPeriods';
-import { selectInsight } from '../engine/selectInsight';
 import { trainingItemInsights } from '../engine/trainingItemInsights';
 import { foodItemInsights } from '../engine/foodItemInsights';
 import { waistWithinNoiseInsights } from '../engine/waistWithinNoiseInsights';
@@ -124,6 +126,8 @@ import type { UnderEatingFinding } from '../engine/UnderEatingFinding';
 import { underEatingNoticeDue } from '../engine/underEatingNoticeDue';
 import type { WeeklyVolume } from '../engine/WeeklyVolume';
 import { withoutPausedDays } from '../engine/withoutPausedDays';
+import { SafetyBounds } from '../engine/SafetyBounds';
+import { usableIntakeDays } from '../engine/usableIntakeDays';
 import { EvidenceRegister } from '../domain/evidence/EvidenceRegister';
 import type { InstalledPack } from '../foodCatalog/download/InstalledPack';
 import { StreamedPackFetch } from '../foodCatalog/download/StreamedPackFetch';
@@ -146,6 +150,7 @@ import { currentValueOf } from '../lang/currentValueOf';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
+import { CoachAnalysis } from './CoachAnalysis';
 import { DerivedCell } from './DerivedCell';
 import type { HealthConnection } from './HealthConnection';
 import type { HomeDestination } from './HomeDestination';
@@ -227,6 +232,9 @@ export class AppState {
   /** Saves new targets when they are due, for as long as it is started. */
   readonly checkIn: CheckIn;
 
+  /** "What your data says" on the Coach tab (MM-610): the span chosen, the spans offered, and the findings. */
+  readonly coachAnalysis: CoachAnalysis;
+
   /** The weigh-ins the user typed, and nothing imported. */
   readonly typedWeights: Cell<Loadable<WeightObservation[]>>;
 
@@ -264,6 +272,8 @@ export class AppState {
 
   /** Every pause the user has set (MM-148). */
   readonly pauses: Cell<Loadable<Pause[]>>;
+  /** Every day marked a Refeed or a Day off, by epoch day (MM-611): counted in the monthly report, read by no calculation. */
+  readonly markedDays: Cell<Loadable<ReadonlyMap<number, DayKind>>>;
 
   /** The pause covering today, if any. */
   readonly activePause: Cell<Pause | undefined>;
@@ -429,11 +439,15 @@ export class AppState {
   readonly insightLog: Cell<Loadable<InsightLogEntry[]>>;
 
   /**
-   * The one insight to show today, if any (MM-141): the catalog's rules
-   * run over the data to yesterday, then rationed against what was already
-   * shown.
+   * The catalog's rules for the Dashboard's card (MM-141), run over the data
+   * to yesterday, without those the coach's analysis says instead
+   * (`InsightRule.analysisSignal`, MM-610), with the insight log they are
+   * rationed against and whether a recent pause silences the card. The card
+   * itself is `coachAnalysis.dashboard`.
    */
-  readonly insightSelection: Cell<InsightSelection | undefined>;
+  readonly insightRules: Cell<
+    { readonly candidates: readonly Insight[]; readonly log: readonly InsightLogEntry[]; readonly paused: boolean } | undefined
+  >;
 
   /** The switches of Settings > Coach (MM-364). */
   readonly insightSwitches: Cell<Loadable<InsightSwitches>>;
@@ -581,6 +595,7 @@ export class AppState {
   private readonly foodBeforeDay = new Map<number, Cell<Loadable<FoodEntry[]>>>();
   private readonly waterByDay = new Map<number, Cell<Loadable<WaterEntry[]>>>();
   private readonly completenessByDay = new Map<number, Cell<Loadable<DayCompleteness>>>();
+  private readonly dayKindByDay = new Map<number, Cell<Loadable<DayKind>>>();
   private readonly reportIntakeByIndex = new Map<number, Cell<Loadable<IntakeDay[]>>>();
   private readonly reportByIndex = new Map<number, Cell<MonthlyReport | undefined>>();
 
@@ -658,6 +673,7 @@ export class AppState {
     this.exercises = derived<readonly Exercise[]>(() => [...builtInExercises, ...(of(this.customExercises) ?? [])]);
     this.exercisesById = derived<ReadonlyMap<string, Exercise>>(() => new Map(this.exercises.value.map((e) => [e.id, e])));
     this.pauses = stream(() => s.pauses.watchPauses());
+    this.markedDays = stream(() => s.dayKinds.watchMarkedDays());
     this.activePause = derived(() => pauseOn(of(this.pauses) ?? [], this.today.value));
     this.intakeDays = stream(() => s.intake.watchIntakeDays({ since: this.today.value.addDays(-60) }));
     this.judgedIntake = derived(() => {
@@ -931,7 +947,9 @@ export class AppState {
 
     this.insightLog = stream(() => s.insightLog.watchInsightLog());
 
-    this.insightSelection = derived(() => {
+    this.insightRules = derived<
+      { readonly candidates: readonly Insight[]; readonly log: readonly InsightLogEntry[]; readonly paused: boolean } | undefined
+    >(() => {
       const setup = of(this.setup);
       const intake = this.judgedIntake.value;
       const weights = of(this.weights);
@@ -940,36 +958,27 @@ export class AppState {
       const coach = this.coach.value;
       const paused = this.pauseWithin(InsightRationing.patternDays);
       const today = this.today.value;
-      if (
-        setup === undefined ||
-        intake === undefined ||
-        weights === undefined ||
-        history === undefined ||
-        log === undefined ||
-        coach === undefined ||
-        paused
-      ) {
+      if (setup === undefined || intake === undefined || weights === undefined || history === undefined || log === undefined || coach === undefined) {
         return undefined;
       }
-      return selectInsight({
-        candidates: findInsights({
-          through: today.addDays(-1),
-          intake,
-          weights,
-          history,
-          stall: this.stallAssessment.value,
-          mealProtein: this.mealProtein.value,
-          sodium: this.sodiumPattern.value,
-          trend: coach.trend,
-          waist: of(this.waist) ?? [],
-          limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
-          sleepAverage: this.sleepAverage.value,
-          fiber: this.fiberPattern.value,
-          plannedShare: this.plannedShare(),
-        }),
-        log,
-        today,
+      if (paused) return { candidates: [], log, paused };
+      const candidates = findInsights({
+        through: today.addDays(-1),
+        intake,
+        weights,
+        history,
+        stall: this.stallAssessment.value,
+        mealProtein: this.mealProtein.value,
+        sodium: this.sodiumPattern.value,
+        trend: coach.trend,
+        waist: of(this.waist) ?? [],
+        limitToProteinAndLogging: setup.screening.eatingDisorderHistory,
+        sleepAverage: this.sleepAverage.value,
+        fiber: this.fiberPattern.value,
+        plannedShare: this.plannedShare(),
       });
+      // A rule the coach's analysis has an equivalent of is said by the analysis instead (MM-610).
+      return { candidates: candidates.filter((i) => InsightRule.analysisSignal(i.rule) === undefined), log, paused };
     });
 
     this.insightSwitches = stream(() => s.preferences.watchInsightSwitches());
@@ -1415,6 +1424,7 @@ export class AppState {
     });
 
     this.checkIn = this.makeCheckIn();
+    this.coachAnalysis = this.makeCoachAnalysis();
   }
 
   /** Reads again which packs are installed, and the catalog made of them. */
@@ -1634,6 +1644,101 @@ export class AppState {
     });
   }
 
+  /** What the Coach tab's analysis reads (MM-610), each part as the app holds it; made last, as the check-in is. */
+  private makeCoachAnalysis(): CoachAnalysis {
+    const s = this.services;
+    return new CoachAnalysis({
+      today: this.today,
+      food: s.food,
+      intake: s.intake,
+      water: s.water,
+      trendLog: s.trendLog,
+      adviceRecord: s.adviceRecord,
+      nowMinute: () => minuteOfDayNow(s.clock),
+      catalog: () => of(this.foodCatalog),
+      pauses: () => of(this.pauses),
+      plannedShare: () => this.plannedShare(),
+      foodInput: () => {
+        const setup = of(this.setup);
+        const history = of(this.targetsHistory);
+        const safeguards = this.insightSafeguards.value;
+        const markedDays = of(this.markedDays);
+        if (setup === undefined || history === undefined || safeguards === undefined || markedDays === undefined) return undefined;
+        const coach = this.coach.value;
+        const today = this.today.value;
+        const goals = of(this.nutritionGoals);
+        const level = of(this.detailLevel);
+        const checkIns = of(this.recoveryCheckIns);
+        // The carb and fat balance in force (MM-122): the latest shape set on or before today.
+        let shape: TargetShape | undefined;
+        for (const set of of(this.targetShapes) ?? []) {
+          if (!set.since.isAfter(today) && (shape === undefined || !set.since.isBefore(shape.since))) shape = set;
+        }
+        const weightKg = coach?.trendWeightKg;
+        const { sex, heightCm } = setup.profile;
+        const limitMg = goals?.sodiumLimitMg;
+        const since = goals?.sodiumLimitSince;
+        return {
+          history,
+          safeguards,
+          markedDays,
+          plannedShare: this.plannedShare(),
+          fatMinimumG: weightKg === undefined ? undefined : (kcal: number) => SafetyBounds.minFatG({ sex, weightKg, heightCm, kcal }),
+          balance: shape?.balance,
+          weightKg,
+          // Fiber only at Full detail, where it is shown (MM-126).
+          fiber: level !== undefined && DetailLevel.showsExtras(level) && checkIns !== undefined ? { sex, checkIns } : undefined,
+          sodium: limitMg === undefined || since === undefined ? undefined : { limitMg, since },
+          calorieFloorKcal: coach?.calorieFloorKcal,
+        };
+      },
+      trainingInput: () => {
+        const setup = of(this.setup);
+        const workouts = of(this.workouts);
+        const weights = of(this.weights);
+        const pauses = of(this.pauses);
+        const history = of(this.targetsHistory);
+        const safeguards = this.insightSafeguards.value;
+        if (
+          setup === undefined ||
+          workouts === undefined ||
+          weights === undefined ||
+          pauses === undefined ||
+          history === undefined ||
+          safeguards === undefined
+        ) {
+          return undefined;
+        }
+        return {
+          setup,
+          workouts,
+          exercises: this.exercises.value,
+          progressions: of(this.exerciseProgressions),
+          weights,
+          pauses,
+          history,
+          deficitRestartOn: this.coach.value?.deficitRestartOn,
+          progressStalled: this.stallAssessment.value?.status === 'stalled',
+          // A record that could not be read is no record, as for the check-in.
+          sleep: of(this.sleepNights) ?? [],
+          waterGoal: this.waterGoal.value,
+          safeguards,
+        };
+      },
+      wholeDays: () => {
+        const intake = this.judgedIntake.value;
+        return intake === undefined ? undefined : usableIntakeDays(intake, { plannedShare: this.plannedShare() });
+      },
+      underEating: () => ({
+        holds: this.underEatingFinding.value !== undefined,
+        noticeShown: this.underEatingNotice.value !== undefined,
+      }),
+      // A snooze that could not be read yet is none: the trade is offered until it is.
+      snoozed: () => snoozedFoodNames(of(this.insightSnoozes) ?? [], this.today.value),
+      insightRules: () => this.insightRules.value,
+    });
+  }
+
   /** Reads the day from the clock again; call when the app comes back to the front. */
   refreshToday(): void {
     this.today.put(this.services.clock.today());
@@ -1731,6 +1836,19 @@ export class AppState {
   }
 
   /**
+   * Whether `date` was marked a Refeed or a Day off (MM-611). Separate from
+   * its completeness, and read by no calculation.
+   */
+  dayKind(date: CalendarDate): Cell<Loadable<DayKind>> {
+    let cell = this.dayKindByDay.get(date.epochDay);
+    if (cell === undefined) {
+      cell = stream(() => this.services.dayKinds.watchDayKind(date));
+      this.dayKindByDay.set(date.epochDay, cell);
+    }
+    return cell;
+  }
+
+  /**
    * Food for a whole report period, read from the log rather than the last
    * 60 days the engine uses, so an old report can be reread (MM-33).
    */
@@ -1770,12 +1888,14 @@ export class AppState {
         const coach = this.coach.value;
         const workouts = of(this.workouts) ?? [];
         const exercises = this.exercises.value;
+        const markedDays = of(this.markedDays);
         if (
           period === undefined ||
           intake === undefined ||
           weights === undefined ||
           waist === undefined ||
-          history === undefined
+          history === undefined ||
+          markedDays === undefined
         ) {
           return undefined;
         }
@@ -1797,6 +1917,8 @@ export class AppState {
           // The body-fat range from the measurements (MM-450), and the eating-disorder answer that withholds its change.
           setup: of(this.setup),
           plannedShare: this.plannedShare(),
+          // The days marked a Refeed or a Day off (MM-611), counted and nothing more.
+          markedDays,
         });
       });
       this.reportByIndex.set(index, cell);

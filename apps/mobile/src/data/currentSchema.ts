@@ -393,4 +393,39 @@ CREATE TABLE "measurement_settings" (
   "limb_side" TEXT NULL CHECK ("limb_side" IS NULL OR "limb_side" IN ('left', 'right')),
   "suggestion_answered" INTEGER NOT NULL DEFAULT 0 CHECK ("suggestion_answered" IN (0, 1))
 );
+CREATE TABLE "day_kinds" (
+  "epoch_day" INTEGER NOT NULL,
+  "kind" TEXT NOT NULL CHECK ("kind" IN ('refeed', 'dayOff')),
+  PRIMARY KEY ("epoch_day")
+);
+CREATE TABLE "trend_announcements" (
+  "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  "trend_key" TEXT NOT NULL,
+  "transition" TEXT NOT NULL CHECK ("transition" IN ('new', 'continuing', 'update', 'reversed', 'held', 'resolved', 'backAgain')),
+  "on_epoch_day" INTEGER NOT NULL,
+  "direction" TEXT NOT NULL CHECK ("direction" IN ('down', 'up')),
+  "onset_epoch_day" INTEGER NULL,
+  "effect" REAL NOT NULL,
+  "unit" TEXT NOT NULL,
+  "n" INTEGER NOT NULL,
+  "k" INTEGER NOT NULL,
+  "span_days" INTEGER NOT NULL CHECK ("span_days" IN (7, 14, 30, 90)),
+  "coverage" REAL NOT NULL,
+  "tier" TEXT NOT NULL CHECK ("tier" IN ('silent', 'clear', 'strong')),
+  "rules_version" INTEGER NOT NULL
+);
+CREATE TABLE "finding_dismissals" (
+  "finding_id" TEXT NOT NULL,
+  "dismissed_epoch_day" INTEGER NOT NULL,
+  PRIMARY KEY ("finding_id", "dismissed_epoch_day")
+);
+CREATE TABLE "coach_advice_given" (
+  "food_key" TEXT NOT NULL,
+  "kind" TEXT NOT NULL CHECK ("kind" IN ('skip', 'halve', 'swap', 'taken')),
+  "given_epoch_day" INTEGER NOT NULL,
+  "food_name" TEXT NOT NULL,
+  "replacement_name" TEXT NULL,
+  "kcal" REAL NOT NULL,
+  PRIMARY KEY ("food_key", "kind", "given_epoch_day")
+);
 `;

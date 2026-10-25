@@ -1,0 +1,290 @@
+{
+ "summary": {
+  "model": "smollm2-1.7b-instruct-q4_k_m",
+  "size_mb": 1007,
+  "passed": 2,
+  "runs": 21,
+  "pass_rate": 0.095,
+  "median_tokens_per_second": 14.0,
+  "median_seconds": 7.1
+ },
+ "runs": [
+  {
+   "scenario": "1-buffet-day",
+   "sample": 0,
+   "text": "You ate 1054 kcal more than your goal today. Your lunch was Chinese buffet with General Tso's chicken, which is the worst food you ate today. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. Drink water tonight; next time get sauce on the side. You ate a sausage, egg and cheese biscuit for breakfast, which you should swap for two eggs on an English muffin with a slice of cheese. You need two cups of vegetables at dinner to meet your fiber goal. Tomorrow, back to plan; do not skip meals to make up for today.",
+   "problems": [
+    "7 sentences"
+   ],
+   "pass": false,
+   "seconds": 27.8,
+   "tokens": 140,
+   "tokens_per_second": 11.6,
+   "prompt_tokens_per_second": 78.4
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 1,
+   "text": "You ate 1054 kcal more than your goal today. General Tso's chicken was the worst food. You are done eating for the day. If you're hungry, have steamed chicken with vegetables for dinner. Drink water tonight. Next time, ask for sauce on the side. You are done eating for the day. Tomorrow, you will go back to plan.",
+   "problems": [
+    "8 sentences"
+   ],
+   "pass": false,
+   "seconds": 6.6,
+   "tokens": 78,
+   "tokens_per_second": 11.8,
+   "prompt_tokens_per_second": 12.5
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 2,
+   "text": "You ate 3229 kcal today, 1054 kcal over your goal. Your lunch was Chinese buffet, which is a meal that is a worst food for today. You ate General Tso's chicken, which is a worst food for today. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. Drink water tonight; next time get sauce on the side. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. You ate 6923 mg of sodium today, which is 3.8 times your limit. You had General Tso's chicken, which is a worst food for today. You ate 691 kcal of sausage, egg and cheese biscuit, which is a worst food for today. You ate 400 kcal of egg and cheese biscuit, which is a replacement. You ate 14 g of fiber at dinner",
+   "problems": [
+    "11 sentences"
+   ],
+   "pass": false,
+   "seconds": 19.5,
+   "tokens": 220,
+   "tokens_per_second": 11.3,
+   "prompt_tokens_per_second": 12.5
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 0,
+   "text": "You ate 715 kcal more than your target today, 1980 kcal from General Tso's chicken. This is 500 kcal over your goal. You are done eating for the day; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. Tomorrow is back to plan; do not skip meals to make up for today.",
+   "problems": [],
+   "pass": true,
+   "seconds": 9.9,
+   "tokens": 87,
+   "tokens_per_second": 14.0,
+   "prompt_tokens_per_second": 80.7
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 1,
+   "text": "You have eaten 715 more calories than your goal this week, and Chinese buffet is the cause. Skip the General Tso's chicken, it is back. You are done eating for today; if you are hungry, dinner under 400 kcal of lean protein and vegetables, no sauce. Tomorrow is back to plan; do not skip meals to make up for today.",
+   "problems": [],
+   "pass": true,
+   "seconds": 5.6,
+   "tokens": 81,
+   "tokens_per_second": 14.4,
+   "prompt_tokens_per_second": 14.1
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 2,
+   "text": "You ate 715 kcal more than your goal today, and it's back to plan tomorrow. Chinese buffet is over 1980 kcal, General Tso's chicken is 744 kcal, and you're done eating for the day; if you're hungry, dinner under 400 kcal of lean protein and vegetables, no sauce.",
+   "problems": [
+    "2 sentences"
+   ],
+   "pass": false,
+   "seconds": 5.7,
+   "tokens": 80,
+   "tokens_per_second": 14.0,
+   "prompt_tokens_per_second": 13.9
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 0,
+   "text": "\"You've had 9 days over your goal, and 8 of those days were protected. You've had 830 kcal of biscuits and gravy, which is 48g of fat. Swap that with Greek yogurt with berries and granola tomorrow. You've had 286 kcal saved by swapping it on weekdays. You've had 140g of protein, but you need 140g to reach your goal. You've had 6 days of protein, but you need 8. You've had 8 sessions of training, which is good, but you need to have 8 sessions every day. You've had 2200kcal tomorrow, which is your target. Back to plan.\"",
+   "problems": [
+    "9 sentences"
+   ],
+   "pass": false,
+   "seconds": 16.9,
+   "tokens": 159,
+   "tokens_per_second": 13.1,
+   "prompt_tokens_per_second": 77.3
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 1,
+   "text": "\"You've had 9 days over your goal, 420 calories of biscuits and gravy, and 48 grams of fat. Swap that for Greek yogurt with berries and granola, 350 calories, 24 grams of protein. A protein food at breakfast every day. Hold up your training sessions, 8 sessions. Tomorrow, back to plan. Your goal is fat loss, and you need to get back to that.\"",
+   "problems": [
+    "6 sentences"
+   ],
+   "pass": false,
+   "seconds": 7.1,
+   "tokens": 95,
+   "tokens_per_second": 13.4,
+   "prompt_tokens_per_second": 14.4
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 2,
+   "text": "\"You've been over your target calories by 9 days and have consumed 420 kcal more than you should. The cause was biscuits and gravy, which you had for breakfast every day. To correct this, swap biscuits and gravy for Greek yogurt with berries and granola every day on weekdays. For protein, have a protein food at breakfast every day. You've been short on protein by 28 grams, so make sure to get that up to 140 grams every day. You've had 6 days of protein short, so you're holding up well. Tomorrow, return to plan and make sure you're back on your target calories.\"",
+   "problems": [
+    "7 sentences"
+   ],
+   "pass": false,
+   "seconds": 10.5,
+   "tokens": 139,
+   "tokens_per_second": 13.2,
+   "prompt_tokens_per_second": 14.1
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 0,
+   "text": "\"You've been eating too much peanut butter for the last 14 days, which has caused you to have 10 days of fat over your goal. You need to cut back on peanut butter and replace it with Greek yogurt. You've been eating 35% more peanut butter than you need to, which has cost you 380 kcal and 32g of fat. To get back on plan, cut the peanut butter to one tablespoon or swap it for Greek yogurt. You've had 5 days of protected eating, which means you've had 35% more than you need, but you've still had enough to get you to your goal. You need to cut back on that 35% to get back to plan. You've had 12 days of protected eating, which means you've had 120% of what you need. You need to cut back on that 120% to get back to your goal. You need to cut back on 120% of your calories to get back to your",
+   "problems": [
+    "9 sentences",
+    "numbers not in facts: 120"
+   ],
+   "pass": false,
+   "seconds": 19.8,
+   "tokens": 220,
+   "tokens_per_second": 13.3,
+   "prompt_tokens_per_second": 83.0
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 1,
+   "text": "\"You've been over your fat grams for 10 days, 35% of your daily allowance. Your protein intake has been short for 5 days, 36g below your goal. You've swapped peanut butter for Greek yogurt, cutting your calories by 32g and protein by 20g. To get back on track, skip the peanut butter tomorrow and swap it for Greek yogurt today. Eat less tomorrow to make up for today.\"",
+   "problems": [
+    "compensation tomorrow"
+   ],
+   "pass": false,
+   "seconds": 6.8,
+   "tokens": 97,
+   "tokens_per_second": 14.2,
+   "prompt_tokens_per_second": 14.6
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 2,
+   "text": "\"You've had 10 days of fat over, and you've had 8 days of protected. You've had 35% of your calories coming from peanut butter. You've had 36 grams of protein today. You've had 32 grams of fat today. You've had 380 calories today. You've had 20 grams of protein today. You've had 200 calories today. You've had 20 grams of fat today. You've had 10 days of fat over. You've had 14 days of protected. You've had 140 grams of protein today. You've had 70 grams of fat today. You've had 300 calories today. You've had 14 grams of protein today. You've had 100 calories today. You've had 10 grams of fat today. You've had 10 days of fat over. You've had 10 days of fat over. You've had 10 days of fat over.",
+   "problems": [
+    "19 sentences",
+    "numbers not in facts: 100, 300"
+   ],
+   "pass": false,
+   "seconds": 16.4,
+   "tokens": 220,
+   "tokens_per_second": 13.4,
+   "prompt_tokens_per_second": 14.3
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 0,
+   "text": "You did not get back in the gym last Monday. To get back on track, skip the protein today and add a protein shake tomorrow. Drink water and go to plan.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 4.5,
+   "tokens": 36,
+   "tokens_per_second": 14.7,
+   "prompt_tokens_per_second": 79.8
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 1,
+   "text": "You did not get back in the gym last Monday. You did not eat enough protein. You need to eat more protein, and you need to do it now.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 2.3,
+   "tokens": 34,
+   "tokens_per_second": 14.6,
+   "prompt_tokens_per_second": 14.7
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 2,
+   "text": "You did not go to the gym last Monday, and you did not get enough protein. Skip today's training session and halve tomorrow's protein.",
+   "problems": [
+    "2 sentences",
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 2.1,
+   "tokens": 31,
+   "tokens_per_second": 14.7,
+   "prompt_tokens_per_second": 15.1
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 0,
+   "text": "\"Today, you consumed 2150 calories, which is 100 more than your target. You consumed 149 grams of protein, which is 49 grams short of your target. You skipped a meal, which saved you 1400 calories. You also added a cup of vegetables, which is good. Tomorrow, you will consume the same amount, same meal, same everything. Remember, you can't out-train a bad diet. Eat less tomorrow to make up for today.\"",
+   "problems": [
+    "7 sentences",
+    "numbers not in facts: 100, 49",
+    "compensation tomorrow"
+   ],
+   "pass": false,
+   "seconds": 10.6,
+   "tokens": 108,
+   "tokens_per_second": 14.0,
+   "prompt_tokens_per_second": 83.0
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 1,
+   "text": "\"Today, you ate 2150 calories, 149 grams of protein, and 1400 calories from a sausage, egg and cheese biscuit. You skipped a meal and saved 1400 calories. Tomorrow, you will eat the same amount of calories and protein, and add a cup of vegetables to your meal. You have 3 days left to eat more than your target. You have 3 days left to eat less than your target. You have 3 days left to eat more protein. You have 3 days left to eat less fiber. You have 3 days left to eat more protein. You have 3 days left to eat more fiber. You have 3 days left to eat more protein. You have 3 days left to eat more fiber. You have 3 days left to eat more protein. You have 3 days left to eat more fiber. You have 3 days left to eat more protein. You have 3 days left to eat more fiber. You have 3 days left to eat more protein.",
+   "problems": [
+    "16 sentences"
+   ],
+   "pass": false,
+   "seconds": 15.9,
+   "tokens": 220,
+   "tokens_per_second": 13.8,
+   "prompt_tokens_per_second": 14.7
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 2,
+   "text": "\"Today, you ate 2150 calories, which is 100 more than your goal. You consumed 192 grams of protein, which is 52 grams more than your target. You skipped three days, which means you saved 1400 calories. You need to add a cup of vegetables tomorrow to reach your goal.\"",
+   "problems": [
+    "numbers not in facts: 100, 52"
+   ],
+   "pass": false,
+   "seconds": 5.2,
+   "tokens": 75,
+   "tokens_per_second": 14.4,
+   "prompt_tokens_per_second": 14.3
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 0,
+   "text": "\"You've had a protein food at every meal today. You've also had a protein food at your snack. You're well-protected from the goal. The minimum amount of protein you need today is 149 grams. You've had 155 grams, which is 2 grams over the minimum. You need to halve your protein food tomorrow to get back to the minimum. You've already had a protein food at each meal, so you can skip a protein food tomorrow.\"",
+   "problems": [
+    "7 sentences",
+    "numbers not in facts: 2",
+    "restriction in the protected path"
+   ],
+   "pass": false,
+   "seconds": 8.2,
+   "tokens": 102,
+   "tokens_per_second": 15.0,
+   "prompt_tokens_per_second": 71.9
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 1,
+   "text": "You're currently holding up 155g of protein, which is 149g more than the minimum you need for today. Keep a protein food at each meal to avoid missing your goal.",
+   "problems": [
+    "2 sentences",
+    "restriction in the protected path"
+   ],
+   "pass": false,
+   "seconds": 2.7,
+   "tokens": 43,
+   "tokens_per_second": 15.9,
+   "prompt_tokens_per_second": 16.4
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 2,
+   "text": "You have a maintenance goal. You have protein held up at breakfast. You have a protein food at lunch. You have protein held up at dinner.",
+   "problems": [
+    "leads without the first fact (155)"
+   ],
+   "pass": false,
+   "seconds": 2.0,
+   "tokens": 31,
+   "tokens_per_second": 15.9,
+   "prompt_tokens_per_second": 15.5
+  }
+ ]
+}

@@ -106,13 +106,16 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
     case 'weekendHigher': {
       const weekend = n('weekendAverageKcal');
       const weekday = n('weekdayAverageKcal');
+      const higherWeeks = n('higherWeeks') === n('weeks') ? `each of the last ${n('weeks')}` : `${n('higherWeeks')} of the last ${n('weeks')}`;
       return [
         'Weekends run higher than weekdays',
-        `Over the last two weeks your weekend days averaged about ${Fmt.whole(weekend)} kcal ` +
+        `In ${higherWeeks} weeks your weekend ran above that week's weekdays. ` +
+          `Your weekend days averaged about ${Fmt.whole(weekend)} kcal ` +
           `and your weekdays about ${Fmt.whole(weekday)}, against a target of ${Fmt.whole(n('targetKcal'))}. ` +
           'A plan that expects the weekend is easier to follow than one that does not; the week as a whole is what counts.',
         [
           period,
+          ['Weeks with the weekend higher', `${n('higherWeeks')} of ${n('weeks')}`],
           ['Weekend days (fully logged)', `${n('weekendDays')}`],
           ['Weekday days (fully logged)', `${n('weekdayDays')}`],
           ['Weekend average', `${Fmt.whole(weekend)} kcal`],
@@ -148,13 +151,14 @@ export function insightText(i: Insight, fmt: Fmt): readonly [title: string, body
       return [
         unlogged ? `${day} goes unlogged` : `${day} is your highest day`,
         unlogged
-          ? `${day} was the day without a log in both of the last two weeks. A day the coach cannot see is left out of the estimate; ` +
+          ? `${day} was the day without a log in ${n('unloggedWeeks')} of the last ${n('weeks')} weeks. ` +
+            'A day the coach cannot see is left out of the estimate; ' +
             'if it is a day that is hard to log, a rough estimate of the whole day still counts.'
           : `${day} was your highest day in both of the last two weeks, about ${Fmt.whole(n('averageKcal'))} kcal. ` +
             'Nothing to change; it is worth knowing which day the week leans on.',
         [
           period,
-          ['Weeks', `${n('weeks')}`],
+          unlogged ? (['Weeks without a log', `${n('unloggedWeeks')} of ${n('weeks')}`] as const) : (['Weeks', `${n('weeks')}`] as const),
           ...(unlogged ? [] : [[`${day} average`, `${Fmt.whole(n('averageKcal'))} kcal`] as const]),
         ],
       ];

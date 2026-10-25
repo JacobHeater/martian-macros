@@ -10,6 +10,7 @@ import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepo
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { BackupPlatform } from '../backup/BackupPlatform';
+import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -34,6 +35,8 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
+import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { PackFileFetch } from '../foodCatalog/download/PackFileFetch';
 import type { PackHttp } from '../foodCatalog/download/PackHttp';
 import type { PackStore } from '../foodCatalog/download/PackStore';
@@ -85,6 +88,8 @@ export interface AppServices {
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
+  /** The days marked a Refeed or a Day off (MM-611); no calculation reads them. */
+  readonly dayKinds: DayKindRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets (MM-122, MM-124), kept in the database (MM-486). */
@@ -97,6 +102,10 @@ export interface AppServices {
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
+  /** What the trend engine said, and the coach's findings dismissed (MM-605). */
+  readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;

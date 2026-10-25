@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, resolve, sep } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { coachBannedWords } from './support/coachBannedWords';
 
 /**
  * MM-108: the app states, it does not judge or moralize. These words must
@@ -30,6 +31,12 @@ const banned = [
   'starvation mode',
   'metabolic damage',
   'toning',
+  // MM-610's verdicts, for the coach's analysis and everything else.
+  'too much',
+  'unhealthy',
+  'fattening',
+  'empty calories',
+  'burn rate',
 ];
 
 const src = resolve('src');
@@ -52,6 +59,8 @@ const notShown = [
   'foodPipeline/',
   'healthIngest/testing/',
   'domain/training/builtInExercises.ts',
+  // MM-617: the food-language lexicon matches food names ("baked good"); none of it is shown.
+  'engine/analysis/language/lexicon/',
 ];
 
 const quoted = [/'((?:[^'\\\n]|\\.)+)'/g, /"((?:[^"\\\n]|\\.)+)"/g, /`((?:[^`\\]|\\.)+)`/g];
@@ -101,6 +110,22 @@ function texts(): (readonly [file: string, text: string])[] {
 
 const all = texts();
 
+/**
+ * MM-617: the coach's analysis text (`format/coach/`) is held to the
+ * coach's list instead of the one above: its verdicts on choices ("too
+ * much", "that was the mistake") are the owner's voice there, and banned
+ * everywhere else. Profanity, words about the person's body or worth, and
+ * cheat, sinful, deserve, earn and burn off are banned in it too.
+ */
+const coachVoice = 'format/coach/';
+const isCoachVoice = (file: string) => file.startsWith(coachVoice);
+
+/** The words a text of `file` may not use: the coach's list in the coach's analysis, MM-108's everywhere else. */
+function bannedFor(file: string, text: string): string[] {
+  if (isCoachVoice(file)) return coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
+  return banned.filter((word) => bannedPattern(word).test(text));
+}
+
 it('the text is found', () => {
   expect(all.length).toBeGreaterThan(1000);
   // Both kinds are found: a quoted sentence, and words between tags.
@@ -125,6 +150,7 @@ describe('no text uses', () => {
       const hits = all
         .filter(
           ([file, text]) =>
+            !isCoachVoice(file) &&
             pattern.test(text) &&
             // The one use: the name of the highest level of the coach's confidence.
             !(word === 'good' && text === 'Good' && file === 'format/confidenceLabel.ts'),
@@ -194,4 +220,30 @@ it('a grade letter passes and a banned word beside it does not', () => {
   expect(bannedIn('Grade D-')).toEqual([]);
   expect(bannedIn('Grade D: junk')).toEqual(['junk']);
   expect(textsOf("detail: 'Grade D: junk',", false).flatMap(bannedIn)).toEqual(['junk']);
+});
+
+describe("the coach's analysis text (MM-617)", () => {
+  const coach = all.filter(([file]) => isCoachVoice(file));
+
+  it('is found: the grammar and its phrasings', () => {
+    expect(coach.length).toBeGreaterThan(300);
+    expect(coach.some(([, text]) => text === "Tomorrow: back to {target}. Don't skip meals to make up for today.")).toBe(true);
+  });
+
+  it("passes the coach's list", () => {
+    expect(coach.flatMap(([file, text]) => bannedFor(file, text).map((name) => `${file}: ${name} in "${text}"`))).toEqual([]);
+  });
+
+  it('a verdict on a choice passes there and nowhere else; the coach\'s list holds there', () => {
+    const verdict = 'Too much. That was the mistake.';
+    expect(bannedFor('format/coach/coachPhrasings.ts', verdict)).toEqual([]);
+    expect(bannedFor('format/insightText.ts', verdict)).toEqual(['too much']);
+    expect(bannedFor('format/coach/coachPhrasings.ts', 'You earned a cheat day.')).toEqual(['cheat', 'earn']);
+    expect(bannedFor('format/coach/coachPhrasings.ts', "You're fat and lazy.")).toEqual(['fat, aimed at the person', 'lazy']);
+    expect(bannedFor('format/coach/coachPhrasings.ts', 'What the hell.')).toEqual(['profanity']);
+  });
+
+  it('only the format layer has the coach\'s voice: no other folder is called coach/ under format/', () => {
+    expect(new Set(coach.map(([file]) => file.split('/').slice(0, 2).join('/')))).toEqual(new Set(['format/coach']));
+  });
 });

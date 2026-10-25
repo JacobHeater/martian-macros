@@ -1,0 +1,14 @@
+{
+  "scenario": "A clean day: everything on plan",
+  "facts": {
+    "period": "today",
+    "goal": "fat loss",
+    "items": [
+      {"type": "holding_up", "what": "calories", "eaten_kcal": 2150, "target_kcal": 2175},
+      {"type": "holding_up", "what": "protein", "value_g": 192, "minimum_g": 149},
+      {"type": "followed_advice", "food": "sausage, egg and cheese biscuit", "skipped_days": 3, "saved_kcal": 1400},
+      {"type": "fiber_short", "g": 24, "guide_g": 30, "order": "add a cup of vegetables"},
+      {"type": "tomorrow", "target_kcal": 2175, "order": "same again"}
+    ]
+  }
+}

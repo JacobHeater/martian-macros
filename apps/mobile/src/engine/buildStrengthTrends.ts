@@ -47,7 +47,11 @@ export function buildStrengthTrends({
     let recentSessions = 0;
     let lastLoggedOn: CalendarDate | undefined;
     for (const workout of finished) {
-      const sets = workout.exercises.filter((entry) => entry.exerciseId === exerciseId).flatMap((e) => e.sets);
+      // A set with no reps (imported without them, MM-189) is evidence of nothing (MM-613).
+      const sets = workout.exercises
+        .filter((entry) => entry.exerciseId === exerciseId)
+        .flatMap((e) => e.sets)
+        .filter((set) => set.reps !== 0);
       if (sets.length === 0) continue;
       loggedSessions++;
       lastLoggedOn = workout.date;

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { CalendarDate, type GoalMode, Pause, Profile, ScreeningAnswers, type TrainingStatus, UserSetup } from '../../src/domain';
 import { assessTrainingLapse, trainingSuspended, TrainingRule } from '../../src/engine';
+import { Workout } from '../../src/domain/training/Workout';
 import { workoutOn } from '../support/workoutOn';
 
 /** MM-134: a goal that needs training says so, and notices when training stops. */
@@ -69,5 +70,21 @@ describe('training against a goal that needs it', () => {
     const open = { ...lifted(2), endedAt: undefined, inProgress: true } as unknown as (typeof regular)[number];
     expect(assessTrainingLapse({ setup: setupFor(), workouts: [...regular, open], today }).kind).toBe('suspend');
     expect(assessTrainingLapse({ setup: setupFor({ goal: 'maintenance' }), workouts: regular, today }).kind).toBe('none');
+  });
+
+  it('an imported session with no sets, or no hard set, is not training (MM-609)', () => {
+    // Before MM-609 the empty import 2 days ago counted, and the lapse read 2 days.
+    const empty = new Workout({
+      id: 99,
+      date: today.addDays(-2),
+      startedAt: new Date(2026, 9, 3, 7),
+      endedAt: new Date(2026, 9, 3, 8),
+      imported: { platformId: 'run-1', sourceName: 'Watch' },
+    });
+    const noReps = workoutOn(today.addDays(-1), [['back-squat', 0, 100]]);
+    const workouts = [...regular, empty, noReps];
+    expect(assessTrainingLapse({ setup: setupFor(), workouts, today })).toMatchObject({ kind: 'suspend', daysSince: 25 });
+    expect(assessTrainingLapse({ setup: setupFor({ goal: 'fatLoss' }), workouts, today }).kind).toBe('notice');
+    expect(trainingSuspended({ setup: setupFor(), workouts, today })).toBe(true);
   });
 });

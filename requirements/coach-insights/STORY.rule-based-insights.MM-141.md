@@ -17,6 +17,10 @@ under your goal, great job!"), and a few are what a good coach would say. The di
 in the user's own data that the user had not noticed and can act on.
 
 ## Decisions
+**Amended by the product owner, 2026-10-24 (MM-608):** on the Coach tab's analysis (MM-610), "insights never concern a single day" and
+the ration (one new a day, three a week) do not apply. The analysis opens on today (MM-612) and shows every finding, ranked. The
+Dashboard card keeps the ration.
+
 Choices I made without asking (say if any is wrong):
 - **An insight is a record with fixed parts**: what was observed, in the user's numbers; the data it rests on (viewable); how sure the app
   is; optionally one action; and the rule that produced it.

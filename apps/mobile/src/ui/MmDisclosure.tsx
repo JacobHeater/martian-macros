@@ -9,6 +9,11 @@ interface MmDisclosureProps {
   children: ReactNode;
   /** Shown in place of the title, with the title still said aloud. */
   header?: ReactNode;
+  /**
+   * What a person hears for the toggle, when the title alone would not tell
+   * one fold from its neighbours ("The numbers behind this: <the finding>").
+   */
+  name?: string | undefined;
   initiallyExpanded?: boolean;
   /** Keeps what is inside alive while closed, so it does not start over. */
   maintainState?: boolean;
@@ -22,6 +27,7 @@ export function MmDisclosure({
   subtitle,
   children,
   header,
+  name,
   initiallyExpanded = false,
   maintainState = false,
   remember,
@@ -35,7 +41,7 @@ export function MmDisclosure({
         className="mm-disclosure-toggle"
         aria-expanded={expanded}
         aria-controls={id}
-        aria-label={header === undefined ? undefined : title}
+        aria-label={name ?? (header === undefined ? undefined : title)}
         onClick={() => setExpanded(!expanded)}
       >
         <span className="mm-list-row-text">

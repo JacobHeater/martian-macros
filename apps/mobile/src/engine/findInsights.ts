@@ -31,7 +31,9 @@ const upToSeven = [0, 1, 2, 3, 4, 5, 6] as const;
  *
  * Each rule is a pattern over `InsightRationing.patternDays` days resting on
  * at least `InsightRationing.minimumBasisDays` days of data, so nothing here
- * can be about a single day or a single weigh-in. A shaped week (MM-124) is
+ * can be about a single day or a single weigh-in. The unlogged weekday reads
+ * the last four weeks and the weekend the last five calendar weeks
+ * (`WeekPatternRule`, MM-614, MM-615), so `intake` reaches back that far. A shaped week (MM-124) is
  * read against its plan (`plannedShare`): which days are whole, as the
  * expenditure estimate judges them, and how high a day ran, so planned lower
  * days are not partial and planned higher days are not a pattern to point
@@ -81,8 +83,8 @@ export function findInsights({
   const logged = intake.filter((d) => inPeriod(d.date) && d.kcal > 0);
   const whole = usableIntakeDays(logged, { plannedShare });
   const found: Insight[] = [];
-  const add = (rule: InsightRule, figures: Record<string, number>) => {
-    found.push(new Insight({ rule, from, to: through, figures }));
+  const add = (rule: InsightRule, figures: Record<string, number>, since: CalendarDate = from) => {
+    found.push(new Insight({ rule, from: since, to: through, figures }));
   };
 
   // More than a third of logged days are partial (MM-27).
@@ -191,33 +193,59 @@ export function findInsights({
     }
   }
 
-  // Weekend days average a fifth of the target or more above weekdays, each day read against its plan (MM-124).
+  // Weekends a fifth of the target or more above weekdays, each day read against its plan (MM-124). Each weekend is
+  // paired with its own Monday-to-Sunday week, and the weeks must agree (MM-615): at least three weeks all higher, or
+  // five with four in five higher. One big Saturday is one week, not a pattern.
   const asPlanned = (d: IntakeDay) => {
     const share = plannedShare?.(d.date) ?? 1;
     return share > 0 ? d.kcal / share : d.kcal;
   };
   const average = (of: readonly IntakeDay[]) => of.reduce((s, d) => s + d.kcal, 0) / of.length;
   const averageAsPlanned = (of: readonly IntakeDay[]) => of.reduce((s, d) => s + asPlanned(d), 0) / of.length;
-  const weekend = whole.filter((d) => d.date.isWeekend);
-  const weekdays = whole.filter((d) => !d.date.isWeekend);
-  const targeted = whole.map((d) => recordOn(d.date)?.targets.kcal).filter((k): k is number => k !== undefined);
+  const targetOf = (of: readonly IntakeDay[]) => of.reduce((s, d) => s + (recordOn(d.date)?.targets.kcal ?? 0), 0) / of.length;
+  const latestMonday = through.addDays(-((through.weekday + 6) % 7));
+  const weekendFrom = latestMonday.addDays(-7 * (WeekPatternRule.weekendWeeks - 1));
+  const weekendWhole = usableIntakeDays(
+    intake.filter((d) => !d.date.isBefore(weekendFrom) && !d.date.isAfter(through) && d.kcal > 0),
+    { plannedShare },
+  );
+  const pairedWeeks = Array.from({ length: WeekPatternRule.weekendWeeks }, (_, i) => weekendFrom.addDays(7 * i))
+    .map((monday) => {
+      const sunday = monday.addDays(6);
+      const inWeek = weekendWhole.filter((d) => !d.date.isBefore(monday) && !d.date.isAfter(sunday));
+      return { monday, weekend: inWeek.filter((d) => d.date.isWeekend), weekdays: inWeek.filter((d) => !d.date.isWeekend) };
+    })
+    .filter(
+      (w) =>
+        w.weekend.length > 0 &&
+        w.weekdays.length >= WeekPatternRule.minimumWeekdaysPerWeek &&
+        [...w.weekend, ...w.weekdays].every((d) => recordOn(d.date) !== undefined),
+    );
+  const higherWeeks = pairedWeeks.filter(
+    (w) =>
+      averageAsPlanned(w.weekend) - averageAsPlanned(w.weekdays) >=
+      WeekPatternRule.weekendExcessOfTarget * targetOf([...w.weekend, ...w.weekdays]),
+  ).length;
+  const weeksCounted = pairedWeeks.length;
   if (
-    whole.length >= minimum &&
-    weekend.length >= WeekPatternRule.minimumWeekendDays &&
-    weekdays.length >= WeekPatternRule.minimumWeekdays &&
-    targeted.length === whole.length
+    (weeksCounted >= WeekPatternRule.allAgreeWeeks && higherWeeks === weeksCounted) ||
+    (weeksCounted >= WeekPatternRule.mostAgreeWeeks && higherWeeks / weeksCounted >= WeekPatternRule.mostAgreeShare)
   ) {
-    const target = targeted.reduce((s, k) => s + k, 0) / targeted.length;
-    const excess = averageAsPlanned(weekend) - averageAsPlanned(weekdays);
-    if (excess >= WeekPatternRule.weekendExcessOfTarget * target) {
-      add('weekendHigher', {
+    const weekend = pairedWeeks.flatMap((w) => w.weekend);
+    const weekdays = pairedWeeks.flatMap((w) => w.weekdays);
+    add(
+      'weekendHigher',
+      {
         weekdayDays: weekdays.length,
         weekendDays: weekend.length,
         weekdayAverageKcal: average(weekdays),
         weekendAverageKcal: average(weekend),
-        targetKcal: target,
-      });
-    }
+        targetKcal: targetOf([...weekend, ...weekdays]),
+        weeks: weeksCounted,
+        higherWeeks,
+      },
+      (pairedWeeks[0] as (typeof pairedWeeks)[0]).monday,
+    );
   }
 
   // The waist is down beyond its noise while the trend weight held. In
@@ -234,15 +262,25 @@ export function findInsights({
     }
   }
 
-  // One weekday was the unlogged day, or the highest day, in both weeks.
+  // One weekday was the unlogged day in three of the last four weeks and most of the days without a log (MM-614), or
+  // the highest day in both of the last two weeks. Two random gaps a week share a weekday in two weeks about half the
+  // time, and land three of four weeks on one weekday about a fifth of the time; only a weekday that is most of the
+  // gaps is a habit. A day before the first log is not a gap.
   if (days === 14) {
-    const halves = [0, 7].map((offset) => {
-      const first = from.addDays(offset);
+    const weeksFrom = through.addDays(1 - 7 * WeekPatternRule.unloggedWeeks);
+    const firstLogged = intake.reduce<CalendarDate | undefined>(
+      (f, d) => (d.kcal > 0 && (f === undefined || d.date.isBefore(f)) ? d.date : f),
+      undefined,
+    );
+    const weeks = Array.from({ length: WeekPatternRule.unloggedWeeks }, (_, index) => {
+      const first = weeksFrom.addDays(7 * index);
       const last = first.addDays(6);
       const within = (d: CalendarDate) => !d.isBefore(first) && !d.isAfter(last);
-      const loggedDates = new Set(logged.filter((d) => within(d.date)).map((d) => d.date));
+      const loggedDates = new Set(intake.filter((d) => within(d.date) && d.kcal > 0).map((d) => d.date));
       const wholeDays = whole.filter((d) => within(d.date));
-      const unlogged = upToSeven.map((i) => first.addDays(i)).filter((d) => !loggedDates.has(d));
+      const unlogged = upToSeven
+        .map((i) => first.addDays(i))
+        .filter((d) => !loggedDates.has(d) && firstLogged !== undefined && !d.isBefore(firstLogged));
       // The highest day against its plan stands out: alone at the top, and well above the rest.
       const top = wholeDays.reduce<IntakeDay | undefined>(
         (h, d) => (h === undefined || asPlanned(d) > asPlanned(h) ? d : h),
@@ -258,13 +296,22 @@ export function findInsights({
         rest.every((d) => asPlanned(d) < asPlanned(top));
       return { loggedDays: loggedDates.size, wholeDays: wholeDays.length, unlogged, highest: standsOut ? top : undefined };
     });
-    const [one, two] = halves as [(typeof halves)[0], (typeof halves)[0]];
+    // The highest day keeps its two-week basis: the last two of the four weeks, the period the whole days come from.
+    const [one, two] = weeks.slice(-2) as [(typeof weeks)[0], (typeof weeks)[0]];
     const enough = (count: number) => count >= WeekPatternRule.minimumDaysPerWeek;
-    const unloggedBoth = one.unlogged
-      .map((d) => d.weekday)
-      .find((weekday) => two.unlogged.some((d) => d.weekday === weekday));
-    if (unloggedBoth !== undefined && enough(one.loggedDays) && enough(two.loggedDays)) {
-      add('consistentDay', { weekday: unloggedBoth, unlogged: 1, weeks: 2 });
+    const gaps = weeks.reduce((s, w) => s + w.unlogged.length, 0);
+    const unloggedWeeksOf = (weekday: number) =>
+      weeks.filter((w) => enough(w.loggedDays) && w.unlogged.some((d) => d.weekday === weekday)).length;
+    const unloggedDay = upToSeven.find((weekday) => {
+      const count = unloggedWeeksOf(weekday);
+      return count >= WeekPatternRule.unloggedMinimumWeeks && count * 2 > gaps;
+    });
+    if (unloggedDay !== undefined) {
+      add(
+        'consistentDay',
+        { weekday: unloggedDay, unlogged: 1, weeks: WeekPatternRule.unloggedWeeks, unloggedWeeks: unloggedWeeksOf(unloggedDay) },
+        weeksFrom,
+      );
     } else if (
       one.highest !== undefined &&
       two.highest !== undefined &&

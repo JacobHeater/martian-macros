@@ -32,7 +32,8 @@ Choices I made without asking (say if any is wrong). The list, each with its rea
 
 **Food and nutrition**
 - **No meal plans and no prescribed foods.** The app sets numbers and the user chooses food. Meal plans are low-adherence and stray into
-  dietetic practice.
+  dietetic practice. *Overruled in part by the product owner on 2026-10-24 (MM-607, MM-608):* the coach's analysis may offer one food as a
+  trade for one the person logs, at about the same calories. Meal plans and any other prescribed food stay out.
 - **No fasting windows, meal-frequency rules or nutrient-timing requirements** (MM-125). Evidence for an effect on body composition beyond
   total intake is weak. Users may eat on any schedule and the app is indifferent.
 - **No supplement recommendations**, including creatine and protein powder. The app asks about creatine only because it moves the scale

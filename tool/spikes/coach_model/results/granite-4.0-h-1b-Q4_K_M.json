@@ -1,0 +1,304 @@
+{
+ "summary": {
+  "model": "granite-4.0-h-1b-Q4_K_M",
+  "size_mb": 859,
+  "passed": 0,
+  "runs": 21,
+  "pass_rate": 0.0,
+  "median_tokens_per_second": 18.4,
+  "median_seconds": 8.6
+ },
+ "runs": [
+  {
+   "scenario": "1-buffet-day",
+   "sample": 0,
+   "text": "You've had a challenging day, with over 1,000 calories consumed today. The main culprit was your Chinese buffet lunch, which contained 2,368 calories and 33g of fat. To stay on track with your fat loss goal, skip the General Tso's chicken next time, or opt for a healthier alternative like steamed chicken with vegetables. \n\nYour sodium intake has been high at 6,923mg, exceeding your daily limit of 1,800mg. To mitigate this, make sure to drink plenty of water tonight, and next time, get the sauce on the side. Your breakfast was okay, with a sausage, egg, and cheese biscuit containing 691 calories and 45g of fat. \n\nTo improve your protein intake, swap the sausage, egg, and cheese biscuit for two eggs on an English muffin with a slice of cheese. This swap will provide you with 400 calories and 25g of protein. \n\nFor tomorrow, aim to reach your target of 2,175 calories. Remember, don't skip meals to make up",
+   "problems": [
+    "10 sentences",
+    "numbers not in facts: 1000",
+    "leads without the first fact (1054)"
+   ],
+   "pass": false,
+   "seconds": 25.3,
+   "tokens": 220,
+   "tokens_per_second": 18.3,
+   "prompt_tokens_per_second": 84.9
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 1,
+   "text": "You've had a tough day, with a meal that cost you 1,324 calories, 33g of fat, and 6923mg of sodium. That's 1054 calories over your goal, and you've had more sodium than you're allowed in 3.8 days. The worst part is, you're tempted to eat General Tso's chicken again, which is a 744 calorie, 33g fat, and 310mg sodium disaster. \n\nBut don't worry, you've got a plan. You've swapped your sausage, egg, and cheese biscuit for two eggs on an English muffin with a slice of cheese, which is a much better 400 calorie option. You've also added two cups of vegetables to your dinner, which is a great step towards your goal. \n\nBut the most important thing is, you've got tomorrow. Your target is 2175 calories, and you've already swapped your bad choices and added more vegetables. You're not going to skip meals to make up for today, so keep up the good work.",
+   "problems": [
+    "9 sentences",
+    "numbers not in facts: 1324"
+   ],
+   "pass": false,
+   "seconds": 12.1,
+   "tokens": 220,
+   "tokens_per_second": 18.3,
+   "prompt_tokens_per_second": 38.9
+  },
+  {
+   "scenario": "1-buffet-day",
+   "sample": 2,
+   "text": "You've had a tough day, with over 1,000 calories consumed from Chinese buffet food alone. The General Tso's chicken, in particular, was a major offender with 744 calories, 33g of fat, and 310 extra calories over your target. While it's tempting to blame yourself for overindulging, remember that today is just one day and there's always tomorrow. \n\nTo get back on track, I recommend skipping the Chinese buffet tomorrow and sticking to a balanced meal. For breakfast, try two eggs on an English muffin with a slice of cheese, which will give you 400 calories and 25g of protein. For lunch, opt for steamed chicken with vegetables instead of that unhealthy Chinese dish. And don't forget to include two cups of vegetables at dinner to meet your fiber goal of 30g. \n\nTo keep your protein intake within the 149g minimum, make sure to include a good source of protein in your dinner. And as for tomorrow, don't skip meals to make up for today's excess. Just back to your plan",
+   "problems": [
+    "10 sentences",
+    "numbers not in facts: 1000",
+    "leads without the first fact (1054)"
+   ],
+   "pass": false,
+   "seconds": 12.4,
+   "tokens": 220,
+   "tokens_per_second": 17.9,
+   "prompt_tokens_per_second": 39.0
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 0,
+   "text": "Your coach, here. Today, you've over your target by 715 kcal, mostly from a Chinese buffet lunch with a 744 kcal General Tso's chicken. This is the third time this week you've exceeded your goal by 500 kcal or more. \n\nWhile it's important to acknowledge your slip, remember that one day doesn't define your progress. You've been doing well overall, and tomorrow, you'll be back to your plan. No need to skip meals to make up for today. Instead, focus on tomorrow and stay consistent.",
+   "problems": [
+    "7 sentences"
+   ],
+   "pass": false,
+   "seconds": 9.3,
+   "tokens": 112,
+   "tokens_per_second": 18.5,
+   "prompt_tokens_per_second": 93.6
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 1,
+   "text": "Your coach, here. Today, you've over your fat loss goal by 715 calories, thanks to a large portion of Chinese buffet food. The General Tso's chicken, a favorite, cost you 744 calories alone. This is the third time this week you've exceeded your target by 500 calories or more. \n\nI know you can do better. Tomorrow, aim for your target of 2175 calories. Don't skip meals to make up for today. Instead, focus on balanced meals with lean protein and vegetables. Remember, you're not alone in this journey. I'm here to support you.",
+   "problems": [
+    "10 sentences"
+   ],
+   "pass": false,
+   "seconds": 6.7,
+   "tokens": 125,
+   "tokens_per_second": 18.7,
+   "prompt_tokens_per_second": 39.7
+  },
+  {
+   "scenario": "2-buffet-again",
+   "sample": 2,
+   "text": "Your coach, speaking directly to you, the individual working towards your fat loss goal, has some important updates to share based on the facts provided.\n\nFirstly, you've consumed a total of 2890 calories so far today, which is 715 calories over your target of 2175. This excess intake is primarily due to your lunch, which consisted of a Chinese buffet meal that contained 1980 calories. This overconsumption of calories is something you need to address, as it's not conducive to your fat loss goals. \n\nThe fact that this General Tso's chicken occurred on Tuesday suggests a pattern. It's happened three times this week, and it's happening again today. This is a clear indication that you need to make some changes in your eating habits. \n\nThe coach suggests that you skip the General Tso's chicken tomorrow. This is a direct order from the coach, and it's a firm one. Skipping this meal is a significant step towards your goal, as it's a meal that's high in calories and not particularly beneficial for your fat loss journey. \n\nAfter",
+   "problems": [
+    "11 sentences"
+   ],
+   "pass": false,
+   "seconds": 11.8,
+   "tokens": 220,
+   "tokens_per_second": 18.7,
+   "prompt_tokens_per_second": 41.7
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 0,
+   "text": "Hey there, it's time to get back on track. You've been over your target days 9 times in the last 14, and your average over is 420 kcal. The culprit? Biscuits and gravy for breakfast, which cost you 830 kcal each. \n\nNow, I know you're trying to lose fat, so let's swap those biscuits and gravy for something healthier. Try having Greek yogurt with berries and granola instead. It's got 350 kcal, 24g of protein, and it's a great way to start your day without derailing your fat loss goals. \n\nAnd remember, you've got 8 training sessions coming up. Keep up the good work, and make sure you're fueling your body properly. Tomorrow, aim for 2200 kcal. Back to plan, and let's keep moving forward towards your goal!",
+   "problems": [
+    "11 sentences",
+    "exclamation mark"
+   ],
+   "pass": false,
+   "seconds": 13.5,
+   "tokens": 177,
+   "tokens_per_second": 17.6,
+   "prompt_tokens_per_second": 95.0
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 1,
+   "text": "Hey there, it's time to take a look at your progress over the last 14 days. You've had 9 days where you've eaten more than your target, and on average, you've consumed 420 calories more than you should have. The culprit was your breakfast of biscuits and gravy, which contained 830 calories and 48g of fat. \n\nTo get back on track, I recommend swapping those biscuits and gravy for a healthier option like Greek yogurt with berries and granola. This swap will provide you with 350 calories and 24g of protein, which should help you meet your protein goal for the day. By making this swap on weekdays, you'll save 286 calories each day, which adds up to a significant reduction in your daily calorie intake. \n\nAdditionally, I noticed that you've been following your training plan with 8 sessions over the past 14 days. Keep up the great work with your workouts! To further improve your fat loss goals, make sure to include a protein-rich food in your breakfast every day. This will help you maintain your muscle mass",
+   "problems": [
+    "10 sentences",
+    "exclamation mark"
+   ],
+   "pass": false,
+   "seconds": 12.3,
+   "tokens": 220,
+   "tokens_per_second": 17.9,
+   "prompt_tokens_per_second": 39.5
+  },
+  {
+   "scenario": "3-biscuit-streak",
+   "sample": 2,
+   "text": "Hey there, coach! \ud83c\udfcb\ufe0f\u200d\u2642\ufe0f\n\nFirst off, I'm proud of you for sticking to your training schedule for 8 days out of 14. That's a great start! \ud83c\udfc3\u200d\u2642\ufe0f\n\nHowever, I noticed that you've been over your target daily calorie intake for 9 days in the last 14 days. That's 420 kcal more than you should be eating, and it's costing you 286 kcal each day. That's a significant amount of extra calories! \ud83c\udf6b\n\nThe culprit here is your breakfast of biscuits and gravy. It's high in fat (48g) and contains 830 kcal, which is 830 kcal more than your target for this meal. And that's a big problem, especially for someone trying to lose fat. \ud83c\udf4f\n\nThe good news is, you have a simple solution. Swap your biscuits and gravy for Greek yogurt with berries and granola. This swap will reduce your calorie intake by 286 kcal per day, and it will also give you some protein (",
+   "problems": [
+    "12 sentences",
+    "exclamation mark",
+    "emoji"
+   ],
+   "pass": false,
+   "seconds": 12.0,
+   "tokens": 220,
+   "tokens_per_second": 18.4,
+   "prompt_tokens_per_second": 41.7
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 0,
+   "text": "Coach, I see you've been struggling with your fat loss goals for the last 14 days. You've been overeating peanut butter, consuming 35% of your daily calories from it, and only managing to eat 36g of protein per day on average. To help you reach your goal of 70g of fat per day, I recommend cutting your peanut butter intake to just one tablespoon or swapping it for Greek yogurt. This swap will provide you with 20g of protein, which is crucial for your fat loss journey. Remember, you've already been eating 12 days within your target calorie range, so focus on maintaining this balance. Keep up the good work!",
+   "problems": [
+    "6 sentences",
+    "exclamation mark",
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 10.3,
+   "tokens": 138,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 91.5
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 1,
+   "text": "Coach, I see you've been struggling with your fat loss goal for the last 14 days. You've been overeating peanut butter, which makes up 35% of your daily calories, and you've been struggling to meet your protein needs. The good news is that you've already identified the problem - it's the amount of peanut butter you're consuming. The coach's order is to cut down on your peanut butter intake to one tablespoon per day, or swap it for Greek yogurt. This swap will provide you with 20 grams of protein, which is essential for muscle growth and recovery. Keep up the good work, and remember to stay hydrated by drinking plenty of water.",
+   "problems": [
+    "6 sentences",
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 7.5,
+   "tokens": 138,
+   "tokens_per_second": 18.6,
+   "prompt_tokens_per_second": 41.2
+  },
+  {
+   "scenario": "4-fat-week",
+   "sample": 2,
+   "text": "Coach, I've analyzed your last 14 days of progress towards your fat loss goal. Here's what I found:\n\nFirstly, you've consumed too much peanut butter, accounting for 35% of your daily calories. This is a significant issue, as you've had 8 days over your target fat grams (98g) and only met your protein goal for 5 days. This has been the primary cause of your fat loss challenges.\n\nTo improve your situation, I recommend cutting your peanut butter intake to just one tablespoon per day or swapping it for Greek yogurt. This swap provides the same amount of protein (20g) while reducing your fat intake to 32g, which is much more aligned with your fat loss goals. \n\nAdditionally, your calorie count has been a bit high for the last 12 days, totaling 1,120 calories. This is a bit above your target for fat loss. To get back on track, try to reduce your daily calorie intake to around 1,000 calories, which should help you continue your fat loss journey.\n\nOverall, you've done",
+   "problems": [
+    "10 sentences",
+    "numbers not in facts: 1000, 1120",
+    "leads without the first fact (10)"
+   ],
+   "pass": false,
+   "seconds": 11.9,
+   "tokens": 220,
+   "tokens_per_second": 18.5,
+   "prompt_tokens_per_second": 39.3
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 0,
+   "text": "Coach, I see that you've dropped your training sessions for the last 14 days, which is a significant setback for your fat loss goal. You've only managed to get back to the gym once, and it's crucial that you get two sessions in this week, with at least one being a heavy session. Your protein intake has been holding up at 12 days, which is a good start, but you need to ensure you're meeting the minimum of 150g daily to support your fat loss journey.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 7.6,
+   "tokens": 104,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 89.3
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 1,
+   "text": "Coach, I see you've dropped your training sessions for the last 14 days. That's a big problem, especially for your fat loss goal. You need to get back in the gym, even if it's just one heavy session a week. Skipping workouts is not helping you reach your goal.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 3.3,
+   "tokens": 61,
+   "tokens_per_second": 18.8,
+   "prompt_tokens_per_second": 40.7
+  },
+  {
+   "scenario": "5-missed-training",
+   "sample": 2,
+   "text": "Coach, I've reviewed the facts for your last 14 days. It's clear that your training dropped to just one session per week, and you haven't returned to the gym since last Monday. Your protein intake is at 12 days, which is below the minimum of 150 days needed for your fat loss goal. I strongly recommend getting back into the gym and increasing your protein intake to at least 150 days per week.",
+   "problems": [
+    "leads without the first fact (1)"
+   ],
+   "pass": false,
+   "seconds": 4.8,
+   "tokens": 88,
+   "tokens_per_second": 18.7,
+   "prompt_tokens_per_second": 41.0
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 0,
+   "text": "Coach, today you've eaten 2150 calories, which is 25 kcal over your target of 2175. Your protein intake is 192g, which is slightly above the minimum of 149g. However, you've skipped 3 days of eating sausage, egg and cheese biscuits, saving 1400 kcal in the process. To improve your results, I suggest adding a cup of vegetables to your meals. Tomorrow, aim to consume the same amount of calories as today.",
+   "problems": [
+    "numbers not in facts: 25"
+   ],
+   "pass": false,
+   "seconds": 7.8,
+   "tokens": 99,
+   "tokens_per_second": 18.5,
+   "prompt_tokens_per_second": 92.3
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 1,
+   "text": "You've eaten 2150 calories today, which is 25 calories over your target of 2175. Your protein intake is 192g, which is above the minimum of 149g. However, you've had a sausage, egg and cheese biscuit, which has cost you 1400 calories. To improve your fat loss, I recommend adding a cup of vegetables to your meal today. Tomorrow, stick to your target of 2175 calories, and continue to monitor your protein intake.",
+   "problems": [
+    "numbers not in facts: 25"
+   ],
+   "pass": false,
+   "seconds": 5.8,
+   "tokens": 102,
+   "tokens_per_second": 17.9,
+   "prompt_tokens_per_second": 41.0
+  },
+  {
+   "scenario": "6-clean-day",
+   "sample": 2,
+   "text": "Coach, today's challenge has been a tough one. You've eaten 2150 calories, which is 25 more than your target of 2175. Your protein intake has also been higher than needed, at 192g, compared to the minimum of 149g. You've skipped three days of eating sausage, egg, and cheese biscuits, saving 1400 calories each day. However, you're still short on fiber, needing 24g but only getting 18g. To improve your health and progress towards your goal, I recommend adding a cup of vegetables to your meals. Tomorrow, aim for the same target of 2175 calories, and remember to include those vegetables. Keep up the good work, and let's get back on track!",
+   "problems": [
+    "8 sentences",
+    "numbers not in facts: 18, 25",
+    "exclamation mark"
+   ],
+   "pass": false,
+   "seconds": 8.6,
+   "tokens": 155,
+   "tokens_per_second": 18.2,
+   "prompt_tokens_per_second": 39.4
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 0,
+   "text": "Your goal is maintenance, and you've been holding up your protein intake at 155g, which is above your minimum requirement of 149g. Keep up the good work!",
+   "problems": [
+    "2 sentences",
+    "exclamation mark"
+   ],
+   "pass": false,
+   "seconds": 3.3,
+   "tokens": 37,
+   "tokens_per_second": 18.2,
+   "prompt_tokens_per_second": 80.6
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 1,
+   "text": "Your protein intake is holding up well today, at 155 grams, which is above your goal of 149 grams. Keep up the good work with your protein-rich foods at each meal.",
+   "problems": [
+    "2 sentences"
+   ],
+   "pass": false,
+   "seconds": 3.5,
+   "tokens": 39,
+   "tokens_per_second": 11.3,
+   "prompt_tokens_per_second": 40.0
+  },
+  {
+   "scenario": "7-protected",
+   "sample": 2,
+   "text": "Your protein intake today so far is holding up nicely at 155g, which is above your minimum goal of 149g. Great job!",
+   "problems": [
+    "2 sentences",
+    "exclamation mark"
+   ],
+   "pass": false,
+   "seconds": 1.9,
+   "tokens": 30,
+   "tokens_per_second": 16.6,
+   "prompt_tokens_per_second": 37.5
+  }
+ ]
+}

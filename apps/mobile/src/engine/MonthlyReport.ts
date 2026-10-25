@@ -26,6 +26,8 @@ interface MonthlyReportInit {
   lifts?: readonly ReportLift[];
   personalRecords?: readonly ReportPersonalRecord[];
   longestRunDays?: number;
+  refeeds?: number;
+  daysOff?: number;
   recompReview?: RecompReview | undefined;
 }
 
@@ -43,6 +45,13 @@ export class MonthlyReport {
   readonly daysLogged: number;
   readonly completeDays: number;
   readonly weighIns: number;
+
+  /**
+   * The days in the month marked a Refeed and a Day off (MM-611), as
+   * counts. Facts only: nothing judges how many there were.
+   */
+  readonly refeeds: number;
+  readonly daysOff: number;
 
   /**
    * The longest logging streak in the month (MM-92), by the Dashboard
@@ -132,6 +141,8 @@ export class MonthlyReport {
     this.lifts = init.lifts ?? [];
     this.personalRecords = init.personalRecords ?? [];
     this.longestRunDays = init.longestRunDays ?? 0;
+    this.refeeds = init.refeeds ?? 0;
+    this.daysOff = init.daysOff ?? 0;
     this.recompReview = init.recompReview;
   }
 }

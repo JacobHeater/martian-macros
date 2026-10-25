@@ -58,6 +58,7 @@ export async function writeFoodPack(db: SqlDatabase, header: FoodPackHeader, ent
         f.tierReason,
         ...PackMicronutrient.values.map((n) => scaled(f.micros[n])),
         scaled(f.sugarAlcoholsG),
+        f.group ?? null,
       ]);
       for (const s of e.servings ?? []) servings.push([f.id, s.description, scaled(s.grams)]);
       for (const b of e.barcodes ?? []) barcodes.push([b, f.id]);
@@ -67,8 +68,8 @@ export async function writeFoodPack(db: SqlDatabase, header: FoodPackHeader, ent
       inside,
       'INSERT INTO foods (id, name, brand, kcal, protein, carbs, fat, fiber, ' +
         'sodium_mg, alcohol, preparation, pair_id, density, source, source_id, ' +
-        `tier, tier_reason, ${micros.join(', ')}, sugar_alcohols) ` +
-        `VALUES (${Array.from({ length: 18 + micros.length }, () => '?').join(', ')})`,
+        `tier, tier_reason, ${micros.join(', ')}, sugar_alcohols, food_group) ` +
+        `VALUES (${Array.from({ length: 19 + micros.length }, () => '?').join(', ')})`,
       foods,
     );
     await insertAll(inside, 'INSERT INTO servings (food_id, description, grams) VALUES (?, ?, ?)', servings);

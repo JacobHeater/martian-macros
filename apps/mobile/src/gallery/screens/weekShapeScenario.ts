@@ -4,9 +4,10 @@ import type { StoryScenario } from './StoryScenario';
 import { storyTargets } from './storyTargets';
 
 /**
- * Seventy days in at maintenance, the last two weeks logged whole with one
- * shape to them (MM-141): weekends about 500 kcal above weekdays, or one
- * weekday the highest day in both weeks, or one weekday unlogged in both.
+ * Seventy days in at maintenance, the last four weeks logged whole with one
+ * shape to them (MM-141): weekends about 500 kcal above each week's
+ * weekdays (MM-615), or one weekday the highest day in the last two weeks,
+ * or one weekday unlogged in all four (MM-614).
  * Weighed daily and flat, so no stall competes with the pattern.
  */
 export const weekShapeScenario =

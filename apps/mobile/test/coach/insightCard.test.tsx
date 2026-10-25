@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
@@ -14,8 +14,13 @@ import { foodOn } from '../support/foodOn';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { dashboardLoaded } from '../support/dashboardLoaded';
+import { openTab } from '../support/openTab';
 
-/** MM-141: one rationed insight, in fixed words, with its evidence. Carried over from insight_card_test.dart. */
+/**
+ * MM-141: one rationed insight, in fixed words, with its evidence. Carried over from insight_card_test.dart. Since
+ * MM-610 the card on the dashboard is the coach's analysis where it has an equivalent rule, and agrees with the Coach
+ * tab.
+ */
 const today = CalendarDate.of(2026, 10, 5);
 const fmt = new Fmt('metric');
 
@@ -47,10 +52,18 @@ const every = [
   insight('stall'),
   insight('proteinByMeal', { meal: 0, missedDays: 10, lowDays: 8 }),
   insight('sodiumOverLimit', { overDays: 5, judgedDays: 8, leftOutDays: 6, limitMg: 2300 }),
-  insight('weekendHigher', { weekdayDays: 10, weekendDays: 4, weekdayAverageKcal: 2100, weekendAverageKcal: 2600, targetKcal: 2100 }),
+  insight('weekendHigher', {
+    weekdayDays: 15,
+    weekendDays: 6,
+    weekdayAverageKcal: 2100,
+    weekendAverageKcal: 2600,
+    targetKcal: 2100,
+    weeks: 3,
+    higherWeeks: 3,
+  }),
   insight('waistAgainstWeight', { waistFromCm: 92.4, waistToCm: 90.4, weightChangeKg: 0 }),
   insight('consistentDay', { weekday: 6, unlogged: 0, weeks: 2, averageKcal: 2700 }),
-  insight('consistentDay', { weekday: 1, unlogged: 1, weeks: 2 }),
+  insight('consistentDay', { weekday: 1, unlogged: 1, weeks: 4, unloggedWeeks: 3 }),
   insight('shortSleep', { averageMinutes: 340, nights: 12 }),
   new Insight({
     rule: 'fiberForFullness',
@@ -93,6 +106,11 @@ it('the weekend insight states both averages against the target', () => {
   expect(title).toBe('Weekends run higher than weekdays');
   expect(body).toContain('weekend days averaged about 2,600 kcal and your weekdays about 2,100, against a target of 2,100');
   expect(evidence).toContainEqual(['Weekend average', '2,600 kcal']);
+  // MM-615: the weeks that agree are stated, each weekend against its own weekdays.
+  expect(body).toContain("In each of the last 3 weeks your weekend ran above that week's weekdays");
+  const [, mostBody] = insightText(insight('weekendHigher', { ...every[7].figures, weeks: 5, higherWeeks: 4 }), fmt);
+  expect(mostBody).toContain('In 4 of the last 5 weeks');
+  expect(evidence).toContainEqual(['Weeks with the weekend higher', '3 of 3']);
 });
 
 it('the waist insight states the tape and the scale', () => {
@@ -106,8 +124,11 @@ it('the consistent day names the weekday, highest or unlogged', () => {
   const [highest, highestBody] = insightText(every[9], fmt);
   expect(highest).toBe('Saturday is your highest day');
   expect(highestBody).toContain('about 2,700 kcal');
-  const [unlogged, unloggedBody] = insightText(every[10], fmt);
+  const [unlogged, unloggedBody, unloggedEvidence] = insightText(every[10], fmt);
   expect(unlogged).toBe('Monday goes unlogged');
+  // MM-614: three of the last four weeks, never "both of the last two".
+  expect(unloggedBody).toContain('Monday was the day without a log in 3 of the last 4 weeks');
+  expect(unloggedEvidence).toContainEqual(['Weeks without a log', '3 of 4']);
   expect(unloggedBody).toContain('a rough estimate of the whole day still counts');
 });
 
@@ -210,10 +231,48 @@ describe('on the dashboard', () => {
     expect(card()).toHaveTextContent('about 30 g short');
     await userEvent.click(screen.getByRole('button', { name: /The numbers behind this/ }));
     expect(await screen.findByText('Days at or above the minimum')).toBeInTheDocument();
-    const log = await first(repos.insightLog.watchInsightLog());
-    expect(log).toHaveLength(1);
-    expect(log[0]?.rule).toBe('proteinShort');
-    expect(log[0]?.shownOn).toBe(today);
+    // MM-610: protein short is said by the coach's analysis now (its protein minimum), announced once in the trend
+    // log as of yesterday; the insight log keeps the catalog rules the analysis has no equivalent of.
+    const announced = await first(repos.trendLog.watchTrendAnnouncements());
+    expect(announced.filter((entry) => entry.key === 'proteinMinimum:level')).toEqual([
+      expect.objectContaining({ transition: 'new', on: today.addDays(-1) }),
+    ]);
+    expect(await first(repos.insightLog.watchInsightLog())).toEqual([]);
+  });
+
+  it('Dashboard and Coach agree: dismissed on the Dashboard, the same finding is hidden on the Coach tab', async () => {
+    const repos = await shortOnProtein();
+    renderApp(repos, today);
+    expect(await screen.findByRole('heading', { name: /^Protein minimum met on 0 of 14 days/ })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(card()).toBeNull();
+    expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([{ findingId: 'proteinMinimum:level', dismissedOn: today }]);
+    await openTab('Coach');
+    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    await userEvent.click(await section.findByRole('button', { name: '2w' }));
+    await userEvent.click(await section.findByRole('button', { name: '1 finding hidden' }));
+    expect(section.getByText(`shows again ${Fmt.shortDay(today.addDays(28))}`)).toBeInTheDocument();
+  });
+
+  it('Dashboard and Coach agree: dismissed on the Coach tab, it is gone from the Dashboard', async () => {
+    const repos = await shortOnProtein();
+    renderApp(repos, today);
+    await screen.findByRole('heading', { name: /^Protein minimum met on 0 of 14 days/ });
+    await openTab('Coach');
+    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    await userEvent.click(await section.findByRole('button', { name: '2w' }));
+    await userEvent.click(await section.findByRole('button', { name: 'Dismiss: Protein minimum met on 0 of 14 days' }));
+    await openTab('Dashboard');
+    await dashboardLoaded();
+    expect(screen.queryByRole('heading', { name: /^Protein minimum met on/ })).not.toBeInTheDocument();
+  });
+
+  it('pressed, the card opens its section on the Coach tab, on the span it reads', async () => {
+    const repos = await shortOnProtein();
+    renderApp(repos, today);
+    await userEvent.click(await screen.findByRole('button', { name: /^Open on Coach: Protein minimum met on 0 of 14 days/ }));
+    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    expect(await section.findByRole('heading', { name: 'Protein minimum met on 0 of 14 days' })).toBeInTheDocument();
   });
 
   it('dismissed, it does not come back ten days later', async () => {

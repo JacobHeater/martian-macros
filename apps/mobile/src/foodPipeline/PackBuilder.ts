@@ -122,17 +122,17 @@ export class PackBuilder {
         winner = resolution.winner;
         disagree = disagree || resolution.disagree;
       }
-      barcodeEntries.push(
-        packEntryFor(winner, {
-          id: barcodeEntries.length + 1,
-          packId: this.barcodePackId,
-          gtin14: gtin,
-          disagreement: disagree ? disagreement : undefined,
-          preparation: 'packaged',
-          asOfSeconds,
-        }),
-      );
+      const entry = packEntryFor(winner, {
+        id: barcodeEntries.length + 1,
+        packId: this.barcodePackId,
+        gtin14: gtin,
+        disagreement: disagree ? disagreement : undefined,
+        preparation: 'packaged',
+        asOfSeconds,
+      });
+      barcodeEntries.push(entry);
       report.countWritten(winner.source);
+      report.countGroup(winner.source, winner.category, entry.food.group);
     }
 
     // One name, one food: the more reliable source's record is kept (MM-383).
@@ -168,7 +168,10 @@ export class PackBuilder {
         asOfSeconds,
       });
     });
-    for (const c of generic) report.countWritten(c.source);
+    generic.forEach((c, i) => {
+      report.countWritten(c.source);
+      report.countGroup(c.source, c.category, genericEntries[i]?.food.group);
+    });
     for (const entry of [...genericEntries, ...barcodeEntries]) report.countStated(entry.food);
 
     return { generic: genericEntries, barcode: barcodeEntries, report };

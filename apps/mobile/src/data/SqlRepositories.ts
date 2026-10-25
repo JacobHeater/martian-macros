@@ -2,6 +2,7 @@ import type { CustomExerciseRepository } from '../domain/repositories/CustomExer
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
+import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -29,6 +30,8 @@ import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepos
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
 import type { TargetsHistoryRepository } from '../engine/TargetsHistoryRepository';
+import type { CoachAdviceRecordRepository } from '../engine/analysis/accountability/CoachAdviceRecordRepository';
+import type { TrendLogRepository } from '../engine/trends/TrendLogRepository';
 import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
@@ -38,6 +41,7 @@ import { SqlCustomFoodRepository } from './SqlCustomFoodRepository';
 import { SqlDataEraser } from './SqlDataEraser';
 import { SqlDataRestorer } from './SqlDataRestorer';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
+import { SqlDayKindRepository } from './SqlDayKindRepository';
 import { SqlDayMarkRepository } from './SqlDayMarkRepository';
 import { SqlExerciseProgressionRepository } from './SqlExerciseProgressionRepository';
 import { SqlFoodRepository } from './SqlFoodRepository';
@@ -55,6 +59,8 @@ import { SqlSleepRepository } from './SqlSleepRepository';
 import { SqlTargetShapeRepository } from './SqlTargetShapeRepository';
 import { SqlGoalBodyFatRepository } from './SqlGoalBodyFatRepository';
 import { SqlTargetsHistoryRepository } from './SqlTargetsHistoryRepository';
+import { SqlTrendLogRepository } from './SqlTrendLogRepository';
+import { SqlCoachAdviceRecordRepository } from './SqlCoachAdviceRecordRepository';
 import { SqlMenstruationRepository } from './SqlMenstruationRepository';
 import { SqlMeasurementRepository } from './SqlMeasurementRepository';
 import { SqlMeasurementSettingsRepository } from './SqlMeasurementSettingsRepository';
@@ -85,6 +91,8 @@ export class SqlRepositories {
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
   readonly dayMarks: DayMarkRepository;
+  /** The days marked a Refeed or a Day off (MM-611). */
+  readonly dayKinds: DayKindRepository;
   readonly intake: IntakeReader;
   readonly targets: TargetsHistoryRepository;
   /** How the user shapes their targets, by the day each shape was set from (MM-122, MM-124, MM-486). */
@@ -97,6 +105,10 @@ export class SqlRepositories {
   readonly insightLog: InsightLogRepository;
   readonly inlineInsightLog: InlineInsightLogRepository;
   readonly insightSnoozes: InsightSnoozeRepository;
+  /** What the trend engine said, and the coach's findings dismissed (MM-605). */
+  readonly trendLog: TrendLogRepository;
+  /** The coach's record of the advice it showed (MM-617). */
+  readonly adviceRecord: CoachAdviceRecordRepository;
   readonly pauses: PauseRepository;
   readonly reminders: ReminderRepository;
   readonly recovery: RecoveryCheckInRepository;
@@ -121,6 +133,7 @@ export class SqlRepositories {
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);
     this.dayMarks = new SqlDayMarkRepository(db);
+    this.dayKinds = new SqlDayKindRepository(db);
     this.intake = new SqlIntakeReader(db);
     this.targets = new SqlTargetsHistoryRepository(db);
     this.targetShapes = new SqlTargetShapeRepository(db);
@@ -131,6 +144,8 @@ export class SqlRepositories {
     this.insightLog = new SqlInsightLogRepository(db);
     this.inlineInsightLog = new SqlInlineInsightLogRepository(db);
     this.insightSnoozes = new SqlInsightSnoozeRepository(db);
+    this.trendLog = new SqlTrendLogRepository(db);
+    this.adviceRecord = new SqlCoachAdviceRecordRepository(db);
     this.pauses = new SqlPauseRepository(db);
     this.reminders = new SqlReminderRepository(db);
     this.recovery = new SqlRecoveryCheckInRepository(db);
