@@ -126,7 +126,8 @@ export function coachAdviceText(
       const keep = foodInSentence(a.keepFood);
       order(say(hasVegetables.test(keep) ? 'orderKeepWithVegetables' : 'orderKeep', { keep }));
     }
-    const swap = block.swap;
+    // A meal with a better food in it already says what to eat: the swap would name a second one.
+    const swap = a.keepFood !== undefined && worst === 0 ? undefined : block.swap;
     if (swap?.replacement !== undefined) {
       const figures = figuresOf(swap.replacement, x);
       const replacement = replacementName(swap.replacement);

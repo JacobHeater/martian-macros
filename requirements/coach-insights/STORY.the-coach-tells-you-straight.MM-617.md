@@ -546,3 +546,16 @@ Choices made without asking (say if any is wrong):
 
 Remaining:
 - none for the words; the owner's review of the voice.
+
+Read against the voice standard, 2026-10-24: four corrections.
+- **One food named once.** The calorie line no longer adds a swap after "Fill the plate with steamed chicken with vegetables
+  first": the meal's own better food is the order, and a second named food was noise.
+- **No jargon.** "4.8 g protein per 100 kcal. You need 8.6 g." is now "Too many calories for too little protein." The span
+  lines and titles speak plainly too ("Too little protein for your calories", "{meal}: big calories, little protein"). The
+  figures stay in "The numbers behind this".
+- **Today's view lists every fix.** 1d is uncapped (`arrangeCoachFindings`' `uncapped`), so fiber is no longer folded under
+  "1 more". Spans keep 3 a group.
+- **The cause before the rest of today.** On a day over target, "what is left" follows the first fix, as the standard reads:
+  lunch was the problem, then you're done eating.
+
+Tests updated: `test/format/buffetDayText.test.ts` (the calorie line without the swap; the density lead).

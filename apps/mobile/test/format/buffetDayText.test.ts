@@ -99,8 +99,8 @@ describe("the voice standard, sentence by sentence (MM-617's Decisions)", () => 
     expect(body(calories)).toContain(' Fill the plate with steamed chicken with vegetables first. ');
   });
 
-  it("the swap from swapFor: steamed chicken with mixed vegetables, sauce on the side, at 265 kcal", () => {
-    expect(body(calories)).toContain(' Swap in steamed chicken with mixed vegetables, sauce on the side: about 265 kcal, 35 g protein, 4 g fat. ');
+  it('one food named once: no swap after "fill the plate with" the buffet\'s own steamed chicken', () => {
+    expect(body(calories)).not.toContain('Swap in');
   });
 
   it(`"Without the General Tso's chicken you'd be 310 kcal over, not 1,054."`, () => {
@@ -154,8 +154,7 @@ describe('the whole of each line, and its title', () => {
     expect(body(calories)).toBe(
       "Lunch was the problem. The Chinese buffet: 2,368 kcal, more than your whole day's 2,175. General Tso's chicken was " +
         'the worst of it: 744 kcal, 33 g fat. Skip it next time, or take one spoonful. Fill the plate with steamed chicken ' +
-        'with vegetables first. Swap in steamed chicken with mixed vegetables, sauce on the side: about 265 kcal, 35 g ' +
-        "protein, 4 g fat. Without the General Tso's chicken you'd be 310 kcal over, not 1,054.",
+        "with vegetables first. Without the General Tso's chicken you'd be 310 kcal over, not 1,054.",
     );
   });
 
@@ -168,10 +167,10 @@ describe('the whole of each line, and its title', () => {
     );
   });
 
-  it('protein per 100 kcal: the biscuit swapped, the cookie butter skipped', () => {
+  it('too many calories for the protein: the biscuit swapped, the cookie butter skipped', () => {
     expect(title(density)).toBe('155 g protein in 3,229 kcal so far');
     expect(body(density)).toBe(
-      '4.8 g protein per 100 kcal. You need 8.6 g. Breakfast: the sausage egg and cheese biscuit with extra eggs, 691 kcal, ' +
+      'Too many calories for too little protein. Breakfast: the sausage egg and cheese biscuit with extra eggs, 691 kcal, ' +
         '45 g fat. Swap it for two eggs on an English muffin with a slice of cheese: about 390 kcal, 24 g protein, less than ' +
         'half the fat. Cookie butter: 170 kcal, 1 g protein. Does nothing for your goal. Skip it.',
     );
