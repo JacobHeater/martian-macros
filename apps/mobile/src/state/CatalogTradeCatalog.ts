@@ -2,6 +2,8 @@ import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodGroup } from '../domain/food/FoodGroup';
 import type { FoodOrigin } from '../domain/food/portion/FoodOrigin';
 import type { TradeCatalog } from '../engine/analysis/TradeCatalog';
+import type { SwapNameIndex } from '../engine/analysis/swap/SwapNameIndex';
+import { swapNameIndexOf } from '../engine/analysis/swap/swapNameIndexOf';
 import type { TradeCatalogFood } from '../engine/analysis/TradeCatalogFood';
 import type { TradeTarget } from '../engine/analysis/TradeTarget';
 import { gradeMicrosFrom } from '../engine/gradeMicrosFrom';
@@ -19,15 +21,18 @@ const originKey = (origin: Pick<FoodOrigin, 'packId' | 'foodId'>) => `${origin.p
  * of each catalog food the entries were logged from, then lists the foods of
  * those groups, each at its default serving (the first the pack lists, or
  * 100 g). A group lists at most `perGroup` foods, in the order the packs
- * store them.
+ * store them. Each group's name index for the swap (MM-617) is built there
+ * too, over the same foods, so a swap never reads the catalog.
  */
 export class CatalogTradeCatalog implements TradeCatalog {
   private readonly groups: ReadonlyMap<string, FoodGroup>;
   private readonly foods: ReadonlyMap<FoodGroup, readonly TradeCatalogFood[]>;
+  private readonly indexes: ReadonlyMap<FoodGroup, SwapNameIndex>;
 
   private constructor(groups: ReadonlyMap<string, FoodGroup>, foods: ReadonlyMap<FoodGroup, readonly TradeCatalogFood[]>) {
     this.groups = groups;
     this.foods = foods;
+    this.indexes = new Map([...foods].map(([group, listed]): [FoodGroup, SwapNameIndex] => [group, swapNameIndexOf(listed)]));
   }
 
   static async load(
@@ -69,6 +74,10 @@ export class CatalogTradeCatalog implements TradeCatalog {
     return (this.foods.get(group) ?? []).filter(
       (food) => food.kcal >= target.minKcal && (target.maxKcal === undefined || food.kcal <= target.maxKcal),
     );
+  }
+
+  nameIndexIn(group: FoodGroup): SwapNameIndex {
+    return this.indexes.get(group) ?? swapNameIndexOf([]);
   }
 }
 

@@ -165,3 +165,240 @@ Scenario: Back to plan
   Given any day over target
   Then the coach's last line for the day is "Tomorrow: back to {target}. Don't skip meals to make up for today."
 ```
+
+## Progress
+The advice engine, 2026-10-24. Not run locally; CI validates. The words (`format/`) and accountability are next.
+
+- **Where:** `apps/mobile/src/engine/analysis/` and its `food/`, one declaration per file, pure, no words.
+  - **Contract:**
+    - `CoachAdvice` keeps its shape. It gains training kinds (`train`, `addSets`, `slowDown`, `sleep`, `keepLifting`) and
+      the fields the orders need: `addCategory`, `amountCups`, `amountG`, `lowProtein`, `mealName`, `on`, `noSauce`,
+      `sodiumMultiple`, `sessions`, `sets`, `group`, `lifts`, `rateFraction`, `minutes`, `amountMl` and `days`. A `halve`
+      with no food uses `nutrient` to say what to halve.
+    - `CoachFinding` gains `cause?: CoachCause`: the meal, the logged meal's name, its calories and foods, the worst food,
+      and, on a span, the day.
+    - `CoachFindingKind` `close` is 1d's closing line (signal `backToPlan`).
+    - `CoachFindingSections` gains `close` (never hidden) and `verdict`.
+  - **The headline's facts:** `CoachVerdict` (`over`, `fix` or `holdingUp`, with the finding, `overKcal`, `targetKcal`
+    and the cause), from `coachVerdictOf`, set by `arrangeCoachFindings`.
+  - **1d** (`analyseFoodDay(input, today, { nowMinute })`): every fix gets its orders from `dayAdviceOf`, using
+    `DayAdviceContext`, `dayUnitsOf` (a logged meal is one unit, except the meal the breakdown takes apart),
+    `mealBreakdownOf`, `saucedOrFried` (the tagger, or the swap table's breaded and fried rows) and `swapFor`.
+    The safeguards run through `allowedOrders` (`adviceAllowed`, then a fallback), and a fix left with no order is not
+    said. Changes:
+    - fiber short of the guide by 5 g is a fix by the evening;
+    - sodium names the foods giving 10% of it or more, with `sodiumMultiple`;
+    - "what is left" carries the rest-of-day limit, or the protein left;
+    - the closing line `backToPlan` comes on any day over target;
+    - the calorie line comes first on a day over the band.
+  - **Spans** (`foodSpanAnalysisOf`): `spanAdviceOf` now swaps with `swapFor`, says sauce on the side only for sauced or
+    fried foods, and falls back to an order every safeguard allows. A calorie line driven by one day
+    (`dominantDayAdviceOf`: one day with half the span's calories over target, itself over the band) also skips that
+    day's worst food, with `on` and the day's `withoutKcalOver`, and names that meal as its cause. Otherwise the top
+    food is the cause.
+  - **Training** (`analyseTrainingSpan`): each fix gets its orders from `trainingAdviceOf`:
+    - T1: two sessions this week;
+    - T2: the usual sessions a week;
+    - T3: the sets that bring the group to 10 a week;
+    - T6: one more set a session on each stalled lift;
+    - T7: the slower pace, 7 hours' sleep and protein where the finding found them, then keep the loads;
+    - X1: protein on the days it falls short;
+    - X3: the water goal on training days.
+  - **New `CoachAdviceRule` figures:** `swapDensityShareOfRequired` 0.85, `fiberCups` 2, `dominantDayShare` 0.5,
+    `restartSessions` 2, `stalledAddSets` 1, `sleepMinutes` 420.
+- **The owner's buffet day gives** (fixture `apps/mobile/test/engine/support/buffetDay.ts`, at 7:40 pm):
+  - **Headline:** `verdict` `over`, `overKcal` 1,054, target 2,175. Cause: lunch, "Chinese buffet", 2,368 kcal, 13 foods,
+    worst food General Tso's chicken.
+  - **The calorie line** (fat 159 g with calories folded in, said first):
+    - `skip` General Tso's chicken (744 kcal, 33 g fat, 32 g protein, at lunch in the Chinese buffet), with
+      `orOneSpoonful`, `keepFood` "Steamed chicken with vegetables", `overKcal` 1,054 and `withoutKcalOver` 310;
+    - then the swap: "steamed chicken with mixed vegetables, sauce on the side" (265 kcal, 35 g protein, 4 g fat),
+      the swap table's `generalTso` row, as no food of the owner's and no catalog food qualifies.
+  - **What is left:** `limitRestOfDay` 400 kcal at dinner, `noSauce`.
+  - **Sodium:** `sodiumMultiple` 3.85; foods: General Tso's chicken; `drinkWater`, then `sauceOnSide`.
+  - **Protein per 100 kcal:**
+    - `swap` of the biscuit meal (691 kcal, 45 g fat, 31 g protein, at breakfast) for "two eggs on an English muffin
+      with a slice of cheese" (390 kcal, 24 g protein, 20 g fat), the swap table's `biscuit` row;
+    - `skip` cookie butter (170 kcal, 1 g protein), `lowProtein`.
+  - **Fiber:** 14 g against 30.45 g; `add` vegetables, two cups, at dinner.
+  - **Holding up:** protein 155 g against the 149 g minimum.
+  - **Closing line:** `backToPlan` 2,175.
+  - **With an eating-disorder history:** only the protein minimum and "what is left", whose one order is an add of
+    32 g of protein naming no food. There is no fix, closing line or cause.
+- **Tests:**
+  - `apps/mobile/test/engine/coachAdvice.test.ts` covers:
+    - each line of the voice standard on the buffet day;
+    - before the evening, and with dinner logged;
+    - safety (an eating-disorder history, pregnancy, under-eating);
+    - "without it";
+    - the day that drives a span;
+    - every fix has an order over 12 stationary simulated users (1d and every span, food and training) and over the
+      owner's fat week.
+  - `apps/mobile/test/engine/trainingSpanAnalysis.test.ts` checks the orders of T1, T2, T3, X1 and X3. It now expects
+    T1 not to be said under an eating-disorder history: its only order, to train, is one the safeguard forbids.
+  - No existing expectation had to change.
+
+Choices made without asking (say if any is wrong):
+- **The swaps and skips go on the line they belong to.** The worst food's skip and swap go on the calorie line. The
+  biscuit's swap and the cookie butter's skip go on the protein-per-100-kcal line ("calories that carried little
+  protein"). The rest of today goes on "what is left", and back to plan goes on the closing line.
+- **"Does nothing for your goal"** is never said of a food tagged fruit, vegetable, salad or legume.
+- **Sodium under 1.5× the limit** swaps or halves its top food instead of telling you to drink water.
+- **T1 under an eating-disorder history or the under-eating finding** is not said, as above.
+- **The headline's "over"** needs the day over the band, not just the target. Back to plan and the rest-of-day limit
+  come on any day over target.
+
+Remaining:
+- the phrasing grammar in `format/` from this data: the orders, the verdict, the closing line and the 1d fiber fix,
+  which `foodFindingText` still words as a span;
+- passing `nowMinute` from the clock in `CoachAnalysis`. Until then, 1d's fiber fix comes only once dinner is logged;
+- accountability: the record of 1d advice given, follow-ups, repeats and advice taken;
+- evidence rows for `CoachAdviceRule`;
+- the tagger's lexicon, from its builder. `swapFor`'s steps are built (below); `food/ownMealSwapOf.ts` is unused and
+  can go, as `swap/ownSwapOf.ts` is the own-food step.
+
+The swaps, 2026-10-24. Not run locally; CI validates.
+
+- **`swapFor(input: SwapInput): CoachAdviceReplacement | undefined`** (`engine/analysis/swap/`), the contract kept,
+  takes the first step that gives a replacement:
+  1. **The person's own food** (`ownSwapOf`): MM-607's `findTrades`, with every safeguard it keeps, tried for fat,
+     calories, protein and sodium. X is the food's entries in the 56 days at its meal, as a one-day span; Y a food
+     logged in that slot on 2 days or more, or a saved food logged there. X's rule is loosened for MM-607 too: a
+     protein food that is breaded or fried, or has 40% of its energy from fat, can be replaced (MM-607's Progress).
+  2. **The catalog's nearest better food** (`catalogSwapOf`) in the food's group (MM-616):
+     - ranked by name, TF-IDF cosine over normalized words (`nameTermsOf`: case, accents, possessives, plurals;
+       joining words, amounts and cooking methods left out), weighed by the group's document frequencies, which
+       `TradeCatalog.nameIndexIn(group)` holds from `CatalogTradeCatalog.load` (`swapNameIndexOf`, `nearestByName`);
+     - kept only in MM-607's band of calories, readable, better for a motive by MM-607's matching rules
+       (`tradeGainOf`), not mostly fat or light on protein;
+     - with a better preparation by the tags (`betterPreparation`): not fried or breaded when the food is, not
+       sauced or creamy when it is, a diet drink for a sugary drink, and never one of those the food is not;
+     - never a dessert, candy or snack food for a meal food (`sweetForMeal`);
+     - the same protein source first (`proteinSourceWords`: chicken, beef, shrimp…), then the nearest name, then
+       fewer calories, then the name.
+  3. **The table of classic swaps** (`coachSwapTable`, `tableSwapOf`): 45 reviewed rows, matched by whole words in
+     the singular and by tags (`CoachSwapMatch`), each with its replacements in order, their words for the person
+     (the replacement's `name`), typical figures from USDA FoodData Central and an evidence row
+     `coachSwapTable.<key>`. A replacement qualifies when it saves a fifth of the calories or two fifths of the fat,
+     keeps 60% of the protein of a food with 8 g or more (`SwapRule.proteinKeptFromG`), adds no calories past
+     1.1× (except on lean gain), and is no saltier where the row states its sodium (hot and sour soup).
+- **Safeguards** (`swapLimitsOf`, `swapAllowed`): nothing under 18, paused, under-eating, after bariatric surgery or
+  with an eating-disorder history; with kidney disease no protein-motivated swap and none adding 8 g of protein or
+  more; on insulin or a sulfonylurea no swap lowering carbohydrate by more than 5 g, and none when the food's
+  carbohydrate is not known; in pregnancy, breastfeeding, underweight or low body weight no swap with fewer calories.
+- **The owner's day:** General Tso's chicken gets "steamed chicken with mixed vegetables, sauce on the side" (265 kcal,
+  35 g protein, 4 g fat) from the table, or the catalog's steamed chicken with vegetables where the catalog has one;
+  the biscuit gets "two eggs on an English muffin with a slice of cheese" (390 kcal, 24 g protein, 20 g fat); cookie
+  butter gets "plain Greek yogurt with berries" (140 kcal, 18 g protein, 1 g fat), or a snack the person logs, or
+  nothing with kidney disease.
+- **Tests:** `apps/mobile/test/engine/swapFor.test.ts` (the buffet day with and without a catalog, the biscuit, cookie
+  butter, the order, the nearest-name ranking, the same protein source, a better preparation for fried and for
+  sauced, no dessert for a meal food, the calorie band, every safeguard, 50 classic names to their rows and 6 to
+  none, whole-word matching, the egg roll's sodium, the burrito's share, the plain biscuit, every row reviewed and
+  in the evidence register); `findTrade.test.ts` (a lean protein food is not X; a fried or fatty one can be); the
+  contract `tradeCatalogContract.ts` on both implementations (the name index, its ranking, an empty group, the
+  default serving).
+
+Choices made without asking (say if any is wrong):
+- **The catalog keeps MM-607's band** (0.6× to 1.1× of the food's calories at the catalog's default serving): a
+  catalog food is never "eat less" in disguise. The table is not held to the floor: its rows are classic swaps at a
+  typical serving, like the owner's "two eggs on an English muffin" for a 691 kcal biscuit.
+- **Cooking words do not count toward the nearest name**, since the tags judge the preparation: "Fried chicken
+  thigh" is as near "Chicken thigh, roasted" as a name can be. A word the group's names never use is left out of
+  the name's vector.
+- **Kidney disease also blocks a swap adding 8 g of protein or more**, whatever it was for, so the person's grilled
+  chicken for fried chicken is not offered there but the table's grilled chicken breast, at the same protein, is.
+- **The tagger is the parallel builder's.** Until it lands, `foodTagsOf` returns no tags: the table still matches by
+  its words, and the preparation and dessert tests of the catalog step wait on it.
+- **The table has no profanity, brand or body word in its replacements**; brand names are only keywords for
+  matching what the person logged ("Coca-Cola", "frappuccino").
+
+
+The food-language tagger, 2026-10-24. Not run locally; CI validates. The analysis script was run, against the local
+catalog cache.
+
+- **`foodTagsOf(name): ReadonlySet<FoodTag>`** (`engine/analysis/language/`), the contract kept, is the tags of
+  `readFoodName(name)`, which also returns the tokens and the phrases found:
+  1. **Tokens** (`foodTokensOf`, `foodWordOf`): lower case; accents stripped; "&" and "n" read as "and"; split on
+     anything not a letter, keeping an apostrophe inside a word; a possessive dropped ("tso's" → "tso") unless the
+     lexicon knows it ("chili's", the restaurant); plurals folded to the singular the lexicon knows ("cookies" →
+     "cookie", "fries" → "fry", "quiches" → "quiche"), never for a word that only looks plural ("hummus",
+     "asparagus", "gas", `keepPlural`); spellings read as another ("doughnut" → "donut", "barbecue" → "bbq");
+     brand and packaging noise ("inc", "oz", "ct", "pack") marked as stop words; "93% lean" read before the digits
+     go (90% or more is lean). Commas and brackets split a name's parts.
+  2. **Phrases**: the lexicon phrases that cover the most words with the fewest phrases, so a phrase wins over its
+     parts; on a tie the later phrase is the longer, as English puts the head last ("dark chocolate chips" are
+     chocolate chips). A phrase stays inside one part of the name, except USDA's inverted names written with a
+     comma ("cheese, cottage", "milk, chocolate"), read only where they open the name. A part that only repeats
+     earlier words ("… SNACK BAR, COOKIES & CREAM") is dropped.
+  3. **Cues**: "flavor"/"flavored" makes the words before it a flavor, back to a bar, chip, drink or yogurt;
+     "without" and "for" cancel what follows them up to an unknown word, "no" the phrase right after it.
+  4. **The head**: the last phrase that says what the food is, in the first part that says anything, before
+     "with", "in", "on" or "and"; a catalog's category part ("Snacks, …") and a flavor-name drink or dessert
+     ("tropical punch", "cheesecake") give way. When the head is a snack, candy, dessert, drink, sauce, snack bar,
+     yogurt, cereal, jerky, protein powder or a pastry that is not bread, the other words' kinds of food are its
+     flavor ("strawberry cheesecake Greek yogurt" is a yogurt; "shrimp crackers" are crackers). A dish keeps them
+     ("sausage egg and cheese biscuit").
+  5. **Rules** (`foodLexicon.rules`, 54, each with its reason): weak cues settle (chips fried unless baked; nuggets
+     breaded unless grilled; chocolate candy only when the name is about it; butter a spread only when alone), then
+     qualifiers ("diet", "zero", "unsweetened" make a sweet drink or tea a diet drink, never a juice; "lean only" makes
+     beef lean), then flavors (a fruit is fruit only when the food is; a vegetable in a cake, a drink or a sausage is
+     a flavor), then fried, breaded, creamy, cheesy, processed or fatty is never lean protein, and a fast-food chain
+     or buffet is a restaurant.
+- **The lexicon** (`foodLexicon`, families in `language/lexicon/`): 2,855 phrases (1,697 of two words or more) in
+  cooking, sauce, protein, grain, sweet, drink, dairy, produce, place and qualifier families; 66 stop words, 39
+  aliases, 27 words that only look plural; 38 cues (`FoodCue`). Each family's header says its choices.
+- **Measured** (`tool/spikes/coach_model/lexicon/analyse.ts`; `concordance.ts` and `probe.ts` beside it) on 83,694
+  catalog names: every USDA Foundation, SR Legacy and FNDDS name, 50,000 USDA Branded and 20,000 Open Food Facts
+  names, a deterministic sample of the local cache:
+  - **coverage**: 84.6% of names get a tag (Foundation 92.5%, FNDDS 89.5%, SR Legacy 87.1%, Branded 87.1%, Open Food
+    Facts 75.9%). The untagged are mostly names with nothing to say (water, tea, coffee, oils, spices, sweeteners,
+    infant formula, gum) and Open Food Facts names in other languages; `results/untagged-tokens.tsv` lists the 300
+    most frequent words of untagged names;
+  - **precision**: two fresh samples of 200 tagged names each (seeds `holdout9`, `holdout10`), hand-checked against
+    the final lexicon and never used to tune it: **87.8% of 400 names have every tag right; 90.9% of 606 tags are
+    right**. That is short of the 95% aimed for. The first hand-check, before any review, was 76.0% of names; ten
+    rounds of review and fixing on other samples (`verdicts-*.tsv`) brought fresh samples to 87–92%;
+  - **the misses that remain** are branded names whose flavor or brand words read as foods ("Carambar candy cola",
+    "veggie bacon frittata", "Mike Ike fruits", "Candy Crush gummies"), heads the word order hides ("buffalo wings
+    with ranch flavored potato crisps"), and lexicon gaps for compound product nouns. The wrong tags are mostly
+    kinds of food read from a flavor (snack food 6, fruit 6, dairy 5, nut 4 of the 55), rarely a cooking method: a
+    wrong fried or breaded tag came up on 3 of the 400 names.
+- **Examples**: "General Tso's chicken" → fried, breaded, sauced; "Sausage egg and cheese biscuit with extra eggs" →
+  processed meat, egg, cheesy, refined grain, pastry; "Diet Pepsi Cola 12 Fluid Ounce Aluminum Can (Pepsi)" → diet
+  drink; "COOKIE BUTTER, CRUNCHY (LOTUS)" → dessert, spread; "Chinese buffet" → buffet, restaurant; "Air fried
+  chicken" → baked, lean protein; "Unsweetened iced tea" → diet drink; "Grilled cheese sandwich" → cheesy, refined
+  grain, not grilled.
+- **Tests:** `apps/mobile/test/engine/foodTagsOf.test.ts`: the ticket's 11 cases and 81 more from the hand-checked
+  samples; the tokenizer (case, accents, possessives, "&" and "n", stop words, parts, lean percentages), plural
+  folding and the words never folded; the lexicon's hygiene (each phrase in one family, written as the tokenizer
+  reads it, in the singular, no stop word alone, only known senses and every cue used); determinism; the evidence
+  row `foodLexicon`.
+- **To extend the lexicon:** add the phrase, singular, unaccented and lower case, to the family it belongs to in
+  `language/lexicon/`; add a whole phrase where its meaning is not the sum of its words ("chicken fried steak",
+  "grilled cheese"), and a `weakHead` cue where a drink or dessert is often only a flavor name. Add a case to
+  `foodTagsOf.test.ts`. Then run, from `tool/spikes/coach_model/lexicon/`:
+  `node --import ./resolve.mjs analyse.ts --seed <new seed>` to see coverage and draw a fresh sample, review it into
+  `verdicts-<seed>.tsv` (name, tags, then `ok` or the wrong tags as `-tag`), and run it again for the precision. A
+  sample reviewed once is spent: measure on a new seed after changing the lexicon. `concordance.ts` lists the most
+  frequent phrases in context, the quickest way to find a word read in the wrong sense.
+
+Choices made without asking (say if any is wrong):
+- **One tag added, `nut`** (nuts and seeds): 2,474 of the sampled names name one, and they are neither legume nor
+  snack food to the coach.
+- **Air fried, air fryer and oven fried are baked**: dry heat with little oil, never fried. Boiled and poached are
+  steamed (moist heat, no fat added); broiled, charbroiled and blackened are grilled. Stir fried, sautéed, braised,
+  stewed and smoked say nothing. "Pot roast" is braised: fatty meat, not roasted. "Crunchy" is a texture; "crispy"
+  is fried only on a meat, fish, egg or vegetable.
+- **Chicken and turkey are lean protein** unless the name says a fatty part (thigh, wing, skin) or a fatty way; beef,
+  pork and lamb are fatty meat unless the name says lean ("lean only", 90% lean or more, sirloin, tenderloin, round,
+  loin, flank) and no fatty cut (shoulder, blade). Deli turkey is processed meat, which outweighs lean.
+- **A juice is a sugary drink**, 100% or unsweetened; plain tea, coffee and water get no tag; sparkling water and
+  seltzer are diet drinks.
+- **A chain's name tags the food as the chain's**, even a product sold in shops ("Starbucks frappuccino"); names that
+  are also ordinary words match only in full ("chipotle mexican grill", "domino's").
+- **Precision before recall**: where a word is often a flavor, a brand or another sense, the lexicon says nothing
+  rather than guess, so some foods are untagged rather than mis-tagged.
+
+Remaining:
+- precision at 95%: more review rounds on fresh samples, on the misses above.

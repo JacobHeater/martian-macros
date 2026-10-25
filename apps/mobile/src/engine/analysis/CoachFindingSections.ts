@@ -1,4 +1,5 @@
 import type { CoachFinding } from './CoachFinding';
+import type { CoachVerdict } from './CoachVerdict';
 import type { HiddenFinding } from './HiddenFinding';
 
 /**
@@ -19,4 +20,8 @@ export interface CoachFindingSections {
   readonly more: readonly CoachFinding[];
   /** The findings dismissed in the last 28 days, the first to show again first. */
   readonly hidden: readonly HiddenFinding[];
+  /** 1d's closing line on a day over target (MM-617's back to plan), said last; never hidden. */
+  readonly close?: CoachFinding | undefined;
+  /** The headline's facts (MM-617): the biggest problem and its cause, or the biggest strength. */
+  readonly verdict?: CoachVerdict | undefined;
 }

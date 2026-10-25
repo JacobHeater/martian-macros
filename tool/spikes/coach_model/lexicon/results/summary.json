@@ -1,0 +1,86 @@
+{
+  "sampledNames": 83694,
+  "taggedNames": 70789,
+  "coverage": "84.6%",
+  "sources": {
+    "off": {
+      "names": 20000,
+      "tagged": 15177,
+      "coverage": "75.9%"
+    },
+    "usda_branded": {
+      "names": 50000,
+      "tagged": 43529,
+      "coverage": "87.1%"
+    },
+    "usda_fndds": {
+      "names": 5432,
+      "tagged": 4862,
+      "coverage": "89.5%"
+    },
+    "usda_foundation": {
+      "names": 469,
+      "tagged": 434,
+      "coverage": "92.5%"
+    },
+    "usda_sr_legacy": {
+      "names": 7793,
+      "tagged": 6787,
+      "coverage": "87.1%"
+    }
+  },
+  "lexicon": {
+    "phrases": 2855,
+    "multiWordPhrases": 1697,
+    "stopWords": 66,
+    "rules": 54
+  },
+  "tags": {
+    "refinedGrain": 9555,
+    "dessert": 7515,
+    "vegetable": 7193,
+    "sauced": 6769,
+    "cheesy": 6534,
+    "snackFood": 6492,
+    "candy": 5692,
+    "dairy": 5680,
+    "leanProtein": 5135,
+    "sugaryDrink": 4340,
+    "processedMeat": 3818,
+    "fried": 3402,
+    "fattyMeat": 3249,
+    "fruit": 2992,
+    "creamy": 2649,
+    "wholeGrain": 2588,
+    "nut": 2474,
+    "seafood": 2397,
+    "legume": 1916,
+    "roasted": 1777,
+    "pastry": 1690,
+    "raw": 1626,
+    "spread": 1624,
+    "soup": 1372,
+    "restaurant": 1344,
+    "dietDrink": 1059,
+    "breaded": 990,
+    "fastFood": 871,
+    "egg": 837,
+    "grilled": 769,
+    "baked": 735,
+    "steamed": 548,
+    "salad": 539,
+    "alcohol": 398,
+    "buffet": 27
+  },
+  "handcheck": {
+    "seed": "holdout9",
+    "size": 200,
+    "precision": {
+      "reviewedNames": 200,
+      "namesAllTagsRight": "88.5%",
+      "reviewedTags": 300,
+      "tagPrecision": "91.3%",
+      "changedSinceReview": 0
+    }
+  }
+}

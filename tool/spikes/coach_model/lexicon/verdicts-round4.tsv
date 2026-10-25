@@ -1,0 +1,202 @@
+# MM-617 fourth hand-check pass (seed "round4"), against the lexicon after the third round of fixes.
+# name<TAB>tags as reviewed<TAB>verdict: ok, or the wrong tags marked "-tag" (missing ones "+tag" do not count against precision).
+COUNTRY STYLE RABBIT, PORK & GINGER SAUSAGE, COUNTRY STYLE RABBIT, PORK & GINGER	processedMeat fattyMeat	ok
+SWEET & CREAMY ICED COFFEE, HERSHEY'S COOKIES 'N' CREME	dessert	-dessert
+Cubbies Gala Apples	fruit	ok
+Bell Orto Prepared Pizza Sauce	sauced	ok
+String cheese authentic mexican style	cheesy dairy	ok
+ITALIAN MASCARPONE ICE CREAM, BALSAMIC GLAZED FIGS	dessert	ok
+SWEETENED DRIED PINEAPPLE TIDBITS, SWEETENED	fruit	ok
+ROUNDY'S, SELECT, TRADITIONAL CAESAR DRESSING	sauced creamy	ok
+Clancy‘s cheese melt	cheesy dairy	ok
+Vanilla bean sugar cookies	dessert	ok
+BOURBON SWEET POTATO BUTTER, BOURBON SWEET POTATO	vegetable	-vegetable
+RAW DARK CHOCOLATE BAR, RASPBERRY	raw candy	-raw
+Lamb or mutton and potatoes with gravy	sauced fattyMeat vegetable	ok
+Cheese, caraway	cheesy dairy	ok
+BLACK CHERRY GREEK 100 CALORIES NONFAT YOGURT, BLACK CHERRY	leanProtein dairy	ok
+LOFTHOUSE, CAKE BITES, PEPPERMINT CREME	dessert	ok
+Naturally Cherrywood Smoked, Boneless,  Slicing Ham, Lower Sodium, Water Added, 2/8 lb. Avg, Fully Cooked, Certified Gluten-Free	processedMeat	ok
+Blended Fruit, Strawberry Vanilla	fruit	ok
+SALSA ORGANIC VERDE, SALSA	vegetable	ok
+Tuna with Beans Chilli Italian Style	leanProtein seafood legume	ok
+CHUNKY CHICKEN & DUMPLINGS-MICROWAVABLE 15.25 OZ	creamy soup refinedGrain	ok
+apple gider	fruit	ok
+Alaska pink salmon	seafood	ok
+LASAGNA PASTA WITH BEEF IN TOMATO SAUCE, BEEF	sauced cheesy fattyMeat refinedGrain	ok
+Clover valley, ready to bake! cookies, chocolate chip	dessert	ok
+TROPICALLY SWEET & SPICY CARIBBEAN GRILLING SAUCE, TROPICALLY SWEET & SPICY	sauced	ok
+SUGAR FREE SWEET COCONUT IN CHOCOLATE CANDY, COCONUT	candy	ok
+Boneless & skinless chicken Breast	leanProtein	ok
+Skinless Boneless Sardine Filet In Olive Oil	seafood	ok
+CANDY BAR	candy	ok
+MILK CHOCOLATE NON PAREILS CANDY, MILK CHOCOLATE	candy	ok
+GAMESA, ARCOIRIS, MARSHMALLOW COOKIES	dessert	ok
+Sheetz, Marshmallow Syrup, For Iced Mocha, Small	fastFood restaurant	ok
+CHOCOLATE CHIP COOKIE DOUGH PREMIUM ICE CREAM WITH CHOCOLATE CHIPS AND COOKIE DOUGH PIECES, CHOCOLATE CHIP COOKIE DOUGH	dessert	ok
+Squishmallow gummies	candy	ok
+YUCA FROZEN CASSAVA	vegetable	ok
+ON THE BORDER, cheese enchilada	sauced cheesy refinedGrain	ok
+Bière Lager blonde sans alcool	alcohol	-alcohol
+Rice, white, with corn, no added fat	vegetable refinedGrain	ok
+Spices, fenugreek seed	nut	-nut
+MEIJER, 100% REAL BACON	processedMeat	ok
+DELUXE CHEDDAR & SHELLS MACARONI & CHEESE	creamy cheesy refinedGrain	ok
+MACHISNO SPICY CHIPOTLE SALSA, MACHISMO	vegetable	ok
+ROSARITA Refried Beans with Salsa, 16 OZ	legume vegetable	ok
+FOCO, JUICE, SOURSOP, SOURSOP	sugaryDrink	ok
+Egg white, omelet, scrambled, or fried, with cheese, meat, and vegetables	fried cheesy egg dairy vegetable	ok
+Classic Yellow Cheddar Shells	cheesy dairy	ok
+Gourmet Lollipops	candy	ok
+caribean style jerk chicken	leanProtein	ok
+Vitruvian lager	alcohol	ok
+Pork Shldr Butt Portions Boneless	fattyMeat	ok
+STRAWBERRY FILLED CANDY	candy	ok
+KFC, Fried Chicken, ORIGINAL RECIPE, Thigh, meat and skin with breading	fried breaded fastFood restaurant	ok
+PARMESAN AND ROMANO GRATED CHEESE, PARMESAN AND ROMANO	cheesy dairy	ok
+HALF&HALF ICED TEA LEMONADE, HALF&HALF	creamy dairy sugaryDrink	-creamy -dairy
+Beef, round, outside round, bottom round, steak, separable lean and fat, trimmed to 0" fat, all grades, cooked, grilled	grilled leanProtein	ok
+Beef, round, eye of round, roast, separable lean and fat, trimmed to 1/8" fat, choice, raw	raw leanProtein	ok
+Fish, tuna, white, canned in water, without salt, drained solids	leanProtein seafood	ok
+CREAM-O-LAND, MILK, CHOCOLATE, CHOCOLATE	creamy	-creamy +sugaryDrink
+ORIGINAL SEA SALT CARAMELS	candy	ok
+Wilde Hilde Scwäbische Curry Sauce mit Carolina Reaper	sauced	ok
+PEACH GUMMI RINGS, PEACH	candy	ok
+PINEAPPLE ORANGE GUAVA JUICE BLEND COCKTAIL, PINEAPPLE; ORANGE; GUAVA	sugaryDrink	ok
+Babyfood, dessert, fruit dessert, without ascorbic acid, strained	dessert	ok
+Beef, rib, large end (ribs 6-9), separable lean and fat, trimmed to 1/8" fat, choice, cooked, broiled	grilled fattyMeat	ok
+MAGIC SHELL CUPCAKE	dessert	ok
+TOMATO BASIL SOUPE, TOMATO BASIL	vegetable	ok
+TOFFEE ALMOND 72% CACAO DARK CHOCOLATE BAR, TOFFEE ALMOND	candy	ok
+Enchanted rose organic potatoes	vegetable	ok
+OLD STYLE HEAVY CREAM	creamy dairy	ok
+Blueberry nonfat yogurt	dairy	ok
+PANKO BREADED CHICKEN BREAST & VEGETABLE PATTIES	breaded vegetable	ok
+Snacks, Pretzels, gluten- free made with cornstarch and potato flour	snackFood	ok
+THREE TWINS ICE CREAM, ORGANIC ICE CREAM, VANILLA	dessert	ok
+Pumpkin spice cream cheese spread	creamy cheesy spread	ok
+Veal, variety meats and by-products, thymus, raw	raw	ok
+MANGO FLAVOR TRIPLE ZERO BLENDED GREEK NONFAT YOGURT, MANGO	leanProtein dairy	ok
+SOOTHING CANDY	candy	ok
+BIG & BOLD BUFFALO STYLE CHICKEN WITH SPICY BUFFALO SAUCE AND REDUCED FAT CHEDDAR CHEESE IN A BUFFALO BLASTED CRUST SANDWICH, BUFFALO STYLE CHICKEN	sauced cheesy refinedGrain	ok
+Tiscan style vegetable soup	vegetable soup	ok
+ORANGE COLD PRESSED JUICE, ORANGE	sugaryDrink	ok
+Organic sweetened milk condensed	dairy	ok
+FOOD LION, NATURAL STRING CHEESE, MOZZARELLA	cheesy dairy	ok
+ORGANIC ANCIENT GRAIN BLEND, SPANISH STYLE	wholeGrain	ok
+Eggplant, cooked, fat added	vegetable	ok
+CINNAMON STREUSEL BISCOTTI, CINNAMON STREUSEL	dessert	ok
+4% MILKFAT MIN SMALL CURD COTTAGE CHEESE WITH GARDEN VEGETABLES, GARDEN VEGETABLES	leanProtein dairy vegetable	ok
+CHILLIN BERRY LIMEADE FLAVORED ZERO SUGAR ISLAND PUNCH LOW CALORIE DRINK MIX SINGLES TO GO!, CHILLIN BERRY LIMEADE	dietDrink	ok
+Peaches, dried, sulfured, uncooked	fruit	ok
+Dip, TOSTITOS, salsa con queso, medium	fried cheesy snackFood	-fried -snackFood
+DOUBLE CHOCOLATEY CHUNK CRISPY MARSHMALLOW SQUARES, DOUBLE CHOCOLATEY	candy	ok
+Soft top variety cookie tray	dessert	ok
+Meat loaf dinner, NFS, frozen meal	fattyMeat	ok
+THE BAKERY BAKED WITH PRIDE, SOFT BAKED COOKIES, CONFETTI	baked dessert	ok
+SALTED ROASTED SESAME STICKS, SALTED ROASTED	roasted	ok
+MINI GUMMI BEARS CANDY, MINI GUMMI BEARS	candy	ok
+PASTA SOUP MIX	soup refinedGrain	ok
+Sea salt caramel popcorn, sea salt caramel	candy	ok
+KELLOGG ORIGINS CEREAL FRUIT & SEED MUESLI RAISIN APRICOT CRANBERRY WITH PUMPKIN SEEDS 14.1OZ	wholeGrain	ok
+BAKING CARAMELS	candy	ok
+CHOCOLATE GLAZED PEPPERMINT DONUTS, CHOCOLATE	fried pastry	ok
+Mini Filled Donuts	fried pastry	ok
+Grape leaves, raw	raw fruit	-fruit +vegetable
+Golden valley natural, organic beef jerky, black pepper	processedMeat	ok
+Cheese, Ricotta	cheesy dairy	ok
+Venison sausage	processedMeat	ok
+RICH CHOCOLATE ICE CREAM, RICH CHOCOLATE	dessert	ok
+Sun-Maid Fruity Raisin Snacks Tropical Punch 30lb Case	snackFood	ok
+Sausage, smoked link sausage, pork and beef (nonfat dry milk added)	processedMeat fattyMeat	ok
+Hearty Grains 100% Whole Wheat English Muffins	wholeGrain	ok
+KETCHUP  POTATO SCOOPS, KETCHUP	sauced vegetable	-sauced -vegetable +snackFood
+CHOCOLATE SINGLE DECKER, CHOCOLATE	candy	ok
+Sloe gin fizz	alcohol	ok
+Sweet potato, cooked, candied, home-prepared	vegetable	ok
+Oil, oat	wholeGrain	-wholeGrain
+GRILL SAUCE, GRILL	sauced	ok
+Mushroom & asiago egg bites	cheesy egg dairy vegetable	ok
+HAVILAND, NONPAREILS, DARK CHOCOLATE, DARK CHOCOLATE	candy	ok
+Qualified Belgian-style quadruple ale	alcohol	ok
+ENRICHED EGG NOODLE PRODUCT, MEDIUM EGG NOODLES CLASSIC PASTA	refinedGrain	ok
+POWDER BONE BROTH	soup	ok
+SLICED LOAF CAKE, CRANBERRY ORANGE	dessert	ok
+Millet flour	wholeGrain	ok
+PEANUT BUTTER & MILK CHOCOLATE PROMISES, PEANUT BUTTER & MILK CHOCOLATE	candy	ok
+HANDCRAFTED GOURMET POPCORN, GARLIC PARMESAN	cheesy snackFood	ok
+CUBED COLBY JACK CHEESE	cheesy dairy	ok
+ARTIZO, ENERGIZE BREAD, ANCIENT GRAINS & CHIA	wholeGrain	ok
+Turkey, light meat, roasted, skin eaten	roasted	ok
+PROVOLONE NOT SMOKED CLASSIC CHEESE, PROVOLONE	cheesy dairy	ok
+PUMPKIN SUNFLOWER CHIA COCONUT & SEEDS CLUSTERS, PUMPKIN SUNFLOWER CHIA	nut vegetable	-vegetable
+CLASSIC KETTLE STYLE POTATO CHIPS	fried snackFood	ok
+Jell-O Jell-O Pudding & Pie Filling Instant Pistachio Sugar Free Fat	dessert	ok
+Lite Florida Orange Juice Beverage	sugaryDrink	ok
+BEEFY ITALIAN BOLOGNESE SAUCE, BEEFY ITALIAN	sauced	ok
+BLUE BUNNY, PREMIUM ICE CREAM, VANILLA BEAN	dessert	ok
+ASIAN CHOPPED SALAD WITH CABBAGE, ALMONDS, CARROTS, WONTON NOODLES, CELERY, ONIONS, CILANTRO & ASIAN SESAME DRESSING, ASIAN CHOPPED	vegetable salad refinedGrain	ok
+VANILLA GREEK NONFAT YOGURT	leanProtein dairy	ok
+Bread, roll, Mexican, bollilo	refinedGrain	ok
+HIMALANIA, GOJI BERRIES, DARK CHOCOLATE, DARK CHOCOLATE	candy	ok
+PREMIUM CLUB SODA	dietDrink	ok
+WHOLE GRAIN	wholeGrain	ok
+WAFFLES, MIXED BERRY	refinedGrain	ok
+Bryan Deli Classics Bologna, 2 ct.	processedMeat	ok
+BISON PATTIES WITH UNCURED BACON, BISON WITH BACON	processedMeat	ok
+NO SUGAR ADDED RED GRAPEFRUIT	fruit	ok
+DOLCI GELATI, STRACCIATELL GELATO	dessert	ok
+Pasta with cream sauce and poultry, home recipe	sauced creamy refinedGrain	ok
+Fast foods, submarine sandwich, sweet onion chicken teriyaki on white bread with lettuce, tomato and sweet onion sauce	sauced leanProtein vegetable refinedGrain fastFood restaurant	ok
+Chocolate white chip ready to bake bag full of cookies, chocolate white chip	dessert	ok
+BROWN SUGAR BOURBON BEEF JERKY	processedMeat	ok
+DARK CHOCOLATE PEPPERMINT FLAVORED DAIRY-FREE ALMOND CREAMER, DARK CHOCOLATE PEPPERMINT	creamy	ok
+CLASSIC SOFT CARAMELS, CLASSIC	candy	ok
+MINUTE MAID, PREMIUM ORANGE JUICE, ORIGINAL	sugaryDrink	ok
+RASPBERRY ORGANIC LOWFAT YOGURT, RASPBERRY	dairy	ok
+SEASONED BACON FAT SIMMERED SOUPS AND HOMEMADE DRESSINGS, SEASONED BACON FAT	sauced processedMeat soup	-sauced -soup
+NACHO GRAIN FREE TORTILLA CHIPS, NACHO	fried cheesy snackFood	ok
+BLACKENED CHICKEN TENDERS WITH EGGS AND POTATO HASH BRUNCH BOWL, BLACKENED CHICKEN TENDERS WITH EGGS AND POTATO HASH	fried breaded egg vegetable	-fried -breaded
+SHARP CHEDDAR DELI STYLE CHEESE SLICES, SHARP CHEDDAR	cheesy dairy	ok
+PEPPERONI MADE WITH PORK THIN & CRISPY PIZZA, PEPPERONI	fried cheesy processedMeat fattyMeat refinedGrain	-fried
+Lamb, New Zealand, imported, flap, boneless, separable lean only, cooked, braised	leanProtein	ok
+Wawa, Chocolate Caramel Frozen Cappuccino	dairy sugaryDrink fastFood restaurant	ok
+STEAK BLACK BEAN	fattyMeat legume	ok
+FRESH BAKED COFFEE CAKE	baked pastry dessert	ok
+California organic kiwi	fruit	ok
+Beef, short loin, porterhouse steak, separable lean and fat, trimmed to 1/8" fat, all grades, raw	raw leanProtein	-leanProtein
+TASTY BRAND, ORGANIC FRUIT SNACKS, GUMMIES, MIXED FRUIT	candy	ok
+Hot dog sandwich, beef, on white bun	processedMeat fattyMeat refinedGrain	ok
+HYDRATE Electrolytes Lemonade	sugaryDrink	ok
+Snacks, granola bars, soft, uncoated, chocolate chip, graham and marshmallow	snackFood	ok
+SWEET STRAWBERRY WITH PIECES OF RIPE STRAWBERRIES PREMIUM ICE CREAM, STRAWBERRY	dessert	ok
+SHARP PASTEURIZED PREPARED CHEESE PRODUCT SINGLES, SHARP	cheesy dairy	ok
+Beef Pot Toast	fattyMeat refinedGrain	-refinedGrain
+Appleways Whole Grain 1.0 oz Sweet Potato Crispy Crackers, Individually Wrapped, 108ct	fried snackFood	-fried
+WHITE BALSAMIC VINAIGRETTE, WHITE BALSAMIC	sauced	ok
+KITCHEN SINK BROWNIE TUB PEANUT & TREE NUT FREE TREATS	dessert	ok
+HOT SAUCE, JALAPENO	sauced	ok
+FUDGE MARBLE CHOCOLATE FUDGE SAUCE SWIRLED IN VANILLA FLAVORED ICE CREAM	dessert	ok
+Thai flavored milk tea	dairy sugaryDrink	ok
+Energy drink, sugar free (Vault)	dietDrink	ok
+PROSCIUTTO PROVOLONE CHEESE & TARALLI BREAD	cheesy processedMeat refinedGrain	ok
+365 EVERYDAY VALUE, DELICIOUS NATURAL CHEESE, MUENSTER	cheesy dairy	ok
+Pepsi Zero Sugar Cola 24 Fl Oz Pet Bottle6 Pack	dietDrink	ok
+STRAWBERRIES, BLUEBERRIES, AND CRANBERRIES DIPPED IN SILKY SMOOTH DOVE DARK CHOCOLATE	candy	ok
+FRICK'S, PORK JOWL BACON, HICKORY SMOKED	processedMeat fattyMeat	ok
+Campbell's Camp Chunky Soup, Steak & Potato Soup, 3 Pack of 16.3 Ounce Cans	creamy fattyMeat soup	-creamy
+CRYSTAL CREAMERY, BERRY PUNCH, WITH GRAPE, PEAR, AND STRAWBERRY FLAVOR	sugaryDrink	ok
+Restaurant, Latino, tamale, pork	fattyMeat restaurant	ok
+Restaurant, Latino, tamale, pork	fattyMeat restaurant	ok
+PARMESAN CHEESE OVEN-BAKED KETO CRISPS, PARMESAN CHEESE	cheesy baked snackFood	ok
+MEATLOAF MIX	fattyMeat	ok
+SWEET CHILE BBQ PLANT-BASED BITES, SWEET CHILE BBQ	sauced	-sauced
+HIGH PROTEIN GINGER GRANOLA CLUSTERS	wholeGrain	ok
+Raspberries, raw	raw fruit	ok
+Raspberries, raw	raw fruit	ok
+Raspberries, raw	raw fruit	ok
+Raspberries, raw	raw fruit	ok
+Pie, apple, fast food	dessert fastFood restaurant	ok
+Sour Punch Mini Bites	sugaryDrink	-sugaryDrink +candy
+ORVILLE REDENBACHERS Tender White Popcorn, 18.37 OZ	snackFood	ok
+BREWED TO MATTER COFFEE ICE CREAM WITH FUDGE CHUNKS & A BROWNIE BATTER SWIRL, BREWED TO MATTER	breaded dessert candy	-breaded

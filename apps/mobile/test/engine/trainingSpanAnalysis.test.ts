@@ -67,6 +67,8 @@ describe('training dropped (T2)', () => {
     expect(dropped?.figures).toMatchObject({ recentSessions: 2, recentDays: 14, usualPerWeek: 3 });
     expect(dropped?.priority).toBe('pattern');
     expect(dropped?.to).toBe(asOf);
+    // MM-617: the order, back to the usual three this week.
+    expect(dropped?.advice).toEqual([{ kind: 'train', sessions: 3 }]);
   });
 
   it('sessions in line with the usual rate are holding up, and fewer than 2 a week usual says nothing', () => {
@@ -95,6 +97,8 @@ describe('a pause silences training (T1, T2)', () => {
     const input = trainingInput(asOf, { goal: 'fatLoss', workouts: droppedWorkouts([]) });
     const findings = analyseTrainingSpan(input, 30, asOf);
     expect(of(findings, 'trainingStopped', 'fix')[0]?.figures).toMatchObject({ daysSince: 14, suspended: 0 });
+    // MM-617: the order, two sessions this week.
+    expect(of(findings, 'trainingStopped', 'fix')[0]?.advice).toEqual([{ kind: 'train', sessions: 2 }]);
     expect(findings.every((f) => f.signal === 'trainingStopped' || f.signal === 'proteinByTrainingDay' || f.signal === 'waterOnTrainingDays')).toBe(true);
   });
 
@@ -110,6 +114,8 @@ describe('sets per muscle (T3)', () => {
     const fixes = of(analyseTrainingSpan(input, 30, asOf), 'setsPerMuscle', 'fix');
     expect(fixes.map((f) => f.subjects)).toEqual([['hamstrings', 'chest']]);
     expect(fixes[0]?.figures['groupSets']).toBe(2);
+    // MM-617: the order, 8 more hard sets a week for hamstrings, to the 10 of MM-78's range.
+    expect(fixes[0]?.advice).toEqual([{ kind: 'addSets', sets: 8, group: 'hamstrings' }]);
     expect(fixes[0]?.figures['topSets']).toBe(14);
   });
 
@@ -154,6 +160,7 @@ describe('rest-day protein (X1)', () => {
     });
     const [x1] = of(analyseTrainingSpan(input, 14, asOf), 'proteinByTrainingDay', 'fix');
     expect(x1?.figures).toMatchObject({ trainingDays: 6, trainingMet: 6, restDays: 8, restMet: 2, minimumG: 130, lowerOnRestDays: 1 });
+    expect(x1?.advice).toEqual([{ kind: 'add', nutrient: 'protein', days: 'rest' }]);
   });
 });
 
@@ -161,6 +168,7 @@ describe('water on training days (X3)', () => {
   it('training days logged 1 L under the goal and under rest days: a fix', () => {
     const [x3] = of(analyseTrainingSpan(waterInput(), 14, asOf), 'waterOnTrainingDays', 'fix');
     expect(x3?.figures).toMatchObject({ loggedDays: 14, trainingDays: 5, underDays: 5, goalMl: 2500, restAverageMl: 2500 });
+    expect(x3?.advice).toEqual([{ kind: 'drinkWater', days: 'training', amountMl: 2500 }]);
   });
 
   it('is said only with a goal the app suggested, and with water logged on 10 of 14 days', () => {
@@ -188,6 +196,11 @@ describe('an eating-disorder history', () => {
     expect(of(findings, 'setsPerMuscle')).toEqual([]);
     expect(of(findings, 'strengthOnFatLoss', 'holdingUp')).toEqual([]);
     expect(of(findings, 'waterOnTrainingDays')).toEqual([]);
+  });
+
+  it('nor T1 (MM-617): its only order is to train more, which the safeguard forbids, so it is not said', () => {
+    const input = trainingInput(asOf, { goal: 'fatLoss', workouts: droppedWorkouts([]), ...ed });
+    expect(of(analyseTrainingSpan(input, 30, asOf), 'trainingStopped', 'fix')).toEqual([]);
   });
 
   it('so does under-eating', () => {

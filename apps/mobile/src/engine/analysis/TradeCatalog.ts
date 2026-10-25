@@ -1,12 +1,13 @@
 import type { FoodGroup } from '../../domain/food/FoodGroup';
 import type { FoodOrigin } from '../../domain/food/portion/FoodOrigin';
+import type { SwapNameIndex } from './swap/SwapNameIndex';
 import type { TradeCatalogFood } from './TradeCatalogFood';
 import type { TradeTarget } from './TradeTarget';
 
 /**
- * What a trade asks of the food catalog (MM-607, MM-616), answered at once:
- * the engine never imports the catalog, and an adapter reads it ahead of
- * time (`state/CatalogTradeCatalog`).
+ * What a trade (MM-607) and a swap (MM-617) ask of the food catalog
+ * (MM-616), answered at once: the engine never imports the catalog, and an
+ * adapter reads it ahead of time (`state/CatalogTradeCatalog`).
  */
 export interface TradeCatalog {
   /**
@@ -22,4 +23,12 @@ export interface TradeCatalog {
    * group, and never one with no calories.
    */
   candidatesIn(group: FoodGroup, target: TradeTarget): readonly TradeCatalogFood[];
+
+  /**
+   * The name index of the catalog's foods in `group` (MM-617), built ahead
+   * by `swapNameIndexOf` over the same foods `candidatesIn` lists, at every
+   * calorie: each food's tags and TF-IDF vector, weighed over the group.
+   * Empty for a group the catalog holds no food of.
+   */
+  nameIndexIn(group: FoodGroup): SwapNameIndex;
 }

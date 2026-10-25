@@ -24,7 +24,9 @@ Choices made without asking (from the nutrition panel; say if any is wrong):
   - a top contributor (N11), or a repeated food or meal item (N17, N18), on ≥ 3 distinct days in the span;
   - ≥ 150 kcal a time;
   - not an estimate, with macros explaining ≥ 75% of its calories;
-  - not a protein food (≥ 20% of energy from protein) when the trade is for protein or fat;
+  - not a protein food (≥ 20% of energy from protein) when the trade is for protein or fat, unless it is breaded or fried
+    (its name's tags) or has ≥ 40% of its energy from fat (MM-617, 2026-10-24: fried chicken, sausage, bacon, chicken
+    thigh with the skin);
   - not alcohol, not snoozed;
   - not the person's top source of a micronutrient that is under its reference (uncertain).
 - **Y comes from, in order:**
@@ -85,9 +87,13 @@ Scenario: Not eat less in disguise
   Given the only candidate Y has 50% of X's calories
   Then it is rejected
 
-Scenario: A protein food is not X
-  Given chicken thigh is the top fat contributor
-  Then it is never X for a protein or fat trade
+Scenario: A lean protein food is not X
+  Given turkey meatballs, a protein food with fat under 40% of its energy, are the top fat contributor
+  Then they are never X for a protein or fat trade
+
+Scenario: A fried or fatty protein food can be X (MM-617)
+  Given chicken thigh with the skin, 66% of its energy from fat, or a breaded chicken cutlet
+  Then it can be X for a protein or fat trade
 
 Scenario: No room, no add
   Given fat loss over target and no qualifying Y
@@ -193,4 +199,19 @@ Review fixes (MM-610's review), 2026-10-24. Not run locally; CI validates.
 Choice made without asking (say if any is wrong):
 - **The portion is kept as data** on the trade (`portion`, `grams`) and said by `format/`, since the engine holds no
   words; the review asked for "portion text".
+
+Amended by MM-617, 2026-10-24. Not run locally; CI validates.
+
+- **X loosened:** a protein food can be X for a protein or fat trade when its name's tags say breaded or fried
+  (`foodTagsOf`, or the swap table's fried rows by name) or fat is ≥ `TradeRule.friedProteinFatShare` (40%) of its
+  macros' energy. It was "breaded or fried *and* 40% fat". Every other rule and safeguard of `findTrades` is kept.
+  The scenario "A protein food is not X" is now "A lean protein food is not X" (turkey meatballs), with a new one
+  for the fried or fatty protein food (chicken thigh, a breaded cutlet), both in `findTrade.test.ts`.
+- **Shared with the swap:** the matching rules (`swap/tradeGainOf.ts`), the band (`swap/tradeTargetFor.ts`), the
+  readable check (`swap/readableFood.ts`) and "mostly fat or light on protein" (`swap/unbalancedFood.ts`) moved
+  out of `findTrades.ts` unchanged, so MM-617's catalog swap matches by the same rules.
+- **`TradeCatalog.nameIndexIn(group)`** (MM-617): each group's foods with their tags and TF-IDF vectors, built
+  ahead in `CatalogTradeCatalog.load` and in `InMemoryTradeCatalog`'s constructor; the contract suite
+  (`tradeCatalogContract.ts`) checks the index, the nearest-name ranking and the default serving on both.
+- **Evidence:** `TradeRule.friedProteinFatShare` now has its row.
 

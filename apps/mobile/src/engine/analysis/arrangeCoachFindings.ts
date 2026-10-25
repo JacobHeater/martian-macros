@@ -6,6 +6,7 @@ import type { TrendFinding } from '../trends/TrendFinding';
 import { TrendTransition } from '../trends/TrendTransition';
 import type { CoachFinding } from './CoachFinding';
 import type { CoachFindingSections } from './CoachFindingSections';
+import { coachVerdictOf } from './coachVerdictOf';
 import { findingQuietDays } from './findingQuietDays';
 import { foldTrainingProtein } from './foldTrainingProtein';
 import type { HiddenFinding } from './HiddenFinding';
@@ -35,6 +36,8 @@ const listed = 3;
  *   section shows them as two groups under the same labels (MM-610's PD-2).
  * - The headline is the top holding-up finding and the top fix, only when
  *   both exist.
+ * - 1d's closing line (MM-617's back to plan) is `close`, never hidden, and
+ *   the headline's facts are `verdict` (`coachVerdictOf`).
  */
 export function arrangeCoachFindings(
   findings: readonly CoachFinding[],
@@ -64,7 +67,7 @@ export function arrangeCoachFindings(
   const hidden: HiddenFinding[] = [];
   const shown: CoachFinding[] = [];
   for (const finding of all) {
-    const on = finding.kind === 'left' ? undefined : dismissedOn.get(finding.id);
+    const on = finding.kind === 'left' || finding.kind === 'close' ? undefined : dismissedOn.get(finding.id);
     const showsAgainOn = on?.addDays(findingQuietDays);
     if (on !== undefined && showsAgainOn !== undefined && today.isBefore(showsAgainOn)) {
       hidden.push({ finding, dismissedOn: on, showsAgainOn });
@@ -84,6 +87,7 @@ export function arrangeCoachFindings(
   const worth = [...quality, ...fixes];
   const topHolding = holding[0];
   const topFix = fixes[0];
+  const close = shown.find((f) => f.kind === 'close');
   return {
     left: shown.find((f) => f.kind === 'left'),
     headline: topHolding === undefined || topFix === undefined ? undefined : { holdingUp: topHolding, fix: topFix },
@@ -91,6 +95,8 @@ export function arrangeCoachFindings(
     holdingUp: holding.slice(0, listed),
     more: [...worth.slice(listed), ...holding.slice(listed)],
     hidden,
+    close,
+    verdict: coachVerdictOf({ fixes, holdingUp: holding, close }),
   };
 }
 

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { FoodGroup } from '../../src/domain/food/FoodGroup';
+import { foodTagsOf } from '../../src/engine/analysis/language/foodTagsOf';
+import { nearestByName } from '../../src/engine/analysis/swap/nearestByName';
 import type { TradeCatalog } from '../../src/engine/analysis/TradeCatalog';
 
 /** A catalog food for the contract, at its default serving of `grams`. */
@@ -39,13 +41,17 @@ const seeds: readonly TradeCatalogSeed[] = [
   seed(4, 'Puffed rice', 'breakfastCereals', 120, 30),
   seed(5, 'Tuna, canned', 'fish', 200, 140),
   seed(6, 'Granola of no kind', undefined, 300, 80),
+  // The swap's name index (MM-617).
+  seed(7, 'Chicken thigh, roasted', 'meatAndPoultry', 190, 85),
+  seed(8, 'Chicken salad, creamy', 'meatAndPoultry', 200, 100),
+  seed(9, 'Beef stew', 'meatAndPoultry', 250, 240),
 ];
 
 /**
- * What every `TradeCatalog` must do (MM-607): the group of the foods the
- * entries were logged from, and a group's foods within a band of calories,
- * at their default serving. `create` is given the seeds, and entries logged
- * from each of them.
+ * What every `TradeCatalog` must do (MM-607, MM-617): the group of the
+ * foods the entries were logged from, a group's foods within a band of
+ * calories, at their default serving, and a group's name index for the
+ * swap. `create` is given the seeds, and entries logged from each of them.
  */
 export function tradeCatalogContract(
   name: string,
@@ -105,6 +111,46 @@ export function tradeCatalogContract(
       expect(granola?.carbsG).toBeCloseTo(52.5);
       expect(granola?.fatG).toBeCloseTo(10.5);
       expect(granola?.sodiumMg).toBeCloseTo(420);
+    });
+
+    it("indexes each group's foods by name and tags, at every calorie (MM-617)", async () => {
+      const catalog = await create(seeds);
+      const index = catalog.nameIndexIn('meatAndPoultry');
+      expect(index.foods.map((f) => f.food.name).sort()).toEqual(['Beef stew', 'Chicken salad, creamy', 'Chicken thigh, roasted']);
+      for (const indexed of index.foods) {
+        expect(indexed.food.group).toBe('meatAndPoultry');
+        expect([...indexed.tags].sort()).toEqual([...foodTagsOf(indexed.food.name)].sort());
+      }
+      expect(index.documentFrequency.get('chicken')).toBe(2);
+      expect(index.documentFrequency.get('thigh')).toBe(1);
+      const cereals = catalog.nameIndexIn('breakfastCereals').foods.map((f) => f.food.name);
+      expect(cereals.sort()).toEqual(['Bran flakes', 'Granola, honey', 'Muesli', 'Puffed rice']);
+    });
+
+    it('ranks the nearest name by its rarer words, and leaves out a food that shares none (MM-617)', async () => {
+      const catalog = await create(seeds);
+      const nearest = nearestByName(catalog.nameIndexIn('meatAndPoultry'), 'Fried chicken thigh');
+      expect(nearest.map((m) => m.food.food.name)).toEqual(['Chicken thigh, roasted', 'Chicken salad, creamy']);
+      expect(nearest[0]?.similarity).toBeCloseTo(1);
+      expect(nearest[1]?.similarity).toBeLessThan(0.5);
+    });
+
+    it('indexes nothing for a group it holds no food of, nor a food without a group (MM-617)', async () => {
+      const catalog = await create(seeds);
+      expect(catalog.nameIndexIn('fruit').foods).toEqual([]);
+      expect(nearestByName(catalog.nameIndexIn('fruit'), 'Apple')).toEqual([]);
+      for (const group of ['breakfastCereals', 'fish', 'meatAndPoultry'] as const) {
+        expect(catalog.nameIndexIn(group).foods.map((f) => f.food.name)).not.toContain('Granola of no kind');
+      }
+    });
+
+    it('states each indexed food at its default serving (MM-617)', async () => {
+      const catalog = await create(seeds);
+      const thigh = catalog.nameIndexIn('meatAndPoultry').foods.find((f) => f.food.name === 'Chicken thigh, roasted')?.food;
+      expect(thigh?.grams).toBeCloseTo(85);
+      expect(thigh?.kcal).toBeCloseTo(190);
+      expect(thigh?.proteinG).toBeCloseTo(9.5);
+      expect(thigh?.fatG).toBeCloseTo(4.75);
     });
   });
 }

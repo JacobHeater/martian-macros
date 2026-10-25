@@ -2,6 +2,8 @@ import type { CalendarDate } from '../../domain/CalendarDate';
 import type { InsightPriority } from '../InsightPriority';
 import type { TrendFinding } from '../trends/TrendFinding';
 import type { AnalysisSpan } from './AnalysisSpan';
+import type { CoachAdvice } from './CoachAdvice';
+import type { CoachCause } from './CoachCause';
 import type { CoachFindingKind } from './CoachFindingKind';
 import type { CoachFood } from './CoachFood';
 import type { CoachTrade } from './CoachTrade';
@@ -34,4 +36,17 @@ export interface CoachFinding {
    * MM-348), or the muscle groups by id. Absent when nothing is named.
    */
   readonly subjects?: readonly string[] | undefined;
+  /**
+   * What to do about it (MM-617): every 'fix' carries at least one order,
+   * and 1d's "what is left" and closing line carry theirs. The words are
+   * `format/coachAdviceText`. Absent is none.
+   */
+  readonly advice?: readonly CoachAdvice[] | undefined;
+  /**
+   * What drove it (MM-617): on 1d the meal that gave the most calories and
+   * its worst food, on a span the top food or the one day that drove it.
+   * The headline's verdict reads it (`coachVerdictOf`). Absent when nothing
+   * can be named.
+   */
+  readonly cause?: CoachCause | undefined;
 }

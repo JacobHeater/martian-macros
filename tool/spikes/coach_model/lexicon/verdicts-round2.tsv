@@ -1,0 +1,203 @@
+# MM-617 second hand-check pass (seed "round2"), against the lexicon after the first round of fixes.
+# Historical: name<TAB>verdict. Reviewed at 86.0% of names with every tag right, 90.3% of tags right (318 tags).
+# Verdict: ok, or the wrong tags marked "-tag" (missing ones "+tag" do not count against precision).
+PEANUT CHOCOLATE CHUNK PRETZEL BARS	ok
+Beans, baked, canned, with pork	-fattyMeat
+VITA, HONEY CHRYSANTHEMUM TEA DRINK	ok
+MILK CHOCOLATE COVERED PRETZELS MINIS, MILK CHOCOLATE	ok
+APPLE MIXED BERRY SQUEEZABLE FRUIT POUCH, APPLE MIXED BERRY	ok
+Beans, Dry, Light Tan (0% moisture)	ok
+Beans, Dry, Light Tan (0% moisture)	ok
+RASPBERRY COCONUT DAIRY FREE ALTERNATIVE, RASPBERRY	-fruit
+Individually quick frozen organic dark sweet cherries	ok
+ALLAN, BEAR BITES GUMMY CANDY	ok
+CHOCOLATE COVERED HALVAH	ok
+AUTHENTIC SOURDOUGH	ok
+ASIAGO WITH ROASTED TOMATOES MAC & CHEESE	ok
+LA YOGURT, PROBIOTIC BLENDED NONFAT YOGURT, STRAWBERRY BANANA, STRAWBERRY BANANA	ok
+SUSHI SAUCE, SUSHI	-seafood -refinedGrain
+DEVEINED, TAIL-ON LARGE RAW SHRIMP	ok
+Italian sauce	ok
+Beef rice	ok
+HAMMOND'S, FLAVORED POPCORN, CINNAMON TOAST	-refinedGrain
+Pork Loin Steaks	ok
+GREAT AMERICAN, CHUNKY GRILLED SAUSAGE GUMBO SOUP	ok
+KETCHUP FLAVORED BAKED CORN SNACK, KETCHUP	ok
+DANCING DEER BAKING CO, THIN & CRISPY COOKIES, DARK CHOCOLATE MACADAMIA NUT, DARK CHOCOLATE MACADAMIA NUT	-fried
+Green peas, fresh, cooked, no added fat	ok
+Fish, lingcod, meat, raw (Alaska Native)	ok
+Beef, chuck, under blade center steak, boneless, Denver Cut, separable lean only, trimmed to 0" fat, select, raw	ok
+Cheese Pleasers, White Cheese Curds	ok
+DUNCAN HINES, PERFECT SIZE, RED VELVET CAKE MIX & CREAM CHEESE FROSTING MIX	ok
+LAY'S, POTATO CHIPS, GARDEN TOMATO & BASIL, GARDEN TOMATO & BASIL	ok
+Taystee Treat Gourmet Corn Muffins	ok
+ROYAL MANDARIN GREENS JUICE	ok
+BANQUET, BROWN 'N SERVE, FULLY COOKED SAUSAGE LINKS, MAPLE, MAPLE	ok
+Fish, anchovy, european, canned in oil, drained solids	ok
+Organic Smooth Cashew Butter	ok
+Mayonnaise, fat free	ok
+WILD CAUGHT CHUNK LIGHT TUNA IN WATER	ok
+HIGH PROTEIN BARS, CHUNKY PEANUT BUTTER	ok
+SAUSAGE GRIDDLE CAKE SANDWICHES	-dessert
+PREMIUM MILK CHOCOLATE BAR, ALMOND	ok
+PASTA CHIPS	ok
+CULTURED 1% LOWFAT BUTTERMILK	ok
+Dad's original scotch oatmeal cookies, scotch oatmeal	ok
+ORIGINAL TINY TWISTS PRETZELS, ORIGINAL	ok
+Denny's, Pico De Gallo	ok
+RASPBERRY COOKIES	ok
+COLD WATER LOBSTER TAILS WITH BUTTER	ok
+SPAGHETTI PRODUCT, SPAGHETTI	ok
+JACK 'N JILL, CHIPPY CORN CHIPS, GARLIC & VINEGAR, GARLIC & VINEGAR	ok
+PARTY CAKE FLAVORED MARSHMALLOW CHICKS	ok
+COOKIES & SCREEEM, DARK CHOCOLATE & WHITE CHOCOLATE	ok
+TEA, SIGNATURE ICED TEA	ok
+ENRICHED GIANT BREAD	ok
+Fish, pompano, steamed	ok
+PAPPARDELLE WHOLE WHEAT MACARONI PRODUCT	ok
+Trident Vibes Sour Patch Kids	-candy
+Roasted kale	ok
+50/50 Blend Baby Spinach / Spring Mix	ok
+Beef, New Zealand, imported, flank, separable lean and fat, cooked, braised	ok
+Empanada, fruit	ok
+McDONALD'S, McCHICKEN Sandwich	ok
+Pork, fresh, loin, sirloin (chops), bone-in, separable lean and fat, cooked, braised	ok
+WILD GARLIC PESTO	ok
+Babyfood, vegetables, green beans, strained	ok
+CHOCOLATE CARAMEL SUPER PROTEIN SHAKE WITH NUTRIENTS, CHOCOLATE CARAMEL	-sugaryDrink
+MOGU MOGU, LYCHEE JUICE, LYCHEE	ok
+Hearts Lava Cake Dark Chocolate	ok
+Red rice & quinoa tortilla chips, ancho chile	-wholeGrain
+CINNAMON CHEESECAKE RICH CINNAMON GRAHAM SWIRLS WITH GRAHAM CRACKER CRUST PIECES FOLDED IN CREAMY CHEESECAKE REAL PREMIUM ICE CREAM, CINNAMON CHEESECAKE	ok
+ADVANCED ENERGY RICH CHOCOLATE MEAL REPLACEMENT SHAKE	-dairy -sugaryDrink
+LIME FAT FREE SHERBET	ok
+Mother's Cookies Oatmeal 12.5oz	ok
+Popcorn, ready-to-eat, cheese flavored	ok
+peanut butter powder Rich Chocolate	-candy
+ORGANIC GARLIC & HERB PASTA SAUCE	ok
+MEDITERRANEAN SNACKS, BEAN STALKS, BEAN STALKS, BBQ	-sauced
+READY TO DECORATE CAKE LAYERS	ok
+GARDEN OF LIFE, PERFECT FOOD, CHOCOLATE COVERED GREENS BAR, CHOCOLATE RASPBERRY, CHOCOLATE RASPBERRY	-candy
+BUFFALO-STYLE CHICKEN GRILLED WHITE-MEAT CHICKEN, PROVOLONE CHEESE & BUFFALO SAUCE ON A FLOUR TORTILLA WRAP, BUFFALO-STYLE CHICKEN	ok
+Chicory, witloof, raw	ok
+OREGON CHAI, PEPPERMINT CHAI TEA LATTE	ok
+GLUTINO, MACARONI STYLE ENRICHED PASTA	ok
+EXTRA SHARP WHITE NATURAL CHEDDAR CHEESE	ok
+BORETTANE ONIONS	ok
+Fried fish with sauce, Puerto Rican style	ok
+Smoke Test Cola	ok
+Hard Sour Balls Candy	ok
+SHREDDED BEEF & BEAN BURRITO WITH BEANS, ROASTED GREEN CHILE & CHEESE, BEANS, ROASTED GREEN CHILE & CHEESE	ok
+MEXICAN STYLE BLEND REDUCED MONTEREY JACK, MILD CHEDDAR, ASADERO & QUESO QUESADILLA CHEESES, MEXICAN STYLE BLEND	ok
+Deli Rounds Tortilla Chips	ok
+MULTI GRAIN WITH SEA SALT TORTILLA CHIPS, MULTI GRAIN WITH SEA SALT	ok
+ROASTED GARLIC & HERB BREADED FISH FILLETS, ROASTED GARLIC & HERB	-roasted
+LEMONADE FROM CONCENTRATE, STRAWBERRY	ok
+Finely shredded colby jack cheese, colby jack	ok
+INSTANT PUDDING, CHOCOLATE PEANUT BUTTER, CHOCOLATE PEANUT BUTTER	ok
+TONY PACKO'S, KETCHUP, SWEET HOT, SWEET HOT	ok
+OSHEE Latte Macchiato	ok
+CELEBRATION ICE CREAM DESSERT ROLL	ok
+Sweet Onion Buns	-vegetable
+HONEYCRISP CARAMEL APPLE PREMIUM COLD BREW COFFEE	ok
+Country Ham Pork Side Meat	ok
+Kirkland ks oven browned turkey	ok
+Pureed Baby Food, Beets, Sweet Potatoes, Apples + Cinnamon	ok
+LEMON, LIME, ORANGE, BLUE RASPBERRY, REDBERRY FROZEN ICE POPS, LEMON, LIME, ORANGE, BLUE RASPBERRY, REDBERRY	ok
+Toffee & Almonds In Milk Chocolate	ok
+ICE CREAM SQUARES	ok
+ENTENMANN'S, DANISH TWIST, RASPBERRY	ok
+Cowpeas (blackeyes), immature seeds, cooked, boiled, drained, with salt	-nut
+Baking chocolate, MARS SNACKFOOD US, M&M's Milk Chocolate Mini Baking Bits	ok
+Qua pasa, tortilla chips, purple corn	ok
+RUGGERO'S BAKE SHOP APRICOT DELIGHT, 14 OZS	-fruit
+DELI SLICES MUENSTER	ok
+GUMMI SKULLS & BONES CANDY	ok
+Bagels, cinnamon-raisin, toasted	ok
+Bacon Ranch Broccoli And Carrots	ok
+MINT 80% CACAO DARK CHOCOLATE, MINT	ok
+BACON DRESSING	ok
+POT READY SPAGHETTI, ENRICHED MACARONI PRODUCT	ok
+SHELLED AND UNSALTED PUMPKIN SEEDS, SHELLED AND UNSALTED	ok
+Red & White Rose Potato Salad	ok
+Vegetable curry	ok
+Beef, retail cuts, separable fat, raw	ok
+LITE ITALIAN DRESSING, LITE ITALIAN	ok
+NUTRITION ENERGY BAR, DARK CHOCOLATE	ok
+ITALIAN-STYLE WEDDING WITH MEATBALLS SOUP, ITALIAN-STYLE WEDDING WITH MEATBALLS	ok
+Egg substitute, omelet, scrambled, or fried, with cheese, meat, and vegetables	ok
+TARGET CORPORATION, EDIBLE EASTER GRASS, GREEN APPLE, GREEN APPLE	-fruit +candy
+Spring Egg Rolls	ok
+Creme Chocolat	ok
+Nuts, coconut meat, raw	ok
+Egg omelet or scrambled egg, with cheese, meat, tomatoes, and dark-green vegetables, no added fat	ok
+HEB 96% lean 4% fat Extra Lean Ground Beef	ok
+CARROTS PETITE	ok
+Small mixed melon chunks	ok
+Zero Sugar Peach Tea	ok
+DON WINE GOAT SOAKED IN RED WINE CHEESE	-alcohol
+Lamb, Australian, imported, fresh, leg, sirloin half, boneless, separable lean and fat, trimmed to 1/8" fat, cooked, roasted	ok
+AUNT JEMIMA, BLUEBERRY PANCAKES	ok
+TIRAMISU CAKE, TIRAMISU	ok
+CANDY SHOP CHERRY SLICES, CHERRY	ok
+Seasoning without pepper excellent for chicken	-leanProtein
+Walnut & Cellulose Scrubber Sponge	-nut
+SHELLS & WHITE CHEDDAR MACARONI & CHEESE, SHELLS & WHITE CHEDDAR	ok
+COOKIE BITES, MINT	ok
+Chic Naturals, Dry Roasted Chickpeas, Spicy Barbeque	-sauced
+KEY FOOD, NATURAL SALTED PISTACHIOS	ok
+TOASTED COCONUT COFFEE CREAMER, TOASTED COCONUT	ok
+CREAMY SALSA DRESSING	-vegetable
+Hint of mint suagar cookies	ok
+90% Lean Ground Beef Sirloin	ok
+HARRIS TEETER, WHITE GRAPE PEACH	ok
+Egg omelet or scrambled egg, with cheese, made with cooking spray	ok
+HARD SMOKED PULLED CHICKEN WITH BBQ SAUCE	ok
+Pears, dried, sulfured, stewed, without added sugar	ok
+Mott's Medleys Fruit Flavored Snacks Assorted Fruit 64ct	ok
+Mott's Medleys Fruit Flavored Snacks Assorted Fruit 64ct	ok
+CRISPY COCOA RICE CEREAL, CRISPY COCOA RICE	-fried
+CHEESE SAUCE, CHEDDAR	ok
+PANE & PASTA	ok
+Peanuts, NFS	ok
+KALUA BRAND SHREDDED PORK	ok
+CHOCOLATE MALT FLAVORED GOLD STANDARD 100% WHEY PROTEIN POWDER DRINK MIX, CHOCOLATE	ok
+Cheddar Andouille Smoked Sausage	ok
+MIXED APPLE SLICES, MIXED APPLE	ok
+Cereals ready-to-eat, MALT-O-MEAL, HONEY GRAHAM SQUARES	-snackFood
+DRY ROASTED ALMONDS WITH SEA SALT	ok
+ASSORTED CHOCOLATES MILK	-dairy -sugaryDrink +candy
+GUMBO CREOLE RICE DINNER MIX, GUMBO	ok
+VANILLA ICE CREAM	ok
+KINNIKINNICK FOODS, WAFERS, VANILLA	ok
+Cream of wheat, regular or quick, made with water, fat added	ok
+AdvancePierre Flame Grilled Beef Steak Burger, 3 oz.	ok
+Old fashioned apple cider	ok
+ORIGINAL BAR-B-Q SEASONED ALMONDS, ORIGINAL	-sauced
+Einkorn, grain, dry, raw	ok
+MULLER, GREEK LOWFAT YOGURT, STRAWBERRY, STRAWBERRY	ok
+BLACKBERRY TEA & SAGE FRUIT SPREAD	ok
+BOB'S RED MILL, FAVA BEANS	ok
+CASHEW COOKIE DOUGH ENERGIZING SNACK BAR	ok
+40% MILKFAT HEAVY CREAM	ok
+PINEAPPLE SLICES IN HEAVY SYRUP	ok
+Meat with gravy, NS as to type of meat,	ok
+Mini Flour Tortillas	ok
+Popcorn, ready-to-eat, low sodium	ok
+Bagels, plain, enriched, with calcium propionate (includes onion, poppy, sesame), toasted	-vegetable
+Soup, chicken rice, canned, chunky, ready-to-serve	ok
+ARTISAN BISTRO, SPICED CHICKEN MOROCCO INSPIRED ENTREE	ok
+Potatoes, russet, without skin, raw	ok
+STRAWBERRY FLAVORED ZERO SUGAR SPORTS DRINK, STRAWBERRY	ok
+THAI BANGKOK VEGETABLES	ok
+Cabbage, green, raw	ok
+Cabbage, green, raw	ok
+Apple + Coconut Fruit Bar	ok
+TYSON, TRIMMED & READY, BONELESS SKINLESS CHICKEN BREASTS	ok
+PINEAPPLE FLAVORED ORIGINAL GREEK NONFAT YOGURT, PINEAPPLE	ok
+BERRY CREME FLAVORED CHOCOLATE SANDWICH COOKIES, BERRY CREME	ok
+3 CHEESE MACARONI AND CHEESE, 3 CHEESE	ok
+Pie, cherry, prepared from recipe	ok
+FOUR CHEESE FILLED WITH RICOTTA, ASIAGO, PARMESAN & ROMANO CHEESE TORTELLINI, FOUR CHEESE	ok
+Premium shredded white chicken in buffalo style sauce	ok
+HAWAIIAN SPECIAL RECIPE BREAD	ok
