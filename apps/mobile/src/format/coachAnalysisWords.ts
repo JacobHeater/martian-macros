@@ -1,6 +1,6 @@
-/** The fixed words of "What your data says" on the Coach tab (MM-610). */
+/** The fixed words of "Coach’s feedback" on the Coach tab (MM-610; named by the owner, MM-620). */
 export const coachAnalysisWords = {
-  title: 'What your data says',
+  title: 'Coach’s feedback',
   /** The switcher's row, and what a screen reader hears for its choices, as the Dashboard's own. */
   spanName: 'Days shown',
   /** Nothing logged at all yet. */

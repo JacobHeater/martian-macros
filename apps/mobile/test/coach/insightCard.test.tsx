@@ -248,7 +248,7 @@ describe('on the dashboard', () => {
     expect(card()).toBeNull();
     expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([{ findingId: 'proteinMinimum:level', dismissedOn: today }]);
     await openTab('Coach');
-    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     await userEvent.click(await section.findByRole('button', { name: '2w' }));
     await userEvent.click(await section.findByRole('button', { name: '1 finding hidden' }));
     expect(section.getByText(`shows again ${Fmt.shortDay(today.addDays(28))}`)).toBeInTheDocument();
@@ -259,7 +259,7 @@ describe('on the dashboard', () => {
     renderApp(repos, today);
     await screen.findByRole('heading', { name: /^Protein minimum met on 0 of 14 days/ });
     await openTab('Coach');
-    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     await userEvent.click(await section.findByRole('button', { name: '2w' }));
     await userEvent.click(await section.findByRole('button', { name: 'Dismiss: Protein minimum met on 0 of 14 days' }));
     await openTab('Dashboard');
@@ -271,7 +271,7 @@ describe('on the dashboard', () => {
     const repos = await shortOnProtein();
     renderApp(repos, today);
     await userEvent.click(await screen.findByRole('button', { name: /^Open on Coach: Protein minimum met on 0 of 14 days/ }));
-    const section = within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+    const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     expect(await section.findByRole('heading', { name: 'Protein minimum met on 0 of 14 days' })).toBeInTheDocument();
   });
 

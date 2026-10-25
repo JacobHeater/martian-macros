@@ -15,7 +15,7 @@ import { coachBannedWords } from '../support/coachBannedWords';
 import { renderApp } from '../support/renderApp';
 
 /**
- * MM-610: "What your data says" on the Coach tab, from the app's own cells:
+ * MM-610: "Coach’s feedback" (MM-620) on the Coach tab, from the app's own cells:
  * under the one thing to do and above the targets, opening on today, with
  * the spans the data supports, the lists, the numbers behind each finding,
  * the hidden ones, and the areas a span cannot judge.
@@ -36,7 +36,7 @@ async function onCoach(scenario: StoryScenario, then?: (repos: InMemoryRepositor
 /** MM-617's headline for the fat week over 2w: the top fix, and the food that did it. */
 const headline = /^Fat averaged 90 g against 70 g\. (Peanut butter did it|That was peanut butter|Peanut butter put you there)\.$/;
 
-const section = async () => within(await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 }));
+const section = async () => within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
 
 async function choose(label: string) {
   const s = await section();
@@ -59,17 +59,18 @@ describe("the owner's fat week on the tab", () => {
 
   it('sits under the one thing to do and above "Your targets"', async () => {
     await onCoach(analysisFatWeekScenario());
-    const region = await screen.findByRole('region', { name: 'What your data says' }, { timeout: 5000 });
+    const region = await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 });
     const targets = screen.getByRole('region', { name: 'Your targets' });
     expect(region.compareDocumentPosition(targets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
 
 describe('opens on today', () => {
-  it('a person whose first entry was this morning sees 1d for today, and no switcher', async () => {
+  it('a person whose first entry was this morning sees 1d for today, no switcher, and what opens 7d (MM-620)', async () => {
     await onCoach(firstMorningScenario);
     const s = await section();
     expect(await s.findByText('Today so far')).toBeInTheDocument();
+    expect(s.getByText('7d opens a week after your first entry · 7 days to go')).toBeInTheDocument();
     expect(s.queryByRole('group', { name: 'Days shown' })).not.toBeInTheDocument();
     expect(s.queryByRole('button', { name: '7d' })).not.toBeInTheDocument();
   });
@@ -92,6 +93,7 @@ describe('spans appear with data', () => {
     expect(s.getByRole('button', { name: '2w' })).toBeInTheDocument();
     expect(s.queryByRole('button', { name: '1m' })).not.toBeInTheDocument();
     expect(s.queryByRole('button', { name: '3m' })).not.toBeInTheDocument();
+    expect(s.queryByText(/^7d opens/)).not.toBeInTheDocument();
   });
 });
 
@@ -194,7 +196,7 @@ describe('safeguards', () => {
     const s = await section();
     await s.findByText('Worth changing');
     for (const numbers of s.getAllByRole('button', { name: /^The numbers behind this: / })) await userEvent.click(numbers);
-    const region = screen.getByRole('region', { name: 'What your data says' });
+    const region = screen.getByRole('region', { name: 'Coach’s feedback' });
     expect(region.textContent).not.toMatch(/\d\s?(kg|lb)\b/);
   });
 
@@ -260,7 +262,7 @@ describe('words', () => {
     await choose('2w');
     const s = await section();
     await s.findByText('Worth changing');
-    const text = screen.getByRole('region', { name: 'What your data says' }).textContent ?? '';
+    const text = screen.getByRole('region', { name: 'Coach’s feedback' }).textContent ?? '';
     // The coach's list (MM-617): verdicts on choices are its voice; profanity and words about the person never are.
     expect(coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name)).toEqual([]);
   });

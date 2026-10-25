@@ -20,14 +20,14 @@ The coaching panel proposed the layout and the sentence rules.
 By the product owner, 2026-10-24: everything, ranked; factual voice.
 
 Choices made without asking (from the coaching panel; say if any is wrong):
-- **Position:** one section, "What your data says", directly under "One thing to do" and above "Your targets". The safeguards
+- **Position:** one section, "What your data says" (renamed "Coach's feedback" by MM-620), directly under "One thing to do" and above "Your targets". The safeguards
   (pause, under-eating, training lapse, relief offer) stay above it and outrank it. While the under-eating finding holds, the
   section opens by pointing to that notice.
 - **The span switcher (the owner's design, 2026-10-24):**
   - The analysis opens on **1d** (today, MM-612), with an `MmSegmented` switcher `1d | 7d | 2w | 1m | 3m` like Progress's 30d and
     90d.
   - A span appears in the switcher only when the data supports it: the days since the first entry reach the span, and its days
-    meet MM-605's coverage rule (≥ 60% eligible). The switcher itself appears only when 7d does.
+    meet MM-605's coverage rule (≥ 60% eligible). The switcher itself appears only when 7d does (MM-620: once any span past 1d does).
   - The tab opens on 1d each time.
   - 7d to 3m run MM-605's detectors over that span, through yesterday. A change inside the span is dated ("since 12 Oct").
 - **Layout, top to bottom:**
