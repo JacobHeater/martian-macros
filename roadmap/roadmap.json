@@ -2954,7 +2954,8 @@
         ],
         "remaining": [
           "MM-145",
-          "MM-617"
+          "MM-617",
+          "MM-618"
         ]
       },
       "sequence": [
@@ -3114,6 +3115,13 @@
             "MM-610",
             "MM-612",
             "MM-617"
+          ]
+        },
+        {
+          "step": 17,
+          "title": "Spike: a small on-device model phrases the coach, permissive licenses only (the owner, 2026-10-24, MM-618)",
+          "tickets": [
+            "MM-618"
           ]
         }
       ],
