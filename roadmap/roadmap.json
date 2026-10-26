@@ -2622,6 +2622,10 @@
           "MM-594",
           "MM-595",
           "MM-596",
+          "MM-623",
+          "MM-624",
+          "MM-625",
+          "MM-626",
           "MM-588",
           "MM-592",
           "MM-593"
@@ -2849,6 +2853,16 @@
           "title": "Mark a day as a Refeed or a Day off, on record, so the coach does not judge it alone (the owner, 2026-10-24, MM-611)",
           "tickets": [
             "MM-611"
+          ]
+        },
+        {
+          "step": 18,
+          "title": "Logging that keeps what it reuses and says when it fails: a re-logged food keeps its nutrients and its food (MM-623), a save said and pressed once, food and fat together (MM-624), meal writes all or nothing (MM-625), a meal's time settable (MM-626); found in the food-logging review, 2026-10-26",
+          "tickets": [
+            "MM-623",
+            "MM-624",
+            "MM-625",
+            "MM-626"
           ]
         }
       ],
