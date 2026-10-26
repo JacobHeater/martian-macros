@@ -14,9 +14,10 @@ import { renderApp } from '../support/renderApp';
 
 /**
  * MM-626: a food's time eaten "can be changed, never cleared" (MM-570), but
- * the foods of a logged meal open only in View meal, which has no time, and
- * moving the meal to another day clears it (MM-587) with no way to give it
- * again. Skipped until MM-626 is fixed: it fails on main at f5a08b4.
+ * the foods of a logged meal open only in View meal, which had no time, and
+ * moving the meal to another day cleared it (MM-587) with no way to give it
+ * again. The owner decided on 2026-10-26 that a day move keeps the time.
+ * Both cases failed on main at f5a08b4.
  */
 const today = CalendarDate.of(2026, 10, 22);
 let repos: InMemoryRepositories;
@@ -33,7 +34,7 @@ beforeEach(async () => {
   }
 });
 
-it.skip('MM-626: a logged meal’s time is changed in View meal, for every food of it', async () => {
+it('MM-626: a logged meal’s time is changed in View meal, for every food of it', async () => {
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'View Chicken and rice' }));
@@ -43,4 +44,13 @@ it.skip('MM-626: a logged meal’s time is changed in View meal, for every food 
   await turnClock(clock, clockTurnOf('18:30'));
   await userEvent.click(within(clock).getByRole('button', { name: 'OK' }));
   await expect.poll(async () => (await first(repos.food.watchFood(today))).map((f) => f.eatenAt)).toEqual([18 * 60 + 30, 18 * 60 + 30, 18 * 60 + 30]);
+});
+
+it('MM-626: a logged meal moved to another day keeps its time eaten', async () => {
+  renderApp(repos, today);
+  await openTab('Food');
+  await userEvent.click(await screen.findByRole('button', { name: 'View Chicken and rice' }));
+  const sheet = await screen.findByRole('dialog', { name: 'View meal' });
+  await userEvent.click(within(sheet).getByRole('button', { name: /^Previous day/ }));
+  await expect.poll(async () => (await first(repos.food.watchFood(today.addDays(-1)))).map((f) => f.eatenAt)).toEqual([19 * 60, 19 * 60, 19 * 60]);
 });

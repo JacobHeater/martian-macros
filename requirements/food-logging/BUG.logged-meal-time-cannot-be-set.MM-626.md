@@ -1,6 +1,6 @@
 ---
 id: MM-626
-status: proposed
+status: done
 component: food-logging
 related: [MM-570, MM-587, MM-594]
 ---
@@ -46,4 +46,7 @@ eaten, for both alike. This supersedes MM-587's clearing of a meal's time on a d
 makes the time settable and keeps it on a move.
 
 ## Notes
-- Regression test (skipped with this ID until fixed): `apps/mobile/test/food/loggedMealTime.test.tsx`.
+- Fixed 2026-10-26: View meal has a "Time eaten" row (`TimeEatenRow`, the food editor's) under the meal
+  chips, written to every food in one step (MM-625's batch); a day move keeps the time. MM-587's
+  decision is amended to say so.
+- Regression tests: `apps/mobile/test/food/loggedMealTime.test.tsx`.

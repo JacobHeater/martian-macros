@@ -119,7 +119,7 @@ and WS-09 steps 1 and 8.
 14. **A recipe ingredient keeps the food it came from (MM-456).** M4. Done 2026-10-21: schema 20 adds the source food to `recipe_ingredients`, so a found line's weight changes in place from the food as installed.
 15. **AI meal analysis (MM-586, MM-587, MM-588).** The owner, 2026-10-22. Inside Estimate: a fixed prompt for the person's own assistant, its JSON answer pasted back as one meal of several foods, each saying where its numbers came from; the meal as one row that opens to its foods. Schema 26 tags each food with its meal and its source. Then the slot is named `MealSlot` in code (MM-588), alone, once both are merged.
 16. **No arrow to nowhere (MM-592).** The owner, 2026-10-22: the day stepper draws no next-day arrow on today, keeping its room.
-18. **Logging that keeps what it reuses and says when it fails (MM-623 to MM-626).** Bugs from the food-logging review of 2026-10-26 (`docs/food-logging-plan.md`), each with a regression test skipped under its ID. The prerequisite for the plan's meal-oriented logging; MM-624's food-plus-fat write and MM-625 share one all-or-nothing writer.
+18. **Logging that keeps what it reuses and says when it fails (MM-623 to MM-626).** Bugs from the food-logging review of 2026-10-26 (`docs/food-logging-plan.md`), each with its regression test; all four fixed the same day. The prerequisite for the plan's meal-oriented logging; MM-624's food-plus-fat write and MM-625 share one all-or-nothing writer.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -163,7 +163,7 @@ workstream's.
 - Added 2026-10-21 (step 12): MM-471 (cancelling a pack download on the phone never settled it, done).
 - Added 2026-10-19 (step 13): MM-406 (the camera on iOS).
 - Added 2026-10-24 (step 17): MM-611 (mark a day as a Refeed or a Day off).
-- Added 2026-10-26 (step 18, the food-logging review): MM-623 (a recent food logged again loses its nutrients and its food), MM-624 (a save that fails says nothing; pressed twice it logs twice; the fat can be lost), MM-625 (meal writes can leave part of a meal), MM-626 (a logged meal's time cannot be changed), all proposed.
+- Added 2026-10-26 (step 18, the food-logging review): MM-623 (a recent food logged again loses its nutrients and its food; fixed the same day), MM-624 (a save that fails says nothing; pressed twice it logs twice; the fat can be lost; fixed the same day), MM-625 (meal writes can leave part of a meal, and a deleted meal went row by row; fixed the same day with one all-or-nothing batch), MM-626 (a logged meal's time cannot be changed; fixed the same day, and a day move keeps the time).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

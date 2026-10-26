@@ -7,6 +7,11 @@ ticketed (MM-623 to MM-626), each with a regression test skipped under its
 ID, as `AGENTS.md` requires. Everything else here is a finding or a
 proposal, and no feature ticket has been allocated for it yet.
 
+**Since then (2026-10-26):** MM-623 to MM-626 were fixed, and W-A below is
+built. The food log gained one all-or-nothing batch write
+(`FoodEntryBatchWriter`), so a deleted meal now goes in one redraw rather
+than row by row.
+
 How the evidence was gathered, and what it does not cover, is in
 [Coverage and limits](#coverage-and-limits). In short, it rests on source
 inspection plus a bounded panel. Nothing ran locally (CI validates), and no

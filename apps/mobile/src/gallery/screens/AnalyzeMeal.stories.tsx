@@ -322,6 +322,19 @@ export const ViewMealChangeRefused = screenStory({
   },
 });
 
+/** MM-624: a change to a logged meal that could not be saved: said above its foods, the meal as it was. */
+export const ViewMealChangeFailed = screenStory({
+  covers: ['ViewMealSheet'],
+  shows: /^That change could not be saved/,
+  scenario: loggedMealScenario,
+  stores: failingWrite('food', 'applyFoodChanges'),
+  open: ({ overlays, today }) => void showViewMealSheet(overlays, today, storyMealKey),
+  walk: async (canvas) => {
+    const viewMeal = within(await sheet(canvas).findByRole('dialog', { name: 'View meal' }, { timeout: 10000 }));
+    await userEvent.click(await viewMeal.findByRole('button', { name: 'Lunch' }));
+  },
+});
+
 /** MM-587: a food being added to a logged meal. */
 export const ViewMealAddFood = screenStory({
   covers: ['ViewMealSheet'],

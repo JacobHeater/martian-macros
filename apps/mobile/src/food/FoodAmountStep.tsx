@@ -145,6 +145,8 @@ export function FoodAmountStep({
   // Logged for today, it starts at now; for another day, it has no time until one is given (MM-570).
   const [eatenAt, setEatenAt] = useState<number | undefined>(() => eatenAtWhenLogged(day, services.clock));
   const [oil, setOil] = useState<CookingFat>('none');
+  /** Whether the last "Log it" failed: said above it, the step kept to try again (MM-624). */
+  const [logFailed, setLogFailed] = useState(false);
   /** The fat chosen here, once chosen; until then the person's usual (MM-152). */
   const [fatChosen, setFatChosen] = useState<CookingFatKind | undefined>(undefined);
   const fat = fatChosen ?? usualFat;
@@ -207,58 +209,62 @@ export function FoodAmountStep({
 
   const log = async () => {
     if (totals === undefined) return;
-    await services.food.addFood(
-      new FoodEntry({
-        id: 0,
-        date: day,
-        meal,
-        name: food.brand === undefined ? food.name : `${food.name} (${food.brand})`,
-        kcal: totals.kcal,
-        proteinG: totals.proteinG,
-        carbsG: totals.carbsG,
-        fatG: totals.fatG,
-        source: method(),
-        fiberG: extra(food.fiberG),
-        sugarAlcoholsG: extra(food.sugarAlcoholsG),
-        sodiumMg: extra(food.sodiumMg),
-        alcoholG: extra(food.alcoholG),
-        micros: grams === undefined ? undefined : microsOfPackFood(food).times(grams / 100),
-        portion: {
-          method: method(),
-          basis: 'calculated',
-          quantity: amount,
-          unit: choice.unit,
-          reference,
-          impliedGrams: isHand ? grams : undefined,
-          handModelVersion: isHand ? HandModel.version : undefined,
-          origin: { packId: food.packId, foodId: food.id, source: food.source, sourceId: food.sourceId },
-          preparation: custom === undefined ? preparationOf(food) : undefined,
-          conversion: conversionFor(choice.unit, reference, { hand }),
-        },
-        eatenAt,
-      }),
-    );
-    const oilTotals = CookingFat.totals(oil, fat);
-    if (oilTotals !== undefined && offersOil) {
-      // The fat chosen becomes the usual, so it is one tap next time (MM-152).
-      if (fat !== usualFat) await services.preferences.saveUsualCookingFat(fat);
-      await services.food.addFood(
-        new FoodEntry({
-          id: 0,
-          date: day,
-          meal,
-          name: cookingFatEntryName(fat),
-          kcal: oilTotals.kcal,
-          proteinG: oilTotals.proteinG,
-          carbsG: oilTotals.carbsG,
-          fatG: oilTotals.fatG,
-          source: 'householdMeasure',
-          portion: { method: 'householdMeasure', basis: 'enteredTotals', quantity: 1, unit: CookingFat.unit(oil) },
-          // The fat it was cooked in was eaten with it.
-          eatenAt,
-        }),
-      );
+    const logged = new FoodEntry({
+      id: 0,
+      date: day,
+      meal,
+      name: food.brand === undefined ? food.name : `${food.name} (${food.brand})`,
+      kcal: totals.kcal,
+      proteinG: totals.proteinG,
+      carbsG: totals.carbsG,
+      fatG: totals.fatG,
+      source: method(),
+      fiberG: extra(food.fiberG),
+      sugarAlcoholsG: extra(food.sugarAlcoholsG),
+      sodiumMg: extra(food.sodiumMg),
+      alcoholG: extra(food.alcoholG),
+      micros: grams === undefined ? undefined : microsOfPackFood(food).times(grams / 100),
+      portion: {
+        method: method(),
+        basis: 'calculated',
+        quantity: amount,
+        unit: choice.unit,
+        reference,
+        impliedGrams: isHand ? grams : undefined,
+        handModelVersion: isHand ? HandModel.version : undefined,
+        origin: { packId: food.packId, foodId: food.id, source: food.source, sourceId: food.sourceId },
+        preparation: custom === undefined ? preparationOf(food) : undefined,
+        conversion: conversionFor(choice.unit, reference, { hand }),
+      },
+      eatenAt,
+    });
+    // The fat, as the line above the action says it (`oilTotals` below), its own entry.
+    const cookedIn =
+      oilTotals === undefined
+        ? undefined
+        : new FoodEntry({
+            id: 0,
+            date: day,
+            meal,
+            name: cookingFatEntryName(fat),
+            kcal: oilTotals.kcal,
+            proteinG: oilTotals.proteinG,
+            carbsG: oilTotals.carbsG,
+            fatG: oilTotals.fatG,
+            source: 'householdMeasure',
+            portion: { method: 'householdMeasure', basis: 'enteredTotals', quantity: 1, unit: CookingFat.unit(oil) },
+            // The fat it was cooked in was eaten with it.
+            eatenAt,
+          });
+    // The food and its fat are logged together or not at all, and a failure is said, never swallowed (MM-624).
+    try {
+      await services.food.applyFoodChanges({ add: cookedIn === undefined ? [logged] : [logged, cookedIn] });
+    } catch {
+      setLogFailed(true);
+      return;
     }
+    // The fat chosen becomes the usual, so it is one tap next time (MM-152); one not remembered costs nothing logged.
+    if (cookedIn !== undefined && fat !== usualFat) await services.preferences.saveUsualCookingFat(fat).catch(() => undefined);
     onDone();
   };
 
@@ -405,7 +411,8 @@ export function FoodAmountStep({
         </>
       )}
       <div className="app-gap" />
-      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => void log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
+      {logFailed ? <Notice icon="warning" text="The food could not be logged, so nothing was. Press Log it to try again." /> : null}
+      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
       {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}
       <MmButton label="Back to search" kind="text" onPress={onBack} />
     </div>

@@ -409,6 +409,56 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       });
     });
 
+    it('MM-625: a batch adds, updates and deletes in one step, and gives the new ids in order', async () => {
+      const keep = await repo.addFood(entry(d1, 'Oats'));
+      const gone = await repo.addFood(entry(d1, 'Toast'));
+      const [oatsBefore] = await first(repo.watchFood(d1));
+      const ids = await repo.applyFoodChanges({
+        add: [entry(d1, 'Eggs'), entry(d2, 'Rice')],
+        update: [(oatsBefore as FoodEntry).copyWith({ name: 'Porridge', meal: 'breakfast' })],
+        delete: [gone],
+      });
+      expect(ids).toHaveLength(2);
+      expect(ids[0]).toBeGreaterThan(gone);
+      expect(ids[1]).toBeGreaterThan(ids[0] as number);
+      expect((await first(repo.watchFood(d1))).map((e) => [e.id, e.name, e.meal])).toEqual([
+        [keep, 'Porridge', 'breakfast'],
+        [ids[0], 'Eggs', 'lunch'],
+      ]);
+      expect((await first(repo.watchFood(d2))).map((e) => e.name)).toEqual(['Rice']);
+      expect(await repo.applyFoodChanges({})).toEqual([]);
+    });
+
+    it('MM-625: a batch that names a food no longer in the log changes nothing', async () => {
+      const id = await repo.addFood(entry(d1, 'Oats'));
+      const [oats] = await first(repo.watchFood(d1));
+      await expect(
+        repo.applyFoodChanges({ add: [entry(d1, 'Eggs')], update: [(oats as FoodEntry).copyWith({ name: 'Porridge' })], delete: [id + 100] }),
+      ).rejects.toThrow();
+      await expect(repo.applyFoodChanges({ update: [(oats as FoodEntry).copyWith({ id: id + 100 })] })).rejects.toThrow();
+      expect((await first(repo.watchFood(d1))).map((e) => e.name)).toEqual(['Oats']);
+    });
+
+    it('MM-625: a watcher sees a batch whole, never part of it', async () => {
+      const ids = [await repo.addFood(entry(d1, 'A')), await repo.addFood(entry(d1, 'B')), await repo.addFood(entry(d1, 'C'))];
+      const seen: number[] = [];
+      let arrived: () => void = () => {};
+      const firstValue = new Promise<void>((resolve) => {
+        arrived = resolve;
+      });
+      const stop = repo.watchFood(d1).subscribe((list) => {
+        seen.push(list.length);
+        arrived();
+      });
+      await firstValue;
+      await repo.applyFoodChanges({ delete: ids });
+      for (let i = 0; i < 100 && seen[seen.length - 1] !== 0; i++) await new Promise((resolve) => setTimeout(resolve, 0));
+      stop();
+      expect(seen[0]).toBe(3);
+      expect(seen[seen.length - 1]).toBe(0);
+      expect(seen.filter((n) => n === 1 || n === 2)).toEqual([]);
+    });
+
     it('MM-570: the time eaten is kept, changed by an update, and unknown stays unknown', async () => {
       const timed = (id: number, eatenAt: number | undefined) =>
         new FoodEntry({ id, date: d1, meal: 'lunch', name: 'Soup', kcal: 300, proteinG: 10, carbsG: 30, fatG: 8, source: 'weighed', eatenAt });
