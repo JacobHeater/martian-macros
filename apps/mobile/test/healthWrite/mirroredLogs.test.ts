@@ -109,6 +109,24 @@ describe('food (MM-70)', () => {
     expect(platform.nutrition.size).toBe(0);
   });
 
+  it('MM-625: a batch is mirrored, each food added, changed or removed, after the log has changed', async () => {
+    const { platform, food } = setUp(true);
+    const gone = await food.addFood(lunch(510));
+    const kept = await food.addFood(lunch(300));
+    const [added] = await food.applyFoodChanges({ add: [lunch(200)], update: [lunch(350, kept)], delete: [gone] });
+    await expect.poll(() => [...platform.nutrition.keys()].sort()).toEqual([`martian-macros-food-ns1-${added}`, `martian-macros-food-ns1-${kept}`].sort());
+    expect(platform.nutrition.get(`martian-macros-food-ns1-${kept}`)?.kcal).toBe(350);
+  });
+
+  it('MM-625: a batch never waits for the platform: the log has changed before it answers', async () => {
+    const repos = new InMemoryRepositories();
+    const slow = writingOn();
+    slow.writeNutrition = () => new Promise<boolean>(() => undefined);
+    const food = new MirroredFoodLog({ log: repos.food, platform: slow });
+    await food.applyFoodChanges({ add: [lunch(510), lunch(300)] });
+    expect((await first(repos.food.watchFood(today))).map((entry) => entry.kcal)).toEqual([510, 300]);
+  });
+
   it('while writing food is off, logging works as before and nothing is written', async () => {
     const { platform, repos, food } = setUp(false);
     await food.addFood(lunch(510));

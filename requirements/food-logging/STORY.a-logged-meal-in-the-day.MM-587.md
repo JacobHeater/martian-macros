@@ -31,8 +31,9 @@ Choices I made without asking (say if any is wrong):
 - **Swiping the meal's row away deletes the meal**, as swiping a food deletes the food.
 - **Copying a slot to today (MM-47) copies its meals as meals**, each under a new key, so the copy and the
   original are separate.
-- **Moving a meal to another day** uses the day stepper of the add-food sheet; the time eaten is kept only
-  when the day does not change (MM-570).
+- **Moving a meal to another day** uses the day stepper of the add-food sheet, and keeps its time eaten, as a
+  food's move does (MM-570). Superseded on 2026-10-26 by the owner (MM-626): it was cleared on a day move,
+  and View meal had no time to give it again; View meal now has the "Time eaten" row.
 
 ## Description
 The day's slot groups the entries that carry the same meal key into one row. View meal is a sheet over the

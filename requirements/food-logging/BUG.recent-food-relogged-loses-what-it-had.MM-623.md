@@ -1,6 +1,6 @@
 ---
 id: MM-623
-status: proposed
+status: done
 component: food-logging
 related: [MM-39, MM-167, MM-308, MM-309, MM-396, MM-595, MM-596]
 ---
@@ -64,5 +64,10 @@ Choices made without asking (say if any is wrong):
   label serving as `filledFrom` makes it today (MM-596), is left to the owner; this bug does not change it.
 
 ## Notes
-- Regression tests (skipped with this ID until fixed): `apps/mobile/test/food/relogKeepsWhatItReuses.test.tsx`.
+- Fixed 2026-10-26: `AddFoodSheet` keeps the food being logged again as a template (`template`), apart
+  from the entry being edited; extras, micronutrients, alcohol, origin and preparation scale from
+  whichever of the two there is. `filledFrom` brings a calculated food back on its own reference, as
+  `editing` does. Going back to the choices, or entering a food by hand, lets the template go.
+- Regression tests: `apps/mobile/test/food/relogKeepsWhatItReuses.test.tsx` (label serving, weighed pack
+  food, a food of an analysed meal).
 - Not covered by `recentFoodsAreRows.test.tsx` (name only) or `searchTheLog.test.tsx` (kcal and serving only).

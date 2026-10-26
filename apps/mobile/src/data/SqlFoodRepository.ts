@@ -79,6 +79,27 @@ export class SqlFoodRepository implements FoodRepository {
     return this.db.write(['food_entries'], (db) => db.execute('DELETE FROM food_entries WHERE id = ?', [id]));
   }
 
+  applyFoodChanges(changes: {
+    readonly add?: readonly FoodEntry[];
+    readonly update?: readonly FoodEntry[];
+    readonly delete?: readonly number[];
+  }): Promise<number[]> {
+    const { add = [], update: updates = [], delete: deletes = [] } = changes;
+    // One transaction and one notice to the watchers (MM-625): a meal goes, comes back or moves whole.
+    return this.db.write(['food_entries'], async (db) => {
+      const touched = [...new Set([...updates.map((entry) => entry.id), ...deletes])];
+      if (touched.length > 0) {
+        const found = await db.select(`SELECT id FROM food_entries WHERE id IN (${touched.map(() => '?').join(', ')})`, touched);
+        if (found.length !== touched.length) throw new Error('A food to change is no longer in the log.');
+      }
+      const ids: number[] = [];
+      for (const entry of add) ids.push(await insert(db, 'food_entries', valuesOf(entry)));
+      for (const entry of updates) await update(db, 'food_entries', valuesOf(entry), { column: 'id', value: entry.id });
+      for (const id of deletes) await db.execute('DELETE FROM food_entries WHERE id = ?', [id]);
+      return ids;
+    });
+  }
+
   async lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
     if (foodIds.length === 0) return undefined;
     const rows = await this.db.read((db) =>

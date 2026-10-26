@@ -13,6 +13,7 @@ import { WaterEntry } from '../../domain/water/WaterEntry';
 import { WaterUnits } from '../../domain/water/WaterUnits';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
+import { failingWrite } from './failingWrite';
 import { firstDayScenario } from './firstDayScenario';
 import { onTargetScenario } from './onTargetScenario';
 import { runningTotalScenario } from './runningTotalScenario';
@@ -1551,4 +1552,53 @@ export const HeroUsualDayWaiting = screenStory({
   shows: 'Your usual day appears after 7 days with meal times · 2 of 7',
   scenario: runningTotalScenario({ usualDays: 2 }),
   open: yesterdaysFood,
+});
+
+/** MM-624: a typed food that could not be logged: said above Log it, the form kept to try again. */
+export const AddFoodLogFailed = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^The food could not be logged/,
+  stores: failingWrite('food', 'addFood'),
+  open: addFood,
+  walk: async (canvas) => {
+    await press('Enter manually')(canvas);
+    const sheet = within(canvas);
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Food name' }), 'Granola');
+    await userEvent.type(sheet.getByRole('textbox', { name: 'Protein g' }), '10');
+    await userEvent.type(sheet.getByRole('textbox', { name: /^Calories/ }), '200');
+    await press('Log it')(canvas);
+  },
+});
+
+/** MM-624: a change to a logged food that could not be saved: said above Save changes, the food as it was. */
+export const EditFoodSaveFailed = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^The change could not be saved/,
+  stores: failingWrite('food', 'updateFood'),
+  open: async ({ services, overlays, today }) => {
+    const [entry] = await valueOf(services.food.watchFood(today));
+    if (entry !== undefined) void showAddFoodSheet(overlays, today, { entry });
+  },
+  walk: press('Save changes'),
+});
+
+/** MM-624: a found food that could not be logged: said above Log it, nothing logged, its fat neither. */
+export const AddFoodAmountLogFailed = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^The food could not be logged/,
+  stores: failingWrite('food', 'applyFoodChanges'),
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'chicken breast, cooked' }),
+  walk: async (canvas) => {
+    await press(/^Chicken breast, cooked/)(canvas);
+    await press('Log it')(canvas);
+  },
+});
+
+/** MM-624: an estimate that could not be logged: said above its action. */
+export const AddFoodEstimateLogFailed = screenStory({
+  covers: ['EstimateMealStep'],
+  shows: /^The estimate could not be logged/,
+  stores: failingWrite('food', 'addFood'),
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { estimateSize: 'regular' }),
+  walk: press('Log the estimate'),
 });
