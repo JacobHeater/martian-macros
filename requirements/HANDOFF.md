@@ -47,7 +47,12 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   meals under the completeness row; the header keeps the chip. MM-656 (the soda still had no grade after MM-654:
   neither fiber nor sugars stated): an unstated fiber is counted as none, said so; only sodium is required now.
   MM-657: the edit sheet says where an entry's numbers came from. MM-658: the fluid ounce is offered under
-  "Cup / spoon" for every food (the owner's soda, in fluid ounces, had no such chip when edited). **Lesson, the owner's (2026-10-27):** a fix
+  "Cup / spoon" for every food (the owner's soda, in fluid ounces, had no such chip when edited). MM-659 (the
+  owner): the edit sheet shows the entry's grade under its name, following the numbers on the sheet. **Owner's
+  question, 2026-10-27:** General Tso chicken (FNDDS) grades C by the method, as Nutri-Score would; the per-calorie
+  framing and the 3 kcal/g start of the energy-density scale let a fried, sauced dish sit mid-table on its
+  protein. Whether that is the grade the owner wants is open: the levers are the energy-density scale's start
+  (`FoodGradeRule.kcalPerGram`) and the sugars and sodium scales. **Lesson, the owner's (2026-10-27):** a fix
   proven only on a hand-built entry passed CI and failed on the phone; `test/food/drinkGradeOnThePhone.test.tsx`
   is the shape every such fix needs: the real screens, the real database, a reopen and an edit.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
