@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { convertedQuantity } from '../../src/domain/food/portion/convertedQuantity';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
+import { PortionUnit } from '../../src/domain/food/portion/PortionUnit';
 import type { ReferenceNutrition } from '../../src/domain/food/portion/ReferenceNutrition';
 
 /** MM-628: a unit change keeps the portion when the two units share an exact measure, and only then. */
@@ -13,7 +14,7 @@ const milk: ReferenceNutrition = { ...rice, densityGPerMl: 1.03 };
 
 it('MM-628: weight to weight and volume to volume by their constants, with or without a food', () => {
   expect(convertedQuantity(180, { unit: 'gram' }, { unit: 'ounce' })).toBeCloseTo(6.3493, 4);
-  expect(convertedQuantity(6.349313218580085, { unit: 'ounce' }, { unit: 'gram' })).toBeCloseTo(180, 9);
+  expect(convertedQuantity(180 / PortionUnit.gramsPerOunce, { unit: 'ounce' }, { unit: 'gram' })).toBeCloseTo(180, 9);
   expect(convertedQuantity(2, { unit: 'cup' }, { unit: 'tablespoon' })).toBeCloseTo(32, 9);
 });
 
@@ -37,4 +38,12 @@ it('MM-628: a hand portion never converts, either way', () => {
 it('MM-628: nothing converts from no amount', () => {
   expect(convertedQuantity(0, { unit: 'gram' }, { unit: 'ounce' })).toBeUndefined();
   expect(convertedQuantity(Number.NaN, { unit: 'gram' }, { unit: 'ounce' })).toBeUndefined();
+});
+
+// MM-632: the cup was 236.588236 mL, a digit short, so 16 tablespoons or 8 fl oz were not quite a cup.
+it('MM-632: a cup is exactly 16 tablespoons, 48 teaspoons and 8 fluid ounces', () => {
+  expect(PortionUnit.mlPerCup).toBe(16 * PortionUnit.mlPerTablespoon);
+  expect(PortionUnit.mlPerCup).toBe(48 * PortionUnit.mlPerTeaspoon);
+  expect(PortionUnit.mlPerCup).toBe(8 * PortionUnit.mlPerFluidOunce);
+  expect(convertedQuantity(2, { unit: 'cup' }, { unit: 'tablespoon' })).toBe(32);
 });
