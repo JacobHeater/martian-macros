@@ -47,25 +47,53 @@ describe('the candidate (MM-650)', () => {
 });
 
 describe('the pack (MM-650)', () => {
-  const drinks = () =>
-    new PackBuilder({ policy: new PreferredSourcePolicy('usda_branded') }).build([
-      new CandidateFood({
-        source: 'usda_branded',
-        sourceId: '1105904',
-        kind: 'barcode',
-        name: 'Cola',
-        brand: 'Fizz Co',
-        rawBarcode: cola,
-        kcal: 39,
-        proteinG: 0,
-        carbsG: 10.6,
-        fatG: 0,
-        sodiumMg: 4,
-        basis: 'per100ml',
-        servings: [{ description: '1 Can (355 mL)', milliliters: 355 }],
-        updatedAt: 1_700_000_000,
-      }),
-    ]);
+  const branded = new CandidateFood({
+    source: 'usda_branded',
+    sourceId: '1105904',
+    kind: 'barcode',
+    name: 'Cola',
+    brand: 'Fizz Co',
+    rawBarcode: cola,
+    kcal: 39,
+    proteinG: 0,
+    carbsG: 10.6,
+    fatG: 0,
+    sodiumMg: 4,
+    micros: { sugars: 10.6 },
+    basis: 'per100ml',
+    servings: [{ description: '1 Can (355 mL)', milliliters: 355 }],
+    updatedAt: 1_700_000_000,
+  });
+  const builder = () => new PackBuilder({ policy: new PreferredSourcePolicy('usda_branded') });
+  const drinks = () => builder().build([branded]);
+
+  it('the same barcode in both sources keeps the winner whole: its basis and its servings (the panel\'s IN-5)', async () => {
+    const off = new CandidateFood({
+      source: 'off',
+      sourceId: cola,
+      kind: 'barcode',
+      name: 'Cola',
+      rawBarcode: cola,
+      kcal: 42,
+      proteinG: 0,
+      carbsG: 10.6,
+      fatG: 0,
+      servings: [{ description: '1 cup (240 g)', grams: 240 }],
+      updatedAt: 1_700_000_000,
+    });
+    const { barcode } = await builder().build([branded, off]);
+    expect(barcode).toHaveLength(1);
+    expect(barcode[0]?.food.basis).toBe('per100ml');
+    expect(barcode[0]?.servings).toEqual([{ description: '1 Can (355 mL)', milliliters: 355 }]);
+  });
+
+  it('a syrup stated per 100 mL keeps sugars above 100 g (the panel\'s IN-6)', async () => {
+    const syrup = new CandidateFood({ ...branded, sourceId: '2', rawBarcode: undefined, kind: 'generic', name: 'Corn syrup', kcal: 420, carbsG: 108, micros: { sugars: 106 } });
+    const { generic } = await builder().build([syrup]);
+    expect(generic[0]?.food.micros.sugars).toBe(106);
+    const solid = new CandidateFood({ ...syrup, basis: 'per100g', carbsG: 99, kcal: 396, micros: { sugars: 101 } });
+    expect((await builder().build([solid])).generic[0]?.food.micros.sugars).toBeUndefined();
+  });
 
   it('format 5 carries the basis and a serving in millilitres', async () => {
     expect(FoodPackFormat.version).toBe(5);
@@ -116,10 +144,11 @@ describe('the extract (MM-650)', () => {
     expect(sql).toMatch(/IN \('ml', 'mlt'\) THEN 'ml' ELSE 'g' END AS basis/);
   });
 
-  it('Open Food Facts: a serving text stating millilitres makes the serving a volume and the product per 100 mL', () => {
-    const matches = sql.match(/regexp_matches\(serving_size, '\[0-9\]\\s\*ml\\b', 'i'\)/g) ?? [];
-    expect(matches.length, 'once for the serving, once for the basis').toBe(2);
-    expect(sql).toMatch(/'ml': try_cast\(serving_quantity AS DOUBLE\)/);
+  it('Open Food Facts: a serving is millilitres when its text states them as the quantity, or its fluid ounces convert to it', () => {
+    expect(sql).toContain("regexp_extract(serving_size, '(?i)([0-9]+(?:[.,][0-9]+)?)\\s*ml\\b', 1), ',', '.') AS DOUBLE), -1)");
+    expect(sql).toContain("regexp_extract(serving_size, '(?i)([0-9]+(?:[.,][0-9]+)?)\\s*fl\\.?\\s*oz', 1), ',', '.') AS DOUBLE), -1) * 29.5735295625");
+    expect(sql).toContain("THEN to_json([{'d': serving_size, 'ml': serving_ml}])");
+    expect(sql).toContain("CASE WHEN serving_ml IS NOT NULL THEN 'ml' ELSE 'g' END");
   });
 
   it('generic foods are per 100 g', () => {

@@ -47,12 +47,12 @@ export class CandidateFood {
   readonly carbsG: number | undefined;
   readonly fatG: number | undefined;
   readonly fiberG: number | undefined;
-  /** Sugar alcohols per 100 g, when the source states them (MM-397). */
+  /** Sugar alcohols per 100 of the basis, when the source states them (MM-397). */
   readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
-  /** The micronutrients besides sodium the source states, per 100 g (MM-307). */
+  /** The micronutrients besides sodium the source states, per 100 of the basis (MM-307). */
   readonly micros: PackMicros;
   readonly servings: readonly CatalogServing[];
 
