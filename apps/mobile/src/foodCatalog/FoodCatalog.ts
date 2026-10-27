@@ -51,11 +51,16 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
 
   async search(
     query: string,
-    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+    {
+      limit = 25,
+      offset = 0,
+      group,
+      closest = false,
+    }: { limit?: number; offset?: number; group?: FoodGroup | undefined; closest?: boolean | undefined } = {},
   ): Promise<SearchHit[]> {
     const hits: SearchHit[] = [];
     for (const pack of this.packs) {
-      hits.push(...(await pack.search(query, { limit: Math.max(limit + offset, pool), group })));
+      hits.push(...(await pack.search(query, { limit: Math.max(limit + offset, pool), group, closest })));
     }
     // A pack's closest partial matches are offered only when no pack matches every word (MM-627).
     const whole = hits.filter((hit) => hit.partial !== true);
