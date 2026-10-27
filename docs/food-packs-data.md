@@ -59,6 +59,52 @@ Measured on the published packs (format 1) against the grade's needs
   licence line. Revisit for a Canadian launch. The UK and Australian tables
   likewise.
 
+## Liquids, measured (H-06, 2026-10-27)
+
+The food-logging plan's H-06 check, run on the dev Mac with DuckDB 1.5.6
+over the 2026-10-19 fetch cache. Both sources state liquids per 100 mL in
+their per-100 columns, and both hold the serving's millilitres as a plain
+number.
+
+USDA Branded, `market_country = 'United States'` (1,986,471 rows), by
+`serving_size_unit`:
+
+| Unit | Rows | Share |
+|---|---|---|
+| `g` | 1,506,308 | 75.8% |
+| `ml` | 240,881 | 12.1% |
+| `GRM` | 181,257 | 9.1% |
+| `MLT` | 27,414 | 1.4% |
+| empty | 18,992 | 1.0% |
+| `mg`, `IU`, `gm`, `mc` | 11,619 | 0.6% |
+
+The mL rows are the drinks: juice 36,853, soda 28,887, water 23,795, milk
+19,956, other drinks 16,442, then dressings, oils, tea, plant milks and
+syrups. `extract.sql` keeps a serving only when the unit is `g` or `GRM`,
+so every mL row (268,295, 13.5%) reaches the pack with no serving at all,
+and the 344 `gm` rows are dropped with them. Their per-100 figures are per
+100 mL: Coca-Cola (`MLT`, 355) is 39 to 42 kcal, the label's 140 kcal per
+355 mL is 39.4; 2% milk (`MLT`, 240, "1 cup") is 50 to 55, the label's 130
+per 240 mL is 54; Tropicana Pure Premium (`MLT`, 240, "8 fl oz") is 46,
+the label's 110 per 240 mL is 45.8.
+
+Open Food Facts, tagged United States with a name and kcal (193,713
+products): 152,724 state a serving; 12,311 (8.1%) of those name it in mL,
+fl oz, L or cL, 2,329 name both a weight and a volume, and 16,099 name
+neither. Of 9,982 servings stated in mL alone, `serving_quantity` equals
+the mL number in 9,951 (the six that differ are typos). The per-100 figures
+are per 100 mL: Coca-Cola 0049000028904 ("355ml") is 39.4, 0049000004632
+is 42.3; 2% milks are 50 to 54; Tropicana 100% orange juice is 46.
+`extract.sql` already emits these servings, as `g: 355`, which is right
+only because a soft drink's density is near 1.
+
+So for C2's liquids half: Branded needs the `ml`/`MLT` branch (serving in
+mL, per-100 per 100 mL); Open Food Facts needs the serving's mL recognised
+from `serving_size` so it is stored as millilitres, not grams. The queries
+are not in the repository; they read `branded_food.csv`, `food_nutrient.csv`
+(nutrient 1008) and `off.csv.gz` with the same `read_csv` options as the
+extract, and the mL match is `(?i)(\bml\b|millilit|fl\.? ?oz|\bl\b|liter|litre|\bcl\b)`.
+
 ## A wider Open Food Facts cut, measured (MM-409, 2026-10-19)
 
 The owner asked for more food in search. The export was read whole with
