@@ -743,6 +743,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
 
   const query = search.trim();
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
+  /** Whether the search found any of the person's own foods or anything in their log (MM-596, MM-637). */
+  const ownFound = customFoods.some((food) => matches(food.name)) || (fromLog?.foods.length ?? 0) > 0 || (fromLog?.meals.length ?? 0) > 0;
   // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What was last
   // logged at the meal being added to comes first (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
@@ -1153,6 +1155,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         <>
           {query !== '' ? (
             <>
+              {/* The person's own foods and log, apart from the food database's, each under its own heading (MM-637). */}
+              {ownFound ? <p className="food-label food-label-spaced">Your foods and meals</p> : null}
               {customFoods
                 .filter((food) => matches(food.name))
                 .map((food) => (
@@ -1175,15 +1179,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               {(fromLog?.foods ?? []).map((e) => (
                 <RecentFoodRow key={`logged-${e.id}`} lead="From your log" entry={e} onPress={() => fill(e)} trailingAction={entryGradeBeside(e)} />
               ))}
-              <FoodSearchResults
-                query={query}
-                onPick={(food) => void pick(food)}
-                alsoFound={
-                  customFoods.some((food) => matches(food.name)) ||
-                  (fromLog?.foods.length ?? 0) > 0 ||
-                  (fromLog?.meals.length ?? 0) > 0
-                }
-              />
+              <FoodSearchResults query={query} onPick={(food) => void pick(food)} alsoFound={ownFound} />
               {/* Beside the phone's results, never inside them, so it keeps its state while they settle (MM-58). */}
               <OnlineSearchResults query={query} onPick={(food) => void pick(food)} />
             </>

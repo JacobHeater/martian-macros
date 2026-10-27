@@ -91,6 +91,8 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
   const closest = hits.every((hit) => hit.partial === true);
   return (
     <>
+      {/* Under its own heading, apart from the person's own foods above it, as "Found online" is below it (MM-637). */}
+      <p className="food-label food-label-spaced">From the food database</p>
       {closest ? <p className="app-caption food-reference-line">{`No exact match for "${settled.trim()}". Closest:`}</p> : null}
       {hits.map(({ food, firstServing }, at) => {
         // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
