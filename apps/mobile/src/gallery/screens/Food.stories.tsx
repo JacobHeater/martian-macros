@@ -841,7 +841,8 @@ export const AddFoodAmountRoundsToZero = screenStory({
   shows: 'Labels may round small servings to zero. Many servings add up.',
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'cola' }),
   walk: async (canvas) => {
-    await press(/^Cola/)(canvas);
+    // The fixture's cola, not the stories' per-100 mL one (MM-651).
+    await press(/^Cola · Test Brand/)(canvas);
     const amount = await inSheet(canvas).findByRole('textbox', { name: /^Amount/ });
     await userEvent.clear(amount);
     await userEvent.type(amount, '1');
@@ -1831,5 +1832,28 @@ export const EditFoodDrink = screenStory({
     await press(/^Cola, classic/)(canvas);
     await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Log it' }));
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Edit Cola, classic/ }));
+  },
+});
+
+/** MM-651: a drink's eight chips at 200% text (the UX guard's UX-4): they wrap above the field and stay in order. */
+export const AddFoodAmountDrinkWithDensityLargeText = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Ounces (weight)',
+  textScale: 2,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'oat drink barista' }),
+  walk: press(/^Oat drink, barista/),
+});
+
+/** MM-651: a can changed into fluid ounces is the same portion, said so; the field reads 12. */
+export const AddFoodAmountDrinkFluidOunces = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: /^Same amount as 1 × 1 can \(355 mL\)\./,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'cola classic' }),
+  walk: async (canvas) => {
+    await press(/^Cola, classic/)(canvas);
+    const servings = await inSheet(canvas).findByRole('textbox', { name: 'How many servings' });
+    await userEvent.clear(servings);
+    await userEvent.type(servings, '1');
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Fluid ounces' }));
   },
 });
