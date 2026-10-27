@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-22, by Claude, Session 42.
+Last updated: 2026-10-26, by Claude, Session 43.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -17,9 +17,23 @@ protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
 
-**Open PRs at the end of Session 42:** #288 (the legal page workflow runs only by hand until Pages
-is on; a workflow change, so the owner merges it) and this handoff. A new session still checks
-`gh pr list` first.
+**Open PRs at the end of Session 43:** only this handoff. A new session still checks `gh pr list` first.
+
+**Food logging, the owner's push of 2026-10-26** (`docs/food-logging-plan.md`, WS-08 steps 18 to 23). Built and
+merged: MM-623 to MM-626 (reuse keeps every nutrient; saves said and pressed once; meal writes all or nothing
+through `FoodEntryBatchWriter`, so a deleted meal goes at once; a logged meal's time settable), MM-627 (search by
+match first, the owner's D-3), MM-628 (a unit change keeps the portion), MM-629 (recents say their amount, this
+meal's first), MM-630 and MM-634 (one time, meal or day for a whole meal or for chosen foods, with Undo), MM-631
+(several foods for one meal, the owner's D-1 and D-2), MM-632 (the cup a digit short), MM-633 (copies said, once,
+to any day). Still to build, each waiting on the owner:
+- **Volume from the source data (the plan's C2):** keep FDC's measure units, Branded mL servings and Open Food
+  Facts' per-100 mL liquids in the pack; a new pack format, so the owner rebuilds and publishes the packs. First
+  run the pack query in the plan's H-06 (how many OFF and Branded rows are liquids).
+- **"Saved" in Add food** opens a saved food's editor, not its amount step (the plan's B5): left as built
+  (MM-45) until the owner says otherwise.
+- Follow-ups recorded in MM-631 and MM-634 (count spoken as it changes, focus after a chosen row is deleted, the
+  bar at 200% text; "Done" and "Select" wording, the owner's call). Frequency-ranked recents, typo-tolerant
+  search, saved meal templates (the plan's C5 and W-D).
 
 **M0 to M4 are done (2026-10-22): every one of the 376 tickets in their `requires` lists is `done` on
 main.** What stays open is owed by people, not code, and is listed in each ticket:
@@ -159,7 +173,13 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   photo, then Send to assistant to ChatGPT, Claude and Gemini, noting which
   keep both the photos and the prompt; no "Save Image" offered on iOS; and,
   after the sheet closes, nothing left under the app's cache
-  (`mm-meal-shared` on Android, `mm-backup-*-meal-*.jpg` on iOS).
+  (`mm-meal-shared` on Android, `mm-backup-*-meal-*.jpg` on iOS). From Session 43: a three-food
+  meal deleted, gone in one redraw (MM-625); "Log it" pressed twice fast, one entry, with TalkBack
+  hearing the busy state (MM-624); three foods to dinner through "Add another food", the time set
+  once, TalkBack hearing each "Added …" and the list's line focused, the list at 360 px with the
+  keyboard open (MM-631); "Select" on Food, boxes ticked, the bar at the foot clear of a snack and of
+  the navigation bar at 200% text (MM-634); 180 g changed to ounces (MM-628); search for "oats" and
+  "chicken breast skinless" (MM-627).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -185,6 +205,24 @@ Water, sodium and micronutrients: MM-305. Sleep as a signal: MM-249 (lesson
 not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
+
+## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 7 PRs)
+
+- **The owner's words:** asked for an evidence-backed food-logging improvement plan (multi-food logging, alternate
+  units and volume, bulk editing especially of time); added that recent foods and database search "is kind of ass"
+  next to MyFitnessPal and MyNetDiary; that deleting a meal row by row is "a pathetic user experience"; then "go
+  forth". Answered D-1 to D-4 as recommended (saved together; loose foods; match first; a day move keeps the time),
+  and allowed one worktree per PR for this build only.
+- **Merged:** #319 (the plan, `docs/food-logging-plan.md`, and MM-623 to MM-626 as tickets with skipped tests),
+  #320 (MM-623 to MM-626 fixed), #321 (MM-627), #322 (MM-628 to MM-630, MM-632), #323 (MM-631), #324 (MM-633), #325
+  (MM-634). A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
+  shipped, and every blocking finding was fixed in the same PR.
+- **Lessons:** a fallback that helps a person reading results can mislead a lookup that takes the first hit (the
+  any-word search matched "broccoli cooked" to broccoli raw; now only the results list asks for it). Number
+  constants deserve a test of their ratios (the cup was a digit short). `exactOptionalPropertyTypes` refuses
+  `{ change: undefined }`, and `useRef<T>()` needs its argument here. A merge's own fetch can race a follow-up
+  fetch on the ref lock: fetch again.
+- **Not run:** nothing was run locally; CI validated every merge.
 
 ## Session 42: 2026-10-22, Claude (M0 to M4 finished: five builder lanes, a panel review of everything, ~50 PRs)
 
@@ -240,24 +278,3 @@ MM-242, a draft by non-lawyers that blocks release.
   together (#221 and #227 crossed on the eraser contract; #228 fixed it): check `main`'s run after a burst of merges. `gh` lives in `~/.local/bin`, and
   `/usr/bin/git` (not `/usr/local/bin`'s 2.10) pushes with `-c credential.helper='!gh auth git-credential'`.
 - **Not run:** nothing was run locally; CI validated every merge.
-
-## Session 40: 2026-10-20, Claude (no Add food button, recent foods as rows, the iOS build, the usage rules)
-
-- **The owner's words this session:** "Kill that button and food entry can only happen from the Food screen by clicking
-  on the plus buttons next to the meals." Then, on usage: "You are not permitted to run tests. You write them, let CI run
-  them on the PR." Subagent runs are capped at five minutes in total per session, and work goes in "small, rapid fire,
-  short burst branches that all run in parallel in their own CI."
-- **MM-438 (#196):** the Dashboard's bar action and Food's floating Add food button are removed. `MmFab` stays in the
-  design system, unused by screens. The `openAddFood` test helper presses a meal's "+". MM-100 and MM-255 are marked
-  superseded in part. The easy-to-miss chips stay (the owner's answer).
-- **MM-439 (#197):** recent foods are `RecentFoodRow`s, five first and "More recent foods" for the rest, not a sideways
-  chip scroller.
-- **MM-440 (#198):** the iOS build failed on `asleepUnspecified` (iOS 16+) against the iOS 15.0 target. Fixed, and
-  guarded by a test that reads the Swift source, since CI builds no iOS app.
-- **The guide split (this PR):** a short root `AGENTS.md` with the usage rules, plus scoped `AGENTS.md` files (each with
-  a `CLAUDE.md` importing it) for the app, the database and the two shells; this handoff is trimmed to state.
-- **Not run:** nothing was run locally after the owner's rule. Before it, the iOS device build was checked once with
-  `xcodebuild`, and the new food tests were run once to see them fail. CI validates all four PRs.
-- **Roadmap:** WS-08 gained MM-438 and MM-439 as built; WS-15 gained MM-440. No milestone moved.
-- **Follow-ups suggested to the owner:** `mm req add` to write and place a ticket in one step; CI that commits the
-  regenerated progress page; auto-merge of green PRs (`gh pr merge --auto` needs the owner's permission rule).
