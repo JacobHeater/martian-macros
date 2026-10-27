@@ -121,6 +121,7 @@ and WS-09 steps 1 and 8.
 16. **No arrow to nowhere (MM-592).** The owner, 2026-10-22: the day stepper draws no next-day arrow on today, keeping its room.
 18. **Logging that keeps what it reuses and says when it fails (MM-623 to MM-626).** Bugs from the food-logging review of 2026-10-26 (`docs/food-logging-plan.md`), each with its regression test; all four fixed the same day. The prerequisite for the plan's meal-oriented logging; MM-624's food-plus-fat write and MM-625 share one all-or-nothing writer.
 19. **Search by match first (MM-627).** The owner, 2026-10-26 (D-3 in `docs/food-logging-plan.md`): the closest name first, reliability among names as close (superseding MM-383's order for search), each row's first serving, and the closest partial matches when every word finds nothing.
+20. **Portions, recents and whole meals (MM-628, MM-629, MM-630).** The food-logging plan's B1, B2 and B4 (2026-10-26): a unit change converts the same portion, recent foods say their amount with this meal's first, and a meal's ⋯ menu sets one time, meal or day for all its foods with Undo.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -166,6 +167,7 @@ workstream's.
 - Added 2026-10-24 (step 17): MM-611 (mark a day as a Refeed or a Day off).
 - Added 2026-10-26 (step 18, the food-logging review): MM-623 (a recent food logged again loses its nutrients and its food; fixed the same day), MM-624 (a save that fails says nothing; pressed twice it logs twice; the fat can be lost; fixed the same day), MM-625 (meal writes can leave part of a meal, and a deleted meal went row by row; fixed the same day with one all-or-nothing batch), MM-626 (a logged meal's time cannot be changed; fixed the same day, and a day move keeps the time).
 - Added 2026-10-26 (step 19, the owner's D-3): MM-627 (search lists the closest name first, with each food's serving; done).
+- Added 2026-10-26 (step 20): MM-628 (a unit change keeps the portion), MM-629 (recent foods say their amount, this meal's first), MM-630 (a meal's menu changes all its foods' time, meal or day), all done.
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

@@ -13,6 +13,7 @@ import type { MealSize } from '../domain/food/estimate/MealSize';
 import { Micronutrients } from '../domain/food/micros/Micronutrients';
 import { HandModel } from '../domain/food/hand/HandModel';
 import { conversionFor } from '../domain/food/portion/conversionFor';
+import { convertedQuantity } from '../domain/food/portion/convertedQuantity';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import type { NutritionBasis } from '../domain/food/portion/NutritionBasis';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
@@ -35,6 +36,7 @@ import { parseNumber } from '../format/parseNumber';
 import { portionUnitChipLabel } from '../format/portionUnitChipLabel';
 import { portionUnitOf } from '../format/portionUnitOf';
 import { quantitySourceLabel } from '../format/quantitySourceLabel';
+import { quantityText } from '../format/quantityText';
 import { referenceBasisLabel } from '../format/referenceBasisLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
@@ -103,7 +105,10 @@ interface Form {
   readonly basis: NutritionBasis;
   /** An entry logged before amounts were recorded: no amount is asked for it and none is invented. */
   readonly legacy: boolean;
-  readonly amountNeedsReentry: boolean;
+  /** Why the amount must be entered again: its method changed (MM-216), or its unit, with no common measure (MM-628). */
+  readonly amountNeedsReentry: false | 'method' | 'unit';
+  /** The amount another unit was converted to, exact while its figure is untouched, and what it was (MM-628). */
+  readonly converted?: { readonly shown: string; readonly value: number; readonly from: string } | undefined;
   /**
    * For an entry calculated from a food's reference nutrition: its amount
    * can be changed and the totals follow; its totals are not typed.
@@ -348,7 +353,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    * typed, and no caution compares them with what is not there (MM-428).
    */
   const energy = typedKcal ?? (showsCarbsAndFat && fromMacros > 0 ? fromMacros : undefined);
-  const amount = parseQuantity(form.quantity);
+  const amount = form.converted !== undefined && form.quantity === form.converted.shown ? form.converted.value : parseQuantity(form.quantity);
   const calc = form.calcRef;
   const amountRequired = calc !== undefined || (!form.legacy && form.source !== 'quickAdd');
   const amountOk = !amountRequired || amount !== undefined;
@@ -410,7 +415,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const selectMethod = (method: QuantitySource) => {
     if (method === form.source) return;
     set({
-      amountNeedsReentry: form.quantityWasEntered && form.quantity.trim() !== '',
+      amountNeedsReentry: form.quantityWasEntered && form.quantity.trim() !== '' ? 'method' : false,
+      converted: undefined,
       quantityWasEntered: false,
       source: method,
       unit: unitsOffered(method)[0],
@@ -437,6 +443,36 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const scaledExtra = (value: number | undefined) => {
     if (value === undefined || base === undefined || totals === undefined) return undefined;
     return base.kcal <= 0 ? value : (value * totals.kcal) / base.kcal;
+  };
+
+  /**
+   * Another unit: the same portion said in it when the two share an exact
+   * measure for this food, or for typed totals weight to weight and volume
+   * to volume; otherwise the amount is asked again (MM-628).
+   */
+  const changeUnit = (next: PortionUnit, reference: ReferenceNutrition | undefined) => {
+    const from = form.unit;
+    if (from === next) return;
+    // A figure the person has not given is not a portion to keep.
+    if (!form.quantityWasEntered) {
+      set({ unit: next, converted: undefined });
+      return;
+    }
+    const same =
+      amount === undefined || from === undefined ? undefined : convertedQuantity(amount, { unit: from, reference }, { unit: next, reference }, { hand });
+    if (same === undefined || amount === undefined || from === undefined) {
+      set({ unit: next, quantity: '', quantityWasEntered: false, amountNeedsReentry: amount === undefined ? false : 'unit', converted: undefined });
+      return;
+    }
+    const shown = quantityText(same);
+    const was = from === 'serving' && reference?.servingDescription !== undefined ? `× ${reference.servingDescription}` : portionUnitOf(from, amount);
+    set({
+      unit: next,
+      quantity: shown,
+      quantityWasEntered: true,
+      amountNeedsReentry: false,
+      converted: { shown, value: same, from: `${quantityText(amount)} ${was}` },
+    });
   };
 
   /** Edits nutrition per serving for servings, or totals for other amounts. */
@@ -614,12 +650,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
 
   const query = search.trim();
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
-  // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food.
+  // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What was last
+  // logged at the meal being added to comes first (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
   const recentRows: readonly ({ kind: 'food'; entry: FoodEntry } | { kind: 'meal'; meal: LoggedMeal })[] = [
-    ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id })),
-    ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m) })),
-  ].sort((a, b) => b.newest - a.newest);
+    ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id, here: entry.meal === meal })),
+    ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m), here: m.meal === meal })),
+  ].sort((a, b) => Number(b.here) - Number(a.here) || b.newest - a.newest);
   /** A food from the log's grade, as it was logged (MM-596). */
   const entryGradeBeside = (e: FoodEntry) => {
     const grade = gradeOfFood?.(e.name) ?? gradeOfFoodEntry(e, { hand });
@@ -672,14 +709,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       label = `How many ${unit === undefined ? '' : portionUnitOf(unit, 2)}`;
     }
     let helper: string | undefined;
-    if (form.amountNeedsReentry) helper = 'Enter how much again for this method.';
-    else if (amount === undefined) helper = empty ? 'How much did you eat?' : 'An amount above zero is needed.';
+    if (form.amountNeedsReentry !== false && empty) {
+      helper = form.amountNeedsReentry === 'method' ? 'Enter how much again for this method.' : 'Enter how much again in this unit.';
+    } else if (amount === undefined) helper = empty ? 'How much did you eat?' : 'An amount above zero is needed.';
+    else if (form.converted !== undefined && form.quantity === form.converted.shown) helper = `Same amount as ${form.converted.from}.`;
     return (
       <>
         {units.length > 1 ? (
           <div className="app-row food-chips" role="group" aria-label="Unit">
             {units.map((u) => (
-              <MmChoiceChip key={u} label={portionUnitChipLabel(u)} selected={unit === u} onSelect={() => set({ unit: u })} />
+              <MmChoiceChip key={u} label={portionUnitChipLabel(u)} selected={unit === u} onSelect={() => changeUnit(u, undefined)} />
             ))}
           </div>
         ) : null}
@@ -697,7 +736,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             set({
               quantity: text,
               quantityWasEntered: text.trim() !== '',
-              ...(parseQuantity(text) === undefined ? {} : { amountNeedsReentry: false }),
+              ...(parseQuantity(text) === undefined ? {} : { amountNeedsReentry: false as const }),
             })
           }
         />
@@ -804,7 +843,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               key={u}
               label={u === 'serving' ? (reference.servingDescription ?? 'Servings') : portionUnitChipLabel(u)}
               selected={unit === u}
-              onSelect={() => set({ unit: u, quantity: '' })}
+              onSelect={() => changeUnit(u, reference)}
             />
           ))}
         </div>
@@ -814,8 +853,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           suffix={unit === undefined || unit === 'serving' ? undefined : portionUnitOf(unit, amount ?? 2)}
           kind="quantity"
           value={form.quantity}
-          helper={amount === undefined ? 'An amount above zero is needed.' : undefined}
-          helperIsWarning={amount === undefined}
+          helper={
+            form.amountNeedsReentry === 'unit' && form.quantity.trim() === ''
+              ? 'Enter how much again in this unit.'
+              : amount === undefined
+                ? 'An amount above zero is needed.'
+                : form.converted !== undefined && form.quantity === form.converted.shown
+                  ? `Same amount as ${form.converted.from}.`
+                  : undefined
+          }
+          helperIsWarning={amount === undefined && !(form.amountNeedsReentry === 'unit' && form.quantity.trim() === '')}
           onChange={(quantity) => set({ quantity })}
         />
         {/* The numbers the entry rests on, in the terms they were typed (MM-221). */}

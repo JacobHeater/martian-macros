@@ -7,12 +7,14 @@ import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { FoodEntry } from '../domain/FoodEntry';
 import { foodLogRows } from '../domain/food/meal/foodLogRows';
 import { LoggedMeal } from '../domain/food/meal/LoggedMeal';
-import type { Meal } from '../domain/Meal';
+import { Meal } from '../domain/Meal';
+import { mealUsualMinute } from '../domain/mealUsualMinute';
 import { mealHasSolidProtein } from '../engine/mealHasSolidProtein';
 import { ProteinSpreadRule } from '../engine/ProteinSpreadRule';
 import { SafetyBounds } from '../engine/SafetyBounds';
 import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
+import { minuteOfDayText } from '../format/minuteOfDayText';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -35,6 +37,9 @@ import { showMealSplitSheet } from './showMealSplitSheet';
 import { SolidProteinMarker } from './SolidProteinMarker';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
+
+/** What a slot's ⋯ menu does (MM-597, MM-630). */
+type SlotAction = 'split' | 'time' | 'meal' | 'day';
 
 interface MealSectionProps {
   meal: Meal;
@@ -88,6 +93,52 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
   const gradeOf = (entry: FoodEntry) => preview.entryGrades?.get(entry.name) ?? gradeOfFoodEntry(entry, { hand });
   const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');
 
+  /**
+   * Changes every food of the slot alike, in one step (MM-625), and offers to
+   * put them back as they were (MM-630). Only the field chosen changes: the
+   * amounts, numbers and where they came from never do.
+   */
+  const changeAll = async (change: (entry: FoodEntry) => FoodEntry, said: string) => {
+    const before = entries;
+    try {
+      await services.food.applyFoodChanges({ update: entries.map(change) });
+    } catch {
+      overlays.snack(`${label} could not be changed, so nothing was.`);
+      return;
+    }
+    overlays.snack(said, { label: 'Undo', onAction: () => void services.food.applyFoodChanges({ update: before }) });
+  };
+
+  /** The slot's ⋯ menu: its macro split (MM-597), or a time, meal or day for all its foods (MM-630). */
+  const slotAction = async (action: SlotAction) => {
+    const name = label.toLowerCase();
+    const count = entries.length === 1 ? 'its food' : `all ${entries.length} foods`;
+    if (action === 'split') {
+      void showMealSplitSheet(overlays, day, meal, entries);
+    } else if (action === 'time') {
+      const times = new Set(entries.map((entry) => entry.eatenAt));
+      const picked = await overlays.timeOfDay({
+        // One time among them opens the clock on it; mixed or none, on the slot's usual time (MM-570).
+        initialMinuteOfDay: times.size === 1 ? (entries[0]?.eatenAt ?? mealUsualMinute(meal)) : mealUsualMinute(meal),
+        helpText: times.size > 1 ? `Time eaten for ${name} (now mixed)` : `Time eaten for ${name}`,
+        everyMinute: true,
+      });
+      if (picked !== undefined) await changeAll((entry) => entry.copyWith({ eatenAt: picked }), `${label} at ${minuteOfDayText(picked)}, ${count}`);
+    } else if (action === 'meal') {
+      const picked = await overlays.options({
+        title: `Move ${name} to`,
+        options: Meal.values.filter((m) => m !== meal).map((m) => ({ value: m, label: mealLabel(m) })),
+      });
+      if (picked !== undefined) await changeAll((entry) => entry.copyWith({ meal: picked.value }), `Moved ${name} to ${picked.label.toLowerCase()}`);
+    } else {
+      const picked = await overlays.date({ helpText: `Move ${name} to`, initial: day, first: day.addDays(-365), last: today, today });
+      // A food moved to another day keeps its time eaten (the owner, 2026-10-26).
+      if (picked !== undefined && picked.epochDay !== day.epochDay) {
+        await changeAll((entry) => entry.copyWith({ date: picked }), `Moved ${name} to ${Fmt.day(picked, today)}`);
+      }
+    }
+  };
+
   /** Deletes `entry` and offers to put it back for a few seconds (MM-48). */
   const remove = (entry: FoodEntry) => {
     void services.food.deleteFood(entry.id);
@@ -139,11 +190,16 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
             onPress={() => void showAddFoodSheet(overlays, day, { meal })}
           />
           {entries.length === 0 ? null : (
-            <MmMenuButton<'split'>
+            <MmMenuButton<SlotAction>
               icon="more"
               label={`Options for ${label.toLowerCase()}`}
-              items={[{ value: 'split', label: 'Macro split' }]}
-              onSelect={() => void showMealSplitSheet(overlays, day, meal, entries)}
+              items={[
+                { value: 'split', label: 'Macro split' },
+                { value: 'time', label: 'Change time' },
+                { value: 'meal', label: 'Move to another meal' },
+                { value: 'day', label: 'Move to another day' },
+              ]}
+              onSelect={(action) => void slotAction(action)}
             />
           )}
         </>

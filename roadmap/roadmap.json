@@ -2609,7 +2609,10 @@
           "MM-624",
           "MM-625",
           "MM-626",
-          "MM-627"
+          "MM-627",
+          "MM-628",
+          "MM-629",
+          "MM-630"
         ],
         "remaining": [
           "MM-37",
@@ -2871,6 +2874,15 @@
           "title": "Food search lists the closest name first, says each food's serving, and offers the closest when every word finds nothing (the owner's D-3, 2026-10-26, MM-627)",
           "tickets": [
             "MM-627"
+          ]
+        },
+        {
+          "step": 20,
+          "title": "A unit change keeps the portion (MM-628); recent foods say their amount and this meal's come first (MM-629); a meal's menu changes the time, meal or day of all its foods with Undo (MM-630); the food-logging plan's B1, B2 and B4, 2026-10-26",
+          "tickets": [
+            "MM-628",
+            "MM-629",
+            "MM-630"
           ]
         }
       ],
