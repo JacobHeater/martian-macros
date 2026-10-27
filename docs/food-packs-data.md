@@ -138,17 +138,50 @@ per-100 mL food weigh up to 150 g (honey). The app reads format 4
 packs as before, per 100 g with servings by weight, so nothing changes for a
 person until the packs are rebuilt.
 
-**Not yet built or published.** To do, on the dev Mac (the 2026-10-19 cache
-suffices; no fetch needed): `./mm food build` (read `report.txt` and
-`coverage.txt`; the barcode pack should gain roughly 268,000 servings and
-show the three H-06 drinks per 100 mL; record here, per basis, the
-energy-agreement drop rate and how many `ml`/`MLT` rows have household text
-stating grams, the panel's IN-1), `./mm food package --base-url
-https://github.com/JacobHeater/martian-macros-food-data/releases/download/<date>/`,
-then `gh release create <date> … --latest` with both packs, `manifest.json`,
-`report.txt` and `coverage.txt`, and pull both packs from Settings > Food
-database. The extract SQL was run once over the cache into a scratch folder
-on 2026-10-27 to check it parses and the three drinks come out as expected.
+**Built 2026-10-27** on the dev Mac from main after PR #342 (the cache of
+2026-10-19; no data was fetched): `./mm food fetch`, `./mm food build`,
+`./mm food package --base-url https://github.com/JacobHeater/martian-macros-food-data/releases/download/2026-10-27/`,
+then `gh release create 2026-10-27 … --latest` with the two packs,
+`manifest.json`, and `report.txt` and `coverage.txt` from `.food_cache/packs/`
+(the publish folder keeps older copies of those two), and both packs pulled
+from Settings > Food database. The fetch step is needed even with a full
+cache: it reuses every file and only restamps `builtOn` in `provenance.json`,
+which becomes the pack version, and the Food database screen offers a pack
+only when its version differs from the installed one. A rebuild on an
+unchanged cache without it is named 2026-10-25 again and never offered (the
+first build of this day was). PR #338 had committed two `node_modules`
+symlinks that broke the build on the main checkout; PR #342 removed them.
+
+| Pack | Foods | Per 100 mL | gzip |
+|---|---|---|---|
+| `generic` | 13,285 | 0 | 1.6 MB |
+| `barcode_us` | 521,079 | 61,782 | 58.2 MB |
+
+534,364 foods, 91 more than 2026-10-25: the `gm` rows. Groups as on
+2026-10-25 except spreads and sauces 42,897, fats and oils 5,905, drinks
+39,549, nuts and seeds 2,793.
+
+The panel's IN-1 figures, computed with DuckDB over the extract among the
+latest version of each barcode per source, counting rows that pass the
+checks before the energy rule:
+
+| Source | Basis | Checked | Energy disagrees | Rate |
+|---|---|---|---|---|
+| Open Food Facts | per 100 g | 168,977 | 9,142 | 5.4% |
+| Open Food Facts | per 100 mL | 13,286 | 356 | 2.7% |
+| USDA Branded | per 100 g | 384,880 | 18,328 | 4.8% |
+| USDA Branded | per 100 mL | 58,909 | 1,605 | 2.7% |
+
+A per-100 mL row fails the energy rule about half as often as a per-100 g
+row, on both sources. Rows per 100 mL whose household text states grams: 29
+of 60,676 Branded `ml`/`MLT` rows and 119 of 69,337 Open Food Facts rows.
+Most are liquids with their weight in parentheses ("250 ml (250 g)", "14 ml
+(14 G)") or dressings; a few are solids the source serves in millilitres
+("1/2 CUP (130g)" for candies, Branded). Two liquid sweeteners' "0.25 ml
+(0.3 g)" came out as 0.3 mL: below 1, the ±0.5 tolerance against
+`serving_quantity` accepts a gram quantity as millilitres. Open: tighten that
+tolerance for quantities under 1; whether the pack version should be the
+build day rather than the fetch day.
 
 ## The build
 
