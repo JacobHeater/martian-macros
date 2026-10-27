@@ -105,3 +105,15 @@ it('MM-629: the foods last logged at this meal list first, newest first among th
   expect(titles.slice(0, 3)).toEqual(['Leftover rice', 'Toast', 'Apple']);
 });
 
+// MM-639: what is usual at a meal, logged there at least twice in four weeks, comes first, most often first.
+it('MM-639: a food usual at lunch lists first there, above newer foods', async () => {
+  for (const daysAgo of [3, 5, 9]) await repos.food.addFood(foodOn(today.addDays(-daysAgo), { name: 'Porridge', meal: 'lunch', kcal: 250 }));
+  await repos.food.addFood(foodOn(today.addDays(-1), { name: 'Soup', meal: 'lunch', kcal: 200 }));
+  const sheet = await openSheet();
+  const inSheet = within(sheet);
+  await inSheet.findByText('Recent foods');
+  const titles = inSheet.queryAllByRole('button', { name: /Your recent food/ }).map((row) => row.querySelector('.mm-list-row-title')?.textContent);
+  // Porridge three times at lunch; soup once, though newer; then the rest.
+  expect(titles.slice(0, 2)).toEqual(['Porridge', 'Soup']);
+});
+
