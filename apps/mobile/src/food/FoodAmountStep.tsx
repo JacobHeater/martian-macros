@@ -39,6 +39,7 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
+import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmTextField } from '../ui/MmTextField';
@@ -388,9 +389,9 @@ export function FoodAmountStep({
       {food.brand === undefined ? null : <p className="app-text">{food.brand}</p>}
       <FoodTrustMark food={food} />
       {/* Its grade (MM-370), said in words beside the letter. */}
+      {/* The letter stays in view; what it means is in "About this food" (MM-642). */}
       <div className="food-amount-grade">
         <FoodGrade grade={grade} subject={food.name} />
-        <span className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</span>
       </div>
       <div className="app-gap" />
       {/* When it was eaten comes first, before what and how much (MM-576). */}
@@ -466,8 +467,6 @@ export function FoodAmountStep({
           )}
         </>
       ) : null}
-      {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
-      <p className="app-caption food-reference-line">{referenceLine}</p>
       {totals === undefined ? (
         <p id={`${ids}-needed`} className="app-caption food-still-needed" data-testid="amount-macros">
           Still needed: an amount above zero.
@@ -483,26 +482,36 @@ export function FoodAmountStep({
         </p>
       )}
       {note === undefined ? null : <Notice kind="info" text={note} />}
-      {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. It is the food's own: the fat is its own entry (the panel's PD-2). */}
-      {totals === undefined || !showsCarbsAndFat ? null : (
-        <>
-          <p className="food-label food-label-spaced">{isHand ? 'Estimated macro split' : 'Macro split'}</p>
-          <MacroSplitChart
-            isPreview
-            intake={
-              new IntakeDay({
-                date: day,
-                kcal: totals.kcal,
-                proteinG: totals.proteinG,
-                carbsG: totals.carbsG,
-                netCarbsG: netCarbsG(totals.carbsG),
-                fatG: totals.fatG,
-              })
-            }
-            netCarbs={netCarbs}
-          />
-        </>
-      )}
+      {/*
+        What the grade means, the numbers the entry rests on and the food's split fold under one line (the owner,
+        2026-10-26, MM-642), so what is logged and how much stay in view. Kept drawn while closed: the source's
+        numbers (MM-153) are one press away, and the fold is remembered as it was left.
+      */}
+      <MmDisclosure title="About this food" maintainState remember="food.amount.about">
+        <p className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</p>
+        {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
+        <p className="app-caption food-reference-line">{referenceLine}</p>
+        {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. It is the food's own: the fat is its own entry (the panel's PD-2). */}
+        {totals === undefined || !showsCarbsAndFat ? null : (
+          <>
+            <p className="food-label food-label-spaced">{isHand ? 'Estimated macro split' : 'Macro split'}</p>
+            <MacroSplitChart
+              isPreview
+              intake={
+                new IntakeDay({
+                  date: day,
+                  kcal: totals.kcal,
+                  proteinG: totals.proteinG,
+                  carbsG: totals.carbsG,
+                  netCarbsG: netCarbsG(totals.carbsG),
+                  fatG: totals.fatG,
+                })
+              }
+              netCarbs={netCarbs}
+            />
+          </>
+        )}
+      </MmDisclosure>
       <div className="app-gap" />
       {logFailed ? <Notice icon="warning" text={`The food could not be logged, so nothing was. Press ${logLabel} to try again.`} /> : null}
       <MmButton
