@@ -25,6 +25,7 @@ Choices made without asking (say if any is wrong):
   - in trends it is counted and named in the evidence;
   - it never contributes a food to a trade.
 - **Any day up to today** can be marked or unmarked, from the Food day's header. No future days, since a plan is not a record.
+  (Moved by MM-655, the owner, 2026-10-27: the action is a row after the meals; the chip stays in the header.)
 - **No judgement of how often.** No rule counts marks to warn about them, and no streak or reward involves them (MM-92).
 - **Built like its sibling (MM-318).** The mark sits beside the completeness mark in the Food day's header
   (`FoodDayHeader`), and "Mark day" opens the same options dialog the completeness row uses (`FoodCompletenessRow`):
