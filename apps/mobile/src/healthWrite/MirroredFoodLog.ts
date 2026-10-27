@@ -68,6 +68,33 @@ export class MirroredFoodLog implements FoodRepository {
     await this.tell((namespace) => this.platform.removeNutrition(foodRecordId(namespace, id)));
   }
 
+  /**
+   * Changes the log in one step, then tells the platform each change
+   * without being waited for (MM-625): the log, and the screen that shows
+   * it, never wait on the platform, food by food.
+   */
+  async applyFoodChanges(changes: {
+    readonly add?: readonly FoodEntry[];
+    readonly update?: readonly FoodEntry[];
+    readonly delete?: readonly number[];
+  }): Promise<number[]> {
+    const ids = await this.log.applyFoodChanges(changes);
+    const added = changes.add ?? [];
+    void (async () => {
+      for (const [i, entry] of added.entries()) {
+        const id = ids[i];
+        if (id !== undefined) await this.tell((namespace) => this.platform.writeNutrition(nutritionRecordOf(entry, id, namespace)));
+      }
+      for (const entry of changes.update ?? []) {
+        await this.tell((namespace) => this.platform.writeNutrition(nutritionRecordOf(entry, entry.id, namespace)));
+      }
+      for (const id of changes.delete ?? []) {
+        await this.tell((namespace) => this.platform.removeNutrition(foodRecordId(namespace, id)));
+      }
+    })();
+    return ids;
+  }
+
   /** Tells the platform under this run's namespace (MM-522); a platform that fails changes nothing here. */
   private async tell(step: (namespace: string) => Promise<boolean>): Promise<boolean> {
     try {

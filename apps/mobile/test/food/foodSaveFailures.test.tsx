@@ -18,7 +18,7 @@ import { renderApp } from '../support/renderApp';
  * a save was still running logged the food twice, and a cooked food whose
  * fat could not be written was logged without it, so pressing again logged
  * the food a second time. Only AI meal analysis said its failures (MM-591).
- * Skipped until MM-624 is fixed: each case fails on main at f5a08b4.
+ * Each case failed on main at f5a08b4.
  */
 const today = CalendarDate.of(2026, 10, 26);
 let repos: InMemoryRepositories;
@@ -53,7 +53,7 @@ async function typedBar(sheet: HTMLElement): Promise<void> {
   await typeIn(sheet, /^Calories/, '200');
 }
 
-it.skip('MM-624: a typed food that cannot be saved says so and keeps the form', async () => {
+it('MM-624: a typed food that cannot be saved says so and keeps the form', async () => {
   renderApp(repos, today, { change: withAddFood(() => Promise.reject(new Error('The disk is full.'))) });
   const sheet = await openAddFood();
   await typedBar(sheet);
@@ -63,7 +63,7 @@ it.skip('MM-624: a typed food that cannot be saved says so and keeps the form', 
   expect(await logged()).toEqual([]);
 });
 
-it.skip('MM-624: a second press while the save is still running logs the food once', async () => {
+it('MM-624: a second press while the save is still running logs the food once', async () => {
   let release: () => void = () => undefined;
   const gate = new Promise<void>((resolve) => {
     release = resolve;
@@ -79,13 +79,19 @@ it.skip('MM-624: a second press while the save is still running logs the food on
   expect(await logged()).toHaveLength(1);
 });
 
-it.skip('MM-624: a cooked food whose fat cannot be written is logged with its fat or not at all, and says so', async () => {
-  let calls = 0;
+it('MM-624: a cooked food whose fat cannot be written is logged with its fat or not at all, and says so', async () => {
+  // The fat's write fails however it is made: as a second write on its own, or in one batch with its food.
   renderApp(repos, today, {
-    change: withAddFood((original, entry) => {
-      calls += 1;
-      return calls === 2 ? Promise.reject(new Error('The disk is full.')) : original(entry);
-    }),
+    change: (services) => {
+      const food = Object.create(services.food) as AppServices['food'];
+      const add = services.food.addFood.bind(services.food);
+      const batch = services.food.applyFoodChanges.bind(services.food);
+      let adds = 0;
+      food.addFood = (entry) => (++adds === 2 ? Promise.reject(new Error('The disk is full.')) : add(entry));
+      food.applyFoodChanges = (changes) =>
+        (changes.add?.length ?? 0) >= 2 ? Promise.reject(new Error('The disk is full.')) : batch(changes);
+      return { ...withCatalog(catalog)(services), food };
+    },
   });
   await openTab('Food');
   const sheet = await openAddFood();
@@ -95,5 +101,5 @@ it.skip('MM-624: a cooked food whose fat cannot be written is logged with its fa
   await press(sheet, '1 tbsp');
   await press(sheet, 'Log it');
   expect(await within(sheet).findByText(/could not be (logged|saved)/i)).toBeInTheDocument();
-  expect((await logged()).length, 'never the food without the fat it was cooked in').not.toBe(1);
+  expect(await logged(), 'never the food without the fat it was cooked in').toEqual([]);
 });

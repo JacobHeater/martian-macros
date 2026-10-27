@@ -51,29 +51,37 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
   const [meal, setMeal] = useState(firstMeal);
   // Logged for today, it starts at now; for another day, it has no time until one is given (MM-570).
   const [eatenAt, setEatenAt] = useState<number | undefined>(() => eatenAtWhenLogged(day, services.clock));
+  /** Whether the last log failed: said above the action (MM-624). */
+  const [logFailed, setLogFailed] = useState(false);
   const totals = maintenance === undefined ? undefined : estimateMeal(size, kind, { maintenanceKcal: maintenance });
 
   const log = async () => {
     if (totals === undefined) return;
     const typed = name.trim();
-    await services.food.addFood(
-      new FoodEntry({
-        id: 0,
-        date: day,
-        meal,
-        name:
-          typed === ''
-            ? `Estimated meal (${mealSizeLabel(size).toLowerCase()}, ${mealKindShortLabel(kind).toLowerCase()})`
-            : typed,
-        kcal: totals.kcal,
-        proteinG: totals.proteinG,
-        carbsG: totals.carbsG,
-        fatG: totals.fatG,
-        source: 'quickAdd',
-        portion: { method: 'quickAdd', basis: 'enteredTotals' },
-        eatenAt,
-      }),
-    );
+    try {
+      await services.food.addFood(
+        new FoodEntry({
+          id: 0,
+          date: day,
+          meal,
+          name:
+            typed === ''
+              ? `Estimated meal (${mealSizeLabel(size).toLowerCase()}, ${mealKindShortLabel(kind).toLowerCase()})`
+              : typed,
+          kcal: totals.kcal,
+          proteinG: totals.proteinG,
+          carbsG: totals.carbsG,
+          fatG: totals.fatG,
+          source: 'quickAdd',
+          portion: { method: 'quickAdd', basis: 'enteredTotals' },
+          eatenAt,
+        }),
+      );
+    } catch {
+      // A failure is said, never swallowed (MM-624): nothing is logged, and the step stays to try again.
+      setLogFailed(true);
+      return;
+    }
     onDone();
   };
 
@@ -155,7 +163,8 @@ export function EstimateMealStep({ day, meal: firstMeal, onBack, onDone, onManua
       <div className="app-gap" />
       <MmTextField label="Name (optional)" hint="Thai place, usual" value={name} onChange={setName} />
       <div className="app-gap" />
-      <MmButton label="Log the estimate" expand onPress={() => void log()} describedBy={totals === undefined ? undefined : `${ids}-logs`} />
+      {logFailed ? <Notice icon="warning" text="The estimate could not be logged, so nothing was. Press Log the estimate to try again." /> : null}
+      <MmButton label="Log the estimate" expand onPress={() => log()} describedBy={totals === undefined ? undefined : `${ids}-logs`} />
       <MmButton label="Back" kind="text" onPress={onBack} />
       </>
       )}

@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react';
 import { MmIcon } from './MmIcon';
 import type { MmIconName } from './MmIconName';
 import type { MmButtonKind } from './MmButtonKind';
@@ -15,8 +16,12 @@ interface MmButtonProps {
   icon?: MmIconName | undefined;
   /** Fills the width it is given. */
   expand?: boolean;
-  /** With no action the button is shown as off. */
-  onPress?: (() => void) | undefined;
+  /**
+   * With no action the button is shown as off. An action that gives a
+   * promise is pressed once: until it settles the button is busy, and a
+   * second press does nothing (MM-624).
+   */
+  onPress?: (() => void | Promise<unknown>) | undefined;
   /** The id of text that describes the action: what it will record, or what keeps it off (MM-218, MM-220). */
   describedBy?: string | undefined;
   /** For a button that shows or hides something below it: whether that is showing. */
@@ -29,6 +34,22 @@ interface MmButtonProps {
  * is flat, with no glow (MM-181).
  */
 export function MmButton({ label, name, kind = 'primary', icon, expand = false, onPress, expanded, describedBy }: MmButtonProps) {
+  // The ref stops a second press in the same moment; the state says it is busy. Busy, the button stays
+  // enabled and keeps its focus, as a retry does (MM-183), and only ignores presses.
+  const running = useRef(false);
+  const [busy, setBusy] = useState(false);
+  const press = () => {
+    if (onPress === undefined || running.current) return;
+    const result = onPress();
+    if (!(result instanceof Promise)) return;
+    running.current = true;
+    setBusy(true);
+    const settle = () => {
+      running.current = false;
+      setBusy(false);
+    };
+    void result.then(settle, settle);
+  };
   return (
     <button
       type="button"
@@ -36,8 +57,9 @@ export function MmButton({ label, name, kind = 'primary', icon, expand = false, 
       aria-label={name}
       aria-expanded={expanded}
       aria-describedby={describedBy}
+      aria-busy={busy || undefined}
       disabled={onPress === undefined}
-      onClick={onPress}
+      onClick={press}
     >
       {icon === undefined ? null : <MmIcon name={icon} size={20} />}
       {label}

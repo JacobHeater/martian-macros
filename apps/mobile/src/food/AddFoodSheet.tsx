@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useId, useRef, useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
@@ -184,6 +184,17 @@ function filledFrom(e: FoodEntry): Form {
       calcAlcoholPerKcal: alcoholPerKcal(e),
     };
   }
+  // A food calculated from its reference comes back on it, so a new amount is calculated as it was (MM-623).
+  if (portion?.basis === 'calculated' && portion.reference !== undefined && portion.unit !== undefined && portion.quantity !== undefined) {
+    return {
+      ...form,
+      unit: portion.unit,
+      quantity: editableNumber(portion.quantity),
+      quantityWasEntered: true,
+      calcRef: portion.reference,
+      calcAlcoholPerKcal: alcoholPerKcal(e),
+    };
+  }
   if (portion?.quantity !== undefined && portion.unit !== undefined) {
     form = { ...form, unit: portion.unit, quantity: editableNumber(portion.quantity), quantityWasEntered: true };
     if (e.source === 'labelServing' && portion.unit === 'serving' && portion.quantity > 0) {
@@ -309,7 +320,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     return estimateSize === undefined ? { at: 'choices' } : { at: 'estimating' };
   });
   const [form, setForm] = useState<Form>(() => (entry === undefined ? blank : editing(entry)));
+  /** A recent food or one from the log, being logged again: what its extras scale from, never the entry edited (MM-623). */
+  const [template, setTemplate] = useState<FoodEntry>();
+  /** What the entry's extras and origin come from: the entry being corrected, or the food being logged again. */
+  const base = entry ?? template;
   const [askAlcohol, setAskAlcohol] = useState(false);
+  /** Whether the last save failed: said above the action, the form kept to try again (MM-624). */
+  const [saveFailed, setSaveFailed] = useState(false);
+  const relogging = useRef(false);
   const [meal, setMeal] = useState<Meal>(() => entry?.meal ?? firstMeal ?? defaultMeal(services.clock));
   const [day, setDay] = useState(entry?.date ?? firstDay);
   // An entry being corrected keeps its time until it is changed; a new one logged for today starts at now (MM-570).
@@ -384,6 +402,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
 
   const fill = (e: FoodEntry) => {
     setForm(filledFrom(e));
+    setTemplate(e);
     setStep({ at: 'manual' });
     setSearch('');
   };
@@ -411,13 +430,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   };
 
   /**
-   * An edited entry keeps the nutrients beyond the macros its source
-   * stated, scaled by how much its energy changed (they scale with the
-   * amount).
+   * An edited entry, or a food logged again, keeps the nutrients beyond the
+   * macros its source stated, scaled by how much its energy changed (they
+   * scale with the amount).
    */
   const scaledExtra = (value: number | undefined) => {
-    if (value === undefined || entry === undefined || totals === undefined) return undefined;
-    return entry.kcal <= 0 ? value : (value * totals.kcal) / entry.kcal;
+    if (value === undefined || base === undefined || totals === undefined) return undefined;
+    return base.kcal <= 0 ? value : (value * totals.kcal) / base.kcal;
   };
 
   /** Edits nutrition per serving for servings, or totals for other amounts. */
@@ -439,10 +458,10 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             fat: each(totals.fatG),
             alcohol: alcohol === undefined ? '' : each(alcohol),
             // The label's other lines follow the amount, as the macros do.
-            fiber: extra(scaledExtra(entry?.fiberG)),
-            sodium: extra(scaledExtra(entry?.sodiumMg)),
-            sugars: extra(scaledExtra(entry?.micros.of('sugars'))),
-            saturatedFat: extra(scaledExtra(entry?.micros.of('saturatedFat'))),
+            fiber: extra(scaledExtra(base?.fiberG)),
+            sodium: extra(scaledExtra(base?.sodiumMg)),
+            sugars: extra(scaledExtra(base?.micros.of('sugars'))),
+            saturatedFat: extra(scaledExtra(base?.micros.of('saturatedFat'))),
           }),
       calcRef: undefined,
       calcAlcoholPerKcal: undefined,
@@ -461,8 +480,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         quantity: amount,
         unit,
         reference: calc,
-        origin: entry?.portion?.origin,
-        preparation: entry?.portion?.preparation,
+        origin: base?.portion?.origin,
+        preparation: base?.portion?.preparation,
         conversion: unit === undefined ? undefined : conversionFor(unit, calc, { hand }),
         impliedGrams: byHand ? gramsFor(amount ?? 0, unit, calc, { hand }) : undefined,
         handModelVersion: byHand ? HandModel.version : undefined,
@@ -486,10 +505,10 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     if (calc === undefined) alcoholG = a > 0 ? a * (form.basis === 'calculated' ? (amount ?? 1) : 1) : undefined;
     else {
       alcoholG =
-        form.calcAlcoholPerKcal === undefined ? scaledExtra(entry?.alcoholG) : totals.kcal * form.calcAlcoholPerKcal;
+        form.calcAlcoholPerKcal === undefined ? scaledExtra(base?.alcoholG) : totals.kcal * form.calcAlcoholPerKcal;
     }
-    // The micronutrients scale with the amount, as fiber and sodium do (MM-308).
-    const scaledMicros = entry === undefined ? Micronutrients.none : entry.micros.times(entry.kcal <= 0 ? 1 : totals.kcal / entry.kcal);
+    // The micronutrients scale with the amount, as fiber and sodium do (MM-308), for a food logged again too (MM-623).
+    const scaledMicros = base === undefined ? Micronutrients.none : base.micros.times(base.kcal <= 0 ? 1 : totals.kcal / base.kcal);
     /** A typed label line, times the servings when the numbers are per serving; blank is unknown, never zero. */
     const typed = (text: string) => {
       const value = parseNumber(text);
@@ -506,9 +525,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       fatG: totals.fatG,
       source: logged?.method ?? form.source,
       portion: logged,
-      fiberG: calc === undefined ? typed(form.fiber) : scaledExtra(entry?.fiberG),
-      sugarAlcoholsG: scaledExtra(entry?.sugarAlcoholsG),
-      sodiumMg: calc === undefined ? typed(form.sodium) : scaledExtra(entry?.sodiumMg),
+      fiberG: calc === undefined ? typed(form.fiber) : scaledExtra(base?.fiberG),
+      sugarAlcoholsG: scaledExtra(base?.sugarAlcoholsG),
+      sodiumMg: calc === undefined ? typed(form.sodium) : scaledExtra(base?.sodiumMg),
       alcoholG,
       micros:
         calc === undefined
@@ -516,7 +535,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           : scaledMicros,
       eatenAt,
     });
-    await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
+    // A failure is said, never swallowed (MM-624, as MM-591): nothing is logged, and the form stays to try again.
+    try {
+      await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
+    } catch {
+      setSaveFailed(true);
+      return;
+    }
     onDone();
     // An entry moved to another day leaves this day's list; say where it went (MM-221).
     if (entry !== undefined && entry.date !== day) overlays.snack(`Moved to ${Fmt.day(day, today)}.`);
@@ -533,7 +558,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   };
   const pickCustom = (custom: CustomFood) =>
     setStep({ at: 'amount', food: customCatalogFood(custom), servings: [], custom });
-  const choices = () => setStep({ at: 'choices' });
+  /** Back to the choices: the food being logged again is let go, so a food typed next inherits nothing (MM-623). */
+  const choices = () => {
+    setTemplate(undefined);
+    setStep({ at: 'choices' });
+  };
 
   if (step.at === 'amount') {
     return (
@@ -600,9 +629,21 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     const grade = gradeOfLoggedMeal(m, { hand });
     return grade === undefined ? undefined : <FoodGrade grade={grade} subject={m.name} scope="meal" />;
   };
-  /** Logs a recent meal again, to the sheet's day and slot, at its time, in one press (MM-587). */
+  /**
+   * Logs a recent meal again, to the sheet's day and slot, at its time, in one press (MM-587): once, however
+   * often the row is pressed while it is being logged, and a failure is said (MM-624).
+   */
   const logAgain = async (m: LoggedMeal) => {
-    await relogMeal(services.food, m, { date: day, meal, eatenAt });
+    if (relogging.current) return;
+    relogging.current = true;
+    try {
+      await relogMeal(services.food, m, { date: day, meal, eatenAt });
+    } catch {
+      overlays.snack(`${m.name} could not be logged, so nothing was.`);
+      return;
+    } finally {
+      relogging.current = false;
+    }
     overlays.snack(`Logged ${m.name}`);
     onDone();
   };
@@ -836,10 +877,20 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         // An action that is off says what is still needed, beside it (MM-220).
         <p id={`${ids}-needed`} className="app-caption food-still-needed">{`Still needed: ${stillNeeded.join(', ')}.`}</p>
       )}
+      {saveFailed ? (
+        <Notice
+          icon="warning"
+          text={
+            isEditing
+              ? 'The change could not be saved, so the food is as it was. Press Save changes to try again.'
+              : 'The food could not be logged, so nothing was. Press Log it to try again.'
+          }
+        />
+      ) : null}
       <MmButton
         label={isEditing ? 'Save changes' : 'Log it'}
         expand
-        onPress={valid ? () => void save() : undefined}
+        onPress={valid ? () => save() : undefined}
         // The action carries what it will record and what keeps it off, for a reader landing on it (the guard's F1, F3).
         describedBy={[totals === undefined ? undefined : `${ids}-logs`, valid ? undefined : `${ids}-needed`].filter((id) => id !== undefined).join(' ') || undefined}
       />
@@ -952,6 +1003,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
             kind="secondary"
             expand
             onPress={() => {
+              setTemplate(undefined);
               if (query !== '') set({ name: query });
               setSearch('');
               setStep({ at: 'manual' });

@@ -35,29 +35,7 @@ export class InMemoryFoodRepository implements FoodRepository {
 
   async addFood(entry: FoodEntry): Promise<number> {
     const id = this.nextId++;
-    this.entries.value = [
-      ...this.entries.value,
-      new FoodEntry({
-        id,
-        date: entry.date,
-        meal: entry.meal,
-        name: entry.name,
-        kcal: entry.kcal,
-        proteinG: entry.proteinG,
-        carbsG: entry.carbsG,
-        fatG: entry.fatG,
-        source: entry.source,
-        portion: entry.portion,
-        fiberG: entry.fiberG,
-        sugarAlcoholsG: entry.sugarAlcoholsG,
-        sodiumMg: entry.sodiumMg,
-        alcoholG: entry.alcoholG,
-        micros: entry.micros,
-        eatenAt: entry.eatenAt,
-        loggedMeal: entry.loggedMeal,
-        evidence: entry.evidence,
-      }),
-    ];
+    this.entries.value = [...this.entries.value, stored(entry, id)];
     return id;
   }
 
@@ -67,6 +45,26 @@ export class InMemoryFoodRepository implements FoodRepository {
 
   async deleteFood(id: number): Promise<void> {
     this.entries.value = this.entries.value.filter((e) => e.id !== id);
+  }
+
+  async applyFoodChanges(changes: {
+    readonly add?: readonly FoodEntry[];
+    readonly update?: readonly FoodEntry[];
+    readonly delete?: readonly number[];
+  }): Promise<number[]> {
+    const { add = [], update = [], delete: deletes = [] } = changes;
+    const all = this.entries.value;
+    const touched = [...update.map((entry) => entry.id), ...deletes];
+    if (touched.some((id) => !all.some((e) => e.id === id))) throw new Error('A food to change is no longer in the log.');
+    const ids = add.map(() => this.nextId++);
+    const replaced = new Map(update.map((entry) => [entry.id, entry]));
+    const gone = new Set(deletes);
+    // Set once, so a watcher sees the batch whole (MM-625).
+    this.entries.value = [
+      ...all.filter((e) => !gone.has(e.id)).map((e) => replaced.get(e.id) ?? e),
+      ...add.map((entry, i) => stored(entry, ids[i] as number)),
+    ];
+    return ids;
   }
 
   async lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
@@ -121,4 +119,28 @@ export class InMemoryFoodRepository implements FoodRepository {
   clear(): void {
     this.entries.value = [];
   }
+}
+
+/** `entry` as kept under `id`. */
+function stored(entry: FoodEntry, id: number): FoodEntry {
+  return new FoodEntry({
+    id,
+    date: entry.date,
+    meal: entry.meal,
+    name: entry.name,
+    kcal: entry.kcal,
+    proteinG: entry.proteinG,
+    carbsG: entry.carbsG,
+    fatG: entry.fatG,
+    source: entry.source,
+    portion: entry.portion,
+    fiberG: entry.fiberG,
+    sugarAlcoholsG: entry.sugarAlcoholsG,
+    sodiumMg: entry.sodiumMg,
+    alcoholG: entry.alcoholG,
+    micros: entry.micros,
+    eatenAt: entry.eatenAt,
+    loggedMeal: entry.loggedMeal,
+    evidence: entry.evidence,
+  });
 }
