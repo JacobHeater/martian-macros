@@ -58,8 +58,9 @@ const soda: PackEntry = {
 };
 
 /**
- * The same soda as a web service answers with it (MM-58): per 100 g as the online path still keeps it, its serving
- * in millilitres only, and neither fiber nor sugars stated, as the owner's entry was.
+ * The same soda as a web service answers with it (MM-58): per 100 g as the online path still keeps it, its
+ * serving's millilitres taken as grams with the volume in its words (as Open Food Facts' come, MM-636), and
+ * neither fiber nor sugars stated, as the owner's entry was.
  */
 const onlineSoda: PackEntry = {
   food: new CatalogFood({
@@ -77,7 +78,7 @@ const onlineSoda: PackEntry = {
     tier: 'label',
     tierReason: 'Test data, not a nutrition source.',
   }),
-  servings: [{ description: '1 can', milliliters: 355 }],
+  servings: [{ description: '12 fl oz', grams: 355 }],
 };
 
 beforeAll(async () => {
@@ -145,7 +146,7 @@ it('MM-654: four fluid ounces of soda, logged on the phone, kept, reopened and e
   expect(noGradeOnTheRow()).toBeNull();
 });
 
-it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged by its can, shows a C on the row (its sugars unstated, so not counted) and says its source when edited', async () => {
+it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged by the fluid ounce, shows a C on the row (its sugars unstated, so not counted) and says its source when edited', async () => {
   await repos.preferences.saveOnlineLookup('always');
   open({ online: true });
   await openTab('Food');
@@ -155,13 +156,18 @@ it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged b
   await press(sheet, 'Search online');
   await userEvent.click(await within(sheet).findByRole('button', { name: /^CRUSH, SODA, ORANGE, ORANGE/ }, slowly));
   await within(sheet).findByRole('button', { name: 'Log it' }, slowly);
+  await press(sheet, 'Fluid ounces');
+  await typeIn(sheet, /^Amount/, '4');
   await press(sheet, 'Log it');
 
   await expect.poll(async () => (await first(sql.food.watchFood(today))).length, slowly).toBe(1);
-  const [can] = await first(sql.food.watchFood(today));
-  expect(can?.portion?.reference?.servingGrams).toBeUndefined();
-  expect(can?.portion?.reference?.servingMilliliters).toBe(355);
-  expect(can?.fiberG).toBeUndefined();
+  const [glass] = await first(sql.food.watchFood(today));
+  expect(glass?.portion?.unit).toBe('fluidOunce');
+  expect(glass?.portion?.reference?.basis).toBe('per100g');
+  expect(glass?.portion?.reference?.servingGrams).toBe(355);
+  expect(glass?.portion?.reference?.servingMilliliters).toBe(355);
+  expect(glass?.fiberG).toBeUndefined();
+  expect(Math.round(glass?.kcal ?? 0)).toBe(64);
   expect(await screen.findByRole('button', { name: /^Grade C for CRUSH, SODA, ORANGE, ORANGE/ }, slowly)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /^No grade for CRUSH/ })).toBeNull();
 
