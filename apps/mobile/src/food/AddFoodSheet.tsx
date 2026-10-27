@@ -712,7 +712,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       />
     );
   }
-  if (step.at === 'myFoods') return <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} />;
+  if (step.at === 'myFoods') return <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} onPick={pickCustom} />;
   if (step.at === 'estimating') {
     return (
       <EstimateMealStep

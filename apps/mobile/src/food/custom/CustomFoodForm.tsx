@@ -25,8 +25,8 @@ interface CustomFoodFormProps {
   initialBarcode?: string | undefined;
   /** A database food copied to be corrected ("Fix this food", MM-153): the form starts from it and saves a new food. */
   draft?: CustomFood | undefined;
-  /** Called after saving or when the user backs out. */
-  onDone: () => void;
+  /** Called after saving, with the food as saved, or when the user backs out, with nothing (MM-635). */
+  onDone: (saved?: CustomFood) => void;
 }
 
 /** A stored figure as it is put back in its field: to one decimal place, without a trailing zero. */
@@ -163,8 +163,7 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
 
   const save = async () => {
     if (energy === undefined) return;
-    await services.customFoods.saveCustomFood(
-      new CustomFood({
+    const made = new CustomFood({
         id: food?.id ?? 0,
         name: name.trim(),
         kind: 'food',
@@ -175,9 +174,9 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
         fiberG: extraValue('fiber'),
         sugarAlcoholsG: extraValue('sugarAlcohols'),
         micros: new Micronutrients(Object.fromEntries(Micronutrient.values.map((n) => [n, extraValue(n)]))),
-      }),
-    );
-    onDone();
+      });
+    const id = await services.customFoods.saveCustomFood(made);
+    onDone(new CustomFood({ ...made, id }));
   };
 
   const whole = roundHalfAwayFromZero(fromMacros) + 0;
@@ -329,7 +328,7 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
         </p>
       )}
       <MmButton label="Save food" expand onPress={valid ? () => void save() : undefined} describedBy={valid ? undefined : `${ids}-needed`} />
-      <MmButton label="Cancel" kind="text" onPress={onDone} />
+      <MmButton label="Cancel" kind="text" onPress={() => onDone()} />
     </div>
   );
 }

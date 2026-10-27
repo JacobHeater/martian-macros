@@ -2616,7 +2616,8 @@
           "MM-632",
           "MM-631",
           "MM-633",
-          "MM-634"
+          "MM-634",
+          "MM-635"
         ],
         "remaining": [
           "MM-37",
@@ -2909,6 +2910,13 @@
           "title": "Choose some foods of a day, from any meals, and change their time, meal or day together, copy or delete them, with Undo (the food-logging plan's C3, 2026-10-26, MM-634)",
           "tickets": [
             "MM-634"
+          ]
+        },
+        {
+          "step": 24,
+          "title": "In Add food, pressing a saved food logs it; Edit and Delete in its menu (the owner, 2026-10-26, MM-635)",
+          "tickets": [
+            "MM-635"
           ]
         }
       ],
