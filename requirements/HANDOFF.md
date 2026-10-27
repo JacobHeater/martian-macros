@@ -35,7 +35,10 @@ into a meal says how it was measured, and Look up offers its matches; the plan's
 amount, never a corrected calorie; F-20), MM-649 (focus after the chosen row is gone; MM-634's follow-up). The
 plan's status table in `docs/food-logging-plan.md` says what is built and what is not, and why. Still open:
 - **Liquids' volume** (the plan's C2, second half): Branded servings stated only in mL and Open Food Facts
-  per-100 mL liquids. First the plan's H-06 pack query (needs the owner's DuckDB and the source files).
+  per-100 mL liquids. The H-06 pack query ran on the dev Mac on 2026-10-27 and confirmed both bases
+  (`docs/food-packs-data.md`, "Liquids, measured"): 13.5% of Branded US rows are in mL and the extract drops
+  their serving today; 8% of Open Food Facts US servings are in mL and `serving_quantity` is that mL number.
+  C2's liquids half is unblocked and next to ticket.
 - **Owner's calls:** favorites pinned by the person (not built: Saved and usual-first cover it, say if a star is
   still wanted); F-21 (a re-logged analysed food becomes a label serving); whether "Select" is worded better.
 - **On a phone:** every new food-logging screen, the choosing bar at 200% text (a story exists), and View meal's

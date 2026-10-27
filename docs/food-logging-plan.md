@@ -34,8 +34,10 @@ proposal, and no feature ticket has been allocated for it yet.
 | MM-634's follow-up: focus after the chosen row is gone; the choosing bar at 200% text, a story | MM-649 |
 
 Not built, and why:
-- **C2's liquids half**, waiting on the H-06 data check: Branded mL-only servings and Open Food Facts per-100 mL.
-  It needs the owner's DuckDB and the source files; nothing here can run it.
+- **C2's liquids half**: Branded mL-only servings and Open Food Facts per-100 mL. The H-06 data check ran on
+  2026-10-27 and confirmed both (the hypotheses table below, and `docs/food-packs-data.md`), so this half is no
+  longer blocked on data. It is still a format bump, a pipeline change, the grouped unit control, a panel design
+  pass and a pack rebuild by the owner, so it is the next thing to ticket, not something done in passing.
 - **W-D, favorites pinned by the person.** Not built as a third thing: Saved foods and meals log in one press
   (MM-635, MM-645) and sit first in search (MM-637), and what is usual at a meal comes first among the recents
   (MM-639). If the owner still wants a star, it is a ticket of its own.
@@ -482,7 +484,7 @@ runtime.
 
 | ID | Hypothesis | How to check |
 | --- | --- | --- |
-| F-03 / H-06 | Open Food Facts liquids are stored per 100 mL as per 100 g, and their `serving_quantity` (mL) as grams. The OFF schema says `_100g` means "100 ml for liquids". The online path also strips "(240 ml)" from descriptions. USDA Branded mL basis is unconfirmed. | A pack query for the share of OFF and Branded rows whose serving unit is mL; compare three known drinks against their labels. |
+| F-03 / H-06 | Open Food Facts liquids are stored per 100 mL as per 100 g, and their `serving_quantity` (mL) as grams. The OFF schema says `_100g` means "100 ml for liquids". The online path also strips "(240 ml)" from descriptions. USDA Branded mL basis is unconfirmed. | **Confirmed on both sources, 2026-10-27** (queries and counts in `docs/food-packs-data.md`, "Liquids, measured"). Branded: 13.5% of US rows are stated in mL (`ml` and `MLT`), their per-100 figures are per 100 mL, and the extract drops the serving on every one of them, because it keeps only `g`/`GRM`. OFF: 8% of US servings are in mL, `serving_quantity` is the mL number in 99.9% of them, and the per-100 figures are per 100 mL. Coke, 2% milk and Tropicana match their labels in both. |
 | H-01 | While a corrected query loads, the previous empty answer shows "Nothing found for" the new query. | Story or test with a delayed catalog. |
 | H-02 | A failed log search (`searchLoggedFoods`) is silent and leaves the previous "From your log" rows up. | Test with a rejecting reader. |
 | H-03 | A single delete shows "Removed" and Undo before the delete has worked; if it fails, Undo duplicates the food. | Test with a rejecting `deleteFood`. |
@@ -631,7 +633,7 @@ the appendix).
    only with a density.
 
 Branded servings stated in mL are ingested with their mL. Open Food Facts
-liquids are read per 100 mL (pending H-06's check).
+liquids are read per 100 mL (H-06 confirmed both on 2026-10-27).
 
 A label's own cup (240 mL) and a customary cup (236.6 mL) are never mixed:
 eating the source's own unit scales by its count (`servingUnit`, as
