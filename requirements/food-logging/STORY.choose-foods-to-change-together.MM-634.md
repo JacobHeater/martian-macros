@@ -34,9 +34,9 @@ Choices made without asking (say if any is wrong):
 - **Focus and what is said** (the UX guard's UX-1): when choosing starts, the box it started from holds
   the focus and "Choosing: tick the foods to change together" is said. When it ends, focus is back on the
   row it started from. The bar stays clear of a snack (MM-302, the designer's PD-1).
-- Follow-ups noted, not built: the bar's count spoken as it changes; focus when the row it started from
-  was deleted or moved away; the bar's height at 200% text (UX-2); "Done" and "Select" may be worded
-  better (UX-4, UX-6, owner's call).
+- Follow-ups, since built: the bar's count spoken as it changes (MM-640); focus when the row it started
+  from was deleted or moved away, and a story of the bar at 200% text (MM-649); "Done" is "Cancel" (MM-644).
+  Still the owner's call: whether "Select" is worded better (UX-6).
 
 ## Description
 On the Food screen, foods can be chosen, from one meal or several, and their time eaten, meal or day

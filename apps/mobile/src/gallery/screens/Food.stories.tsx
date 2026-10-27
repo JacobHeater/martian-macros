@@ -135,6 +135,19 @@ export const FoodChoosing = screenStory({
   },
 });
 
+/** MM-634's follow-up (UX-2): choosing at 200% text: the boxes wrap and the bar at the foot keeps its action in reach. */
+export const FoodChoosingLargeText = screenStory({
+  covers: ['FoodScreen'],
+  shows: /chosen$/,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Select' }));
+  },
+  textScale: 2,
+});
+
 /** MM-634: choosing with nothing chosen: the bar asks for foods, and its action is off. */
 export const FoodChoosingNone = screenStory({
   covers: ['FoodScreen'],

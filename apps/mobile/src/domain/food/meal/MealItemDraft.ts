@@ -1,3 +1,4 @@
+import type { QuantitySource } from '../../QuantitySource';
 import type { Micronutrients } from '../micros/Micronutrients';
 import type { FoodEvidence } from './FoodEvidence';
 import type { UsualPortion } from './UsualPortion';
@@ -14,6 +15,12 @@ export interface MealItemDraft {
   readonly lookup?: string | undefined;
   /** How much of it was eaten in this meal. */
   readonly grams?: number | undefined;
+  /**
+   * How the grams were measured (MM-646): what the person said for a food
+   * they typed in by hand; none for the assistant's own item, whose grams
+   * are judged from the photo.
+   */
+  readonly method?: QuantitySource | undefined;
   /** A reasonable serving of it on its own, for logging it again (MM-595); required of an answer. */
   readonly usualPortion?: UsualPortion | undefined;
   readonly kcal?: number | undefined;

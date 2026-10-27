@@ -10,8 +10,9 @@ import type { MealItemDraft } from './MealItemDraft';
  * The food entry one food of an analysed meal is logged as (MM-586): its
  * numbers for the grams eaten, with those numbers per 100 g as its
  * reference, so it is graded as any weighed food is (MM-382). It is
- * measured by photo estimate, carries its meal and where its numbers came
- * from. `item` must have every number `mealItemProblems` asks for.
+ * measured as the item says, by photo estimate when it does not say (the
+ * assistant's own item; MM-646), and carries its meal and where its numbers
+ * came from. `item` must have every number `mealItemProblems` asks for.
  */
 export function entryOfMealItem(
   item: MealItemDraft,
@@ -22,6 +23,7 @@ export function entryOfMealItem(
     throw new ArgumentError('A food of a meal is logged with its grams, calories and macros.');
   }
   const totals = new NutritionTotals({ kcal, proteinG, carbsG, fatG });
+  const method = item.method ?? 'photoEstimate';
   return new FoodEntry({
     id,
     date,
@@ -31,9 +33,9 @@ export function entryOfMealItem(
     proteinG,
     carbsG,
     fatG,
-    source: 'photoEstimate',
+    source: method,
     portion: {
-      method: 'photoEstimate',
+      method,
       basis: 'calculated',
       quantity: grams,
       unit: 'gram',
