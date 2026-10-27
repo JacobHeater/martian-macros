@@ -6,6 +6,7 @@ import { useLoaded } from '../../app/useLoaded';
 import { MmButton } from '../../ui/MmButton';
 import { MmIconButton } from '../../ui/MmIconButton';
 import { MmListRow } from '../../ui/MmListRow';
+import { MmMenuButton } from '../../ui/MmMenuButton';
 import { useOverlays } from '../../ui/useOverlays';
 import { CustomFoodForm } from './CustomFoodForm';
 import { RecipeForm } from './RecipeForm';
@@ -20,13 +21,19 @@ interface MyFoodsStepProps {
   initialBarcode?: string | undefined;
   /** A database food copied to be corrected (MM-153): the form opens on it. */
   draft?: CustomFood | undefined;
+  /**
+   * Logs a saved food (MM-635): pressing one opens its amount step, and a
+   * food just made from a scanned label or a corrected copy comes back to be
+   * logged. Without it, pressing a food edits it.
+   */
+  onPick?: ((food: CustomFood) => void) | undefined;
 }
 
 /** Which screen of "My foods" is showing. */
 type MyFoodsPage = 'list' | 'foodForm' | 'recipeForm';
 
 /** The foods and recipes the user saved: add, edit and delete them (MM-45). */
-export function MyFoodsStep({ onBack, initialBarcode, draft }: MyFoodsStepProps) {
+export function MyFoodsStep({ onBack, initialBarcode, draft, onPick }: MyFoodsStepProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const foods = useLoaded(state.customFoods) ?? [];
@@ -50,12 +57,20 @@ export function MyFoodsStep({ onBack, initialBarcode, draft }: MyFoodsStepProps)
     if (ok) await services.customFoods.deleteCustomFood(food.id);
   };
 
-  if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} draft={editing === undefined ? draft : undefined} onDone={() => show('list')} />;
+  // A food made for what was being logged (a scanned label, a corrected copy) goes on to be logged (MM-635).
+  const madeToLog = initialBarcode !== undefined || draft !== undefined;
+  const formDone = (saved?: CustomFood) => {
+    if (saved !== undefined && editing === undefined && madeToLog && onPick !== undefined) onPick(saved);
+    else show('list');
+  };
+  if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} draft={editing === undefined ? draft : undefined} onDone={formDone} />;
   if (page === 'recipeForm') return <RecipeForm recipe={editing} onDone={() => show('list')} />;
   return (
     <div className="food-sheet">
       <h2 className="app-headline">My foods</h2>
-      <p className="app-caption">Foods and recipes you save appear first when you search.</p>
+      <p className="app-caption">
+        {onPick === undefined ? 'Foods and recipes you save appear first when you search.' : 'Press one to log it. Foods and recipes you save also appear first when you search.'}
+      </p>
       <div className="app-gap-small" />
       {foods.length === 0 ? <p className="app-text food-no-hits">Nothing saved yet.</p> : null}
       {foods.map((food) => (
@@ -66,8 +81,24 @@ export function MyFoodsStep({ onBack, initialBarcode, draft }: MyFoodsStepProps)
             `${food.kind === 'recipe' ? 'Recipe' : 'Food'} · ${food.servingDescription} · ` +
             Fmt.kcal(food.perServing.kcal)
           }
-          onPress={() => show(food.kind === 'recipe' ? 'recipeForm' : 'foodForm', food)}
-          trailingAction={<MmIconButton icon="delete" label={`Delete ${food.name}`} onPress={() => void remove(food)} />}
+          // In Add food, pressing a saved food logs it; its editing and deleting are in its menu (MM-635).
+          opens={onPick !== undefined}
+          onPress={() => (onPick === undefined ? show(food.kind === 'recipe' ? 'recipeForm' : 'foodForm', food) : onPick(food))}
+          trailingAction={
+            onPick === undefined ? (
+              <MmIconButton icon="delete" label={`Delete ${food.name}`} onPress={() => void remove(food)} />
+            ) : (
+              <MmMenuButton<'edit' | 'delete'>
+                icon="more"
+                label={`More actions for ${food.name}`}
+                items={[
+                  { value: 'edit', label: 'Edit' },
+                  { value: 'delete', label: 'Delete' },
+                ]}
+                onSelect={(action) => (action === 'edit' ? show(food.kind === 'recipe' ? 'recipeForm' : 'foodForm', food) : void remove(food))}
+              />
+            )
+          }
         />
       ))}
       <div className="app-gap-small" />

@@ -31,6 +31,12 @@ async function open(): Promise<HTMLElement> {
 }
 
 const logged = () => first(repos.food.watchFood(today));
+
+/** Opens a saved food's editor from its menu in Saved (MM-635). */
+async function editSaved(sheet: HTMLElement, name: string): Promise<void> {
+  await press(sheet, `More actions for ${name}`);
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+}
 const saved = () => first(repos.customFoods.watchCustomFoods());
 
 async function createBar(sheet: HTMLElement): Promise<void> {
@@ -114,7 +120,8 @@ it('editing a saved food does not rewrite what was logged', async () => {
   await expect.poll(() => screen.queryByRole('dialog')).toBeNull();
   sheet = await openAddFood();
   await press(sheet, 'Saved');
-  await press(sheet, /^Protein bar(?!:)/);
+  // MM-635: in Add food a saved food is edited from its menu; pressing it logs it.
+  await editSaved(sheet, 'Protein bar');
   await typeIn(sheet, 'Calories', '150');
   await press(sheet, 'Save food');
   await expect.poll(async () => (await saved())[0]?.perServing.kcal).toBe(150);
@@ -222,7 +229,8 @@ it('deleting a saved food asks first and keeps the sheet open', async () => {
   );
   const sheet = await open();
   await press(sheet, 'Saved');
-  await press(sheet, 'Delete Old bar');
+  await press(sheet, 'More actions for Old bar');
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
   const question = await screen.findByRole('dialog', { name: 'Delete Old bar?' });
   await userEvent.click(within(question).getByRole('button', { name: 'Delete' }));
   expect(await within(sheet).findByText('Nothing saved yet.')).toBeInTheDocument();
@@ -288,7 +296,7 @@ async function editRecipe(name: string): Promise<HTMLElement> {
   await openTab('Food');
   const sheet = await openAddFood();
   await press(sheet, 'Saved');
-  await userEvent.click(await within(sheet).findByRole('button', { name: new RegExp(`^${name}`) }));
+  await editSaved(sheet, name);
   await within(sheet).findByRole('heading', { name: 'Edit your recipe' });
   return sheet;
 }
@@ -406,3 +414,17 @@ it("a recipe's ingredients can be put in another order", async () => {
   await expect.poll(async () => (await saved()).length).toBe(1);
   expect((await saved())[0]?.ingredients.map((i) => i.name)).toEqual(['Onion', 'Beef']);
 });
+
+// MM-635 (the owner, 2026-10-26): in Add food, a saved food is logged by pressing it.
+it('MM-635: pressing a saved food in Add food opens its amount step and logs it', async () => {
+  await repos.customFoods.saveCustomFood(
+    food({ name: 'Protein bar', servingDescription: '1 bar', servingGrams: 30, kcal: 120, proteinG: 10, carbsG: 12, fatG: 4 }),
+  );
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  expect(await within(sheet).findByText(/^Press one to log it/)).toBeInTheDocument();
+  await press(sheet, /^Protein bar/);
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await logged()).map((f) => [f.name, f.kcal])).toEqual([['Protein bar', 120]]);
+});
+

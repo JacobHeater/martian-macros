@@ -125,6 +125,7 @@ and WS-09 steps 1 and 8.
 21. **Several foods for one meal (MM-631).** The owner's first priority and D-1, D-2 (2026-10-26): foods added one after another to an "In this meal" list and logged together, as loose foods, at one meal and time; the sheet asks before it is left with them.
 22. **Copies said and undoable (MM-633).** The plan's B3 (2026-10-26): a copy says what was copied and where with Undo, is made once however often pressed, and a meal copies to any day from its menu.
 23. **Choose foods to change together (MM-634).** The plan's C3 (2026-10-26): "Select" from a food's or meal's menu turns the day's rows into boxes to tick, and a bar at the foot changes the chosen foods' time, meal or day, copies or deletes them, in one step with Undo.
+24. **Saved foods log when pressed (MM-635).** The owner, 2026-10-26: in Add food, a saved food is logged by pressing it; Edit and Delete are in its menu.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -174,6 +175,7 @@ workstream's.
 - Added 2026-10-26 (step 21): MM-631 (several foods for one meal in one sitting; done).
 - Added 2026-10-26 (step 22): MM-633 (a copy says so with Undo, once, to any day; done).
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
+- Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
