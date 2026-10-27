@@ -64,8 +64,10 @@ two.
 food under 10 kcal per 100 g (broth, coffee, a diet drink), which has almost
 nothing to grade per calorie; an estimate; an entry whose grams are not known
 (or, for a drink stated per 100 mL, its millilitres: MM-654);
-a recipe, whose ingredients carry no fiber or sodium; and a food that does not
-state fiber or sodium, since a missing value is never zero (MM-310).
+a recipe, whose ingredients carry no sodium; and a food that does not
+state sodium, since a missing value is never zero (MM-310). A fiber that is not
+stated is counted as none and the grade says so (MM-656, the owner): fiber can
+only count for a food, so the letter is at worst a step too low.
 
 ## Inputs
 

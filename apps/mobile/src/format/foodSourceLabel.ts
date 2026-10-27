@@ -1,7 +1,7 @@
 import type { CatalogFood } from '../foodCatalog';
 
-/** Where a food's numbers came from, in words (MM-153). Never "verified". */
-export function foodSourceLabel(food: CatalogFood): string {
+/** Where a food's numbers came from, in words (MM-153). Never "verified". A logged entry's origin names its source the same way (MM-657). */
+export function foodSourceLabel(food: Pick<CatalogFood, 'source'> | { source: string }): string {
   switch (food.source) {
     case 'usda_foundation':
     case 'usda_sr_legacy':

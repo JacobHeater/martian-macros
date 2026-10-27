@@ -41,3 +41,5 @@ Fixed in `gradeOfNutrition` (with `carbsG` in `GradeNutrition`), `GradeOmission`
 `FoodGrade`. Regression test: `test/engine/foodGrade.test.ts`, "grades a food whose unstated fiber could not
 change its letter". Not run locally; CI validates. Not checked against the owner's own parmesan entry: if its
 carbs are high enough to move the letter, it still says so.
+
+(Superseded in part by MM-656, the owner, 2026-10-27: every food with fiber unstated is graded as having none, not only those whose carbs could not change the letter.)

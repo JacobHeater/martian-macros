@@ -14,6 +14,7 @@ import type { AppServices } from '../../src/state/AppServices';
 import { foodSheet, openAddFood, press, typeIn } from '../support/addFood';
 import { first } from '../support/first';
 import { fixtureCatalog, withCatalog } from '../support/fixtureCatalog';
+import { onlineSource } from '../support/onlineFixtures';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
@@ -56,6 +57,29 @@ const soda: PackEntry = {
   servings: [{ description: '1 can (355 mL)', milliliters: 355 }],
 };
 
+/**
+ * The same soda as a web service answers with it (MM-58): per 100 g as the online path still keeps it, its serving
+ * in millilitres only, and neither fiber nor sugars stated, as the owner's entry was.
+ */
+const onlineSoda: PackEntry = {
+  food: new CatalogFood({
+    id: 0,
+    packId: 'online',
+    name: 'CRUSH, SODA, ORANGE, ORANGE',
+    brand: 'CRUSH',
+    kcal: 54,
+    proteinG: 0,
+    carbsG: 14.4,
+    fatG: 0,
+    sodiumMg: 15,
+    source: 'usda_branded',
+    sourceId: '2000001',
+    tier: 'label',
+    tierReason: 'Test data, not a nutrition source.',
+  }),
+  servings: [{ description: '1 can', milliliters: 355 }],
+};
+
 beforeAll(async () => {
   catalog = await fixtureCatalog(FixturePack.header, [...FixturePack.entries, soda]);
 });
@@ -71,7 +95,7 @@ beforeEach(async () => {
 /** The app over the in-memory stores, with the food log in the real database. */
 const open = () =>
   renderApp(repos, today, {
-    change: (services: AppServices) => withCatalog(catalog)({ ...services, food: sql.food }),
+    change: (services: AppServices) => withCatalog(catalog)({ ...services, food: sql.food, onlineSources: [onlineSource([onlineSoda])] }),
   });
 
 const gradeOnTheRow = () => screen.findByRole('button', { name: /^Grade D for Orange soda/ }, slowly);
@@ -113,4 +137,33 @@ it('MM-654: four fluid ounces of soda, logged on the phone, kept, reopened and e
   await expect.poll(async () => (await first(sql.food.watchFood(today)))[0]?.portion?.quantity, slowly).toBe(6);
   expect(await gradeOnTheRow()).toBeInTheDocument();
   expect(noGradeOnTheRow()).toBeNull();
+});
+
+it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged by its can, shows a C on the row (its sugars unstated, so not counted) and says its source when edited', async () => {
+  await repos.preferences.saveOnlineLookup('always');
+  open();
+  await openTab('Food');
+  const sheet = await openAddFood();
+  await typeIn(sheet, 'Search foods', 'crush');
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Online' }));
+  await press(sheet, 'Search online');
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^CRUSH, SODA, ORANGE, ORANGE/ }, slowly));
+  await within(sheet).findByRole('button', { name: 'Log it' }, slowly);
+  await press(sheet, 'Log it');
+
+  await expect.poll(async () => (await first(sql.food.watchFood(today))).length, slowly).toBe(1);
+  const [can] = await first(sql.food.watchFood(today));
+  expect(can?.portion?.reference?.servingGrams).toBeUndefined();
+  expect(can?.portion?.reference?.servingMilliliters).toBe(355);
+  expect(can?.fiberG).toBeUndefined();
+  expect(await screen.findByRole('button', { name: /^Grade C for CRUSH, SODA, ORANGE, ORANGE/ }, slowly)).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /^No grade for CRUSH/ })).toBeNull();
+
+  // The popover says fiber was counted as none; the edit sheet says where the numbers came from.
+  await userEvent.click(screen.getByRole('button', { name: /^Grade C for CRUSH, SODA, ORANGE, ORANGE/ }));
+  expect(await screen.findByText(/Fiber isn’t stated for this food, so none was counted/)).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Got it' }));
+  await userEvent.click(await screen.findByRole('button', { name: /^Edit CRUSH, SODA, ORANGE, ORANGE/ }, slowly));
+  const edit = await foodSheet('Edit food');
+  expect(within(edit).getByText('Source: Manufacturer label (USDA), found online.')).toBeInTheDocument();
 });
