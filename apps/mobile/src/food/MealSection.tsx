@@ -34,13 +34,14 @@ import { FoodGrade } from './FoodGrade';
 import { LoggedMealRow } from './meal/LoggedMealRow';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
+import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { showMealSplitSheet } from './showMealSplitSheet';
 import { SolidProteinMarker } from './SolidProteinMarker';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 /** What a slot's ⋯ menu does (MM-597, MM-630). */
-type SlotAction = 'split' | 'time' | 'meal' | 'day' | 'copy';
+type SlotAction = 'split' | 'time' | 'meal' | 'day' | 'copy' | 'save';
 
 interface MealSectionProps {
   meal: Meal;
@@ -110,6 +111,11 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
   const slotAction = async (action: SlotAction) => {
     if (action === 'split') {
       void showMealSplitSheet(overlays, day, meal, entries);
+      return;
+    }
+    // Kept to log again in one press, from Saved (MM-645).
+    if (action === 'save') {
+      void showSaveMealSheet(overlays, entries);
       return;
     }
     await changeTogether(services.food, overlays, {
@@ -210,6 +216,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
                 { value: 'meal', label: 'Move to another meal' },
                 { value: 'day', label: 'Move to another day' },
                 { value: 'copy', label: 'Copy to another day' },
+                { value: 'save', label: 'Save as a meal' },
               ]}
               onSelect={(action) => void slotAction(action)}
             />

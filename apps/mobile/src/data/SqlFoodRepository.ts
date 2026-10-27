@@ -7,38 +7,14 @@ import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { orNull } from './columns';
+import { foodEntryValues } from './foodEntryValues';
 import { foodFromRow } from './foodFromRow';
-import { microsValues } from './microsValues';
-import { portionValues } from './portionValues';
 import { insert } from './insert';
 import { update } from './update';
-import type { Values } from './Values';
 
 /** A LIKE pattern for names holding `query`, its own % and _ taken literally (MM-596). SQLite's LIKE ignores ASCII case. */
 const containing = (query: string) => `%${query.trim().replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
 
-const valuesOf = (entry: FoodEntry): Values => ({
-  epoch_day: entry.date.epochDay,
-  meal: entry.meal,
-  name: entry.name,
-  kcal: entry.kcal,
-  protein_g: entry.proteinG,
-  carbs_g: entry.carbsG,
-  fat_g: entry.fatG,
-  quantity_source: entry.source,
-  fiber_g: orNull(entry.fiberG),
-  sugar_alcohols_g: orNull(entry.sugarAlcoholsG),
-  sodium_mg: orNull(entry.sodiumMg),
-  alcohol_g: orNull(entry.alcoholG),
-  eaten_at_minute: orNull(entry.eatenAt),
-  logged_meal_key: orNull(entry.loggedMeal?.key),
-  logged_meal_name: orNull(entry.loggedMeal?.name),
-  evidence_kind: orNull(entry.evidence?.kind),
-  evidence_citation: orNull(entry.evidence?.citation),
-  ...microsValues(entry.micros),
-  ...portionValues(entry.portion),
-});
 
 /** `FoodRepository` kept in the database. Ids are never reused. */
 export class SqlFoodRepository implements FoodRepository {
@@ -66,12 +42,12 @@ export class SqlFoodRepository implements FoodRepository {
   }
 
   addFood(entry: FoodEntry): Promise<number> {
-    return this.db.write(['food_entries'], (db) => insert(db, 'food_entries', valuesOf(entry)));
+    return this.db.write(['food_entries'], (db) => insert(db, 'food_entries', foodEntryValues(entry)));
   }
 
   updateFood(entry: FoodEntry): Promise<void> {
     return this.db.write(['food_entries'], (db) =>
-      update(db, 'food_entries', valuesOf(entry), { column: 'id', value: entry.id }),
+      update(db, 'food_entries', foodEntryValues(entry), { column: 'id', value: entry.id }),
     );
   }
 
@@ -93,8 +69,8 @@ export class SqlFoodRepository implements FoodRepository {
         if (found.length !== touched.length) throw new Error('A food to change is no longer in the log.');
       }
       const ids: number[] = [];
-      for (const entry of add) ids.push(await insert(db, 'food_entries', valuesOf(entry)));
-      for (const entry of updates) await update(db, 'food_entries', valuesOf(entry), { column: 'id', value: entry.id });
+      for (const entry of add) ids.push(await insert(db, 'food_entries', foodEntryValues(entry)));
+      for (const entry of updates) await update(db, 'food_entries', foodEntryValues(entry), { column: 'id', value: entry.id });
       for (const id of deletes) await db.execute('DELETE FROM food_entries WHERE id = ?', [id]);
       return ids;
     });

@@ -3,6 +3,7 @@ import { ExerciseProgression } from '../../src/domain/training/ExerciseProgressi
 import { FakeHealthSource, HealthImporter, recordedHealthHistory } from '../../src/healthIngest';
 import { customExerciseRepositoryContract } from '../contracts/customExerciseRepositoryContract';
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
+import { savedMealRepositoryContract } from '../contracts/savedMealRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
 import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
@@ -63,6 +64,7 @@ preferencesRepositoryContract('SQLite', async () => (await open()).preferences);
 weighInWindowContract('SQLite', async () => (await open()).weighInWindow);
 foodRepositoryContract('SQLite', async () => (await open()).food);
 customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);
+savedMealRepositoryContract('SQLite', async () => (await open()).savedMeals);
 dayMarkRepositoryContract('SQLite', async () => (await open()).dayMarks);
 dayKindRepositoryContract('SQLite', async () => (await open()).dayKinds);
 targetsHistoryRepositoryContract('SQLite', async () => (await open()).targets);

@@ -1,6 +1,7 @@
 import { InMemoryProgressPhotoRepository } from './InMemoryProgressPhotoRepository';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
+import type { SavedMealRepository } from '../domain/repositories/SavedMealRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
@@ -37,6 +38,7 @@ import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import { InMemoryHealthSampleStore } from '../healthIngest/testing/InMemoryHealthSampleStore';
 import { InMemoryCustomExerciseRepository } from './InMemoryCustomExerciseRepository';
 import { InMemoryCustomFoodRepository } from './InMemoryCustomFoodRepository';
+import { InMemorySavedMealRepository } from './InMemorySavedMealRepository';
 import { InMemoryDataEraser } from './InMemoryDataEraser';
 import { InMemoryDayKindRepository } from './InMemoryDayKindRepository';
 import { InMemoryDayMarkRepository } from './InMemoryDayMarkRepository';
@@ -83,6 +85,7 @@ export class InMemoryRepositories {
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
+  readonly savedMeals: SavedMealRepository;
   readonly dayMarks: DayMarkRepository;
   /** The days marked a Refeed or a Day off (MM-611). */
   readonly dayKinds: DayKindRepository;
@@ -122,6 +125,7 @@ export class InMemoryRepositories {
     const water = new InMemoryWaterRepository();
     const food = new InMemoryFoodRepository();
     const customFoods = new InMemoryCustomFoodRepository();
+    const savedMeals = new InMemorySavedMealRepository();
     const dayMarks = new InMemoryDayMarkRepository();
     const dayKinds = new InMemoryDayKindRepository();
     const targets = new InMemoryTargetsHistoryRepository();
@@ -153,6 +157,7 @@ export class InMemoryRepositories {
     this.water = water;
     this.food = food;
     this.customFoods = customFoods;
+    this.savedMeals = savedMeals;
     this.dayMarks = dayMarks;
     this.dayKinds = dayKinds;
     this.intake = new InMemoryIntakeReader(food, dayMarks);
@@ -185,6 +190,7 @@ export class InMemoryRepositories {
       () => water.clear(),
       () => food.clear(),
       () => customFoods.clear(),
+      () => savedMeals.clear(),
       () => dayMarks.clear(),
       () => dayKinds.clear(),
       () => targets.clear(),

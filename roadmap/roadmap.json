@@ -2626,7 +2626,8 @@
           "MM-637",
           "MM-642",
           "MM-643",
-          "MM-644"
+          "MM-644",
+          "MM-645"
         ],
         "remaining": [
           "MM-37",
@@ -2953,6 +2954,13 @@
             "MM-642",
             "MM-643",
             "MM-644"
+          ]
+        },
+        {
+          "step": 28,
+          "title": "Save a meal and log it again in one press, from Saved or search (the owner, 2026-10-26, MM-645; schema 30)",
+          "tickets": [
+            "MM-645"
           ]
         }
       ],

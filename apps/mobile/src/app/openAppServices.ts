@@ -117,6 +117,7 @@ export async function openAppServices(): Promise<AppServices> {
     water: new MirroredWaterLog({ log: repositories.water, platform: healthWriting }),
     food: new MirroredFoodLog({ log: repositories.food, platform: healthWriting }),
     customFoods: repositories.customFoods,
+    savedMeals: repositories.savedMeals,
     dayMarks: repositories.dayMarks,
     dayKinds: repositories.dayKinds,
     intake: repositories.intake,
