@@ -22,6 +22,7 @@ import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
+import { FoodDayMarkRow } from './FoodDayMarkRow';
 import { changeTogether } from './changeTogether';
 import { MealSection } from './MealSection';
 import { SelectionBar } from './SelectionBar';
@@ -185,13 +186,18 @@ export function FoodScreen() {
         />
       ))}
       <WaterSection day={day} />
-      {entries.length === 0 ? null : (
-        <>
-          <div className="food-complete-row">
-            <FoodCompletenessRow day={day} entries={entries} />
-            <FoodDayGradeRow entries={entries} />
-          </div>
-        </>
+      {/* The day's rows: completeness and its grade once anything is logged; its Refeed or Day off for any day up to
+          today, with or without entries (MM-611, MM-655: a day off may have nothing logged). */}
+      {entries.length === 0 && day.isAfter(today) ? null : (
+        <div className="food-complete-row">
+          {entries.length === 0 ? null : (
+            <>
+              <FoodCompletenessRow day={day} entries={entries} />
+              <FoodDayGradeRow entries={entries} />
+            </>
+          )}
+          <FoodDayMarkRow day={day} />
+        </div>
       )}
       {/* Last, so it is held in view at the foot while everything above it scrolls (MM-634). */}
       {selected === undefined ? null : (
