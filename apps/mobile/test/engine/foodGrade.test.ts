@@ -390,6 +390,35 @@ describe('a pack food, a food of one’s own, and a logged entry', () => {
     const estimate = new FoodEntry({ id: 2, date: CalendarDate.of(2026, 10, 18), meal: 'lunch', name: 'Soup', kcal: 220, proteinG: 9, carbsG: 30, fatG: 6, source: 'quickAdd' });
     expect(gradeOfFoodEntry(estimate)).toEqual({ kind: 'ungradable', reason: 'Estimated, so not graded.' });
     const typed = new FoodEntry({ id: 3, date: CalendarDate.of(2026, 10, 18), meal: 'lunch', name: 'Curry', kcal: 450, proteinG: 20, carbsG: 40, fatG: 20, source: 'weighed' });
-    expect(gradeOfFoodEntry(typed)).toMatchObject({ kind: 'ungradable', reason: expect.stringMatching(/grams isn’t known/) });
+    expect(gradeOfFoodEntry(typed)).toMatchObject({ kind: 'ungradable', reason: 'The amount in grams or millilitres isn’t known, so the food can’t be graded.' });
+  });
+
+  it('MM-654: grades a drink logged by volume per 100 mL, as the pack grades it, with no density', () => {
+    // An orange soda stated per 100 mL: 54 kcal, 14.4 g of sugars, 15 mg of sodium, no fiber stated; 4 fl oz of it.
+    const ml = 4 * 29.5735295625;
+    const f = ml / 100;
+    const soda = new FoodEntry({
+      id: 4,
+      date: CalendarDate.of(2026, 10, 27),
+      meal: 'lunch',
+      name: 'Orange soda',
+      kcal: 54 * f,
+      proteinG: 0,
+      carbsG: 14.4 * f,
+      fatG: 0,
+      sodiumMg: 15 * f,
+      source: 'householdMeasure',
+      micros: new Micronutrients({ sugars: 14.4 * f }),
+      portion: {
+        method: 'householdMeasure',
+        basis: 'calculated',
+        quantity: 4,
+        unit: 'fluidOunce',
+        reference: { basis: 'per100ml', nutrition: new NutritionTotals({ kcal: 54, proteinG: 0, carbsG: 14.4, fatG: 0 }) },
+      },
+    });
+    const per100ml = gradeOfNutrition({ kcal: 54, proteinG: 0, carbsG: 14.4, fiberG: undefined, sodiumMg: 15, sugarsG: 14.4, saturatedFatG: undefined, alcoholG: undefined, micros: {} });
+    expect(per100ml).toMatchObject({ kind: 'graded', letter: 'D' });
+    expect(gradeOfFoodEntry(soda)).toEqual(per100ml);
   });
 });
