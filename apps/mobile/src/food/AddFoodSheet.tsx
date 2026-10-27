@@ -51,6 +51,7 @@ import { MmIconButton } from '../ui/MmIconButton';
 import { useOverlays } from '../ui/useOverlays';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
+import { MmSegmented } from '../ui/MmSegmented';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { AlcoholFields } from './AlcoholFields';
@@ -269,6 +270,9 @@ const foodsText = (count: number) => (count === 1 ? '1 food' : `${count} foods`)
 /** How many times in four weeks make a food usual at a meal, and first among the recent foods there (MM-639). */
 const usualTimes = 2;
 
+/** Where a search's results come from, one list at a time, chosen at the top (MM-652): `undefined` lets the sheet choose. */
+type ResultSource = 'own' | 'database' | 'online';
+
 /** How many recent foods the sheet lists before "More recent foods" (MM-439). */
 const recentsFirst = 5;
 
@@ -331,6 +335,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const today = useCell(state.today);
   const overlays = useOverlays();
   const hand = useCell(state.handSize);
+  // Whether online is offered changes as the person's choice loads and is answered (MM-58); the chooser follows it (MM-652).
+  useCell(state.onlineLookup.choice);
+  useCell(state.onlineLookup.allowedOnce);
   const recents = useLoaded(state.recentFoods) ?? [];
   const recentMeals = useLoaded(state.recentMeals) ?? [];
   // The four weeks before the day, to know what is usual at a meal (MM-639).
@@ -380,6 +387,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    * loose foods, at the list's meal and time. Kept only while the sheet is open.
    */
   const [listed, setListed] = useState<readonly FoodEntry[]>([]);
+  // The results chosen at the top, for this search (MM-652); cleared with the search, so the next starts where it should.
+  const [source, setSource] = useState<ResultSource>();
   /** Whether the list could not be logged: said above its action (MM-624). */
   const [listFailed, setListFailed] = useState(false);
   /** Whether the list's line takes focus once drawn: after a food is added or taken out (the UX guard's UX-1). */
@@ -827,6 +836,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     savedMeals.some((m) => matches(m.name)) ||
     (fromLog?.foods.length ?? 0) > 0 ||
     (fromLog?.meals.length ?? 0) > 0;
+  // Online is a choice only where it is offered: a source exists and the person has not said never (MM-58). Once
+  // chosen it stays for the search, so "Never" answered there leaves its notice in view (MM-58, the panel's F6).
+  const onlineOffered = state.onlineLookup.available && (state.onlineLookup.allowed || state.onlineLookup.mustAsk || source === 'online');
+  /** The results shown: what the person chose, or their own when any matched, else the food database (MM-652). */
+  const shownSource: ResultSource = source ?? (ownFound ? 'own' : 'database');
   // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What is usual at
   // the meal being added to comes first, most often first (MM-639), then what was last logged at it (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
@@ -1035,7 +1049,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     const unit = form.unit;
     return (
       <>
-        <div className="app-row food-chips" role="group" aria-label="Unit">
+        <div className="app-row food-chips food-chips-fill" role="group" aria-label="Unit">
           {candidates.map((u) => (
             <MmChoiceChip
               key={u}
@@ -1223,7 +1237,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   return (
     <div className="food-sheet">
       <h2 className="app-headline">{isEditing ? 'Edit food' : 'Add food'}</h2>
-      {searching ? <MmTextField label="Search foods" value={search} onChange={setSearch} /> : null}
+      {searching ? (
+        <MmTextField
+          label="Search foods"
+          value={search}
+          onChange={(words) => {
+            setSearch(words);
+            if (words.trim() === '') setSource(undefined);
+          }}
+        />
+      ) : null}
       {searching && listed.length > 0 ? listBlock(query !== '') : null}
       {/* With foods in the list, only the ways that add to it: AI analysis, Saved and Estimate log on their own (MM-631). */}
       {searching && query === '' && listed.length > 0 ? (
@@ -1261,44 +1284,62 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         <>
           {query !== '' ? (
             <>
-              {/* The person's own foods and log, apart from the food database's, each under its own heading (MM-637). */}
-              {ownFound ? <p className="food-label food-label-spaced">Your foods and meals</p> : null}
-              {customFoods
-                .filter((food) => matches(food.name))
-                .map((food) => (
-                  <MmListRow
-                    key={`custom-${food.id}`}
-                    title={food.name}
-                    subtitle={
-                      `${food.kind === 'recipe' ? 'Your recipe' : 'Your food'} · ` +
-                      `${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`
-                    }
-                    opens
-                    onPress={() => pickCustom(food)}
-                    trailingAction={gradeBeside(food.name)}
-                  />
-                ))}
-              {/* The meals saved to log again (MM-645). */}
-              {savedMeals
-                .filter((m) => matches(m.name))
-                .map((m) => (
-                  <MmListRow
-                    key={`saved-meal-${m.id}`}
-                    title={m.name}
-                    subtitle={`Your meal · logs ${m.foods.length === 1 ? '1 food' : `${m.foods.length} foods`} · ${Fmt.kcal(m.foods.reduce((sum, f) => sum + f.kcal, 0))}`}
-                    onPress={() => void logSavedMeal(m)}
-                  />
-                ))}
-              {/* Everything ever logged that matches, not only the recent (MM-596). */}
-              {(fromLog?.meals ?? []).map((m) => (
-                <RecentMealRow key={`logged-meal-${m.key}`} lead="From your log" meal={m} onPress={() => void logAgain(m)} trailingAction={mealGradeBeside(m)} />
-              ))}
-              {(fromLog?.foods ?? []).map((e) => (
-                <RecentFoodRow key={`logged-${e.id}`} lead="From your log" entry={e} onPress={() => fill(e)} trailingAction={entryGradeBeside(e)} />
-              ))}
-              <FoodSearchResults query={query} onPick={(food) => void pick(food)} alsoFound={ownFound} />
-              {/* Beside the phone's results, never inside them, so it keeps its state while they settle (MM-58). */}
-              <OnlineSearchResults query={query} onPick={(food) => void pick(food)} />
+              {/* One list at a time, chosen at the top (MM-652, the owner): their own, the food database or online. */}
+              <div className="food-results-source">
+                <MmSegmented<ResultSource>
+                  name="Results from"
+                  segments={[
+                    { value: 'own', label: 'Yours' },
+                    { value: 'database', label: 'Database' },
+                    ...(onlineOffered ? [{ value: 'online' as const, label: 'Online' }] : []),
+                  ]}
+                  selected={shownSource}
+                  onChange={(chosen) => setSource(chosen)}
+                />
+              </div>
+              {shownSource === 'own' ? (
+                ownFound ? (
+                  <>
+                    {customFoods
+                      .filter((food) => matches(food.name))
+                      .map((food) => (
+                        <MmListRow
+                          key={`custom-${food.id}`}
+                          title={food.name}
+                          subtitle={
+                            `${food.kind === 'recipe' ? 'Your recipe' : 'Your food'} · ` +
+                            `${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`
+                          }
+                          opens
+                          onPress={() => pickCustom(food)}
+                          trailingAction={gradeBeside(food.name)}
+                        />
+                      ))}
+                    {/* The meals saved to log again (MM-645). */}
+                    {savedMeals
+                      .filter((m) => matches(m.name))
+                      .map((m) => (
+                        <MmListRow
+                          key={`saved-meal-${m.id}`}
+                          title={m.name}
+                          subtitle={`Your meal · logs ${m.foods.length === 1 ? '1 food' : `${m.foods.length} foods`} · ${Fmt.kcal(m.foods.reduce((sum, f) => sum + f.kcal, 0))}`}
+                          onPress={() => void logSavedMeal(m)}
+                        />
+                      ))}
+                    {/* Everything ever logged that matches, not only the recent (MM-596). */}
+                    {(fromLog?.meals ?? []).map((m) => (
+                      <RecentMealRow key={`logged-meal-${m.key}`} lead="From your log" meal={m} onPress={() => void logAgain(m)} trailingAction={mealGradeBeside(m)} />
+                    ))}
+                    {(fromLog?.foods ?? []).map((e) => (
+                      <RecentFoodRow key={`logged-${e.id}`} lead="From your log" entry={e} onPress={() => fill(e)} trailingAction={entryGradeBeside(e)} />
+                    ))}
+                  </>
+                ) : (
+                  <p className="app-text food-no-hits">{`Nothing of yours matches "${query}".`}</p>
+                )
+              ) : null}
+              {shownSource === 'database' ? <FoodSearchResults query={query} onPick={(food) => void pick(food)} /> : null}
+              {shownSource === 'online' ? <OnlineSearchResults query={query} onPick={(food) => void pick(food)} /> : null}
             </>
           ) : recentRows.length > 0 ? (
             <>

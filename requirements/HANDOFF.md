@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-27, by Claude, Session 44.
+Last updated: 2026-10-27, by Claude, Session 45.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -17,7 +17,7 @@ protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
 
-**Open PRs at the end of Session 44:** none expected (the liquids build, #341, merges when green; #340 recorded the H-06 check). A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 45:** none expected (MM-652 and MM-653 merge when green). A new session still checks `gh pr list` first.
 
 **Food logging, the owner's push of 2026-10-26** (`docs/food-logging-plan.md`, WS-08 steps 18 to 23). Built and
 merged: MM-623 to MM-626 (reuse keeps every nutrient; saves said and pressed once; meal writes all or nothing
@@ -34,6 +34,11 @@ choosing), MM-645 (save a meal and log it again in one press; schema 30), MM-646
 into a meal says how it was measured, and Look up offers its matches; the plan's F-19), MM-648 (extras follow the
 amount, never a corrected calorie; F-20), MM-649 (focus after the chosen row is gone; MM-634's follow-up). The
 plan's status table in `docs/food-logging-plan.md` says what is built and what is not, and why. Still open:
+- **From the phone, 2026-10-27 (the owner):** MM-652, a search's results come one list at a time, chosen at the top
+  ("Yours", "Database", "Online"; their own first when any matched; MM-637's headings gone), and MM-653, the food
+  sheets' stacked actions 12 px apart and the unit chips filling their rows. The owner dictated both, so no panel.
+  On the review that missed them: the panel reads code and stories and never sees the phone; what the owner
+  calls out from the phone is fixed without a panel pass.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
   100 g or per 100 mL, a serving by weight, by volume or both; the extract reads Branded `ml`/`MLT` rows and
   Open Food Facts mL servings as per 100 mL) and MM-651 (a drink by its can, the fluid ounce or the millilitre;

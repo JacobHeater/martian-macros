@@ -438,7 +438,7 @@ export function FoodAmountStep({
           <div className="app-gap" />
         </>
       )}
-      <div className="app-row" role="group" aria-label="Amount in">
+      <div className="app-row food-chips-fill" role="group" aria-label="Amount in">
         {choices.map((c) => (
           <MmChoiceChip key={choiceLabel(c, chosen.basis)} label={choiceLabel(c, chosen.basis)} selected={c === choice} onSelect={() => pick(c)} />
         ))}

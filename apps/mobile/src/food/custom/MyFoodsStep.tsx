@@ -136,7 +136,6 @@ export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal 
       ))}
       <div className="app-gap-small" />
       <MmButton label="New food" kind="secondary" icon="plus" expand onPress={() => show('foodForm')} />
-      <div className="app-gap-small" />
       <MmButton label="New recipe" kind="secondary" icon="plus" expand onPress={() => show('recipeForm')} />
       <MmButton label="Back" kind="text" onPress={onBack} />
     </div>
