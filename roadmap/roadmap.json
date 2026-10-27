@@ -2608,7 +2608,8 @@
           "MM-623",
           "MM-624",
           "MM-625",
-          "MM-626"
+          "MM-626",
+          "MM-627"
         ],
         "remaining": [
           "MM-37",
@@ -2863,6 +2864,13 @@
             "MM-624",
             "MM-625",
             "MM-626"
+          ]
+        },
+        {
+          "step": 19,
+          "title": "Food search lists the closest name first, says each food's serving, and offers the closest when every word finds nothing (the owner's D-3, 2026-10-26, MM-627)",
+          "tickets": [
+            "MM-627"
           ]
         }
       ],
