@@ -31,7 +31,7 @@ beforeEach(async () => {
 const on = (date: CalendarDate) => first(repos.food.watchFood(date));
 
 async function onYesterday(change?: (services: AppServices) => AppServices): Promise<void> {
-  renderApp(repos, today, { change });
+  renderApp(repos, today, change === undefined ? {} : { change });
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
 }
