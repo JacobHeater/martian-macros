@@ -10,12 +10,16 @@ function usualPortionOf(entry: FoodEntry): UsualPortion | undefined {
   return description === undefined || grams === undefined ? undefined : { description, grams };
 }
 
-/** A logged food of a meal as an item to change (MM-587): its grams, when it was logged by weight, and its numbers. */
+/**
+ * A logged food of a meal as an item to change (MM-587): its grams, when it
+ * was logged by weight, how they were measured (MM-646), and its numbers.
+ */
 export function mealItemOfEntry(entry: FoodEntry): MealItemDraft {
   const portion = entry.portion;
   return {
     name: entry.name,
     grams: portion?.unit === 'gram' ? portion.quantity : undefined,
+    method: portion?.method,
     usualPortion: usualPortionOf(entry),
     kcal: entry.kcal,
     proteinG: entry.proteinG,

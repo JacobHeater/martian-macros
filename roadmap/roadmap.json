@@ -2627,7 +2627,11 @@
           "MM-642",
           "MM-643",
           "MM-644",
-          "MM-645"
+          "MM-645",
+          "MM-646",
+          "MM-647",
+          "MM-648",
+          "MM-649"
         ],
         "remaining": [
           "MM-37",
@@ -2961,6 +2965,16 @@
           "title": "Save a meal and log it again in one press, from Saved or search (the owner, 2026-10-26, MM-645; schema 30)",
           "tickets": [
             "MM-645"
+          ]
+        },
+        {
+          "step": 29,
+          "title": "The plan's tail: a food typed into a meal says how it was measured (MM-646), Look up offers its matches (MM-647), extras follow the amount, never a corrected calorie (MM-648), focus after the chosen row is gone (MM-649), 2026-10-26",
+          "tickets": [
+            "MM-646",
+            "MM-647",
+            "MM-648",
+            "MM-649"
           ]
         }
       ],
