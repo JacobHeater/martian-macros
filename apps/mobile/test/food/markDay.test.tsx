@@ -9,7 +9,10 @@ import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
-/** MM-611: a day marked a Refeed or a Day off from the Food day's header, shown as a neutral chip and kept. */
+/**
+ * MM-611: a day marked a Refeed or a Day off, shown in the Food day's header as a neutral chip and kept; from the
+ * row after the meals since MM-655 (the owner: no flag in the header).
+ */
 const today = CalendarDate.of(2026, 10, 18);
 let repos: InMemoryRepositories;
 
@@ -23,8 +26,10 @@ beforeEach(async () => {
 
 const chip = (label: string) => screen.queryByText(label, { selector: '.mm-chip-status' });
 
+const markRow = () => screen.findByRole('button', { name: /^(Mark a refeed or a day off|Refeed|Day off)/ });
+
 async function choose(answer: string): Promise<void> {
-  await userEvent.click(await screen.findByRole('button', { name: 'Mark day' }));
+  await userEvent.click(await markRow());
   const options = await screen.findByRole('dialog', { name: 'Mark this day' });
   expect(within(options).getAllByRole('option').map((o) => o.textContent)).toEqual([
     expect.stringContaining('Refeed'),
@@ -60,7 +65,7 @@ it('clearing a Day off takes the chip away', async () => {
   await expect.poll(() => first(repos.dayKinds.watchDayKind(today))).toBe('none');
 });
 
-it('a day before today can be marked from its own header', async () => {
+it('a day before today can be marked from its own row', async () => {
   renderApp(repos, today);
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'Previous day' }));
@@ -73,6 +78,16 @@ it('a day before today can be marked from its own header', async () => {
 it('tomorrow cannot be marked: there is no step past today to reach it', async () => {
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByRole('button', { name: 'Mark day' })).toBeEnabled();
+  expect(await markRow()).toBeEnabled();
   expect(screen.queryByRole('button', { name: 'Next day' })).toBeNull();
+});
+
+it('MM-655: the header has no Mark day control; the row stands after the meals, under the completeness row', async () => {
+  renderApp(repos, today);
+  await openTab('Food');
+  const row = await markRow();
+  expect(screen.queryByRole('button', { name: 'Mark day' })).toBeNull();
+  const completeness = screen.getByRole('button', { name: /^Is this day fully logged\?/ });
+  expect(completeness.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(row).toHaveTextContent('Not marked.');
 });
