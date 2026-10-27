@@ -26,6 +26,14 @@ usability from authority or memory.
 Check that the Storybook stories show the relevant flows and interaction
 states (MM-237), including empty, loading, error and validation states, and
 the semantics and keyboard reach of the real components in them.
+A screen or sheet with chips that can wrap, stacked full-width actions, or
+names and labels that can run long is reviewed only from its story at phone
+width (360 px) with the longest realistic labels and the most choices it can
+offer (`apps/mobile/AGENTS.md`, "Drawn as the phone will draw it before
+review"; the owner, 2026-10-27). Read that story, say in the report that you
+did, and find on wrap, touching actions, ragged rows and spacing as you would
+on a phone. Without such a story, do not review the screen: return the
+request through the chair.
 ## Existing implementation audit
 Audit complete existing flows, input friction, recovery, focus, semantics,
 contrast, text scaling and accessible interaction against requirements, code,

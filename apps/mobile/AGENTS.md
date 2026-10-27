@@ -67,6 +67,18 @@ You don't run these locally, but CI fails on them, so write code that passes:
   built once the UX guard has no open blocking finding. Removals, bug fixes
   and changes the owner dictated skip the panel. Their stories are still
   updated.
+- **Drawn as the phone will draw it before review (owner, 2026-10-27, after
+  MM-652 and MM-653).** The panel reads code and stories and never sees the
+  phone, so a story must show what the phone shows. Any screen or sheet with
+  chips that can wrap, stacked full-width actions, or names and labels that
+  can run long has a story at phone width (`screenStory`'s `viewport:
+  'smallPhone'`, 360 px) with the longest realistic labels and the most
+  choices it can offer (every unit a food can have, a food in the meal's list
+  so both actions stand), and that story is named in the ticket's `## UI/UX`.
+  The reviewers read it and say in the report that they did, and a finding
+  on wrap, spacing or placement is in scope for both the product-designer and
+  the UX-accessibility role. No such story, no review: the chair returns the
+  request. Draw the longest labels from the data, not invented ones.
 - **Build a new part like its siblings (MM-318, rule 9 of
   `design/screen-direction.md`).** Before drawing a new section, row or
   control, open the nearest one on that screen and reuse it. Name that sibling
