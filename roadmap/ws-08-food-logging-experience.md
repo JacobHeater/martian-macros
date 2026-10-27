@@ -187,6 +187,9 @@ workstream's.
 - Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).
 - Added 2026-10-26 (step 27): MM-642, MM-643, MM-644 (the owner's choices on the sheet; done).
 - Added 2026-10-26 (step 28): MM-645 (saved meals, schema 30; done).
+- Added 2026-10-26 (step 29): MM-646 (a food typed into a meal says how it was measured; done), MM-647 (Look up
+  offers its matches; done), MM-648 (extras follow the amount, never a corrected calorie; done), MM-649 (focus
+  after the chosen row is gone; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

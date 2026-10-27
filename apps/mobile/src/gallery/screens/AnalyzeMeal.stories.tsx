@@ -344,6 +344,20 @@ export const ViewMealAddFood = screenStory({
   walk: press('Add a food'),
 });
 
+/** MM-647: Look up offers the foods the name finds, to choose the one it is, under how it was measured (MM-646). */
+export const ViewMealLookUp = screenStory({
+  covers: ['ViewMealSheet'],
+  shows: /foods matched\. Press the one it is\./,
+  scenario: loggedMealScenario,
+  open: ({ overlays, today }) => void showViewMealSheet(overlays, today, storyMealKey),
+  walk: async (canvas) => {
+    await press('Add a food')(canvas);
+    await userEvent.type(await sheet(canvas).findByRole('textbox', { name: 'Food' }), 'chicken breast');
+    await userEvent.type(await sheet(canvas).findByRole('textbox', { name: 'Grams eaten' }), '100');
+    await press('Look up in the app’s foods')(canvas);
+  },
+});
+
 /** MM-587: View meal for a meal no longer in the log (deleted from elsewhere): it says so. */
 export const ViewMealGone = screenStory({
   covers: ['ViewMealSheet'],
