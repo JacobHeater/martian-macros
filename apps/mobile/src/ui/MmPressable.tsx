@@ -12,6 +12,8 @@ interface MmPressableProps {
   describedBy?: string | undefined;
   /** Given the pressed content's edges, for what opens beside it (MM-562). */
   onPress: (anchor: MmAnchor) => void;
+  /** Takes focus when it first draws: where focus goes back to after something it stood for was replaced (MM-634). */
+  autoFocus?: boolean | undefined;
   children: ReactNode;
 }
 
@@ -21,7 +23,7 @@ interface MmPressableProps {
  * nothing of its own, so the content keeps its look, and it is the one way
  * a screen makes a region pressable without a raw button (MM-246).
  */
-export function MmPressable({ label, expanded, controls, describedBy, onPress, children }: MmPressableProps) {
+export function MmPressable({ label, expanded, controls, describedBy, onPress, children, autoFocus = false }: MmPressableProps) {
   return (
     <button
       type="button"
@@ -30,6 +32,7 @@ export function MmPressable({ label, expanded, controls, describedBy, onPress, c
       aria-expanded={expanded}
       aria-controls={controls}
       aria-describedby={describedBy}
+      autoFocus={autoFocus}
       onClick={(event) => onPress(event.currentTarget.getBoundingClientRect())}
     >
       {children}

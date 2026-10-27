@@ -2615,7 +2615,8 @@
           "MM-630",
           "MM-632",
           "MM-631",
-          "MM-633"
+          "MM-633",
+          "MM-634"
         ],
         "remaining": [
           "MM-37",
@@ -2901,6 +2902,13 @@
           "title": "A copy says it was made with Undo, is made once, and a meal copies to any day (the food-logging plan's B3, 2026-10-26, MM-633)",
           "tickets": [
             "MM-633"
+          ]
+        },
+        {
+          "step": 23,
+          "title": "Choose some foods of a day, from any meals, and change their time, meal or day together, copy or delete them, with Undo (the food-logging plan's C3, 2026-10-26, MM-634)",
+          "tickets": [
+            "MM-634"
           ]
         }
       ],
