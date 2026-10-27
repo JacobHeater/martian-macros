@@ -90,6 +90,8 @@ export function FoodScreen() {
   /** The foods the chosen rows stand for: a meal's row is all its foods (MM-587, MM-634). */
   const chosen = (keys: ReadonlySet<string>) =>
     entries.filter((e) => keys.has(`food:${e.id}`) || (e.loggedMeal !== undefined && keys.has(`meal:${e.loggedMeal.key}`)));
+  /** The key of a row on the day: a meal's row for a food of a logged meal, the food's own otherwise (MM-634). */
+  const rowKey = (food: FoodEntry) => (food.loggedMeal === undefined ? `food:${food.id}` : `meal:${food.loggedMeal.key}`);
   /** Does `action` to the chosen foods, then stops choosing (MM-634). */
   const changeChosen = async (action: TogetherAction, foods: readonly FoodEntry[]) => {
     const meals = new Set(foods.map((food) => food.meal));
@@ -101,6 +103,14 @@ export function FoodScreen() {
       day,
       today,
     });
+    // The row choosing started from may have left the day (deleted, or moved to another day): then the focus goes
+    // to the first row still here, never nowhere (MM-649).
+    const leaves = action === 'delete' || action === 'day';
+    const started = startedFrom.current;
+    if (leaves && started !== undefined && foods.some((food) => rowKey(food) === started)) {
+      const remaining = entries.find((entry) => !foods.includes(entry));
+      startedFrom.current = remaining === undefined ? undefined : rowKey(remaining);
+    }
     stopChoosing();
   };
   /** Copies yesterday's food to the day shown and says so with Undo (MM-633); the button is pressed once (MM-624). */

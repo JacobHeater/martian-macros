@@ -123,6 +123,13 @@ interface Form {
    */
   readonly calcRef: ReferenceNutrition | undefined;
   readonly calcAlcoholPerKcal: number | undefined;
+  /**
+   * On the typed path, what the base entry's micronutrients and sugar
+   * alcohols stand for: the calories they go with, and the servings when the
+   * numbers are per serving. They follow the servings, never a corrected
+   * calorie (MM-648).
+   */
+  readonly extrasAt: { readonly kcal: number; readonly servings: number } | undefined;
 }
 
 const blank: Form = {
@@ -145,6 +152,7 @@ const blank: Form = {
   amountNeedsReentry: false,
   calcRef: undefined,
   calcAlcoholPerKcal: undefined,
+  extrasAt: undefined,
 };
 
 const alcoholPerKcal = (e: FoodEntry) => (e.alcoholG !== undefined && e.kcal > 0 ? e.alcoholG / e.kcal : undefined);
@@ -174,6 +182,7 @@ function filledFrom(e: FoodEntry): Form {
     ...extrasOf(e, 1),
     source: e.source,
     basis: 'enteredTotals',
+    extrasAt: { kcal: e.kcal, servings: 1 },
   };
   // A food of an analysed meal comes back as one usual portion of it (MM-595, MM-596), never the amount the meal had.
   const usual = portion?.reference;
@@ -549,6 +558,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       calcRef: undefined,
       calcAlcoholPerKcal: undefined,
       basis: source === 'labelServing' ? 'calculated' : 'enteredTotals',
+      // The extras now stand for these calories, at these servings (MM-648).
+      extrasAt: totals === undefined ? undefined : { kcal: totals.kcal, servings: servings ?? 1 },
     });
   };
 
@@ -591,8 +602,20 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       alcoholG =
         form.calcAlcoholPerKcal === undefined ? scaledExtra(base?.alcoholG) : totals.kcal * form.calcAlcoholPerKcal;
     }
-    // The micronutrients scale with the amount, as fiber and sodium do (MM-308), for a food logged again too (MM-623).
-    const scaledMicros = base === undefined ? Micronutrients.none : base.micros.times(base.kcal <= 0 ? 1 : totals.kcal / base.kcal);
+    /**
+     * The micronutrients and sugar alcohols follow the amount, as fiber and sodium do (MM-308), for a food logged
+     * again too (MM-623): on the calculated path the calories say the amount; on the typed path the servings do,
+     * and a corrected calorie changes nothing but the calories (MM-648).
+     */
+    const extrasFactor = (() => {
+      if (base === undefined || base.kcal <= 0) return 1;
+      if (calc !== undefined) return totals.kcal / base.kcal;
+      const at = form.extrasAt;
+      if (at === undefined) return 1;
+      return (at.kcal / base.kcal) * (form.basis === 'calculated' && at.servings > 0 ? (amount ?? 1) / at.servings : 1);
+    })();
+    const scaledMicros = base === undefined ? Micronutrients.none : base.micros.times(extrasFactor);
+    const scaledSugarAlcohols = base?.sugarAlcoholsG === undefined ? undefined : base.sugarAlcoholsG * extrasFactor;
     /** A typed label line, times the servings when the numbers are per serving; blank is unknown, never zero. */
     const typed = (text: string) => {
       const value = parseNumber(text);
@@ -610,7 +633,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       source: logged?.method ?? form.source,
       portion: logged,
       fiberG: calc === undefined ? typed(form.fiber) : scaledExtra(base?.fiberG),
-      sugarAlcoholsG: scaledExtra(base?.sugarAlcoholsG),
+      sugarAlcoholsG: scaledSugarAlcohols,
       sodiumMg: calc === undefined ? typed(form.sodium) : scaledExtra(base?.sodiumMg),
       alcoholG,
       micros:

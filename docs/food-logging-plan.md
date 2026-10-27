@@ -22,11 +22,27 @@ proposal, and no feature ticket has been allocated for it yet.
 | The cup a digit short | MM-632 |
 | B5, Saved logs a food (owner's answer) | MM-635 |
 | C2, volume through a serving the source states as one, read from its words, no pack rebuild | MM-636 |
+| Own results apart from the database's (the owner's ask) | MM-637 |
+| W-D, typo tolerance | MM-638 |
+| C5, what is usual at a meal first | MM-639 |
+| The chosen count said as it changes | MM-640 |
+| W-D, one food taken out of a logged meal | MM-641 |
+| The owner's choices on the sheet: About this food folds, calories first, Cancel while choosing | MM-642 to MM-644 |
+| W-D, saved meal templates (schema 30) | MM-645 |
+| F-19, a food typed by hand into a meal says how it was measured; Look up offers its matches | MM-646, MM-647 |
+| F-20, extras follow the amount, never a corrected calorie (the recommendation taken) | MM-648 |
+| MM-634's follow-up: focus after the chosen row is gone; the choosing bar at 200% text, a story | MM-649 |
 
-Not built:
+Not built, and why:
 - **C2's liquids half**, waiting on the H-06 data check: Branded mL-only servings and Open Food Facts per-100 mL.
-- **C5:** frequency.
-- **W-D.**
+  It needs the owner's DuckDB and the source files; nothing here can run it.
+- **W-D, favorites pinned by the person.** Not built as a third thing: Saved foods and meals log in one press
+  (MM-635, MM-645) and sit first in search (MM-637), and what is usual at a meal comes first among the recents
+  (MM-639). If the owner still wants a star, it is a ticket of its own.
+- **W-D, a persisted session draft:** only if D-1's in-memory list proves fragile on devices. Not seen yet.
+- **W-D, the manual form redesign (F-14)** beyond calories first (MM-643): the owner's call on the rest.
+- **F-21** (a re-logged analysed food becomes a label serving): the owner's call, recorded in MM-623.
+- **Device checks**: every new screen on a phone and with a screen reader; the checklist in `requirements/HANDOFF.md`.
 
 How the evidence was gathered, and what it does not cover, is in
 [Coverage and limits](#coverage-and-limits). In short, it rests on source
@@ -427,6 +443,9 @@ runtime.
 - **Outcome:**
   - Correcting an AI item should reuse the portion control and search.
   - Hand-added items get their real method.
+- **Built (2026-10-26):** MM-646 asks how a food typed by hand was measured and logs it that way; MM-647 makes
+  Look up offer its matches. The portion control itself is not reused in the item form: grams stay its one
+  amount, as the analysis gives grams.
 
 **F-20 · Ambiguity — A typed-totals edit scales some extras by the calorie change.**
 - **Evidence:** `AddFoodSheet.tsx:492`, `:510`. A calorie typo corrected
@@ -434,7 +453,8 @@ runtime.
   read back from their fields and don't change.
 - **Outcome:** decide whether a calorie correction is an amount change.
   The plan recommends not: extras follow the amount, or are kept as stated.
-  Not ticketed until decided.
+- **Built (2026-10-26):** MM-648 takes the recommendation. Typed per serving, the servings say the amount;
+  typed totals keep the extras as stated.
 
 **F-21 · Ambiguity — A re-logged analysed food becomes a label serving.**
 - **Evidence:** `filledFrom` sets `source: 'labelServing'` for a

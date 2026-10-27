@@ -229,6 +229,14 @@ describe('logged as a meal', () => {
     expect(gradeOfFoodEntry(entry)).toEqual(gradeOfMealItem(item()));
   });
 
+  it('MM-646: a food that says how it was measured is logged that way, and reads back saying it', () => {
+    const entry = entryOfMealItem(item({ method: 'weighed' }), { date: day, meal: 'dinner', eatenAt: undefined, loggedMeal: tag });
+    expect(entry.source).toBe('weighed');
+    expect(entry.portion?.method).toBe('weighed');
+    expect(mealItemOfEntry(entry).method).toBe('weighed');
+    expect(mealItemOfEntry(entryOfMealItem(item(), { date: day, meal: 'dinner', eatenAt: undefined, loggedMeal: tag })).method).toBe('photoEstimate');
+  });
+
   it('a food missing its grams or macros is not logged', () => {
     expect(() => entryOfMealItem(item({ kcal: undefined }), { date: day, meal: 'dinner', eatenAt: undefined, loggedMeal: tag })).toThrow();
   });
