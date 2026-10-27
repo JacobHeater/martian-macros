@@ -3,6 +3,8 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
+import { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { foodSheet } from '../support/addFood';
@@ -59,3 +61,47 @@ it('nothing in the food stylesheet scrolls sideways', () => {
   const css = readFileSync('src/food/food.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   expect(css).not.toMatch(/overflow-x:\s*(?:auto|scroll)/);
 });
+
+// MM-629: a recent row says the amount it repeats, as the meal's row says it.
+it('MM-629: a recent food says the amount it repeats', async () => {
+  await repos.food.addFood(
+    new FoodEntry({
+      id: 0,
+      date: today.addDays(-1),
+      meal: 'breakfast',
+      name: 'Greek yogurt',
+      kcal: 100,
+      proteinG: 17,
+      carbsG: 6,
+      fatG: 0.7,
+      source: 'labelServing',
+      portion: {
+        method: 'labelServing',
+        basis: 'calculated',
+        quantity: 1,
+        unit: 'serving',
+        reference: {
+          basis: 'perServing',
+          servingUnit: 'serving',
+          servingDescription: '1 container',
+          servingGrams: 170,
+          nutrition: new NutritionTotals({ kcal: 100, proteinG: 17, carbsG: 6, fatG: 0.7 }),
+        },
+      },
+    }),
+  );
+  const sheet = await openSheet();
+  expect(await within(sheet).findByRole('button', { name: /^Greek yogurt.*Your recent food · 1 × 1 container · 170 g · 100 kcal/ })).toBeInTheDocument();
+});
+
+// MM-629: what was last logged at the meal being added to comes first.
+it('MM-629: the foods last logged at this meal list first, newest first among them', async () => {
+  await repos.food.addFood(foodOn(today.addDays(-1), { name: 'Leftover rice', meal: 'lunch', kcal: 300 }));
+  const sheet = await openSheet();
+  const inSheet = within(sheet);
+  await inSheet.findByText('Recent foods');
+  const titles = inSheet.queryAllByRole('button', { name: /Your recent food/ }).map((row) => row.querySelector('.mm-list-row-title')?.textContent);
+  // Opened from lunch's "+": the one lunch food first, then the dinner foods newest first.
+  expect(titles.slice(0, 3)).toEqual(['Leftover rice', 'Toast', 'Apple']);
+});
+
