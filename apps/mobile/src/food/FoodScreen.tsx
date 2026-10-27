@@ -64,7 +64,7 @@ export function FoodScreen() {
   useEffect(() => {
     if (focusKey !== undefined) setFocusKey(undefined);
   }, [focusKey]);
-  const startedFrom = useRef<string>();
+  const startedFrom = useRef<string | undefined>(undefined);
   /** Starts choosing with `key` chosen, and says how (MM-634). */
   const startChoosing = (key: string) => {
     startedFrom.current = key;
