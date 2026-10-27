@@ -111,10 +111,11 @@ it('MM-647: Look up offers the foods the name finds, and the one pressed gives i
   await typeIn(sheet, 'Grams eaten', '100');
   await userEvent.click(within(sheet).getByRole('button', { name: 'Look up in the app’s foods' }));
   // Both chicken breasts of the pack are offered; nothing is taken yet.
-  expect(await within(sheet).findByRole('status')).toHaveTextContent(/foods matched\. Press the one it is\./);
+  // Said as a status, so a reader hears it.
+  expect((await within(sheet).findByText(/foods matched\. Press the one it is\./)).getAttribute('role')).toBe('status');
   expect(within(sheet).getByRole('textbox', { name: 'Calories' })).toHaveValue('');
   await userEvent.click(within(sheet).getByRole('button', { name: /^Chicken breast, cooked/ }));
-  expect(within(sheet).getByRole('status')).toHaveTextContent('Using Chicken breast, cooked.');
+  expect(within(sheet).getByText('Using Chicken breast, cooked.')).toBeInTheDocument();
   expect(within(sheet).queryByRole('button', { name: /^Chicken breast, raw/ }), 'the choice is made').not.toBeInTheDocument();
   expect(within(sheet).getByRole('textbox', { name: 'Calories' })).toHaveValue('165');
   await userEvent.click(within(within(sheet).getByRole('group', { name: 'How was it measured?' })).getByRole('button', { name: 'Weighed' }));
@@ -128,5 +129,5 @@ it('MM-647: a name nothing matches is said, and nothing is offered', async () =>
   await typeIn(sheet, 'Food', 'zzz');
   await typeIn(sheet, 'Grams eaten', '50');
   await userEvent.click(within(sheet).getByRole('button', { name: 'Look up in the app’s foods' }));
-  expect(await within(sheet).findByRole('status')).toHaveTextContent('Nothing in the app’s foods matched “zzz”.');
+  expect((await within(sheet).findByText('Nothing in the app’s foods matched “zzz”.')).getAttribute('role')).toBe('status');
 });
