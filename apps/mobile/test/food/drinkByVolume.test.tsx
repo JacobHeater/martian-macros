@@ -86,6 +86,7 @@ it('MM-651: a can of cola is a label serving of 149 kcal, calculated per 100 mL;
   for (const name of ['Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs']) expect(chip(sheet, name), name).not.toBeInTheDocument();
   expect(within(sheet).getByTestId('amount-macros').textContent).toMatch(/^Logs 149 kcal/);
   expect(within(sheet).getByText('355 mL'), 'the helper says the volume, since there is no weight').toBeInTheDocument();
+  expect(within(sheet).getByText(/No weight is offered: its density is not known/)).toBeInTheDocument();
   await press(sheet, 'Log it');
   await expect.poll(async () => (await first(repos.food.watchFood(today))).length).toBe(1);
   const [can] = await first(repos.food.watchFood(today));
@@ -125,7 +126,8 @@ it('MM-651: a serving changed to fluid ounces is the same portion, said so', asy
 it('MM-651: a drink with a density offers grams, and says its cup in grams', async () => {
   const sheet = await pick('oat drink', /^Oat drink, barista/);
   expect(chip(sheet, 'Grams')).toBeInTheDocument();
-  expect(chip(sheet, 'Ounces')).toBeInTheDocument();
+  expect(chip(sheet, 'Ounces (weight)'), 'said to be the weight, beside fluid ounces').toBeInTheDocument();
+  expect(chip(sheet, 'Ounces')).not.toBeInTheDocument();
   expect(within(sheet).getByText('247 g'), '240 mL at 1.03 g/mL').toBeInTheDocument();
   await press(sheet, 'Grams');
   expect(within(sheet).getByRole('textbox', { name: /^Amount/ })).toHaveValue('100');
@@ -145,6 +147,8 @@ it('MM-651: a logged can opened again offers its serving and every volume, no we
   const edit = await screen.findByRole('dialog', { name: 'Edit food' });
   expect(chip(edit, '1 can (355 mL)')).toBeInTheDocument();
   for (const name of ['Fluid ounces', 'Milliliters', 'Cups']) expect(chip(edit, name), name).toBeInTheDocument();
-  expect(chip(edit, 'Grams')).not.toBeInTheDocument();
+  for (const name of ['Grams', 'Ounces', 'Palms', 'Cupped hands', 'Thumbs']) expect(chip(edit, name), name).not.toBeInTheDocument();
+  const chips = within(within(edit).getByRole('group', { name: 'Unit' })).getAllByRole('button').map((b) => b.textContent);
+  expect(chips.slice(0, 3), 'the volumes first, as logging offers them').toEqual(['1 can (355 mL)', 'Fluid ounces', 'Milliliters']);
   expect(within(edit).getByText(/^Per 100 mL: 42 kcal/)).toBeInTheDocument();
 });

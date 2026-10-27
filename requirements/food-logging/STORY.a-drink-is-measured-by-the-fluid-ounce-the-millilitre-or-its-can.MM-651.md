@@ -26,7 +26,7 @@ Choices made without asking (say if any is wrong):
   per-100 mL food; grams are said only when the food has a density. The "About this food" line and the edit
   sheet's reference line say "Per 100 mL".
 - **A serving in millilitres can be changed into a fluid ounce and back**, the same portion (MM-628), through its
-  millilitres; into grams only with a density, otherwise the amount is asked again.
+  millilitres; into grams, offered only with a density, through that density.
 - **The edit sheet** offers a per-100 mL entry its serving and every volume, and a weight only with a density,
   by the same rule as logging (it already filtered units by what the reference can scale).
 - **Extras follow the millilitres**: fiber, sodium, sugar alcohols and the micronutrients of a per-100 mL food
@@ -67,8 +67,18 @@ Scenario: The search row
 ```
 
 ## UI/UX
-- Food — apps/mobile/src/gallery/screens/Food.stories.tsx (Stories: AddFoodAmountDrink, AddFoodAmountDrinkWithDensity,
-  AddFoodSearchDrink, EditFoodDrink).
+- Food — apps/mobile/src/gallery/screens/Food.stories.tsx (Stories: AddFoodAmountDrink, AddFoodAmountDrinkFluidOunces,
+  AddFoodAmountDrinkWithDensity, AddFoodAmountDrinkWithDensityLargeText, AddFoodSearchDrink, EditFoodDrink).
+- Panel pass (2026-10-27, product designer, UX and accessibility, integrations; source inspection, no render):
+  taken: the ounce beside fluid ounces is "Ounces (weight)" (UX-1, the plan's §5.2); "About this food" says why a
+  density-less drink has no Grams chip (UX-3); the edit sheet orders a drink's volumes first, as logging does,
+  and says its serving's volume (UX-6, PD-1); a 200% story (UX-4); a fluid-ounce walk story (PD-7); an older
+  story pressing "Cola" disambiguated (PD-6). Confirmed from the code, not changed: the edit sheet offers a drink
+  no hand portion with or without a density (PD-8). Not taken, the owner's call: saying millilitres, never grams,
+  under a density drink's serving (PD-3; the grams are a fact a scale user wants, and the acceptance line "240 mL
+  reads as 247 g" stands); "355 mL in all" for the screen reader (UX-2); the "1 × 1 can" doubling, MM-628's
+  (UX-5). The chair's question to coaching and measurement, whether a density-less drink should ever be weighed
+  at 1 g/mL: no, nothing is guessed (MM-167); the caption says so.
 
 ## Notes
 - Built in `domain/food/portion/referenceAmounts.ts`, `millilitersFor.ts`, `scaleNutrition`, `convertedQuantity`,

@@ -286,6 +286,21 @@ const calculatedUnits: readonly PortionUnit[] = [
   'thumb',
 ];
 
+/** The same, for a drink stated per 100 mL: its volumes first, as logging offers them (MM-651). */
+const liquidUnits: readonly PortionUnit[] = [
+  'serving',
+  'fluidOunce',
+  'milliliter',
+  'cup',
+  'tablespoon',
+  'teaspoon',
+  'gram',
+  'ounce',
+  'palm',
+  'cuppedHand',
+  'thumb',
+];
+
 type Step =
   | { readonly at: 'choices' }
   | { readonly at: 'manual' }
@@ -1007,7 +1022,16 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    * the totals follow, or type the totals yourself.
    */
   const calculatedFields = (reference: ReferenceNutrition) => {
-    const candidates = calculatedUnits.filter((u) => scaleNutrition(1, u, reference, { hand }) !== undefined);
+    // A drink stated per 100 mL offers its volumes first, says which ounce is the weight, and says its serving's
+    // volume unless the serving's own words do, as logging does (MM-651; the UX guard's UX-1 and UX-6).
+    const liquid = reference.basis === 'per100ml';
+    const candidates = (liquid ? liquidUnits : calculatedUnits).filter((u) => scaleNutrition(1, u, reference, { hand }) !== undefined);
+    const servingLabel = (() => {
+      const description = reference.servingDescription ?? 'Servings';
+      const ml = reference.servingMilliliters;
+      const states = /\(\s*[\d.,]+\s*ml\s*\)/i.test(description) || /^[\d.,]+\s*ml$/i.test(description.trim());
+      return liquid && ml !== undefined && reference.servingDescription !== undefined && !states ? `${description} (${whole(ml)} mL)` : description;
+    })();
     const unit = form.unit;
     return (
       <>
@@ -1015,7 +1039,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           {candidates.map((u) => (
             <MmChoiceChip
               key={u}
-              label={u === 'serving' ? (reference.servingDescription ?? 'Servings') : portionUnitChipLabel(u)}
+              label={u === 'serving' ? servingLabel : u === 'ounce' && liquid ? 'Ounces (weight)' : portionUnitChipLabel(u)}
               selected={unit === u}
               onSelect={() => changeUnit(u, reference)}
             />

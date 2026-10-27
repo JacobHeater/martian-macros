@@ -118,7 +118,8 @@ function handMethod(unit: PortionUnit): QuantitySource | undefined {
 
 const choiceLabel = (choice: AmountChoice, basis: CatalogBasis) => {
   const serving = choice.serving;
-  if (serving === undefined) return portionUnitChipLabel(choice.unit);
+  // Beside fluid ounces, the ounce is said to be the weight (the plan's §5.2; the UX guard's UX-1).
+  if (serving === undefined) return choice.unit === 'ounce' && basis === 'per100ml' ? 'Ounces (weight)' : portionUnitChipLabel(choice.unit);
   // A volume weighed through a serving is of that serving's form: "Tablespoons, chopped" (MM-636).
   if (choice.unit !== 'serving') {
     const form = servingForm(serving.description);
@@ -525,6 +526,10 @@ export function FoodAmountStep({
         <p className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</p>
         {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
         <p className="app-caption food-reference-line">{referenceLine}</p>
+        {/* Why a drink has no Grams chip: its density is not known, and none is guessed (MM-167; the UX guard's UX-3). */}
+        {food.basis === 'per100ml' && food.densityGPerMl === undefined ? (
+          <p className="app-caption">No weight is offered: its density is not known, so grams would be a guess.</p>
+        ) : null}
         {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. It is the food's own: the fat is its own entry (the panel's PD-2). */}
         {totals === undefined || !showsCarbsAndFat ? null : (
           <>
