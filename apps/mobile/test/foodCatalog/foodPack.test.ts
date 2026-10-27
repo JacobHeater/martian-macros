@@ -145,7 +145,7 @@ it('a pack written out as a file opens and reads', async () => {
   await pack.close();
 });
 
-it('reference foods list before label and check-this foods', async () => {
+it('the closer name lists first; among names as close, reference foods before check-this foods', async () => {
   const pack = async (id: string, tier: TrustTier, name: string) =>
     SqliteFoodPack.open(
       await written({ ...FixturePack.header, packId: id }, [
@@ -166,12 +166,15 @@ it('reference foods list before label and check-this foods', async () => {
       ]),
     );
 
-  // The branded name matches "oats" more tightly, but is the weaker tier.
+  // MM-627 (the owner, 2026-10-26): the closer name lists first, whatever its tier, which its trust mark says;
+  // among names as close, the reference food leads.
   const catalog = new FoodCatalog([
     await pack('b', 'checkThis', 'Oats'),
     await pack('g', 'reference', 'Oats, rolled, dry, plain, whole grain'),
   ]);
-  expect((await first(catalog, 'oats')).tier).toBe('reference');
+  expect((await first(catalog, 'oats')).tier).toBe('checkThis');
+  const asClose = new FoodCatalog([await pack('b', 'checkThis', 'Oats'), await pack('g', 'reference', 'Oats, rolled')]);
+  expect((await first(asClose, 'oats')).tier).toBe('reference');
 });
 
 it('a food finds its raw or cooked counterpart (MM-151)', async () => {
