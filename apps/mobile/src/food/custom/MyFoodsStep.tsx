@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { CustomFood } from '../../domain/food/custom/CustomFood';
+import type { SavedMeal } from '../../domain/food/meal/SavedMeal';
 import { Fmt } from '../../format/Fmt';
 import { useApp } from '../../app/useApp';
 import { useLoaded } from '../../app/useLoaded';
@@ -26,16 +27,28 @@ interface MyFoodsStepProps {
    * logged.
    */
   onPick: (food: CustomFood) => void;
+  /** Logs a saved meal's foods, at the meal and time of the sheet (MM-645). */
+  onPickMeal: (meal: SavedMeal) => void;
 }
 
 /** Which screen of "My foods" is showing. */
 type MyFoodsPage = 'list' | 'foodForm' | 'recipeForm';
 
 /** The foods and recipes the user saved: add, edit and delete them (MM-45). */
-export function MyFoodsStep({ onBack, initialBarcode, draft, onPick }: MyFoodsStepProps) {
+export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal }: MyFoodsStepProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const foods = useLoaded(state.customFoods) ?? [];
+  const meals = useLoaded(state.savedMeals) ?? [];
+
+  const removeMeal = async (meal: SavedMeal) => {
+    const ok = await overlays.confirm({
+      title: `Delete ${meal.name}?`,
+      message: 'What you already logged from it stays as it is. This only removes it from your saved meals.',
+      confirmLabel: 'Delete',
+    });
+    if (ok) await services.savedMeals.deleteSavedMeal(meal.id);
+  };
   const [page, setPage] = useState<MyFoodsPage>(initialBarcode === undefined && draft === undefined ? 'list' : 'foodForm');
   const [editing, setEditing] = useState<CustomFood>();
   const [barcode, setBarcode] = useState(initialBarcode);
@@ -68,10 +81,35 @@ export function MyFoodsStep({ onBack, initialBarcode, draft, onPick }: MyFoodsSt
     <div className="food-sheet">
       <h2 className="app-headline">My foods</h2>
       <p className="app-caption">
-        Press one to log it. Foods and recipes you save also appear first when you search.
+        Press one to log it. What you save here is also found first when you search.
       </p>
       <div className="app-gap-small" />
-      {foods.length === 0 ? <p className="app-text food-no-hits">Nothing saved yet.</p> : null}
+      {foods.length === 0 && meals.length === 0 ? <p className="app-text food-no-hits">Nothing saved yet.</p> : null}
+      {/* The meals saved to log again, each its foods in one press (MM-645), apart from the foods. */}
+      {meals.length === 0 ? null : (
+        <>
+          <p className="food-label food-label-spaced">Your meals</p>
+          {meals.map((meal) => (
+            <MmListRow
+              key={`meal-${meal.id}`}
+              title={meal.name}
+              // What the press does, said: it logs the foods (the UX guard's UX-1).
+              subtitle={`Meal · logs ${meal.foods.length === 1 ? '1 food' : `${meal.foods.length} foods`} · ${Fmt.kcal(meal.foods.reduce((sum, f) => sum + f.kcal, 0))}`}
+              // Pressed, it logs at once, as a recent meal does: nothing opens, so no chevron.
+              onPress={() => onPickMeal(meal)}
+              trailingAction={
+                <MmMenuButton<'delete'>
+                  icon="more"
+                  label={`More actions for ${meal.name}`}
+                  items={[{ value: 'delete', label: 'Delete' }]}
+                  onSelect={() => void removeMeal(meal)}
+                />
+              }
+            />
+          ))}
+          {foods.length === 0 ? null : <p className="food-label food-label-spaced">Your foods and recipes</p>}
+        </>
+      )}
       {foods.map((food) => (
         <MmListRow
           key={food.id}

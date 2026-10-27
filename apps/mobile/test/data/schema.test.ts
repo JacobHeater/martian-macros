@@ -122,6 +122,9 @@ const tablesAddedSince: readonly string[] = [
   'finding_dismissals',
   // Version 29 (MM-617): the coach's record of the advice it showed.
   'coach_advice_given',
+  // Version 30 (MM-645): the meals saved to log again, and their foods.
+  'saved_meals',
+  'saved_meal_foods',
 ];
 
 /** The Dart database's tables since removed. */

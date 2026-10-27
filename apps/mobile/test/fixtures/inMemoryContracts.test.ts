@@ -1,6 +1,7 @@
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { customExerciseRepositoryContract } from '../contracts/customExerciseRepositoryContract';
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
+import { savedMealRepositoryContract } from '../contracts/savedMealRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
 import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
@@ -51,6 +52,7 @@ waterRepositoryContract('In-memory', () => new InMemoryRepositories().water);
 preferencesRepositoryContract('In-memory', () => new InMemoryRepositories().preferences);
 foodRepositoryContract('In-memory', () => new InMemoryRepositories().food);
 customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().customFoods);
+savedMealRepositoryContract('In-memory', () => new InMemoryRepositories().savedMeals);
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
 dayKindRepositoryContract('In-memory', () => new InMemoryRepositories().dayKinds);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);

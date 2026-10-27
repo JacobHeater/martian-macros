@@ -129,6 +129,7 @@ and WS-09 steps 1 and 8.
 25. **Volume through a volume serving (MM-636).** The owner, 2026-10-26 (the plan's C2): a serving's volume is read from its words ("1 cup, chopped"), and the food is offered cups, tablespoons and teaspoons weighed through it; no new pack format. Branded mL-only servings and Open Food Facts per-100 mL liquids wait on the plan's H-06 data check.
 26. **Own results apart (MM-637).** The owner, 2026-10-26: "Your foods and meals" and "From the food database" head a search's two kinds of results.
 27. **The owner's choices on the sheet (MM-642, MM-643, MM-644).** 2026-10-26: "About this food" folds the grade's meaning, the source's numbers and the split; calories first when typing; "Cancel" on the choosing bar.
+28. **Saved meals (MM-645).** The owner, 2026-10-26: a slot or the meal's list saved as a meal, logged again in one press from Saved or search, its foods loose. Schema 30 adds `saved_meals` and `saved_meal_foods`.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -185,6 +186,7 @@ workstream's.
 - Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
 - Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).
 - Added 2026-10-26 (step 27): MM-642, MM-643, MM-644 (the owner's choices on the sheet; done).
+- Added 2026-10-26 (step 28): MM-645 (saved meals, schema 30; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

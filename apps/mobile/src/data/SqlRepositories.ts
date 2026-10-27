@@ -1,5 +1,6 @@
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
+import type { SavedMealRepository } from '../domain/repositories/SavedMealRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
@@ -38,6 +39,7 @@ import type { SqlDatabase } from '../sql/SqlDatabase';
 import { AppDatabase } from './AppDatabase';
 import { SqlCustomExerciseRepository } from './SqlCustomExerciseRepository';
 import { SqlCustomFoodRepository } from './SqlCustomFoodRepository';
+import { SqlSavedMealRepository } from './SqlSavedMealRepository';
 import { SqlDataEraser } from './SqlDataEraser';
 import { SqlDataRestorer } from './SqlDataRestorer';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
@@ -90,6 +92,7 @@ export class SqlRepositories {
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
+  readonly savedMeals: SavedMealRepository;
   readonly dayMarks: DayMarkRepository;
   /** The days marked a Refeed or a Day off (MM-611). */
   readonly dayKinds: DayKindRepository;
@@ -132,6 +135,7 @@ export class SqlRepositories {
     this.water = new SqlWaterRepository(db);
     this.food = new SqlFoodRepository(db);
     this.customFoods = new SqlCustomFoodRepository(db);
+    this.savedMeals = new SqlSavedMealRepository(db);
     this.dayMarks = new SqlDayMarkRepository(db);
     this.dayKinds = new SqlDayKindRepository(db);
     this.intake = new SqlIntakeReader(db);
