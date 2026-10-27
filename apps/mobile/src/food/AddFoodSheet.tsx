@@ -1099,6 +1099,13 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   /** The typed form's action: this food alone, or with the meal's list (MM-631). */
   const formLogLabel = listed.length > 0 ? `Log ${listed.length + 1} foods` : 'Log it';
 
+  /** The grade of the entry as it is being edited (MM-659, the owner): the row's letter, following the numbers on the sheet. */
+  const editedGrade = (() => {
+    if (!isEditing) return undefined;
+    const live = toSave();
+    return gradeOfFood?.(form.name.trim()) ?? (live === undefined ? undefined : gradeOfFoodEntry(live, { hand }));
+  })();
+
   const formFields = () => (
     <>
       {/* When it was eaten comes first, before what and how much (MM-576). */}
@@ -1112,6 +1119,12 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       )}
       <div className="app-gap-small" />
       <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
+      {/* The entry's grade under its name, as the amount step shows a found food's (MM-370, MM-659): the letter in view, its meaning a press away. */}
+      {editedGrade === undefined ? null : (
+        <div className="food-amount-grade">
+          <FoodGrade grade={editedGrade} subject={form.name.trim()} />
+        </div>
+      )}
       {calc === undefined ? typedFields() : calculatedFields(calc)}
       {/* Where the entry's numbers came from (MM-657, the owner): kept with the entry, said when it is edited. */}
       {entry === undefined ? null : <p className="app-caption food-reference-line">{entryOriginLine(entry)}</p>}
