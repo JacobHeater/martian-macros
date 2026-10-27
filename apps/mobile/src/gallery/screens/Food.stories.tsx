@@ -1,6 +1,7 @@
 import type { Meta } from '@storybook/react-vite';
 import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
+import { showSaveMealSheet } from '../../food/meal/showSaveMealSheet';
 import { showEasyToMissSheet } from '../../food/showEasyToMissSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
@@ -1712,5 +1713,72 @@ export const AddFoodSessionLogFailed = screenStory({
     await userEvent.clear(await within(canvas).findByRole('textbox', { name: 'Search foods' }));
     await press('Log 1 food')(canvas);
   },
+});
+
+/** MM-645: today's food saved as a meal, its name taken from its foods. */
+export const SaveMeal = screenStory({
+  covers: ['SaveMealSheet'],
+  shows: 'Save meal',
+  open: async ({ services, overlays, today }) => {
+    const foods = await valueOf(services.food.watchFood(today));
+    void showSaveMealSheet(overlays, foods.slice(0, 3));
+  },
+});
+
+/** MM-645: Saved with a saved meal above the saved foods, and found by search. */
+export const AddFoodSavedMeals = screenStory({
+  covers: ['AddFoodSheet', 'MyFoodsStep'],
+  shows: 'Your meals',
+  scenario: async (repos, today) => {
+    await repos.customFoods.saveCustomFood(
+      new CustomFood({
+        id: 0,
+        name: 'Protein bar',
+        kind: 'food',
+        servingDescription: '1 bar',
+        servingGrams: 60,
+        perServing: new NutritionTotals({ kcal: 220, proteinG: 20, carbsG: 22, fatG: 7 }),
+      }),
+    );
+    await repos.savedMeals.saveMeal(
+      'Usual breakfast',
+      [
+        new FoodEntry({ id: 0, date: today, meal: 'breakfast', name: 'Oats', kcal: 300, proteinG: 10, carbsG: 54, fatG: 5, source: 'weighed' }),
+        new FoodEntry({ id: 0, date: today, meal: 'breakfast', name: 'Berries', kcal: 40, proteinG: 1, carbsG: 9, fatG: 0, source: 'weighed' }),
+      ],
+      today,
+    );
+  },
+  open: addFood,
+  walk: press('Saved'),
+});
+
+/** MM-645: a saved meal found by search, among the person's own. */
+export const AddFoodSavedMealFound = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Your meal · logs 1 food/,
+  scenario: async (repos, today) => {
+    await repos.savedMeals.saveMeal(
+      'Usual breakfast',
+      [new FoodEntry({ id: 0, date: today, meal: 'breakfast', name: 'Oats', kcal: 300, proteinG: 10, carbsG: 54, fatG: 5, source: 'weighed' })],
+      today,
+    );
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'usual');
+  },
+});
+
+/** MM-645: a meal that could not be saved: said above Save meal, and in a snack. */
+export const SaveMealFailed = screenStory({
+  covers: ['SaveMealSheet'],
+  shows: /^The meal could not be saved/,
+  stores: failingWrite('savedMeals', 'saveMeal'),
+  open: async ({ services, overlays, today }) => {
+    const foods = await valueOf(services.food.watchFood(today));
+    void showSaveMealSheet(overlays, foods.slice(0, 2));
+  },
+  walk: press('Save meal'),
 });
 

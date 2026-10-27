@@ -85,6 +85,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     sleep: repos.sleep,
     food: repos.food,
     customFoods: repos.customFoods,
+    savedMeals: repos.savedMeals,
     dayMarks: repos.dayMarks,
     dayKinds: repos.dayKinds,
     intake: repos.intake,

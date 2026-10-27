@@ -7,6 +7,7 @@ import type { InsightSwitches } from '../domain/InsightSwitches';
 import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { DayKind } from '../domain/DayKind';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
+import type { SavedMeal } from '../domain/food/meal/SavedMeal';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
@@ -338,6 +339,8 @@ export class AppState {
 
   /** The user's own foods and recipes, by name (MM-45). */
   readonly customFoods: Cell<Loadable<CustomFood[]>>;
+  /** The meals saved to log again (MM-645). */
+  readonly savedMeals: Cell<Loadable<SavedMeal[]>>;
 
   /** The setting for the easy-to-miss line (MM-152). */
   readonly easyToMiss: Cell<Loadable<EasyToMissPreference>>;
@@ -718,6 +721,7 @@ export class AppState {
     this.photoSettings = stream(() => s.progressPhotos.watchPhotoSettings());
     this.photoLock = new PhotoLock(s.deviceLock);
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
+    this.savedMeals = stream(() => s.savedMeals.watchSavedMeals());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
       const profile = of(this.setup)?.profile;

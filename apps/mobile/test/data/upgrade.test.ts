@@ -146,8 +146,14 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 29 left it: no meal saved to log again (MM-645). */
+const versionTwentyNine = currentSchema
+  .replace(/CREATE TABLE "saved_meals" \([\s\S]*?\n\);\n/, '')
+  .replace(/CREATE TABLE "saved_meal_foods" \([\s\S]*?\n\);\n/, '')
+  .replace(/CREATE INDEX "saved_meal_foods_meal" [^\n]*\n/, '');
+
 /** The schema as version 28 left it: no record of the advice the coach showed (MM-617). */
-const versionTwentyEight = currentSchema.replace(/CREATE TABLE "coach_advice_given" \([\s\S]*?\n\);\n/, '');
+const versionTwentyEight = versionTwentyNine.replace(/CREATE TABLE "coach_advice_given" \([\s\S]*?\n\);\n/, '');
 
 /** The schema as version 27 left it: nothing the trend engine said, and no finding dismissed (MM-605). */
 const versionTwentySeven = versionTwentyEight
@@ -1041,3 +1047,29 @@ it('a version 28 database comes up to date with no advice recorded, and keeps wh
     'a kind the record does not keep',
   ).rejects.toThrow();
 });
+
+// MM-645: a version 29 database comes up to date with no meal saved; a meal saved from then on is kept with its foods.
+it('a version 29 database comes up to date with no saved meal, and keeps what is saved after', async () => {
+  expect(versionTwentyNine).not.toContain('saved_meal');
+  expect(versionTwentyNine).toContain('coach_advice_given');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 29, schema: versionTwentyNine });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await first(repos.savedMeals.watchSavedMeals())).toEqual([]);
+  const oats = new FoodEntry({ id: 0, date: day, meal: 'breakfast', name: 'Oats', kcal: 300, proteinG: 10, carbsG: 54, fatG: 5, source: 'weighed' });
+  const id = await repos.savedMeals.saveMeal('Usual breakfast', [oats], day);
+  const [saved] = await first(repos.savedMeals.watchSavedMeals());
+  expect(saved?.id).toBe(id);
+  expect(saved?.foods.map((f) => [f.name, f.kcal])).toEqual([['Oats', 300]]);
+});
+

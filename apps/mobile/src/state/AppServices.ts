@@ -7,6 +7,7 @@ import type { ExactAlarms } from '../domain/integration/ExactAlarms';
 import type { RestSignal } from '../domain/integration/RestSignal';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
+import type { SavedMealRepository } from '../domain/repositories/SavedMealRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { BackupPlatform } from '../backup/BackupPlatform';
@@ -87,6 +88,8 @@ export interface AppServices {
   readonly water: WaterRepository;
   readonly food: FoodRepository;
   readonly customFoods: CustomFoodRepository;
+  /** The meals saved to log again (MM-645). */
+  readonly savedMeals: SavedMealRepository;
   readonly dayMarks: DayMarkRepository;
   /** The days marked a Refeed or a Day off (MM-611); no calculation reads them. */
   readonly dayKinds: DayKindRepository;
