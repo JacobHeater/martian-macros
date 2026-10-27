@@ -72,12 +72,15 @@ export interface Overlays {
   /**
    * Brings a panel up from the bottom of the screen. `content` draws it and
    * is given the way to close it, with an answer or without one. A "tall"
-   * sheet keeps one height whatever it holds (MM-566).
+   * sheet keeps one height whatever it holds (MM-566). `mayLeave`, when its
+   * `current` is set, is asked before the sheet is closed without an answer
+   * (Close, a drag down, a press outside, Escape, Back), and the sheet stays
+   * unless it agrees: content holding something unsaved sets it (MM-631).
    */
   sheet<T>(
     label: string,
     content: (close: (answer?: T) => void) => ReactNode,
-    options?: { size?: 'fit' | 'tall' },
+    options?: { size?: 'fit' | 'tall'; mayLeave?: { current: (() => Promise<boolean>) | undefined } },
   ): Promise<T | undefined>;
 
   /**

@@ -1623,3 +1623,62 @@ export const AddFoodEstimateLogFailed = screenStory({
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { estimateSize: 'regular' }),
   walk: press('Log the estimate'),
 });
+
+/** MM-631: finds `query`, opens its pack result and puts it in the meal's list. */
+const addToMeal = (query: string, name: RegExp) => async (canvas: HTMLElement) => {
+  const search = await within(canvas).findByRole('textbox', { name: 'Search foods' }, { timeout: 10000 });
+  await userEvent.clear(search);
+  await userEvent.type(search, query);
+  await press(name)(canvas);
+  await press('Add another food')(canvas);
+};
+
+/** MM-631: one food in the meal's list: the list under the search, its meal and time, and Log 1 food. */
+export const AddFoodSessionOne = screenStory({
+  covers: ['AddFoodSheet', 'FoodAmountStep'],
+  shows: /^In this meal · 1 food/,
+  open: addFood,
+  walk: addToMeal('chicken breast, cooked', /^Chicken breast, cooked/),
+});
+
+/** MM-631: three foods in the meal's list, each with a way to take it out. */
+export const AddFoodSessionMany = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^In this meal · 3 foods/,
+  open: addFood,
+  walk: async (canvas) => {
+    await addToMeal('chicken breast, cooked', /^Chicken breast, cooked/)(canvas);
+    await addToMeal('white rice, cooked', /^White rice, cooked/)(canvas);
+    await addToMeal('banana', /^Banana/)(canvas);
+    // The search cleared, the list shows its foods and its action.
+    await userEvent.clear(await within(canvas).findByRole('textbox', { name: 'Search foods' }));
+  },
+});
+
+/** MM-631: the next food's amount, in a meal's list: no meal or time asked, and Log 2 foods. */
+export const AddFoodSessionAmount = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Log 2 foods',
+  open: addFood,
+  walk: async (canvas) => {
+    await addToMeal('chicken breast, cooked', /^Chicken breast, cooked/)(canvas);
+    const search = await within(canvas).findByRole('textbox', { name: 'Search foods' });
+    await userEvent.clear(search);
+    await userEvent.type(search, 'white rice, cooked');
+    await press(/^White rice, cooked/)(canvas);
+  },
+});
+
+/** MM-631: the list could not be logged: said above its action, none logged, the list kept. */
+export const AddFoodSessionLogFailed = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^The foods could not be logged/,
+  stores: failingWrite('food', 'applyFoodChanges'),
+  open: addFood,
+  walk: async (canvas) => {
+    await addToMeal('chicken breast, cooked', /^Chicken breast, cooked/)(canvas);
+    await userEvent.clear(await within(canvas).findByRole('textbox', { name: 'Search foods' }));
+    await press('Log 1 food')(canvas);
+  },
+});
+
