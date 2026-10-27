@@ -194,7 +194,8 @@ workstream's.
   MM-651 (a drink by the fluid ounce, the millilitre or its can; done).
 - Added 2026-10-27 (step 31, the owner from the phone): MM-652 (a search's results one list at a time, chosen at
   the top; done), MM-653 (the food sheets' actions and unit chips keep their distance; done), MM-654 (a drink
-  logged by volume is graded per 100 mL; done, with the audit of every question mark in its Notes).
+  logged by volume is graded per 100 mL; done, with the audit of every question mark in its Notes), MM-655 (the
+  day's mark is a row after the meals, not a flag in the header; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

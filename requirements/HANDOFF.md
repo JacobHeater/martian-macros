@@ -43,6 +43,8 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   way a food ends in the question mark, with counts on the 2026-10-27 pack; **the owner's calls** among them: a
   typed food graded on the per-calorie parts (no mass needed but for calories per gram), recipes graded through
   their ingredients' origins, a copied drink's millilitres kept (a `CustomFood` column), diet drinks under 10 kcal.
+  MM-655 (the owner: "the random flag just sitting at the top"): the day's Refeed or Day off is a row after the
+  meals under the completeness row; the header keeps the chip.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
   100 g or per 100 mL, a serving by weight, by volume or both; the extract reads Branded `ml`/`MLT` rows and
   Open Food Facts mL servings as per 100 mL) and MM-651 (a drink by its can, the fluid ounce or the millilitre;

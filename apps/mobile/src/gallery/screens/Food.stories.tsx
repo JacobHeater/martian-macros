@@ -875,7 +875,7 @@ export const DayCompleteness = screenStory({
   },
 });
 
-/** MM-611: today marked a Refeed: the neutral chip in the day's header, beside the "Mark day" action. */
+/** MM-611: today marked a Refeed: the neutral chip in the day's header, and the row after the meals saying so (MM-655). */
 export const DayMarkedRefeed = screenStory({
   covers: ['FoodScreen'],
   shows: 'Refeed',
@@ -895,13 +895,13 @@ export const DayMarkedDayOffSmallPhone = screenStory({
   viewport: 'smallPhone',
 });
 
-/** MM-611: "Mark day" pressed: Refeed, Day off, and the way to clear a mark. */
+/** MM-611, MM-655: the mark's row after the meals pressed: Refeed, Day off, and the way to clear a mark. */
 export const MarkDay = screenStory({
   covers: ['FoodScreen'],
   shows: 'No mark',
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
-    await userEvent.click(await within(canvas).findByRole('button', { name: 'Mark day' }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Mark a refeed or a day off/ }));
   },
 });
 
