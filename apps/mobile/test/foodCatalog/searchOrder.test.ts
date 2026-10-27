@@ -54,12 +54,19 @@ async function fixtureCatalog(): Promise<FoodCatalog> {
   return new FoodCatalog([await SqliteFoodPack.open(db)]);
 }
 
-it('MM-627: a stray word finds the closest foods, marked as partial, never nothing', async () => {
+it('MM-627: for the list the person reads, a stray word finds the closest foods, marked as partial, never nothing', async () => {
   const catalog = await fixtureCatalog();
-  const hits = await catalog.search('banana xyzzy');
+  const hits = await catalog.search('banana xyzzy', { closest: true });
   expect(hits.map((h) => h.food.name)).toEqual(['Banana']);
   expect(hits.every((h) => h.partial === true)).toBe(true);
-  expect(await catalog.search('xyzzy'), 'one word that matches nothing finds nothing').toEqual([]);
+  expect(await catalog.search('xyzzy', { closest: true }), 'one word that matches nothing finds nothing').toEqual([]);
+});
+
+it('MM-627: a lookup that takes the first hit never gets a near miss', async () => {
+  const catalog = await fixtureCatalog();
+  // "broccoli cooked": the pack has broccoli raw only, which must not stand in for it.
+  expect(await catalog.search('broccoli cooked', { limit: 1 })).toEqual([]);
+  expect(await catalog.search('banana xyzzy')).toEqual([]);
 });
 
 it('MM-627: a full match drops the partial ones from every pack', async () => {

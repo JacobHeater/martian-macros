@@ -33,7 +33,9 @@ Choices made without asking (say if any is wrong):
 - **A name as close from a less reliable source can lead.** "Oats" from Open Food Facts lists above "Oats,
   rolled, dry" from USDA; the trust mark beside each says which is which (MM-153).
 - **When every word typed finds nothing**, the closest foods that match some of the words are listed
-  under "No exact match for "…". Closest:", most words matched first. Never for a one-word search.
+  under "No exact match for "…". Closest:", most words matched first. Never for a one-word search, and
+  only in the list the person reads: a lookup that takes the first hit (an analysed meal's foods, "Look
+  up in the app's foods") never gets a near miss, so "broccoli cooked" is never matched to broccoli raw.
 - **A row says the food's first serving and its calories** ("1 cup (158 g) · 205 kcal"), with the
   calories per 100 g after it for comparing; a food with no serving says per 100 g only, as before.
 

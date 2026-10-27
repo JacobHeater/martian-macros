@@ -53,7 +53,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
       catalog === undefined
         ? Promise.resolve(undefined)
         : catalog
-            .search(settled, { limit: limit + 1 })
+            .search(settled, { limit: limit + 1, closest: true })
             .then((found) => ({ found, limit, failed: false, attempt }))
             .catch(() => ({ found: [] as SearchHit[], limit, failed: true, attempt })),
     `${catalog?.packs.length ?? -1}:${settled}:${limit}:${attempt}`,

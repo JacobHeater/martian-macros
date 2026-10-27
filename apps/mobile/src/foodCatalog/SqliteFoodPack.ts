@@ -85,7 +85,12 @@ export class SqliteFoodPack implements FoodPack {
 
   async search(
     query: string,
-    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+    {
+      limit = 25,
+      offset = 0,
+      group,
+      closest = false,
+    }: { limit?: number; offset?: number; group?: FoodGroup | undefined; closest?: boolean | undefined } = {},
   ): Promise<SearchHit[]> {
     const words = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
     // A pack older than format 4 holds no groups, so none of its foods is in one (MM-616).
@@ -101,7 +106,7 @@ export class SqliteFoodPack implements FoodPack {
     const terms = words.map((w) => `"${w}"*`);
     const found = await this.matching(terms.join(' '), { limit, offset, group });
     // Every word typed found nothing: the closest foods by some of them, said as such (MM-627).
-    if (found.length > 0 || offset > 0 || words.length < 2) return found;
+    if (!closest || found.length > 0 || offset > 0 || words.length < 2) return found;
     return (await this.matching(terms.join(' OR '), { limit, offset, group })).map((hit) => ({ ...hit, partial: true }));
   }
 
