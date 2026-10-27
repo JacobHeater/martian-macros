@@ -46,7 +46,8 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   MM-655 (the owner: "the random flag just sitting at the top"): the day's Refeed or Day off is a row after the
   meals under the completeness row; the header keeps the chip. MM-656 (the soda still had no grade after MM-654:
   neither fiber nor sugars stated): an unstated fiber is counted as none, said so; only sodium is required now.
-  MM-657: the edit sheet says where an entry's numbers came from. **Lesson, the owner's (2026-10-27):** a fix
+  MM-657: the edit sheet says where an entry's numbers came from. MM-658: the fluid ounce is offered under
+  "Cup / spoon" for every food (the owner's soda, in fluid ounces, had no such chip when edited). **Lesson, the owner's (2026-10-27):** a fix
   proven only on a hand-built entry passed CI and failed on the phone; `test/food/drinkGradeOnThePhone.test.tsx`
   is the shape every such fix needs: the real screens, the real database, a reopen and an edit.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per

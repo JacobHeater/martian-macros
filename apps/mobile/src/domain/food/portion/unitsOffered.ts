@@ -2,7 +2,8 @@ import type { QuantitySource } from '../../QuantitySource';
 import type { PortionUnit } from './PortionUnit';
 import type { ReferenceNutrition } from './ReferenceNutrition';
 
-const volumeUnits: readonly PortionUnit[] = ['cup', 'tablespoon', 'teaspoon', 'milliliter'];
+/** Every volume a cup or spoon measures, the fluid ounce among them (MM-658): it converts exactly as a millilitre does. */
+const volumeUnits: readonly PortionUnit[] = ['cup', 'tablespoon', 'teaspoon', 'milliliter', 'fluidOunce'];
 
 /**
  * The units a person may choose under `method` for a food with `reference`
@@ -26,8 +27,8 @@ export function unitsOffered(
       return ['serving'];
     case 'householdMeasure': {
       if (reference === undefined) return volumeUnits;
-      // A food stated per 100 mL converts every volume exactly, fluid ounces too (MM-650).
-      if (reference.basis === 'per100ml') return [...volumeUnits, 'fluidOunce'];
+      // A food stated per 100 mL converts every volume exactly (MM-650).
+      if (reference.basis === 'per100ml') return volumeUnits;
       const convertible =
         reference.densityGPerMl !== undefined ||
         (reference.servingMilliliters !== undefined && reference.servingGrams !== undefined);
