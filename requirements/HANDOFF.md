@@ -38,7 +38,11 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   ("Yours", "Database", "Online"; their own first when any matched; MM-637's headings gone), and MM-653, the food
   sheets' stacked actions 12 px apart and the unit chips filling their rows. The owner dictated both, so no panel.
   On the review that missed them: the panel reads code and stories and never sees the phone; what the owner
-  calls out from the phone is fixed without a panel pass.
+  calls out from the phone is fixed without a panel pass. MM-654 (the owner: "you can't grade orange soda?"): a
+  drink logged by volume is graded per 100 mL, as the pack grades it. The ticket's Notes hold the audit of every
+  way a food ends in the question mark, with counts on the 2026-10-27 pack; **the owner's calls** among them: a
+  typed food graded on the per-calorie parts (no mass needed but for calories per gram), recipes graded through
+  their ingredients' origins, a copied drink's millilitres kept (a `CustomFood` column), diet drinks under 10 kcal.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
   100 g or per 100 mL, a serving by weight, by volume or both; the extract reads Branded `ml`/`MLT` rows and
   Open Food Facts mL servings as per 100 mL) and MM-651 (a drink by its can, the fluid ounce or the millilitre;
