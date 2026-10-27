@@ -52,6 +52,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSegmented } from '../ui/MmSegmented';
+import { entryOriginLine } from '../format/entryOriginLine';
 import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import { AlcoholFields } from './AlcoholFields';
@@ -1112,6 +1113,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       <div className="app-gap-small" />
       <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
       {calc === undefined ? typedFields() : calculatedFields(calc)}
+      {/* Where the entry's numbers came from (MM-657, the owner): kept with the entry, said when it is edited. */}
+      {entry === undefined ? null : <p className="app-caption food-reference-line">{entryOriginLine(entry)}</p>}
       {/* The split needs all three macros; Simple detail does not draw it (MM-49), as on the hero. */}
       {totals !== undefined && showsCarbsAndFat && totals.proteinG >= 0 && totals.carbsG >= 0 && totals.fatG >= 0 ? (
         <>
