@@ -324,3 +324,10 @@
 .food-meal-grade > .food-label {
   margin: 0;
 }
+
+/* MM-634: the choosing bar stays in view at the foot of the list while the meals scroll above it, clear of a snack (MM-302). */
+.food-selection-bar {
+  position: sticky;
+  bottom: calc(var(--space-8) + var(--mm-snack-clearance, 0px));
+  z-index: 1;
+}
