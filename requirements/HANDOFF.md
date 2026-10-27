@@ -25,12 +25,11 @@ through `FoodEntryBatchWriter`, so a deleted meal goes at once; a logged meal's 
 match first, the owner's D-3), MM-628 (a unit change keeps the portion), MM-629 (recents say their amount, this
 meal's first), MM-630 and MM-634 (one time, meal or day for a whole meal or for chosen foods, with Undo), MM-631
 (several foods for one meal, the owner's D-1 and D-2), MM-632 (the cup a digit short), MM-633 (copies said, once,
-to any day). Still to build, each waiting on the owner:
-- **Volume from the source data (the plan's C2):** keep FDC's measure units, Branded mL servings and Open Food
-  Facts' per-100 mL liquids in the pack; a new pack format, so the owner rebuilds and publishes the packs. First
-  run the pack query in the plan's H-06 (how many OFF and Branded rows are liquids).
-- **"Saved" in Add food** opens a saved food's editor, not its amount step (the plan's B5): left as built
-  (MM-45) until the owner says otherwise.
+to any day), MM-635 (pressing a saved food in Add food logs it, the owner's answer), MM-636 (cups, tablespoons
+and teaspoons through a serving the source states as a volume, read from its words; no pack rebuild). Still open:
+- **Liquids' volume** (the plan's C2, second half): Branded servings stated only in mL and Open Food Facts
+  per-100 mL liquids. First run the plan's H-06 pack query (how many OFF and Branded rows are liquids, and
+  whether their per-100 values are per 100 mL); that needs the owner's DuckDB and the source files.
 - Follow-ups recorded in MM-631 and MM-634 (count spoken as it changes, focus after a chosen row is deleted, the
   bar at 200% text; "Done" and "Select" wording, the owner's call). Frequency-ranked recents, typo-tolerant
   search, saved meal templates (the plan's C5 and W-D).
@@ -179,7 +178,8 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   once, TalkBack hearing each "Added …" and the list's line focused, the list at 360 px with the
   keyboard open (MM-631); "Select" on Food, boxes ticked, the bar at the foot clear of a snack and of
   the navigation bar at 200% text (MM-634); 180 g changed to ounces (MM-628); search for "oats" and
-  "chicken breast skinless" (MM-627).
+  "chicken breast skinless" (MM-627); two tablespoons of a food served "1 cup, chopped" (MM-636); a
+  saved food logged by pressing it (MM-635).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -206,7 +206,7 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
-## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 7 PRs)
+## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 10 PRs)
 
 - **The owner's words:** asked for an evidence-backed food-logging improvement plan (multi-food logging, alternate
   units and volume, bulk editing especially of time); added that recent foods and database search "is kind of ass"
@@ -215,7 +215,7 @@ MM-242, a draft by non-lawyers that blocks release.
   and allowed one worktree per PR for this build only.
 - **Merged:** #319 (the plan, `docs/food-logging-plan.md`, and MM-623 to MM-626 as tickets with skipped tests),
   #320 (MM-623 to MM-626 fixed), #321 (MM-627), #322 (MM-628 to MM-630, MM-632), #323 (MM-631), #324 (MM-633), #325
-  (MM-634). A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
+  (MM-634), #327 (MM-635), #328 (MM-636), and #326 and this PR (the handoff). A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
   shipped, and every blocking finding was fixed in the same PR.
 - **Lessons:** a fallback that helps a person reading results can mislead a lookup that takes the first hit (the
   any-word search matched "broccoli cooked" to broccoli raw; now only the results list asks for it). Number
