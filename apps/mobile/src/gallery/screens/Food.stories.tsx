@@ -670,6 +670,8 @@ export const AddFoodMoreResults = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+    // The demo's log matches too, so their own come first (MM-652); the database's are a press away.
+    await press('Database')(canvas);
   },
 });
 
@@ -680,6 +682,7 @@ export const AddFoodMoreResultsShown = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+    await press('Database')(canvas);
     await userEvent.click(await within(canvas).findByRole('button', { name: 'More results' }, { timeout: 10000 }));
     await waitFor(() => expect(within(canvas).queryByRole('button', { name: 'More results' })).toBeNull(), { timeout: 10000 });
   },
