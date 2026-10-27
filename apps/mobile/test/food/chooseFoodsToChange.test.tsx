@@ -55,7 +55,8 @@ it('MM-634: two foods of dinner and a snack get one time; the rest are untouched
   expect(screen.getByRole('checkbox', { name: 'Salmon · 400 kcal' })).toHaveFocus();
   expect(screen.getByText('Choosing: tick the foods to change together')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('checkbox', { name: 'Apple · 95 kcal' }));
-  expect(screen.getByText('2 foods chosen')).toBeInTheDocument();
+  // Shown in the bar, and said as it changes (MM-640).
+  expect(screen.getAllByText('2 foods chosen').some((element) => element.getAttribute('role') === 'status')).toBe(true);
   await change('2 foods', 'Change time');
   await pickTime('18:30');
   await expect.poll(async () => (await byName('Salmon'))?.eatenAt).toBe(18 * 60 + 30);
