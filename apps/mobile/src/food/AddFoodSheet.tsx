@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { MacroSplitChart } from '../charts/MacroSplitChart';
 import { useNetCarbs } from './useNetCarbs';
 import { useInsightPreview } from '../coach/useInsightPreview';
@@ -33,6 +33,7 @@ import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
 import { Fmt } from '../format/Fmt';
 import { parseNumber } from '../format/parseNumber';
+import { portionAmount } from '../format/portionAmount';
 import { portionUnitChipLabel } from '../format/portionUnitChipLabel';
 import { portionUnitOf } from '../format/portionUnitOf';
 import { quantitySourceLabel } from '../format/quantitySourceLabel';
@@ -44,6 +45,7 @@ import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { DayStepper } from '../ui/DayStepper';
 import { MmButton } from '../ui/MmButton';
+import { MmIconButton } from '../ui/MmIconButton';
 import { useOverlays } from '../ui/useOverlays';
 import { MmChoiceChip } from '../ui/MmChoiceChip';
 import { MmListRow } from '../ui/MmListRow';
@@ -55,6 +57,7 @@ import { MyFoodsStep } from './custom/MyFoodsStep';
 import { defaultMeal } from './defaultMeal';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
+import { entriesCopiedTo } from './entriesCopiedTo';
 import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { AnalyzeMealStep } from './meal/AnalyzeMealStep';
 import { gradeOfLoggedMeal } from './meal/gradeOfLoggedMeal';
@@ -83,6 +86,8 @@ interface AddFoodSheetProps {
   estimateSize?: MealSize | undefined;
   /** Called once the food is logged or saved. */
   onDone: () => void;
+  /** Set while the meal's list holds foods, to ask before the sheet is left with them (MM-631). */
+  mayLeave?: { current: (() => Promise<boolean>) | undefined } | undefined;
 }
 
 /** What the form holds while a food is being typed or edited. */
@@ -246,6 +251,9 @@ function editing(entry: FoodEntry): Form {
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 
+/** "1 food", "3 foods". */
+const foodsText = (count: number) => (count === 1 ? '1 food' : `${count} foods`);
+
 /** How many recent foods the sheet lists before "More recent foods" (MM-439). */
 const recentsFirst = 5;
 
@@ -285,7 +293,7 @@ type Step =
  * estimated, or typed by its macros. Recent foods refill the form in one
  * tap. An entry already logged is corrected here too.
  */
-export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone }: AddFoodSheetProps) {
+export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone, mayLeave }: AddFoodSheetProps) {
   const { services, state } = useApp();
   const { gradeOfFood } = useInsightPreview();
   const netCarbs = useNetCarbs();
@@ -333,6 +341,35 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   /** Whether the last save failed: said above the action, the form kept to try again (MM-624). */
   const [saveFailed, setSaveFailed] = useState(false);
   const relogging = useRef(false);
+  /**
+   * The foods of one meal being entered together (MM-631, the owner's D-1 and D-2): logged in one step, as
+   * loose foods, at the list's meal and time. Kept only while the sheet is open.
+   */
+  const [listed, setListed] = useState<readonly FoodEntry[]>([]);
+  /** Whether the list could not be logged: said above its action (MM-624). */
+  const [listFailed, setListFailed] = useState(false);
+  /** Whether the list's line takes focus once drawn: after a food is added or taken out (the UX guard's UX-1). */
+  const [focusList, setFocusList] = useState(false);
+  const listLine = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (!focusList || listLine.current === null) return;
+    listLine.current.focus();
+    setFocusList(false);
+  });
+  // Leaving with foods in the list asks first (MM-631).
+  useEffect(() => {
+    if (mayLeave === undefined) return;
+    mayLeave.current =
+      listed.length === 0
+        ? undefined
+        : () =>
+            overlays.confirm({
+              title: `Discard ${foodsText(listed.length)}?`,
+              message: 'They are not logged yet.',
+              confirmLabel: 'Discard',
+              cancelLabel: 'Keep',
+            });
+  }, [listed, mayLeave, overlays]);
   const [meal, setMeal] = useState<Meal>(() => entry?.meal ?? firstMeal ?? defaultMeal(services.clock));
   const [day, setDay] = useState(entry?.date ?? firstDay);
   // An entry being corrected keeps its time until it is changed; a new one logged for today starts at now (MM-570).
@@ -534,8 +571,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   };
 
 
-  const save = async () => {
-    if (totals === undefined) return;
+  /** The entry the form describes, or undefined while its totals cannot be known. */
+  const toSave = (): FoodEntry | undefined => {
+    if (totals === undefined) return undefined;
     const logged = portion();
     let alcoholG: number | undefined;
     if (calc === undefined) alcoholG = a > 0 ? a * (form.basis === 'calculated' ? (amount ?? 1) : 1) : undefined;
@@ -571,8 +609,19 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           : scaledMicros,
       eatenAt,
     });
+    return saved;
+  };
+
+  const save = async () => {
+    const saved = toSave();
+    if (saved === undefined) return;
     // A failure is said, never swallowed (MM-624, as MM-591): nothing is logged, and the form stays to try again.
     try {
+      if (entry === undefined && listed.length > 0) {
+        // The last food of the meal's list, logged with the others (MM-631).
+        await logList([saved]);
+        return;
+      }
       await (entry === undefined ? services.food.addFood(saved) : services.food.updateFood(saved));
     } catch {
       setSaveFailed(true);
@@ -581,6 +630,46 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     onDone();
     // An entry moved to another day leaves this day's list; say where it went (MM-221).
     if (entry !== undefined && entry.date !== day) overlays.snack(`Moved to ${Fmt.day(day, today)}.`);
+  };
+
+  /**
+   * Puts foods in the meal's list and goes back to finding the next, with
+   * what was searched still there (MM-631). The first food's meal and time
+   * become the list's.
+   */
+  const addToList = (entries: readonly FoodEntry[]) => {
+    const first = entries[0];
+    if (listed.length === 0 && first !== undefined) {
+      setMeal(first.meal);
+      setEatenAt(first.eatenAt);
+    }
+    setListed((current) => [...current, ...entries]);
+    // Said, and the list's line takes focus, so a person who cannot see it grow knows it did (the UX guard's UX-1).
+    overlays.snack(`Added ${entries.map((food) => food.name).join(' and ')} · ${foodsText(listed.length + entries.length)} in this meal`);
+    setFocusList(true);
+    setListFailed(false);
+    setSaveFailed(false);
+    setForm(blank);
+    setTemplate(undefined);
+    setStep({ at: 'choices' });
+  };
+
+  /**
+   * Logs the list, and `last` with it, in one step at the list's meal and
+   * time (MM-631, MM-625); rejects, logging none, when that cannot be done.
+   */
+  const logList = async (last: readonly FoodEntry[] = []) => {
+    const all = [...listed, ...last].map((food) => food.copyWith({ date: day, meal, eatenAt }));
+    await services.food.applyFoodChanges({ add: all });
+    setListed([]);
+    overlays.snack(`Logged ${foodsText(all.length)}`);
+    onDone();
+  };
+
+  /** Adds the typed food to the meal's list (MM-631). */
+  const addTypedToList = () => {
+    const saved = toSave();
+    if (saved !== undefined) addToList([saved]);
   };
 
   const pick = async (food: CatalogFood, barcode?: string) => {
@@ -612,6 +701,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         meal={meal}
         onBack={choices}
         onDone={onDone}
+        listed={listed.length}
+        onAddToList={addToList}
+        onLogWithList={(entries) => logList(entries)}
         onFix={
           step.custom === undefined
             ? () => setStep({ at: 'myFoods', draft: copyOfPackFood(step.food, step.servings, step.barcode) })
@@ -671,6 +763,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    * often the row is pressed while it is being logged, and a failure is said (MM-624).
    */
   const logAgain = async (m: LoggedMeal) => {
+    // With foods in the meal's list, a meal joins them, at the list's meal and time (MM-631).
+    if (listed.length > 0) {
+      addToList(entriesCopiedTo(day, m.items, { meal }));
+      return;
+    }
     if (relogging.current) return;
     relogging.current = true;
     try {
@@ -883,12 +980,20 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
    * The name, the amount and the numbers: what the sheet collects once a
    * food is being typed or edited and not searched for.
    */
+  /** The typed form's action: this food alone, or with the meal's list (MM-631). */
+  const formLogLabel = listed.length > 0 ? `Log ${listed.length + 1} foods` : 'Log it';
+
   const formFields = () => (
     <>
       {/* When it was eaten comes first, before what and how much (MM-576). */}
       <div className="app-gap-small" />
-      <MealChips meal={meal} onChange={setMeal} />
-      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
+      {/* In a meal's list, its meal and time are the list's, set once (MM-631). */}
+      {listed.length > 0 && !isEditing ? null : (
+        <>
+          <MealChips meal={meal} onChange={setMeal} />
+          <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
+        </>
+      )}
       <div className="app-gap-small" />
       <MmTextField label="Food name" value={form.name} onChange={(name) => set({ name })} helper={form.name.trim() === '' ? 'A name is needed.' : undefined} />
       {calc === undefined ? typedFields() : calculatedFields(calc)}
@@ -930,26 +1035,92 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           text={
             isEditing
               ? 'The change could not be saved, so the food is as it was. Press Save changes to try again.'
-              : 'The food could not be logged, so nothing was. Press Log it to try again.'
+              : `The food could not be logged, so nothing was. Press ${formLogLabel} to try again.`
           }
         />
       ) : null}
       <MmButton
-        label={isEditing ? 'Save changes' : 'Log it'}
+        label={isEditing ? 'Save changes' : formLogLabel}
+        icon={!isEditing && listed.length > 0 ? 'check' : undefined}
         expand
         onPress={valid ? () => save() : undefined}
         // The action carries what it will record and what keeps it off, for a reader landing on it (the guard's F1, F3).
         describedBy={[totals === undefined ? undefined : `${ids}-logs`, valid ? undefined : `${ids}-needed`].filter((id) => id !== undefined).join(' ') || undefined}
       />
+      {isEditing ? null : (
+        // One meal of several foods, without logging each (MM-631).
+        <MmButton label="Add another food" kind="secondary" icon="plus" expand onPress={valid ? addTypedToList : undefined} />
+      )}
     </>
   );
+
+  /**
+   * The meal's list (MM-631): its meal and time, set once, its foods with a
+   * way to take one out, and its one action. While a search is typed it is
+   * its one line, so the results stay in view (the designer's PD-1).
+   */
+  const listBlock = (folded: boolean) => {
+    const kcal = listed.reduce((sum, food) => sum + food.kcal, 0);
+    const logNow = async () => {
+      try {
+        await logList();
+      } catch {
+        setListFailed(true);
+      }
+    };
+    const takeOut = (at: number) => {
+      const food = listed[at];
+      if (food === undefined) return;
+      setListed((current) => current.filter((_, k) => k !== at));
+      setFocusList(true);
+      overlays.snack(`Removed ${food.name}`, {
+        label: 'Undo',
+        onAction: () => setListed((current) => [...current.slice(0, at), food, ...current.slice(at)]),
+      });
+    };
+    const line = (
+      <p ref={listLine} tabIndex={-1} className="food-label food-label-spaced">
+        {`In this meal · ${foodsText(listed.length)} · ${Fmt.kcal(kcal)}`}
+      </p>
+    );
+    if (folded) return line;
+    return (
+      <>
+        {/* Meal and time first, then what they hold, as an analysed meal's review has it (MM-318, the designer's PD-2). */}
+        <div className="app-gap-small" />
+        <MealChips meal={meal} onChange={setMeal} />
+        <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
+        {line}
+        {listed.map((food, at) => (
+          <MmListRow
+            // A food may be in the list twice; its place tells them apart.
+            key={`${at}-${food.name}`}
+            title={food.name}
+            subtitle={[portionAmount(food), Fmt.kcal(food.kcal)].filter((part) => part !== undefined).join(' · ')}
+            trailingAction={<MmIconButton icon="delete" label={`Remove ${food.name}`} onPress={() => takeOut(at)} />}
+          />
+        ))}
+        <div className="app-gap-small" />
+        {listFailed ? (
+          <Notice icon="warning" text={`The foods could not be logged, so none were. Press Log ${foodsText(listed.length)} to try again.`} />
+        ) : null}
+        <MmButton label={`Log ${foodsText(listed.length)}`} icon="check" expand onPress={() => logNow()} />
+        <div className="app-gap" />
+      </>
+    );
+  };
 
   const searching = !isEditing && step.at === 'choices';
   return (
     <div className="food-sheet">
       <h2 className="app-headline">{isEditing ? 'Edit food' : 'Add food'}</h2>
       {searching ? <MmTextField label="Search foods" value={search} onChange={setSearch} /> : null}
-      {searching && query === '' ? (
+      {searching && listed.length > 0 ? listBlock(query !== '') : null}
+      {/* With foods in the list, only the ways that add to it: AI analysis, Saved and Estimate log on their own (MM-631). */}
+      {searching && query === '' && listed.length > 0 ? (
+        <MmButton label="Scan" kind="secondary" icon="barcode" expand onPress={() => setStep({ at: 'scanning' })} />
+      ) : null}
+      {searching && query === '' && listed.length === 0 ? (
         <>
           {/* The person's own AI, one press from a meal's "+" rather than inside Estimate (MM-598): 12 px from the
               search and from the row under it, which fills the same width (MM-600). */}
@@ -1056,7 +1227,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
               setStep({ at: 'manual' });
             }}
           />
-          {query === '' ? null : (
+          {query === '' || listed.length > 0 ? null : (
             // Not found, or not worth finding: the estimate stays in reach from the results (MM-219).
             <MmButton label="Estimate a meal" kind="text" expand onPress={() => setStep({ at: 'estimating' })} />
           )}

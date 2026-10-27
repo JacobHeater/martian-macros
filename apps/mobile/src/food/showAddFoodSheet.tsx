@@ -16,11 +16,13 @@ export function showAddFoodSheet(
   options: { meal?: Meal; entry?: FoodEntry; initialQuery?: string; estimateSize?: MealSize } = {},
 ): Promise<void> {
   const editing = options.entry !== undefined;
+  // Foods in the meal's list are not left behind without asking (MM-631).
+  const mayLeave: { current: (() => Promise<boolean>) | undefined } = { current: undefined };
   return overlays
     .sheet<void>(
       editing ? 'Edit food' : 'Add food',
-      (close) => <AddFoodSheet day={day} {...options} onDone={() => close()} />,
-      { size: 'tall' },
+      (close) => <AddFoodSheet day={day} {...options} mayLeave={mayLeave} onDone={() => close()} />,
+      { size: 'tall', mayLeave },
     )
     .then(() => undefined);
 }

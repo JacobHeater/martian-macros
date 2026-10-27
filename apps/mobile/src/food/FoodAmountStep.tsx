@@ -75,6 +75,16 @@ interface FoodAmountStepProps {
    * logged in, remembered per food (MM-151).
    */
   startOnAlternate?: boolean | undefined;
+  /**
+   * How many foods the meal's list already holds (MM-631). With any, no
+   * meal or time is asked (the list's are used) and "Log it" logs this food
+   * with them.
+   */
+  listed?: number | undefined;
+  /** Puts this food, with its fat, in the meal's list instead of logging it (MM-631). */
+  onAddToList?: ((entries: readonly FoodEntry[]) => void) | undefined;
+  /** Logs this food, with its fat, together with the list's; rejects when nothing could be logged (MM-631). */
+  onLogWithList?: ((entries: readonly FoodEntry[]) => Promise<void>) | undefined;
 }
 
 const n = (value: number) => `${roundHalfAwayFromZero(value) + 0}`;
@@ -108,6 +118,9 @@ export function FoodAmountStep({
   alternate,
   startOnAlternate = false,
   onFix,
+  listed = 0,
+  onAddToList,
+  onLogWithList,
 }: FoodAmountStepProps) {
   const ids = useId();
   const { services, state } = useApp();
@@ -216,8 +229,9 @@ export function FoodAmountStep({
   const netCarbs = useNetCarbs();
   const netCarbsG = (carbsG: number) => Math.max(0, carbsG - (extra(food.fiberG) ?? 0) - (extra(food.sugarAlcoholsG) ?? 0));
 
-  const log = async () => {
-    if (totals === undefined) return;
+  /** The food as it will be logged, and the fat it was cooked in as its own entry, if any. */
+  const toLog = (): FoodEntry[] | undefined => {
+    if (totals === undefined) return undefined;
     const logged = new FoodEntry({
       id: 0,
       date: day,
@@ -265,16 +279,36 @@ export function FoodAmountStep({
             // The fat it was cooked in was eaten with it.
             eatenAt,
           });
-    // The food and its fat are logged together or not at all, and a failure is said, never swallowed (MM-624).
+    return cookedIn === undefined ? [logged] : [logged, cookedIn];
+  };
+
+  /** The fat chosen becomes the usual, so it is one tap next time (MM-152); one not remembered costs nothing logged. */
+  const rememberFat = async (entries: readonly FoodEntry[]) => {
+    if (entries.length > 1 && fat !== usualFat) await services.preferences.saveUsualCookingFat(fat).catch(() => undefined);
+  };
+
+  const log = async () => {
+    const entries = toLog();
+    if (entries === undefined) return;
+    // The food and its fat, and the list's foods when there are any (MM-631), are logged together or not at all,
+    // and a failure is said, never swallowed (MM-624).
     try {
-      await services.food.applyFoodChanges({ add: cookedIn === undefined ? [logged] : [logged, cookedIn] });
+      if (listed > 0 && onLogWithList !== undefined) await onLogWithList(entries);
+      else await services.food.applyFoodChanges({ add: entries });
     } catch {
       setLogFailed(true);
       return;
     }
-    // The fat chosen becomes the usual, so it is one tap next time (MM-152); one not remembered costs nothing logged.
-    if (cookedIn !== undefined && fat !== usualFat) await services.preferences.saveUsualCookingFat(fat).catch(() => undefined);
-    onDone();
+    await rememberFat(entries);
+    if (listed === 0 || onLogWithList === undefined) onDone();
+  };
+
+  /** Into the meal's list, to log with the others (MM-631). */
+  const addToList = async () => {
+    const entries = toLog();
+    if (entries === undefined || onAddToList === undefined) return;
+    await rememberFat(entries);
+    onAddToList(entries);
   };
 
   /**
@@ -328,6 +362,9 @@ export function FoodAmountStep({
   else if (isHand && wholeGrams !== undefined) helper = `About ${wholeGrams} g (estimated)`;
   else if (choice.unit === 'serving' && wholeGrams !== undefined) helper = `${wholeGrams} g`;
 
+  // With the meal's list, the action logs every food of it with this one and its fat, counted as they are (MM-631).
+  const inList = listed > 0 && onLogWithList !== undefined;
+  const logLabel = inList ? `Log ${listed + (toLog()?.length ?? 1)} foods` : 'Log it';
   const grade = preview.gradeOfFood?.(food.name) ?? (custom === undefined ? gradeOfCatalogFood(food) : gradeOfCustomFood(custom));
 
   return (
@@ -342,9 +379,14 @@ export function FoodAmountStep({
       </div>
       <div className="app-gap" />
       {/* When it was eaten comes first, before what and how much (MM-576). */}
-      <MealChips meal={meal} onChange={setMeal} />
-      <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
-      <div className="app-gap" />
+      {/* In a meal's list the list's meal and time are used, set once for every food (MM-631). */}
+      {listed > 0 ? null : (
+        <>
+          <MealChips meal={meal} onChange={setMeal} />
+          <TimeEatenRow eatenAt={eatenAt} meal={meal} onChange={setEatenAt} />
+          <div className="app-gap" />
+        </>
+      )}
       <div className="app-row" role="group" aria-label="Amount in">
         {choices.map((c) => (
           <MmChoiceChip key={choiceLabel(c)} label={choiceLabel(c)} selected={c === choice} onSelect={() => pick(c)} />
@@ -447,8 +489,18 @@ export function FoodAmountStep({
         </>
       )}
       <div className="app-gap" />
-      {logFailed ? <Notice icon="warning" text="The food could not be logged, so nothing was. Press Log it to try again." /> : null}
-      <MmButton label="Log it" expand onPress={totals === undefined ? undefined : () => log()} describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`} />
+      {logFailed ? <Notice icon="warning" text={`The food could not be logged, so nothing was. Press ${logLabel} to try again.`} /> : null}
+      <MmButton
+        label={logLabel}
+        icon={inList ? 'check' : undefined}
+        expand
+        onPress={totals === undefined ? undefined : () => log()}
+        describedBy={totals === undefined ? `${ids}-needed` : `${ids}-logs`}
+      />
+      {onAddToList === undefined ? null : (
+        // One meal of several foods, without logging each (MM-631).
+        <MmButton label="Add another food" kind="secondary" icon="plus" expand onPress={totals === undefined ? undefined : () => addToList()} />
+      )}
       {onFix === undefined ? null : <MmButton label="Fix this food" kind="text" onPress={onFix} />}
       <MmButton label="Back to search" kind="text" onPress={onBack} />
     </div>
