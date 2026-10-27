@@ -39,7 +39,10 @@ export function MmOverlays({ children }: { children: ReactNode }) {
   const [held, setHeld] = useState(false);
 
   /** Shows what `render` draws and answers with what it is finished with. */
-  const ask = useCallback(<T,>(render: (finish: (answer: T | undefined) => void) => ReactNode): Promise<T | undefined> => {
+  const ask = useCallback(<T,>(
+    render: (finish: (answer: T | undefined) => void, leave: () => void) => ReactNode,
+    mayLeave?: { current: (() => Promise<boolean>) | undefined },
+  ): Promise<T | undefined> => {
     return new Promise<T | undefined>((resolve) => {
       dialogCount.current += 1;
       const id = dialogCount.current;
@@ -50,12 +53,18 @@ export function MmOverlays({ children }: { children: ReactNode }) {
         setDialogs((current) => current.filter((dialog) => dialog.id !== id));
         resolve(answer);
       };
+      /** Closed without an answer: at once, or once what the content holds may be left (MM-631). */
+      const leave = () => {
+        const asked = mayLeave?.current;
+        if (asked === undefined) finish(undefined);
+        else void asked().then((agreed) => (agreed ? finish(undefined) : undefined));
+      };
       const dismiss = () => {
         if (answered) return false;
-        finish(undefined);
+        leave();
         return true;
       };
-      setDialogs((current) => [...current, { id, node: render(finish), dismiss }]);
+      setDialogs((current) => [...current, { id, node: render(finish, leave), dismiss }]);
     });
   }, []);
 
@@ -150,11 +159,14 @@ export function MmOverlays({ children }: { children: ReactNode }) {
       },
 
       sheet(label, content, options) {
-        return ask((finish) => (
-          <MmSheet label={label} size={options?.size} onDismiss={() => finish(undefined)}>
-            {content(finish)}
-          </MmSheet>
-        ));
+        return ask(
+          (finish, leave) => (
+            <MmSheet label={label} size={options?.size} onDismiss={leave}>
+              {content(finish)}
+            </MmSheet>
+          ),
+          options?.mayLeave,
+        );
       },
 
       menu({ label, items, anchor }) {

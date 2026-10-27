@@ -2613,7 +2613,8 @@
           "MM-628",
           "MM-629",
           "MM-630",
-          "MM-632"
+          "MM-632",
+          "MM-631"
         ],
         "remaining": [
           "MM-37",
@@ -2885,6 +2886,13 @@
             "MM-629",
             "MM-630",
             "MM-632"
+          ]
+        },
+        {
+          "step": 21,
+          "title": "Several foods for one meal in one sitting: an In this meal list under the search, logged together as loose foods at one meal and time, asked before it is left (the owner's D-1 and D-2, 2026-10-26, MM-631)",
+          "tickets": [
+            "MM-631"
           ]
         }
       ],
