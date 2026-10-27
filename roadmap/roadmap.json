@@ -2620,6 +2620,7 @@
           "MM-633",
           "MM-634",
           "MM-640",
+          "MM-641",
           "MM-635",
           "MM-636",
           "MM-637"
@@ -2917,7 +2918,8 @@
           "title": "Choose some foods of a day, from any meals, and change their time, meal or day together, copy or delete them, with Undo (the food-logging plan's C3, 2026-10-26, MM-634)",
           "tickets": [
             "MM-634",
-            "MM-640"
+            "MM-640",
+            "MM-641"
           ]
         },
         {
