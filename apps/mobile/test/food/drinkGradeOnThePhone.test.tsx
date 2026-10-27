@@ -92,10 +92,16 @@ beforeEach(async () => {
   sql = await SqlRepositories.open(await WasmSqlDatabase.open());
 });
 
-/** The app over the in-memory stores, with the food log in the real database. */
-const open = () =>
+/**
+ * The app over the in-memory stores, with the food log in the real database. The pack case swaps in the fixture
+ * catalog; the online case keeps the app's own, which holds the foods kept from online (MM-58), as the phone's does.
+ */
+const open = ({ online = false }: { online?: boolean } = {}) =>
   renderApp(repos, today, {
-    change: (services: AppServices) => withCatalog(catalog)({ ...services, food: sql.food, onlineSources: [onlineSource([onlineSoda])] }),
+    change: (services: AppServices) =>
+      online
+        ? { ...services, food: sql.food, onlineSources: [onlineSource([onlineSoda])] }
+        : withCatalog(catalog)({ ...services, food: sql.food }),
   });
 
 const gradeOnTheRow = () => screen.findByRole('button', { name: /^Grade D for Orange soda/ }, slowly);
@@ -141,7 +147,7 @@ it('MM-654: four fluid ounces of soda, logged on the phone, kept, reopened and e
 
 it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged by its can, shows a C on the row (its sugars unstated, so not counted) and says its source when edited', async () => {
   await repos.preferences.saveOnlineLookup('always');
-  open();
+  open({ online: true });
   await openTab('Food');
   const sheet = await openAddFood();
   await typeIn(sheet, 'Search foods', 'crush');
