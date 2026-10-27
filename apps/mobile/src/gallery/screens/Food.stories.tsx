@@ -122,6 +122,17 @@ export const MealSplit = screenStory({
   },
 });
 
+/** MM-630: a meal's menu: its macro split, and one time, meal or day for all its foods. */
+export const FoodMealMenu = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Move to another day',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+  },
+});
+
 export const AddFood = screenStory({ covers: ['AddFoodSheet'], shows: 'Search foods', open: addFood });
 
 /** MM-239: the search field with the keyboard in it shows one mark of focus, its box. */

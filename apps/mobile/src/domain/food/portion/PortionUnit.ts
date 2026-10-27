@@ -2,7 +2,7 @@ const values = [
   'gram',
   /** Weight ounce (avoirdupois). Never a fluid ounce. */
   'ounce',
-  /** US legal cup. */
+  /** US customary cup: 8 US fluid ounces, 16 tablespoons (not the 240 mL label cup). */
   'cup',
   'tablespoon',
   'teaspoon',
@@ -17,7 +17,8 @@ const values = [
 ] as const;
 
 const gramsPerOunce = 28.349523125;
-const mlPerCup = 236.588236;
+// Exactly 8 US fluid ounces (MM-632): it was 236.588236, so 16 tablespoons made 0.9999999979 of a cup.
+const mlPerCup = 236.5882365;
 const mlPerTablespoon = 14.78676478125;
 const mlPerTeaspoon = 4.92892159375;
 const mlPerFluidOunce = 29.5735295625;
