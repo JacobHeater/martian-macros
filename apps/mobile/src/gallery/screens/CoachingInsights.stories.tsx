@@ -411,6 +411,8 @@ export const SearchWithGrades = screenStory({
   open: ({ overlays, today }) => void showAddFoodSheet(overlays, today),
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken');
+    // The demo's log matches too, so their own come first (MM-652); the database's are a press away.
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Database' }, { timeout: 10000 }));
   },
 });
 

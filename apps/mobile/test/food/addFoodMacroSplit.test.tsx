@@ -38,6 +38,7 @@ async function open(): Promise<HTMLElement> {
 
 async function pickFromSearch(sheet: HTMLElement, query: string, name: RegExp): Promise<void> {
   await typeIn(sheet, 'Search foods', query);
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Database' }));
   await userEvent.click((await within(sheet).findAllByRole('button', { name }))[0] as HTMLElement);
   await within(sheet).findByRole('button', { name: 'Log it' });
 }

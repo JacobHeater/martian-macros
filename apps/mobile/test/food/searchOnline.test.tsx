@@ -36,16 +36,23 @@ async function searched(words = 'peanut noodle') {
   return sheet;
 }
 
-it('typing never asks online; a Search online action is offered under the results, and the empty-database sentence names it', async () => {
+/** Chooses the online results at the top of the list (MM-652), where the Search online action is. */
+async function chooseOnline(sheet: HTMLElement) {
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Online' }));
+}
+
+it('typing never asks online; Online is a choice of results with a Search online action, and the empty-database sentence names it', async () => {
   const sheet = await searched();
+  expect(await within(sheet).findByText(/No food database is on this phone yet/)).toHaveTextContent(/search online, or enter the food yourself/);
+  await chooseOnline(sheet);
   const button = await within(sheet).findByRole('button', { name: 'Search online' });
   expect(source.asked).toEqual([]);
   expect(button).toBeInTheDocument();
-  expect(within(sheet).getByText(/No food database is on this phone yet/)).toHaveTextContent(/search online, or enter the food yourself/);
 });
 
 it('the first search asks, saying only the words are sent; once allowed, the foods found are listed with their source', async () => {
   const sheet = await searched();
+  await chooseOnline(sheet);
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Search online' }));
   const ask = await within(sheet).findByRole('group', { name: 'Online lookup' });
   expect(ask).toHaveTextContent('Only the words you typed are sent to Open Food Facts');
@@ -53,9 +60,8 @@ it('the first search asks, saying only the words are sent; once allowed, the foo
   // The action stays in place, off, while the question is open (the panel's F4).
   expect(within(sheet).getByRole('button', { name: 'Search online' })).toBeDisabled();
   await userEvent.click(within(ask).getByRole('button', { name: 'Just for now' }));
-  await within(sheet).findByText('Found online', {}, { timeout: 5000 });
+  const row = await within(sheet).findByRole('button', { name: /^Thai peanut noodle kit/ }, { timeout: 5000 });
   expect(source.asked).toEqual(['peanut noodle']);
-  const row = within(sheet).getByRole('button', { name: /^Thai peanut noodle kit/ });
   expect(row).toHaveTextContent('Community label (Open Food Facts)');
   expect(row).toHaveTextContent('Found online');
   expect(within(sheet).getByRole('status')).toHaveTextContent('1 found online.');
@@ -64,6 +70,7 @@ it('the first search asks, saying only the words are sent; once allowed, the foo
 it('picking a food found online keeps it on the phone and opens its amount step with its serving', async () => {
   await repos.preferences.saveOnlineLookup('always');
   const sheet = await searched();
+  await chooseOnline(sheet);
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Search online' }));
   await userEvent.click(await within(sheet).findByRole('button', { name: /^Thai peanut noodle kit/ }));
   await screen.findByRole('heading', { name: /^Thai peanut noodle kit/ }, { timeout: 5000 });
@@ -74,11 +81,14 @@ it('nothing found online, and no connection, each say so', async () => {
   await repos.preferences.saveOnlineLookup('always');
   source.entries.length = 0;
   const sheet = await searched('quinoa');
+  await chooseOnline(sheet);
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Search online' }));
   await within(sheet).findByText('Nothing found online for "quinoa".', {}, { timeout: 5000 });
   source.failWith(new Unavailable('No connection.'));
+  // Clearing the search clears the choice, so Online is chosen again for the next (MM-652).
   await userEvent.clear(within(sheet).getByRole('textbox', { name: 'Search foods' }));
   await userEvent.type(within(sheet).getByRole('textbox', { name: 'Search foods' }), 'farro');
+  await chooseOnline(sheet);
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Search online' }));
   await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/The online food services could not be reached\./));
   expect(within(sheet).getByRole('button', { name: 'Try again' })).toBeInTheDocument();
@@ -86,6 +96,7 @@ it('nothing found online, and no connection, each say so', async () => {
 
 it('never, answered here, says once what changed and where (MM-58, the panel\u2019s F6)', async () => {
   const sheet = await searched();
+  await chooseOnline(sheet);
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Search online' }));
   await userEvent.click(await within(sheet).findByRole('button', { name: 'Never' }));
   await waitFor(() => expect(within(sheet).getByRole('status')).toHaveTextContent(/Online lookup is off\. You can change that in Settings, under Data\./));
@@ -93,11 +104,12 @@ it('never, answered here, says once what changed and where (MM-58, the panel\u20
   expect(source.asked).toEqual([]);
 });
 
-it('never means no Search online action at all', async () => {
+it('never means no Online choice and no Search online action at all', async () => {
   await repos.preferences.saveOnlineLookup('never');
   const sheet = await searched();
   const sentence = await within(sheet).findByText(/No food database is on this phone yet/);
   await new Promise((resolve) => setTimeout(resolve, 200));
+  expect(within(sheet).queryByRole('button', { name: 'Online' })).toBeNull();
   expect(within(sheet).queryByRole('button', { name: 'Search online' })).toBeNull();
   expect(sentence, 'the sentence names only what is offered (the panel\u2019s F7)').not.toHaveTextContent(/search online/);
 });

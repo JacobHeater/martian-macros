@@ -106,7 +106,7 @@ export function OnlineSearchResults({ query, onPick }: OnlineSearchResultsProps)
       ) : null}
       {current.kind === 'found' && current.entries.length > 0 ? (
         <>
-          <p className="food-label food-label-spaced">Found online</p>
+          {/* No heading: the sheet's chooser says these came from online (MM-652); each row still says so. */}
           {current.entries.map((entry) => {
             const grade = preview.gradeOfFood?.(entry.food.name) ?? gradeOfCatalogFood(entry.food);
             return (

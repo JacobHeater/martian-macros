@@ -2633,7 +2633,9 @@
      "MM-648",
      "MM-649",
      "MM-650",
-     "MM-651"
+     "MM-651",
+     "MM-652",
+     "MM-653"
     ],
     "remaining": [
      "MM-37",
@@ -2985,6 +2987,14 @@
      "tickets": [
       "MM-650",
       "MM-651"
+     ]
+    },
+    {
+     "step": 31,
+     "title": "From the phone (the owner, 2026-10-27): a search's results one list at a time, chosen at the top (MM-652); the food sheets' actions and unit chips keep their distance (MM-653)",
+     "tickets": [
+      "MM-652",
+      "MM-653"
      ]
     }
    ],

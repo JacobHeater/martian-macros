@@ -17,8 +17,6 @@ import { FoodTrustMark } from './FoodTrustMark';
 interface FoodSearchResultsProps {
   query: string;
   onPick: (food: CatalogFood) => void;
-  /** Whether the person's own or recent foods already matched above, so an empty pack search says nothing (MM-330). */
-  alsoFound?: boolean;
 }
 
 /** How long the typing pauses before the packs are searched again (MM-408). */
@@ -37,7 +35,7 @@ const pageSize = 20;
  * is never empty); the first new row takes focus and a status says how many
  * joined (MM-410).
  */
-export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSearchResultsProps) {
+export function FoodSearchResults({ query, onPick }: FoodSearchResultsProps) {
   const { state } = useApp();
   const catalog = useLoaded(state.foodCatalog);
   const preview = useInsightPreview();
@@ -76,9 +74,8 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
     );
   }
   if (hits.length === 0) {
-    // Searching online sits after this list, in the sheet (MM-58); the sentence names it when it is offered.
+    // Searching online is the sheet's other choice of results (MM-58, MM-652); the sentence names it when it is offered.
     const canSearchOnline = state.onlineLookup.allowed || state.onlineLookup.mustAsk;
-    if (alsoFound && catalog.installedPacks.length > 0) return null;
     return (
       <p className="app-text food-no-hits">
         {catalog.installedPacks.length === 0
@@ -91,8 +88,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
   const closest = hits.every((hit) => hit.partial === true);
   return (
     <>
-      {/* Under its own heading, apart from the person's own foods above it, as "Found online" is below it (MM-637). */}
-      <p className="food-label food-label-spaced">From the food database</p>
+      {/* No heading: the sheet's chooser says these are the food database's (MM-652, which took over MM-637's). */}
       {closest ? <p className="app-caption food-reference-line">{`No exact match for "${settled.trim()}". Closest:`}</p> : null}
       {hits.map(({ food, firstServing }, at) => {
         // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
