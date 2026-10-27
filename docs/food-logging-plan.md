@@ -20,10 +20,11 @@ proposal, and no feature ticket has been allocated for it yet.
 | C3, choosing foods to change together | MM-634 |
 | C4, search by match first, part 1 | MM-627 |
 | The cup a digit short | MM-632 |
+| B5, Saved logs a food (owner's answer) | MM-635 |
+| C2, volume through a serving the source states as one, read from its words, no pack rebuild | MM-636 |
 
-Not built, each waiting on the owner:
-- **B5:** "Saved" logs a food.
-- **C2:** volume from the source data, a pack-format change the owner rebuilds and publishes.
+Not built:
+- **C2's liquids half**, waiting on the H-06 data check: Branded mL-only servings and Open Food Facts per-100 mL.
 - **C5:** frequency.
 - **W-D.**
 

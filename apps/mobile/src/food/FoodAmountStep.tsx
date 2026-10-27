@@ -19,6 +19,7 @@ import { parseQuantity } from '../domain/food/portion/parseQuantity';
 import { PortionUnit } from '../domain/food/portion/PortionUnit';
 import type { ReferenceNutrition } from '../domain/food/portion/ReferenceNutrition';
 import { scaleNutrition } from '../domain/food/portion/scaleNutrition';
+import { servingVolume } from '../domain/food/portion/servingVolume';
 import { FoodEntry } from '../domain/FoodEntry';
 import { IntakeDay } from '../domain/IntakeDay';
 import type { Meal } from '../domain/Meal';
@@ -32,6 +33,7 @@ import { portionUnitOf } from '../format/portionUnitOf';
 import { referenceBasisLabel } from '../format/referenceBasisLabel';
 import { quantityText } from '../format/quantityText';
 import { roundedToZeroNote } from '../format/roundedToZeroNote';
+import { servingForm } from '../format/servingForm';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
@@ -49,6 +51,7 @@ import { MealChips } from './MealChips';
 import { microsOfPackFood } from './microsOfPackFood';
 import { preparationOf } from './preparationOf';
 import { TimeEatenRow } from './TimeEatenRow';
+import { volumeChoices } from './volumeChoices';
 import { weighedConsequence } from './weighedConsequence';
 import { weighedStateLabel } from './weighedStateLabel';
 import './food.css';
@@ -99,6 +102,11 @@ function handMethod(unit: PortionUnit): QuantitySource | undefined {
 const choiceLabel = (choice: AmountChoice) => {
   const serving = choice.serving;
   if (serving === undefined) return portionUnitChipLabel(choice.unit);
+  // A volume weighed through a serving is of that serving's form: "Tablespoons, chopped" (MM-636).
+  if (choice.unit !== 'serving') {
+    const form = servingForm(serving.description);
+    return form === undefined ? portionUnitChipLabel(choice.unit) : `${portionUnitChipLabel(choice.unit)}, ${form}`;
+  }
   return serving.grams > 0 ? `${serving.description} (${n(serving.grams)} g)` : serving.description;
 };
 
@@ -137,7 +145,10 @@ export function FoodAmountStep({
       const handUnits: readonly PortionUnit[] = hand === undefined ? [] : handUnitsFor(makeup);
       return [
         ...servings.map((serving) => ({ unit: 'serving' as const, serving })),
-        ...(['gram', 'ounce', ...handUnits] as const).map((unit) => ({ unit, serving: undefined })),
+        ...(['gram', 'ounce'] as const).map((unit) => ({ unit, serving: undefined })),
+        // Volumes, weighed through a serving the source states as one (MM-636).
+        ...volumeChoices(servings),
+        ...handUnits.map((unit) => ({ unit, serving: undefined })),
       ];
     }
     const grams = custom.servingGrams;
@@ -198,6 +209,8 @@ export function FoodAmountStep({
           nutrition: new NutritionTotals({ kcal: food.kcal, proteinG: food.proteinG, carbsG: food.carbsG, fatG: food.fatG }),
           servingDescription: c.serving?.description,
           servingGrams: c.serving?.grams,
+          // The serving's volume, read from its own words, so a volume can be weighed through it (MM-636).
+          servingMilliliters: c.serving === undefined ? undefined : servingVolume(c.serving.description),
           servingUnit: c.serving === undefined ? undefined : 'serving',
           densityGPerMl: food.densityGPerMl,
         };
@@ -215,6 +228,8 @@ export function FoodAmountStep({
    */
   const method = (): QuantitySource => {
     if (PortionUnit.isWeight(choice.unit)) return 'weighed';
+    // A cup or a spoon is a household measure, of a packaged food too (MM-167).
+    if (PortionUnit.isVolume(choice.unit)) return 'householdMeasure';
     const byHand = handMethod(choice.unit);
     if (byHand !== undefined) return byHand;
     const packaged = custom !== undefined || food.preparation === 'packaged' || food.source === 'usda_branded' || food.source === 'off';
@@ -360,7 +375,7 @@ export function FoodAmountStep({
   else if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
   else if (converted !== undefined && quantity === converted.shown) helper = `Same amount as ${converted.from}.`;
   else if (isHand && wholeGrams !== undefined) helper = `About ${wholeGrams} g (estimated)`;
-  else if (choice.unit === 'serving' && wholeGrams !== undefined) helper = `${wholeGrams} g`;
+  else if ((choice.unit === 'serving' || PortionUnit.isVolume(choice.unit)) && wholeGrams !== undefined) helper = `${wholeGrams} g`;
 
   // With the meal's list, the action logs every food of it with this one and its fat, counted as they are (MM-631).
   const inList = listed > 0 && onLogWithList !== undefined;

@@ -265,6 +265,7 @@ const calculatedUnits: readonly PortionUnit[] = [
   'tablespoon',
   'teaspoon',
   'milliliter',
+  'fluidOunce',
   'palm',
   'cuppedHand',
   'thumb',
