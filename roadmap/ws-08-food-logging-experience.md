@@ -127,6 +127,7 @@ and WS-09 steps 1 and 8.
 23. **Choose foods to change together (MM-634).** The plan's C3 (2026-10-26): "Select" from a food's or meal's menu turns the day's rows into boxes to tick, and a bar at the foot changes the chosen foods' time, meal or day, copies or deletes them, in one step with Undo.
 24. **Saved foods log when pressed (MM-635).** The owner, 2026-10-26: in Add food, a saved food is logged by pressing it; Edit and Delete are in its menu.
 25. **Volume through a volume serving (MM-636).** The owner, 2026-10-26 (the plan's C2): a serving's volume is read from its words ("1 cup, chopped"), and the food is offered cups, tablespoons and teaspoons weighed through it; no new pack format. Branded mL-only servings and Open Food Facts per-100 mL liquids wait on the plan's H-06 data check.
+26. **Own results apart (MM-637).** The owner, 2026-10-26: "Your foods and meals" and "From the food database" head a search's two kinds of results.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -178,6 +179,7 @@ workstream's.
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
 - Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
 - Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
+- Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
