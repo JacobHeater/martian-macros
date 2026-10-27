@@ -37,9 +37,11 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
   100 g or per 100 mL, a serving by weight, by volume or both; the extract reads Branded `ml`/`MLT` rows and
   Open Food Facts mL servings as per 100 mL) and MM-651 (a drink by its can, the fluid ounce or the millilitre;
-  grams only with a density), PR #341. **The owner's step**: rebuild and publish the packs
-  (`docs/food-packs-data.md`, "Format 5"); until then the app reads the format-4 packs as before. Open: the
-  online path stays per 100 g; a recipe ingredient that is a drink is still weighed in grams.
+  grams only with a density), PR #341. Packs rebuilt 2026-10-27 as format 5 (`docs/food-packs-data.md`,
+  "Format 5", with the panel's IN-1 figures; PR #342 removed two `node_modules` symlinks PR #338 had committed,
+  which broke the build on the main checkout). **The owner's step**: publish release 2026-10-27 and pull both
+  packs from Settings > Food database. Open: the online path stays per 100 g; a recipe ingredient that is a
+  drink is still weighed in grams; the pack version is the fetch day, so a rebuild needs `./mm food fetch` first.
 - **Owner's calls:** favorites pinned by the person (not built: Saved and usual-first cover it, say if a star is
   still wanted); F-21 (a re-logged analysed food becomes a label serving); whether "Select" is worded better.
 - **On a phone:** every new food-logging screen, the choosing bar at 200% text (a story exists), and View meal's

@@ -35,8 +35,6 @@ proposal, and no feature ticket has been allocated for it yet.
 | C2's liquids half: the pack states a drink per 100 mL with its serving in millilitres (format 5); a drink by the fluid ounce, the millilitre or its own can; the H-06 check first (2026-10-27) | MM-650, MM-651 |
 
 Not built, and why:
-- **C2's packs**: MM-650 changed the build (format 5), but the published packs are still format 4, so no drink
-  has its volume until the owner rebuilds and publishes them (`docs/food-packs-data.md`, "Format 5").
 - **W-D, favorites pinned by the person.** Not built as a third thing: Saved foods and meals log in one press
   (MM-635, MM-645) and sit first in search (MM-637), and what is usual at a meal comes first among the recents
   (MM-639). If the owner still wants a star, it is a ticket of its own.
@@ -912,8 +910,8 @@ change. Each increment gets its ticket when it is scheduled, not before.
   half follows B1.
 - **Built:** volume through a serving's words, no rebuild (MM-636,
   2026-10-26); the liquids half after the H-06 check, as format 5 (MM-650)
-  and the drink's amount step, edit and rows (MM-651), 2026-10-27. The owner
-  rebuilds and publishes the packs. Not built: the grouped unit control as
+  and the drink's amount step, edit and rows (MM-651), 2026-10-27; the packs
+  rebuilt as format 5 the same day. Not built: the grouped unit control as
   one dropdown (the chips stayed, as MM-636 chose); density derived from
   unmodified volume measures (no source states one; nothing is guessed).
 
