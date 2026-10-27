@@ -12,6 +12,7 @@ import type { CustomFood } from '../domain/food/custom/CustomFood';
 import { HandModel } from '../domain/food/hand/HandModel';
 import { handUnitsFor } from '../domain/food/hand/handUnitsFor';
 import { conversionFor } from '../domain/food/portion/conversionFor';
+import { convertedQuantity } from '../domain/food/portion/convertedQuantity';
 import { gramsFor } from '../domain/food/portion/gramsFor';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import { parseQuantity } from '../domain/food/portion/parseQuantity';
@@ -141,6 +142,12 @@ export function FoodAmountStep({
   const [choice, setChoice] = useState<AmountChoice>(first);
   const [useAlternate, setUseAlternate] = useState(remembered);
   const [quantity, setQuantity] = useState(() => defaultQuantity(first));
+  /** The amount another unit was converted to, exact, while its figure is untouched, and what it was (MM-628). */
+  const [converted, setConverted] = useState<{ readonly shown: string; readonly value: number; readonly from: string }>();
+  /** Whether the last unit change had no common measure, so the amount is asked again (MM-628). */
+  const [reenter, setReenter] = useState(false);
+  /** Whether the amount is the person's, typed or converted from theirs, rather than a unit's usual figure (MM-628). */
+  const [entered, setEntered] = useState(false);
   const [meal, setMeal] = useState(firstMeal);
   // Logged for today, it starts at now; for another day, it has no time until one is given (MM-570).
   const [eatenAt, setEatenAt] = useState<number | undefined>(() => eatenAtWhenLogged(day, services.clock));
@@ -161,10 +168,10 @@ export function FoodAmountStep({
   const offersOil = custom === undefined && (chosen.preparation === 'cooked' || alternate?.preparation === 'cooked');
 
   /**
-   * The food's nutrition for 100 g, with the chosen serving's details so
-   * the entry can say what it was scaled from.
+   * The food's nutrition for 100 g, with a choice's serving details so the
+   * entry can say what it was scaled from.
    */
-  const reference: ReferenceNutrition =
+  const referenceFor = (c: AmountChoice): ReferenceNutrition =>
     custom !== undefined
       ? {
           basis: 'perServing',
@@ -176,13 +183,15 @@ export function FoodAmountStep({
       : {
           basis: 'per100g',
           nutrition: new NutritionTotals({ kcal: food.kcal, proteinG: food.proteinG, carbsG: food.carbsG, fatG: food.fatG }),
-          servingDescription: choice.serving?.description,
-          servingGrams: choice.serving?.grams,
-          servingUnit: choice.serving === undefined ? undefined : 'serving',
+          servingDescription: c.serving?.description,
+          servingGrams: c.serving?.grams,
+          servingUnit: c.serving === undefined ? undefined : 'serving',
           densityGPerMl: food.densityGPerMl,
         };
+  const reference = referenceFor(choice);
 
-  const amount = parseQuantity(quantity);
+  // A converted amount is kept exact while its figure is untouched (MM-628).
+  const amount = converted !== undefined && quantity === converted.shown ? converted.value : parseQuantity(quantity);
   const totals = amount === undefined ? undefined : scaleNutrition(amount, choice.unit, reference, { hand });
   const grams = amount === undefined ? undefined : gramsFor(amount, choice.unit, reference, { hand });
   const isHand = PortionUnit.isHand(choice.unit);
@@ -268,11 +277,33 @@ export function FoodAmountStep({
     onDone();
   };
 
+  /**
+   * Another unit: the same portion said in it when the two share an exact
+   * measure; otherwise the amount is asked again, never invented (MM-628).
+   * With no amount of the person's yet, the unit's usual figure.
+   */
   const pick = (next: AmountChoice) => {
+    const same =
+      amount === undefined
+        ? undefined
+        : convertedQuantity(amount, { unit: choice.unit, reference }, { unit: next.unit, reference: referenceFor(next) }, { hand });
     setChoice(next);
     // The raw or cooked switch applies to weighing only.
     if (!PortionUnit.isWeight(next.unit)) setUseAlternate(false);
-    setQuantity(defaultQuantity(next));
+    setReenter(false);
+    if (amount === undefined || !entered) {
+      setConverted(undefined);
+      setQuantity(defaultQuantity(next));
+    } else if (same === undefined) {
+      setConverted(undefined);
+      setQuantity('');
+      setReenter(true);
+    } else {
+      const shown = quantityText(same);
+      const was = choice.serving === undefined ? portionUnitOf(choice.unit, amount) : `× ${choice.serving.description}`;
+      setConverted({ shown, value: same, from: `${quantityText(amount)} ${was}` });
+      setQuantity(shown);
+    }
   };
 
   const note =
@@ -291,7 +322,9 @@ export function FoodAmountStep({
       : ` Plus ${cookingFatEntryName(fat).toLowerCase()} as its own entry: about ${n(oilTotals.kcal)} kcal${showsCarbsAndFat ? ` · ${n(oilTotals.fatG)} g fat` : ''}.`;
   const wholeGrams = grams === undefined ? undefined : quantityText(roundHalfAwayFromZero(grams) + 0);
   let helper: string | undefined;
-  if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
+  if (reenter && quantity.trim() === '') helper = 'Enter how much again in this unit.';
+  else if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
+  else if (converted !== undefined && quantity === converted.shown) helper = `Same amount as ${converted.from}.`;
   else if (isHand && wholeGrams !== undefined) helper = `About ${wholeGrams} g (estimated)`;
   else if (choice.unit === 'serving' && wholeGrams !== undefined) helper = `${wholeGrams} g`;
 
@@ -342,7 +375,10 @@ export function FoodAmountStep({
         label={choice.unit === 'serving' ? 'How many servings' : `Amount (${portionUnitOf(choice.unit, 2)})`}
         kind="quantity"
         value={quantity}
-        onChange={setQuantity}
+        onChange={(text) => {
+          setQuantity(text);
+          setEntered(true);
+        }}
         helper={helper}
         helperIsWarning={invalid}
       />
