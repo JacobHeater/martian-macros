@@ -20,6 +20,9 @@ const formatOneColumns =
   'f.sodium_mg, f.alcohol, f.preparation, f.pair_id, f.density, ' +
   'f.source, f.source_id, f.tier, f.tier_reason';
 
+/** How many first letters of a mistyped word are kept to find what it meant (MM-638). */
+const stemLength = 4;
+
 function number(value: SqlValue | undefined, column: string): number {
   if (typeof value !== 'number') throw new FormatError(`The pack's ${column} is not a number.`);
   return value;
@@ -105,9 +108,21 @@ export class SqliteFoodPack implements FoodPack {
     }
     const terms = words.map((w) => `"${w}"*`);
     const found = await this.matching(terms.join(' '), { limit, offset, group });
-    // Every word typed found nothing: the closest foods by some of them, said as such (MM-627).
-    if (!closest || found.length > 0 || offset > 0 || words.length < 2) return found;
-    return (await this.matching(terms.join(' OR '), { limit, offset, group })).map((hit) => ({ ...hit, partial: true }));
+    if (!closest || found.length > 0 || offset > 0) return found;
+    // Every word typed found nothing: the closest foods, said as such (MM-627), tried in turn.
+    const partial = (hits: SearchHit[]) => hits.map((hit) => ({ ...hit, partial: true }));
+    // A word mistyped after its first letters ("chickn"): every word by its first four (MM-638).
+    const stems = words.map((w) => `"${w.length > stemLength ? w.slice(0, stemLength) : w}"*`);
+    const stemmed = stems.some((stem, i) => stem !== terms[i]);
+    if (stemmed) {
+      const near = await this.matching(stems.join(' '), { limit, offset, group });
+      if (near.length > 0) return partial(near);
+    }
+    if (words.length < 2) return [];
+    // Some of the words typed (MM-627), then some of them by their first letters (MM-638).
+    const some = await this.matching(terms.join(' OR '), { limit, offset, group });
+    if (some.length > 0 || !stemmed) return partial(some);
+    return partial(await this.matching(stems.join(' OR '), { limit, offset, group }));
   }
 
   /** The foods `match` finds, best text score first, each with its first serving (MM-627). */
