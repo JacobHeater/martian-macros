@@ -836,10 +836,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     savedMeals.some((m) => matches(m.name)) ||
     (fromLog?.foods.length ?? 0) > 0 ||
     (fromLog?.meals.length ?? 0) > 0;
-  // Online is a choice only where it is offered: a source exists and the person has not said never (MM-58).
-  const onlineOffered = state.onlineLookup.available && (state.onlineLookup.allowed || state.onlineLookup.mustAsk);
+  // Online is a choice only where it is offered: a source exists and the person has not said never (MM-58). Once
+  // chosen it stays for the search, so "Never" answered there leaves its notice in view (MM-58, the panel's F6).
+  const onlineOffered = state.onlineLookup.available && (state.onlineLookup.allowed || state.onlineLookup.mustAsk || source === 'online');
   /** The results shown: what the person chose, or their own when any matched, else the food database (MM-652). */
-  const shownSource: ResultSource = source === 'online' && !onlineOffered ? 'database' : (source ?? (ownFound ? 'own' : 'database'));
+  const shownSource: ResultSource = source ?? (ownFound ? 'own' : 'database');
   // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What is usual at
   // the meal being added to comes first, most often first (MM-639), then what was last logged at it (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
