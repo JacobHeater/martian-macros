@@ -30,14 +30,22 @@ Choices made without asking (say if any is wrong):
   millilitres, described by the household text ("1 Can (355 mL)") or "355 mL". `g`, `GRM` and `gm` are grams
   (the 344 `gm` rows were dropped before). Any other unit (`mg`, `IU`, `mc`, empty: supplements and mistakes)
   keeps no serving, as before.
-- **Open Food Facts**: a product whose serving text states a number of millilitres ("1 can (355 ml)", "240 ml")
-  is per 100 mL and its serving is `serving_quantity` millilitres, which the H-06 check found equal to that
-  number in 9,951 of 9,957. Any other serving is grams, as before. A liquid whose serving names no unit stays
-  per 100 g, as today: the export has no other signal, and nothing is guessed from a category.
+- **Open Food Facts**: a product is per 100 mL, its serving `serving_quantity` millilitres, when the serving text
+  states those millilitres ("1 can (355 ml)", "240 ml": equal in 65,207 of 65,669 US servings) or states fluid
+  ounces that convert to them ("1 can (12 fl oz)": the export converts them itself, 3,913 of 4,475). The
+  export's quantity is the last unit in the text, so "240 ml (245 g)" stays grams (the panel's IN-2 and IN-3).
+  Any other serving is grams, as before. A liquid whose serving names no unit stays per 100 g, as today: the
+  export's `nutrition_data_per` is only 100g or serving, its `quantity` names the package, not the serving, and
+  nothing is guessed from a category (IN-4).
 - **The nutrition rule reads the basis**: "macros exceed 100 g" allows up to 150 g per 100 mL, honey's density
   (1.42) rounded up, so a syrup is not refused for weighing more than water. Energy's ceiling is unchanged.
-- **The online path is unchanged** (FoodData Central online keeps grams-only servings; an Open Food Facts product
-  found online is still read as today). Parity needs a column in the person's own database, a follow-up.
+- **The online path is unchanged**, bar `gm` now read as grams by FoodData Central online as the extract does: an
+  Open Food Facts product found online is still read per 100 g with its serving as grams, so the same soda
+  found online offers weights where the pack's offers volumes (the panel's IN-7). Parity needs a column in the
+  person's own database; the API's `serving_quantity_unit` is that follow-up's signal.
+- **The micronutrient ceilings** are half as much again per 100 mL, as the macro ceiling is (IN-6), so a syrup's
+  sugars are not dropped for its density. The same barcode in both sources keeps the winner whole, basis and
+  servings (IN-5, a test).
 - **The owner rebuilds and publishes the packs** (`mm food fetch` is not needed: the cache of 2026-10-19
   suffices; `mm food build`, `mm food package`, the release, as `docs/food-packs-data.md` says). Until then the
   app reads the format-4 packs as before, with no volume for these foods.

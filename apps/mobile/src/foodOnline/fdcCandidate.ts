@@ -79,7 +79,7 @@ export function fdcCandidate(food: unknown): CandidateFood | undefined {
   const unit = typeof f['servingSizeUnit'] === 'string' ? f['servingSizeUnit'].toLowerCase() : '';
   const household = typeof f['householdServingFullText'] === 'string' ? f['householdServingFullText'].trim() : '';
   const servings: CatalogServing[] =
-    servingGrams !== undefined && servingGrams > 0 && (unit === 'g' || unit === 'grm')
+    servingGrams !== undefined && servingGrams > 0 && (unit === 'g' || unit === 'grm' || unit === 'gm')
       ? [{ description: household === '' ? `${servingGrams} g` : household, grams: servingGrams }]
       : [];
   const brand = [f['brandName'], f['brandOwner']].find((b) => typeof b === 'string' && b.trim() !== '') as string | undefined;
