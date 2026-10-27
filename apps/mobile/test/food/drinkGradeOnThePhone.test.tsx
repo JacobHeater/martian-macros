@@ -165,7 +165,7 @@ it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged b
   expect(glass?.portion?.unit).toBe('fluidOunce');
   expect(glass?.portion?.reference?.basis).toBe('per100g');
   expect(glass?.portion?.reference?.servingGrams).toBe(355);
-  expect(glass?.portion?.reference?.servingMilliliters).toBe(355);
+  expect(glass?.portion?.reference?.servingMilliliters).toBeCloseTo(12 * 29.5735295625, 6);
   expect(glass?.fiberG).toBeUndefined();
   expect(Math.round(glass?.kcal ?? 0)).toBe(64);
   expect(await screen.findByRole('button', { name: /^Grade C for CRUSH, SODA, ORANGE, ORANGE/ }, slowly)).toBeInTheDocument();
