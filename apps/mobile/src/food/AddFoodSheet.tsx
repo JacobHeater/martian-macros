@@ -26,6 +26,7 @@ import { unitsOffered } from '../domain/food/portion/unitsOffered';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import { IntakeDay } from '../domain/IntakeDay';
+import { timesLoggedAt } from '../domain/food/meal/timesLoggedAt';
 import { macrosMatchEnergy } from '../domain/macrosMatchEnergy';
 import type { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
@@ -254,6 +255,9 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 /** "1 food", "3 foods". */
 const foodsText = (count: number) => (count === 1 ? '1 food' : `${count} foods`);
 
+/** How many times in four weeks make a food usual at a meal, and first among the recent foods there (MM-639). */
+const usualTimes = 2;
+
 /** How many recent foods the sheet lists before "More recent foods" (MM-439). */
 const recentsFirst = 5;
 
@@ -303,6 +307,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const hand = useCell(state.handSize);
   const recents = useLoaded(state.recentFoods) ?? [];
   const recentMeals = useLoaded(state.recentMeals) ?? [];
+  // The four weeks before the day, to know what is usual at a meal (MM-639).
+  const lastWeeks = useLoaded(state.foodBefore(firstDay)) ?? [];
   const [allRecents, setAllRecents] = useState(false);
   const customFoods = useLoaded(state.customFoods) ?? [];
   // The form shows the fields for the chosen level and stores what it holds (MM-49).
@@ -745,13 +751,19 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
   /** Whether the search found any of the person's own foods or anything in their log (MM-596, MM-637). */
   const ownFound = customFoods.some((food) => matches(food.name)) || (fromLog?.foods.length ?? 0) > 0 || (fromLog?.meals.length ?? 0) > 0;
-  // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What was last
-  // logged at the meal being added to comes first (MM-629).
+  // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What is usual at
+  // the meal being added to comes first, most often first (MM-639), then what was last logged at it (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
+  const times = timesLoggedAt(meal, lastWeeks);
+  /** How often a name was logged at this meal in the last four weeks, when that makes it usual there. */
+  const usual = (name: string) => {
+    const count = times.get(name.toLowerCase()) ?? 0;
+    return count >= usualTimes ? count : 0;
+  };
   const recentRows: readonly ({ kind: 'food'; entry: FoodEntry } | { kind: 'meal'; meal: LoggedMeal })[] = [
-    ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id, here: entry.meal === meal })),
-    ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m), here: m.meal === meal })),
-  ].sort((a, b) => Number(b.here) - Number(a.here) || b.newest - a.newest);
+    ...recents.map((entry) => ({ kind: 'food' as const, entry, newest: entry.id, here: entry.meal === meal, usual: usual(entry.name) })),
+    ...recentMeals.map((m) => ({ kind: 'meal' as const, meal: m, newest: newestOf(m), here: m.meal === meal, usual: usual(m.name) })),
+  ].sort((a, b) => b.usual - a.usual || Number(b.here) - Number(a.here) || b.newest - a.newest);
   /** A food from the log's grade, as it was logged (MM-596). */
   const entryGradeBeside = (e: FoodEntry) => {
     const grade = gradeOfFood?.(e.name) ?? gradeOfFoodEntry(e, { hand });

@@ -174,7 +174,7 @@ workstream's.
 - Added 2026-10-26 (step 18, the food-logging review): MM-623 (a recent food logged again loses its nutrients and its food; fixed the same day), MM-624 (a save that fails says nothing; pressed twice it logs twice; the fat can be lost; fixed the same day), MM-625 (meal writes can leave part of a meal, and a deleted meal went row by row; fixed the same day with one all-or-nothing batch), MM-626 (a logged meal's time cannot be changed; fixed the same day, and a day move keeps the time).
 - Added 2026-10-26 (step 19, the owner's D-3): MM-627 (search lists the closest name first, with each food's serving; done).
 - Added 2026-10-26 (step 19): MM-638 (a word mistyped after its first letters still finds what it meant; done).
-- Added 2026-10-26 (step 20): MM-628 (a unit change keeps the portion), MM-629 (recent foods say their amount, this meal's first), MM-630 (a meal's menu changes all its foods' time, meal or day), MM-632 (the cup was a digit short), all done.
+- Added 2026-10-26 (step 20): MM-628 (a unit change keeps the portion), MM-629 (recent foods say their amount, this meal's first), MM-630 (a meal's menu changes all its foods' time, meal or day), MM-632 (the cup was a digit short), MM-639 (what is usual at a meal first among the recent foods), all done.
 - Added 2026-10-26 (step 21): MM-631 (several foods for one meal in one sitting; done).
 - Added 2026-10-26 (step 22): MM-633 (a copy says so with Undo, once, to any day; done).
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
