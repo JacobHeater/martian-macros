@@ -123,6 +123,17 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
     await services.food.deleteFood(entry.id);
     overlays.snack(`Removed ${entry.name}`, { label: 'Undo', onAction: () => void services.food.addFood(entry) });
   };
+  /**
+   * Takes one food out of the meal (MM-641): it stays in the same slot, day and time as a food of its own, with
+   * its numbers and where they came from, and Undo puts it back in the meal.
+   */
+  const takeOut = async (entry: FoodEntry) => {
+    await services.food.updateFood(entry.copyWith({ loggedMeal: undefined }));
+    overlays.snack(`${entry.name} is its own food now`, {
+      label: 'Undo',
+      onAction: () => void services.food.updateFood(entry),
+    });
+  };
   const saveToSaved = async () => {
     await services.customFoods.saveCustomFood(recipeOfMeal({ name: loggedMeal.name, items: loggedMeal.items.map(mealItemOfEntry) }));
     overlays.snack(`Saved ${loggedMeal.name} to Saved`);
@@ -159,7 +170,12 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
       <p className="food-label food-label-spaced">{loggedMeal.items.length === 1 ? '1 food' : `${loggedMeal.items.length} foods`}</p>
       {loggedMeal.items.map((entry) => (
         <Fragment key={entry.id}>
-          <MealItemRow item={mealItemOfEntry(entry)} onChange={() => setEditing(entry.id)} onRemove={() => void attempt(() => remove(entry))} />
+          <MealItemRow
+            item={mealItemOfEntry(entry)}
+            onChange={() => setEditing(entry.id)}
+            onRemove={() => void attempt(() => remove(entry))}
+            onTakeOut={() => void attempt(() => takeOut(entry))}
+          />
           {editing === entry.id ? (
             <MealItemForm
               item={mealItemOfEntry(entry)}

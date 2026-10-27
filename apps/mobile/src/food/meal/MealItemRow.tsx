@@ -13,6 +13,8 @@ interface MealItemRowProps {
   item: MealItemDraft;
   onChange: () => void;
   onRemove: () => void;
+  /** Takes a logged meal's food out of the meal, to stand as its own food (MM-641); absent before logging. */
+  onTakeOut?: (() => void) | undefined;
 }
 
 const whole = (value: number | undefined) => (value === undefined ? '?' : String(roundHalfAwayFromZero(value) + 0));
@@ -23,7 +25,7 @@ const whole = (value: number | undefined) => (value === undefined ? '?' : String
  * and anything wrong with it, said in words under it. Its grade beside it;
  * changing and removing it in its menu.
  */
-export function MealItemRow({ item, onChange, onRemove }: MealItemRowProps) {
+export function MealItemRow({ item, onChange, onRemove, onTakeOut }: MealItemRowProps) {
   const problems = mealItemProblems(item);
   const grade = gradeOfMealItem(item);
   const amount = item.grams === undefined ? '' : `${whole(item.grams)} g · `;
@@ -45,14 +47,15 @@ export function MealItemRow({ item, onChange, onRemove }: MealItemRowProps) {
       }
       trailing={grade === undefined ? undefined : <FoodGrade grade={grade} subject={item.name} />}
       trailingAction={
-        <MmMenuButton<'change' | 'remove'>
+        <MmMenuButton<'change' | 'takeOut' | 'remove'>
           icon="more"
           label={`More actions for ${item.name}`}
           items={[
             { value: 'change', label: 'Change' },
+            ...(onTakeOut === undefined ? [] : [{ value: 'takeOut' as const, label: 'Take out of the meal' }]),
             { value: 'remove', label: 'Remove' },
           ]}
-          onSelect={(action) => (action === 'change' ? onChange() : onRemove())}
+          onSelect={(action) => (action === 'change' ? onChange() : action === 'takeOut' ? onTakeOut?.() : onRemove())}
         />
       }
     />
