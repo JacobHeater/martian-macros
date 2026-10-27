@@ -45,20 +45,20 @@ it('MM-652: with a logged banana, Yours is chosen and lists it; Database switche
   const sheet = await search('banana');
   const logged = await within(sheet).findByRole('button', { name: /^Banana.*From your log/ });
   expect(within(chooser(sheet)).getByRole('button', { name: 'Yours' })).toHaveAttribute('aria-pressed', 'true');
-  expect(within(sheet).queryByRole('button', { name: /^Banana · 1 medium/ })).not.toBeInTheDocument();
+  expect(within(sheet).queryByRole('button', { name: /^Banana.*1 medium \(118 g\)/ })).not.toBeInTheDocument();
   await userEvent.click(within(chooser(sheet)).getByRole('button', { name: 'Database' }));
-  expect(await within(sheet).findByRole('button', { name: /^Banana · 1 medium/ })).toBeInTheDocument();
+  expect(await within(sheet).findByRole('button', { name: /^Banana.*1 medium \(118 g\)/ })).toBeInTheDocument();
   expect(logged).not.toBeInTheDocument();
   expect(within(chooser(sheet)).getByRole('button', { name: 'Database' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 it('MM-652: with nothing of their own, Database is chosen; Yours says nothing of theirs matches', async () => {
   const sheet = await search('banana');
-  expect(await within(sheet).findByRole('button', { name: /^Banana · 1 medium/ })).toBeInTheDocument();
+  expect(await within(sheet).findByRole('button', { name: /^Banana.*1 medium \(118 g\)/ })).toBeInTheDocument();
   expect(within(chooser(sheet)).getByRole('button', { name: 'Database' })).toHaveAttribute('aria-pressed', 'true');
   await userEvent.click(within(chooser(sheet)).getByRole('button', { name: 'Yours' }));
   expect(await within(sheet).findByText('Nothing of yours matches "banana".')).toBeInTheDocument();
-  expect(within(sheet).queryByRole('button', { name: /^Banana · 1 medium/ })).not.toBeInTheDocument();
+  expect(within(sheet).queryByRole('button', { name: /^Banana.*1 medium \(118 g\)/ })).not.toBeInTheDocument();
 });
 
 it('MM-652: no online source, no Online choice; the choice made is kept for the search and cleared with it', async () => {

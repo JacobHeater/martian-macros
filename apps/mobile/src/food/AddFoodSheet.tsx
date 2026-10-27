@@ -335,6 +335,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const today = useCell(state.today);
   const overlays = useOverlays();
   const hand = useCell(state.handSize);
+  // Whether online is offered changes as the person's choice loads and is answered (MM-58); the chooser follows it (MM-652).
+  useCell(state.onlineLookup.choice);
+  useCell(state.onlineLookup.allowedOnce);
   const recents = useLoaded(state.recentFoods) ?? [];
   const recentMeals = useLoaded(state.recentMeals) ?? [];
   // The four weeks before the day, to know what is usual at a meal (MM-639).
