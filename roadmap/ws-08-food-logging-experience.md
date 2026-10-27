@@ -178,6 +178,7 @@ workstream's.
 - Added 2026-10-26 (step 21): MM-631 (several foods for one meal in one sitting; done).
 - Added 2026-10-26 (step 22): MM-633 (a copy says so with Undo, once, to any day; done).
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
+- Added 2026-10-26 (step 23): MM-640 (the chosen count said as it changes; done).
 - Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
 - Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
 - Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).
