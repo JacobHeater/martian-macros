@@ -32,12 +32,11 @@ proposal, and no feature ticket has been allocated for it yet.
 | F-19, a food typed by hand into a meal says how it was measured; Look up offers its matches | MM-646, MM-647 |
 | F-20, extras follow the amount, never a corrected calorie (the recommendation taken) | MM-648 |
 | MM-634's follow-up: focus after the chosen row is gone; the choosing bar at 200% text, a story | MM-649 |
+| C2's liquids half: the pack states a drink per 100 mL with its serving in millilitres (format 5); a drink by the fluid ounce, the millilitre or its own can; the H-06 check first (2026-10-27) | MM-650, MM-651 |
 
 Not built, and why:
-- **C2's liquids half**: Branded mL-only servings and Open Food Facts per-100 mL. The H-06 data check ran on
-  2026-10-27 and confirmed both (the hypotheses table below, and `docs/food-packs-data.md`), so this half is no
-  longer blocked on data. It is still a format bump, a pipeline change, the grouped unit control, a panel design
-  pass and a pack rebuild by the owner, so it is the next thing to ticket, not something done in passing.
+- **C2's packs**: MM-650 changed the build (format 5), but the published packs are still format 4, so no drink
+  has its volume until the owner rebuilds and publishes them (`docs/food-packs-data.md`, "Format 5").
 - **W-D, favorites pinned by the person.** Not built as a third thing: Saved foods and meals log in one press
   (MM-635, MM-645) and sit first in search (MM-637), and what is usual at a meal comes first among the recents
   (MM-639). If the owner still wants a star, it is a ticket of its own.
@@ -633,7 +632,8 @@ the appendix).
    only with a density.
 
 Branded servings stated in mL are ingested with their mL. Open Food Facts
-liquids are read per 100 mL (H-06 confirmed both on 2026-10-27).
+liquids are read per 100 mL (H-06 confirmed both on 2026-10-27; built as
+MM-650 and MM-651).
 
 A label's own cup (240 mL) and a customary cup (236.6 mL) are never mixed:
 eating the source's own unit scales by its count (`servingUnit`, as
@@ -859,6 +859,7 @@ change. Each increment gets its ticket when it is scheduled, not before.
 
 **B6. Fluid ounce offered for drinks with a mL basis.** S.
 - **Builds on:** C2's data, or the per-100 mL sources.
+- **Built (2026-10-27):** MM-651, with C2's liquids half.
 
 ### W-C · Larger workflow changes (need tickets, stories and the panel's design pass)
 
@@ -909,6 +910,12 @@ change. Each increment gets its ticket when it is scheduled, not before.
   - Three spot-checked drinks against their labels.
 - **Parallel:** the pipeline half is independent of every W-B item; the UI
   half follows B1.
+- **Built:** volume through a serving's words, no rebuild (MM-636,
+  2026-10-26); the liquids half after the H-06 check, as format 5 (MM-650)
+  and the drink's amount step, edit and rows (MM-651), 2026-10-27. The owner
+  rebuilds and publishes the packs. Not built: the grouped unit control as
+  one dropdown (the chips stayed, as MM-636 chose); density derived from
+  unmodified volume measures (no source states one; nothing is guessed).
 
 **C3. Selection mode and bulk actions.** M–L.
 - **Builds on:** A2, B4.

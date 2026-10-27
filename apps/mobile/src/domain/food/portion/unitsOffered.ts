@@ -26,6 +26,8 @@ export function unitsOffered(
       return ['serving'];
     case 'householdMeasure': {
       if (reference === undefined) return volumeUnits;
+      // A food stated per 100 mL converts every volume exactly, fluid ounces too (MM-650).
+      if (reference.basis === 'per100ml') return [...volumeUnits, 'fluidOunce'];
       const convertible =
         reference.densityGPerMl !== undefined ||
         (reference.servingMilliliters !== undefined && reference.servingGrams !== undefined);

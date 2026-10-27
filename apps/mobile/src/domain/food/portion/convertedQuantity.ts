@@ -1,5 +1,6 @@
 import type { HandSize } from '../hand/HandSize';
 import { gramsFor } from './gramsFor';
+import { millilitersFor } from './millilitersFor';
 import { PortionUnit } from './PortionUnit';
 import type { ReferenceNutrition } from './ReferenceNutrition';
 
@@ -14,8 +15,9 @@ interface Measure {
  * undefined when the two share no exact measure: a hand portion either way
  * (an estimate, MM-46), a serving with no weight, a volume the food cannot
  * weigh. Weight converts to weight and volume to volume by their constants;
- * anything else goes through the grams each unit is for its food, never a
- * guessed density (MM-167).
+ * anything else goes through the grams each unit is for its food, or the
+ * millilitres for a drink stated per 100 mL (MM-650), never a guessed
+ * density (MM-167).
  */
 export function convertedQuantity(
   quantity: number,
@@ -35,5 +37,9 @@ export function convertedQuantity(
   if (from.reference === undefined || to.reference === undefined) return undefined;
   const grams = gramsFor(quantity, from.unit, from.reference, { hand });
   const perUnit = gramsFor(1, to.unit, to.reference, { hand });
-  return grams === undefined || perUnit === undefined || !(perUnit > 0) ? undefined : grams / perUnit;
+  if (grams !== undefined && perUnit !== undefined && perUnit > 0) return grams / perUnit;
+  // A drink's serving in millilitres and a fluid ounce share a volume, with or without a weight (MM-650).
+  const ml = millilitersFor(quantity, from.unit, from.reference);
+  const perUnitMl = millilitersFor(1, to.unit, to.reference);
+  return ml === undefined || perUnitMl === undefined || !(perUnitMl > 0) ? undefined : ml / perUnitMl;
 }

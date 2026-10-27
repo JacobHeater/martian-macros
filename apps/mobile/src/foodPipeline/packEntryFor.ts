@@ -95,6 +95,7 @@ export function packEntryFor(
       tier,
       tierReason: reason,
       group: foodGroupOf(food.category, food.name),
+      basis: food.basis,
     }),
     servings: food.servings,
     barcodes: gtin14 === undefined ? [] : [gtin14],
