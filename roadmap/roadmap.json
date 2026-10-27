@@ -2618,7 +2618,8 @@
           "MM-633",
           "MM-634",
           "MM-635",
-          "MM-636"
+          "MM-636",
+          "MM-637"
         ],
         "remaining": [
           "MM-37",
@@ -2925,6 +2926,13 @@
           "title": "Cups, tablespoons and teaspoons through a serving the source states as a volume, read from its own words; no pack rebuild (the owner, 2026-10-26, MM-636)",
           "tickets": [
             "MM-636"
+          ]
+        },
+        {
+          "step": 26,
+          "title": "A search's own foods and log under their own heading, apart from the food database's (the owner, 2026-10-26, MM-637)",
+          "tickets": [
+            "MM-637"
           ]
         }
       ],
