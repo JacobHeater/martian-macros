@@ -233,10 +233,10 @@ describe('gradeOfNutrition', () => {
     expect(gradeOfNutrition(lentils)).toEqual({ kind: 'graded', letter: 'A', score: 14, notCounted: [], statedMicronutrients: 10 });
   });
 
-  it('names what is missing and never counts it as zero', () => {
+  it('names a missing sodium and never counts it as zero', () => {
     expect(gradeOfNutrition({ ...lentils, carbsG: undefined, fiberG: undefined, sodiumMg: undefined })).toEqual({
       kind: 'ungradable',
-      reason: 'Fiber and sodium aren’t stated for this food, so it can’t be graded.',
+      reason: 'Sodium isn’t stated for this food, so it can’t be graded.',
     });
     expect(gradeOfNutrition({ ...lentils, sodiumMg: undefined })).toEqual({
       kind: 'ungradable',
@@ -244,8 +244,8 @@ describe('gradeOfNutrition', () => {
     });
   });
 
-  // MM-567: grated parmesan said "fiber isn't stated", yet with almost no carbs fiber cannot change its letter.
-  it('grades a food whose unstated fiber could not change its letter, and says fiber was not stated', () => {
+  // MM-567: grated parmesan said "fiber isn't stated"; MM-656 (the owner): a soda with no fiber or sugars stated had no grade.
+  it('grades a food whose fiber is not stated as having none, and says so', () => {
     const parmesan: GradeNutrition = {
       kcal: 392,
       proteinG: 36,
@@ -261,11 +261,14 @@ describe('gradeOfNutrition', () => {
     expect(graded).toMatchObject({ kind: 'graded', notCounted: ['fiber', 'micronutrients'] });
     expect(graded).toEqual({ ...gradeOfNutrition({ ...parmesan, fiberG: 0 }), notCounted: ['fiber', 'micronutrients'] });
     expect(gradeOfNutrition({ ...parmesan, carbsG: 0, sugarsG: undefined })).toMatchObject({ kind: 'graded' });
-    // Where the carbs could hold enough fiber to move the letter, it is still not guessed.
-    expect(gradeOfNutrition({ ...lentils, fiberG: undefined })).toEqual({
-      kind: 'ungradable',
-      reason: 'Fiber isn’t stated for this food, and with its carbs it could change the grade.',
-    });
+    // Where the carbs could hold fiber, the food is still graded as having none: a step too low at worst, never too high.
+    const unstated = gradeOfNutrition({ ...lentils, fiberG: undefined });
+    expect(unstated).toEqual({ ...gradeOfNutrition({ ...lentils, fiberG: 0 }), notCounted: ['fiber'] });
+    expect(unstated).toMatchObject({ kind: 'graded' });
+    expect(step((unstated as { letter: FoodGradeLetter }).letter)).toBeGreaterThan(step('A'));
+    // A soda with no fiber or sugars stated (MM-656): graded, as all carbs and no fiber.
+    const soda: GradeNutrition = { kcal: 54, proteinG: 0, carbsG: 14.4, fiberG: undefined, sodiumMg: 15, sugarsG: undefined, saturatedFatG: undefined, alcoholG: undefined, micros: {} };
+    expect(gradeOfNutrition(soda)).toMatchObject({ kind: 'graded', notCounted: ['fiber', 'sugars', 'saturatedFat', 'micronutrients'] });
   });
 
   it('grades a food without sugars, saturated fat or micronutrients, and says so', () => {
@@ -345,7 +348,7 @@ describe('a pack food, a food of one’s own, and a logged entry', () => {
   it('grades a pack food from its values per 100 g, counting what it states', () => {
     expect(gradeOfCatalogFood(pack({}))).toEqual({ kind: 'graded', letter: 'A-', score: 11, notCounted: ['sugars', 'saturatedFat', 'micronutrients'], statedMicronutrients: 0 });
     expect(gradeOfCatalogFood(pack({ sugars: 1.8, saturatedFat: 0.05, potassium: 369, calcium: 19, iron: 3.3, magnesium: 36, zinc: 1.3, folate: 181 }))).toMatchObject({ kind: 'graded', notCounted: [], statedMicronutrients: 6 });
-    expect(gradeOfCatalogFood(pack({}, { fiberG: undefined }))).toMatchObject({ kind: 'ungradable', reason: 'Fiber isn’t stated for this food, and with its carbs it could change the grade.' });
+    expect(gradeOfCatalogFood(pack({}, { fiberG: undefined }))).toMatchObject({ kind: 'graded', notCounted: ['fiber', 'sugars', 'saturatedFat', 'micronutrients'] });
   });
 
   it('grades a food of one’s own by its serving weight, and never a recipe', () => {

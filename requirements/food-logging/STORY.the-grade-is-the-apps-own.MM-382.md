@@ -46,6 +46,7 @@ Scenario: Per calorie, not per gram
 Scenario: Required inputs
   Given a food with no fiber value, or no sodium value
   Then it is not graded and the question mark's popover names the missing nutrient
+  (Amended by MM-656, the owner, 2026-10-27: only sodium is required; an unstated fiber is counted as none, said so.)
 
 Scenario: Refinements not counted
   Given a food that states calories, macros, fiber and sodium but no sugars or saturated fat
