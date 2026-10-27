@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
+import type { FoodEntry } from '../domain/FoodEntry';
 import { intakeDayFrom } from '../domain/intakeDayFrom';
 import { Meal } from '../domain/Meal';
 import { pauseOn } from '../engine/pauseOn';
@@ -20,7 +22,10 @@ import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
+import { changeTogether } from './changeTogether';
 import { MealSection } from './MealSection';
+import { SelectionBar } from './SelectionBar';
+import type { TogetherAction } from './TogetherAction';
 import { useShownDay } from './useShownDay';
 import { WaterSection } from './WaterSection';
 import './food.css';
@@ -48,6 +53,56 @@ export function FoodScreen() {
   const setup = useLoaded(state.setup);
   const guide = useCell(state.maintenanceGuide);
   const overlays = useOverlays();
+  /** The foods chosen to change together, by key, while choosing (MM-634); undefined when not choosing. */
+  const [selected, setSelected] = useState<ReadonlySet<string>>();
+  /**
+   * The row choosing started from, which takes focus as a box when choosing
+   * starts and as a row again when it ends (the UX guard's UX-1), for one
+   * drawing only.
+   */
+  const [focusKey, setFocusKey] = useState<string>();
+  useEffect(() => {
+    if (focusKey !== undefined) setFocusKey(undefined);
+  }, [focusKey]);
+  const startedFrom = useRef<string>();
+  /** Starts choosing with `key` chosen, and says how (MM-634). */
+  const startChoosing = (key: string) => {
+    startedFrom.current = key;
+    setFocusKey(key);
+    setSelected(new Set([key]));
+    overlays.snack('Choosing: tick the foods to change together');
+  };
+  /** Stops choosing, focus back on the row it started from. */
+  const stopChoosing = () => {
+    setFocusKey(startedFrom.current);
+    setSelected(undefined);
+  };
+  // Another day shown stops choosing: its foods are not the ones chosen.
+  useEffect(() => setSelected(undefined), [day.epochDay]);
+  /** Chooses or unchooses one row while choosing foods to change together (MM-634). */
+  const toggle = (key: string) =>
+    setSelected((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  /** The foods the chosen rows stand for: a meal's row is all its foods (MM-587, MM-634). */
+  const chosen = (keys: ReadonlySet<string>) =>
+    entries.filter((e) => keys.has(`food:${e.id}`) || (e.loggedMeal !== undefined && keys.has(`meal:${e.loggedMeal.key}`)));
+  /** Does `action` to the chosen foods, then stops choosing (MM-634). */
+  const changeChosen = async (action: TogetherAction, foods: readonly FoodEntry[]) => {
+    const meals = new Set(foods.map((food) => food.meal));
+    await changeTogether(services.food, overlays, {
+      action,
+      entries: foods,
+      subject: foods.length === 1 ? '1 food' : `${foods.length} foods`,
+      slot: meals.size === 1 ? foods[0]?.meal : undefined,
+      day,
+      today,
+    });
+    stopChoosing();
+  };
   /** Copies yesterday's food to the day shown and says so with Undo (MM-633); the button is pressed once (MM-624). */
   const copyYesterday = async () => {
     try {
@@ -97,7 +152,7 @@ export function FoodScreen() {
       />
       {/* Once, under the figures, until dismissed (MM-123): close is as good as exact. */}
       {targets === undefined || paused ? null : <LabelAccuracyNote />}
-      {entries.length === 0 && yesterday.length > 0 ? (
+      {entries.length === 0 && yesterday.length > 0 && selected === undefined ? (
         <div className="app-stack-item">
           <MmButton
             label="Copy yesterday"
@@ -109,7 +164,15 @@ export function FoodScreen() {
         </div>
       ) : null}
       {Meal.values.map((meal) => (
-        <MealSection key={meal} meal={meal} day={day} entries={entries.filter((e) => e.meal === meal)} />
+        <MealSection
+          key={meal}
+          meal={meal}
+          day={day}
+          entries={entries.filter((e) => e.meal === meal)}
+          selection={selected === undefined ? undefined : { selected, toggle }}
+          onStartSelection={startChoosing}
+          focusKey={focusKey}
+        />
       ))}
       <WaterSection day={day} />
       {entries.length === 0 ? null : (
@@ -119,6 +182,14 @@ export function FoodScreen() {
             <FoodDayGradeRow entries={entries} />
           </div>
         </>
+      )}
+      {/* Last, so it is held in view at the foot while everything above it scrolls (MM-634). */}
+      {selected === undefined ? null : (
+        <SelectionBar
+          entries={chosen(selected)}
+          onAction={(action) => changeChosen(action, chosen(selected))}
+          onDone={stopChoosing}
+        />
       )}
     </>
   );

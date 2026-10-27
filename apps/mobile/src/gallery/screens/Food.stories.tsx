@@ -122,6 +122,32 @@ export const MealSplit = screenStory({
   },
 });
 
+/** MM-634: choosing foods of the day to change together: each row a box to tick, the bar at the foot of the list. */
+export const FoodChoosing = screenStory({
+  covers: ['FoodScreen'],
+  shows: /chosen$/,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Select' }));
+  },
+});
+
+/** MM-634: choosing with nothing chosen: the bar asks for foods, and its action is off. */
+export const FoodChoosingNone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Choose foods to change together',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Select' }));
+    const [ticked] = await within(canvas).findAllByRole('checkbox', { checked: true });
+    if (ticked !== undefined) await userEvent.click(ticked);
+  },
+});
+
 /** MM-630: a meal's menu: its macro split, and one time, meal or day for all its foods. */
 export const FoodMealMenu = screenStory({
   covers: ['FoodScreen'],

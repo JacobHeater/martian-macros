@@ -21,6 +21,10 @@ interface LoggedMealRowProps {
   loggedMeal: LoggedMeal;
   day: CalendarDate;
   grade: FoodGradeValue | undefined;
+  /** Starts choosing foods to change together, with this meal chosen (MM-634). */
+  onSelect?: (() => void) | undefined;
+  /** Takes focus when drawn: choosing has just ended on this meal (MM-634). */
+  autoFocus?: boolean | undefined;
 }
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -32,7 +36,7 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
  * opens to its foods; swiped away or deleted, the whole meal goes, with
  * Undo.
  */
-export function LoggedMealRow({ loggedMeal, day, grade }: LoggedMealRowProps) {
+export function LoggedMealRow({ loggedMeal, day, grade, onSelect, autoFocus }: LoggedMealRowProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const level = useLoaded(state.detailLevel) ?? 'standard';
@@ -48,7 +52,7 @@ export function LoggedMealRow({ loggedMeal, day, grade }: LoggedMealRowProps) {
     <MmSwipeToRemove onRemove={remove}>
       <div className="food-meal-entry">
         <div className="food-entry-open">
-          <MmPressable label={`View ${loggedMeal.name}`} describedBy={linesId} onPress={view}>
+          <MmPressable label={`View ${loggedMeal.name}`} describedBy={linesId} onPress={view} autoFocus={autoFocus}>
             <span className="food-entry">
               <span className="food-entry-method" role="img" aria-label="Meal">
                 <MmIcon name="food" size={20} />
@@ -62,14 +66,15 @@ export function LoggedMealRow({ loggedMeal, day, grade }: LoggedMealRowProps) {
           </MmPressable>
         </div>
         {grade === undefined ? null : <FoodGrade grade={grade} subject={loggedMeal.name} scope="meal" />}
-        <MmMenuButton<'view' | 'delete'>
+        <MmMenuButton<'view' | 'select' | 'delete'>
           icon="more"
           label={`More actions for ${loggedMeal.name}`}
           items={[
             { value: 'view', label: 'View meal' },
+            ...(onSelect === undefined ? [] : [{ value: 'select' as const, label: 'Select' }]),
             { value: 'delete', label: 'Delete' },
           ]}
-          onSelect={(action) => (action === 'view' ? view() : remove())}
+          onSelect={(action) => (action === 'view' ? view() : action === 'select' ? onSelect?.() : remove())}
         />
       </div>
     </MmSwipeToRemove>
