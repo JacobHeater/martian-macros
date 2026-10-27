@@ -32,7 +32,14 @@ Flag the conflict for the owner before any implementation.
 Review design in Storybook (`mm storybook`, MM-237): the app's own
 components and screens, in every palette; never record approval the owner has not given.
 Check each screen's story for visual fidelity, hierarchy and design-system
-consistency.
+consistency. A screen or sheet with chips that can wrap, stacked full-width
+actions, or names and labels that can run long is reviewed only from its story
+at phone width (360 px) with the longest realistic labels and the most choices
+it can offer (`apps/mobile/AGENTS.md`, "Drawn as the phone will draw it before
+review"; the owner, 2026-10-27). Read that story, say in the report that you
+did, and find on placement, ragged rows, touching actions and spacing as you
+would on a phone. Without such a story, do not review the screen: return the
+request through the chair.
 ## Existing implementation audit
 Audit implemented screens/components against the approved design system,
 visual hierarchy, interaction states, consistency and product identity, using
