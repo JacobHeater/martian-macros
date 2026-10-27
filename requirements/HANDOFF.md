@@ -25,14 +25,17 @@ through `FoodEntryBatchWriter`, so a deleted meal goes at once; a logged meal's 
 match first, the owner's D-3), MM-628 (a unit change keeps the portion), MM-629 (recents say their amount, this
 meal's first), MM-630 and MM-634 (one time, meal or day for a whole meal or for chosen foods, with Undo), MM-631
 (several foods for one meal, the owner's D-1 and D-2), MM-632 (the cup a digit short), MM-633 (copies said, once,
-to any day), MM-635 (pressing a saved food in Add food logs it, the owner's answer), MM-636 (cups, tablespoons
-and teaspoons through a serving the source states as a volume, read from its words; no pack rebuild). Still open:
+to any day), MM-635 (pressing a saved food in Add food logs it), MM-636 (cups, tablespoons and teaspoons through
+a volume serving, read from its words; no pack rebuild), MM-637 (a search's own foods and log under their own
+heading, the owner's ask), MM-638 (a mistyped word still finds), MM-639 (what is usual at a meal first among the
+recents), MM-640 (the chosen count said), MM-641 (take one food out of a logged meal), MM-642 to MM-644 (the
+owner's choices: "About this food" folds the food's details, calories first when typing, "Cancel" while
+choosing), MM-645 (save a meal and log it again in one press; schema 30). Still open:
 - **Liquids' volume** (the plan's C2, second half): Branded servings stated only in mL and Open Food Facts
-  per-100 mL liquids. First run the plan's H-06 pack query (how many OFF and Branded rows are liquids, and
-  whether their per-100 values are per 100 mL); that needs the owner's DuckDB and the source files.
-- Follow-ups recorded in MM-631 and MM-634 (count spoken as it changes, focus after a chosen row is deleted, the
-  bar at 200% text; "Done" and "Select" wording, the owner's call). Frequency-ranked recents, typo-tolerant
-  search, saved meal templates (the plan's C5 and W-D).
+  per-100 mL liquids. First the plan's H-06 pack query (needs the owner's DuckDB and the source files).
+- Owner's call: whether a food typed by hand into View meal should keep the photo-estimate method (its wider
+  uncertainty) or show another label (the plan's F-19). Focus when the row choosing started from was deleted
+  (MM-634's follow-up). The bar at 200% text and every new screen on a phone (the checklist below).
 
 **M0 to M4 are done (2026-10-22): every one of the 376 tickets in their `requires` lists is `done` on
 main.** What stays open is owed by people, not code, and is listed in each ticket:
@@ -179,7 +182,8 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   keyboard open (MM-631); "Select" on Food, boxes ticked, the bar at the foot clear of a snack and of
   the navigation bar at 200% text (MM-634); 180 g changed to ounces (MM-628); search for "oats" and
   "chicken breast skinless" (MM-627); two tablespoons of a food served "1 cup, chopped" (MM-636); a
-  saved food logged by pressing it (MM-635).
+  saved food logged by pressing it (MM-635); a meal saved from breakfast's menu and logged at lunch, then
+  Undo (MM-645); "About this food" opened and remembered (MM-642).
 - The attorney (MM-242, MM-95) and the clinician (MM-29); the licensor's
   legal name and a contact address when they exist.
 - Fifty pantry barcodes and the hand check of fifty products (MM-51).
@@ -206,7 +210,7 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
-## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 10 PRs)
+## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 18 PRs)
 
 - **The owner's words:** asked for an evidence-backed food-logging improvement plan (multi-food logging, alternate
   units and volume, bulk editing especially of time); added that recent foods and database search are weak
@@ -215,13 +219,16 @@ MM-242, a draft by non-lawyers that blocks release.
   and allowed one worktree per PR for this build only.
 - **Merged:** #319 (the plan, `docs/food-logging-plan.md`, and MM-623 to MM-626 as tickets with skipped tests),
   #320 (MM-623 to MM-626 fixed), #321 (MM-627), #322 (MM-628 to MM-630, MM-632), #323 (MM-631), #324 (MM-633), #325
-  (MM-634), #327 (MM-635), #328 (MM-636), and #326 and this PR (the handoff). A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
+  (MM-634), #327 (MM-635), #328 (MM-636), #330 (MM-637), #331 (MM-638), #332 (MM-639), #333 (MM-640), #334
+  (MM-641), #335 (MM-642 to MM-644), #336 (MM-645, schema 30), and #326, #329 and this PR (the handoff). The owner
+  also answered: Saved logs when pressed, build volume, save meals, fold the amount step, calories first, Cancel. A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
   shipped, and every blocking finding was fixed in the same PR.
 - **Lessons:** a fallback that helps a person reading results can mislead a lookup that takes the first hit (the
   any-word search matched "broccoli cooked" to broccoli raw; now only the results list asks for it). Number
   constants deserve a test of their ratios (the cup was a digit short). `exactOptionalPropertyTypes` refuses
   `{ change: undefined }`, and `useRef<T>()` needs its argument here. A merge's own fetch can race a follow-up
-  fetch on the ref lock: fetch again.
+  fetch on the ref lock: fetch again. The unseen check flagged FoodScreen's loading markup once (#334) though
+  FoodLoading draws it; a re-run passed: a coverage flake to watch, not a missing story.
 - **Not run:** nothing was run locally; CI validated every merge.
 
 ## Session 42: 2026-10-22, Claude (M0 to M4 finished: five builder lanes, a panel review of everything, ~50 PRs)
