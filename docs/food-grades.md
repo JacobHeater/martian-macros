@@ -62,7 +62,8 @@ two.
 
 **Not graded:** an alcoholic drink (more than 1.2 g of alcohol per 100 g); a
 food under 10 kcal per 100 g (broth, coffee, a diet drink), which has almost
-nothing to grade per calorie; an estimate; an entry whose grams are not known;
+nothing to grade per calorie; an estimate; an entry whose grams are not known
+(or, for a drink stated per 100 mL, its millilitres: MM-654);
 a recipe, whose ingredients carry no fiber or sodium; and a food that does not
 state fiber or sodium, since a missing value is never zero (MM-310).
 
@@ -73,7 +74,7 @@ state fiber or sodium, since a missing value is never zero (MM-310).
 | A pack food | its values, which are per 100 g; sugars, saturated fat and the vitamins and minerals from its micronutrients when the pack carries them |
 | A food of the person's own | its serving's values ÷ the serving's grams × 100; no grade without a serving weight |
 | A recipe | not graded: its ingredients carry only the four macros |
-| A logged entry | its totals ÷ the grams it was logged as × 100, so the amount eaten does not change it |
+| A logged entry | its totals ÷ the grams it was logged as × 100, so the amount eaten does not change it; a drink stated per 100 mL by its millilitres, as the pack grades it (MM-654) |
 | A meal or a day | the calorie-weighted mean of its graded entries' scores, rounded half up, when they carry at least 70% of its calories; otherwise the question mark says the share |
 
 A graded food says, when its badge is pressed, what its source left unstated
