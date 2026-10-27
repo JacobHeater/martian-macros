@@ -30,12 +30,16 @@ a volume serving, read from its words; no pack rebuild), MM-637 (a search's own 
 heading, the owner's ask), MM-638 (a mistyped word still finds), MM-639 (what is usual at a meal first among the
 recents), MM-640 (the chosen count said), MM-641 (take one food out of a logged meal), MM-642 to MM-644 (the
 owner's choices: "About this food" folds the food's details, calories first when typing, "Cancel" while
-choosing), MM-645 (save a meal and log it again in one press; schema 30). Still open:
+choosing), MM-645 (save a meal and log it again in one press; schema 30), MM-646 and MM-647 (a food typed by hand
+into a meal says how it was measured, and Look up offers its matches; the plan's F-19), MM-648 (extras follow the
+amount, never a corrected calorie; F-20), MM-649 (focus after the chosen row is gone; MM-634's follow-up). The
+plan's status table in `docs/food-logging-plan.md` says what is built and what is not, and why. Still open:
 - **Liquids' volume** (the plan's C2, second half): Branded servings stated only in mL and Open Food Facts
   per-100 mL liquids. First the plan's H-06 pack query (needs the owner's DuckDB and the source files).
-- Owner's call: whether a food typed by hand into View meal should keep the photo-estimate method (its wider
-  uncertainty) or show another label (the plan's F-19). Focus when the row choosing started from was deleted
-  (MM-634's follow-up). The bar at 200% text and every new screen on a phone (the checklist below).
+- **Owner's calls:** favorites pinned by the person (not built: Saved and usual-first cover it, say if a star is
+  still wanted); F-21 (a re-logged analysed food becomes a label serving); whether "Select" is worded better.
+- **On a phone:** every new food-logging screen, the choosing bar at 200% text (a story exists), and View meal's
+  form with a screen reader (the checklist below).
 
 **M0 to M4 are done (2026-10-22): every one of the 376 tickets in their `requires` lists is `done` on
 main.** What stays open is owed by people, not code, and is listed in each ticket:
@@ -220,7 +224,9 @@ MM-242, a draft by non-lawyers that blocks release.
 - **Merged:** #319 (the plan, `docs/food-logging-plan.md`, and MM-623 to MM-626 as tickets with skipped tests),
   #320 (MM-623 to MM-626 fixed), #321 (MM-627), #322 (MM-628 to MM-630, MM-632), #323 (MM-631), #324 (MM-633), #325
   (MM-634), #327 (MM-635), #328 (MM-636), #330 (MM-637), #331 (MM-638), #332 (MM-639), #333 (MM-640), #334
-  (MM-641), #335 (MM-642 to MM-644), #336 (MM-645, schema 30), and #326, #329 and this PR (the handoff). The owner
+  (MM-641), #335 (MM-642 to MM-644), #336 (MM-645, schema 30), #338 (MM-646 to MM-649, the plan's tail: the owner
+  said "finish the plan", so F-19 and F-20 took the plan's own recommendations, recorded in the tickets as choices
+  made without asking), and #326, #329, #337 and this PR (the handoff). The owner
   also answered: Saved logs when pressed, build volume, save meals, fold the amount step, calories first, Cancel. A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
   shipped, and every blocking finding was fixed in the same PR.
 - **Lessons:** a fallback that helps a person reading results can mislead a lookup that takes the first hit (the
