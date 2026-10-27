@@ -173,8 +173,9 @@ it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged b
 
   // The popover says fiber was counted as none; the edit sheet says where the numbers came from.
   await userEvent.click(screen.getByRole('button', { name: /^Grade C for CRUSH, SODA, ORANGE, ORANGE/ }));
-  expect(await screen.findByText(/Fiber isn’t stated for this food, so none was counted/)).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Got it' }));
+  const sentence = await screen.findByText(/Fiber isn’t stated for this food, so none was counted/);
+  // Its own popover's Got it: another "Got it" may stand on the screen behind it.
+  await userEvent.click(within(sentence.closest('[role="dialog"]') as HTMLElement).getByRole('button', { name: 'Got it' }));
   await userEvent.click(await screen.findByRole('button', { name: /^Edit CRUSH, SODA, ORANGE, ORANGE/ }, slowly));
   const edit = await foodSheet('Edit food');
   expect(within(edit).getByText('Source: Manufacturer label (USDA), found online.')).toBeInTheDocument();
