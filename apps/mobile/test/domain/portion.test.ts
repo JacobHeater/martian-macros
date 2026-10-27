@@ -135,5 +135,8 @@ describe('unitsOffered', () => {
       densityGPerMl: 0.9,
     };
     expect(unitsOffered('householdMeasure', { reference: dense })).toContain('tablespoon');
+    // The fluid ounce is a volume like the millilitre, for every food that converts volumes (MM-658).
+    expect(unitsOffered('householdMeasure', { reference: dense })).toContain('fluidOunce');
+    expect(unitsOffered('householdMeasure')).toContain('fluidOunce');
   });
 });
