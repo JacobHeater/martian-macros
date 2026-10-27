@@ -3,6 +3,7 @@
  * through the SQLite seam. From the Dart package `mm_food_catalog`.
  */
 export * from './CatalogBarcodeLookup';
+export * from './CatalogBasis';
 export * from './CatalogFood';
 export * from './CatalogFoodLookup';
 export * from './CatalogPairLookup';

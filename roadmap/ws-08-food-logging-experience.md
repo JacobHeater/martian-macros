@@ -190,6 +190,8 @@ workstream's.
 - Added 2026-10-26 (step 29): MM-646 (a food typed into a meal says how it was measured; done), MM-647 (Look up
   offers its matches; done), MM-648 (extras follow the amount, never a corrected calorie; done), MM-649 (focus
   after the chosen row is gone; done).
+- Added 2026-10-27 (step 30): MM-650 (a drink stated per 100 mL in the pack, format 5; done, packs to rebuild),
+  MM-651 (a drink by the fluid ounce, the millilitre or its can; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

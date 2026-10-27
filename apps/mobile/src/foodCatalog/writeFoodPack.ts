@@ -1,6 +1,8 @@
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { StateError } from '../lang/StateError';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { SqlValue } from '../sql/SqlValue';
+import { CatalogBasis } from './CatalogBasis';
 import { FoodPackFormat } from './FoodPackFormat';
 import type { FoodPackHeader } from './FoodPackHeader';
 import type { PackEntry } from './PackEntry';
@@ -59,8 +61,15 @@ export async function writeFoodPack(db: SqlDatabase, header: FoodPackHeader, ent
         ...PackMicronutrient.values.map((n) => scaled(f.micros[n])),
         scaled(f.sugarAlcoholsG),
         f.group ?? null,
+        CatalogBasis.code(f.basis),
       ]);
-      for (const s of e.servings ?? []) servings.push([f.id, s.description, scaled(s.grams)]);
+      for (const s of e.servings ?? []) {
+        // A serving is a weight, a volume or both (MM-650); one with neither is a bug in the caller, not a row.
+        if (!((s.grams ?? 0) > 0) && !((s.milliliters ?? 0) > 0)) {
+          throw new StateError(`Serving "${s.description}" of ${f.name} has neither grams nor millilitres.`);
+        }
+        servings.push([f.id, s.description, scaled(s.grams), scaled(s.milliliters)]);
+      }
       for (const b of e.barcodes ?? []) barcodes.push([b, f.id]);
     }
     const micros = PackMicronutrient.values.map((n) => PackMicronutrient.column(n));
@@ -68,11 +77,11 @@ export async function writeFoodPack(db: SqlDatabase, header: FoodPackHeader, ent
       inside,
       'INSERT INTO foods (id, name, brand, kcal, protein, carbs, fat, fiber, ' +
         'sodium_mg, alcohol, preparation, pair_id, density, source, source_id, ' +
-        `tier, tier_reason, ${micros.join(', ')}, sugar_alcohols, food_group) ` +
-        `VALUES (${Array.from({ length: 19 + micros.length }, () => '?').join(', ')})`,
+        `tier, tier_reason, ${micros.join(', ')}, sugar_alcohols, food_group, basis) ` +
+        `VALUES (${Array.from({ length: 20 + micros.length }, () => '?').join(', ')})`,
       foods,
     );
-    await insertAll(inside, 'INSERT INTO servings (food_id, description, grams) VALUES (?, ?, ?)', servings);
+    await insertAll(inside, 'INSERT INTO servings (food_id, description, grams, milliliters) VALUES (?, ?, ?, ?)', servings);
     await insertAll(inside, 'INSERT INTO barcodes (gtin, food_id) VALUES (?, ?)', barcodes);
     await inside.execute("INSERT INTO foods_fts(foods_fts) VALUES ('rebuild')");
   });

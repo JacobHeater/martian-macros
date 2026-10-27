@@ -79,7 +79,7 @@ it('a format 1 pack still opens; its foods have no micronutrients', async () => 
   const hit = (await pack.search('banana'))[0];
   expect(hit?.food.sodiumMg).toBe(1);
   expect(hit?.food.micros).toEqual({});
-  expect(FoodPackFormat.version).toBe(4);
+  expect(FoodPackFormat.version).toBe(5);
 });
 
 // MM-397: format 3 carries sugar alcohols; a format 2 pack opens with its micronutrients and none.

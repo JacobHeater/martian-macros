@@ -123,6 +123,33 @@ So the widening the data supports is the whole US-tagged set, read without
 skipping, plus FNDDS in the generic pack and the refreshed USDA Branded
 release. Restaurant menus stay the gap no open source fills.
 
+## Format 5: liquids per 100 mL (MM-650, 2026-10-27)
+
+The build now writes format 5: each food has a `basis` ('g' or 'ml') and a
+serving may be a volume (`milliliters`), a weight (`grams`) or both. A USDA
+Branded row whose serving unit is `ml` or `MLT` is per 100 mL with its serving
+in millilitres (268,295 US rows, 13.5%, had no serving before); `gm` joins the
+gram units (344 rows, dropped before). An Open Food Facts product whose
+serving text states a number of millilitres is per 100 mL with that serving in
+millilitres, or fluid ounces the export converts to them (about 14,000 US
+products, written as grams before; a text whose last unit is grams, "240 ml
+(245 g)", stays grams). The nutrition rule and the micronutrient ceilings let a
+per-100 mL food weigh up to 150 g (honey). The app reads format 4
+packs as before, per 100 g with servings by weight, so nothing changes for a
+person until the packs are rebuilt.
+
+**Not yet built or published.** To do, on the dev Mac (the 2026-10-19 cache
+suffices; no fetch needed): `./mm food build` (read `report.txt` and
+`coverage.txt`; the barcode pack should gain roughly 268,000 servings and
+show the three H-06 drinks per 100 mL; record here, per basis, the
+energy-agreement drop rate and how many `ml`/`MLT` rows have household text
+stating grams, the panel's IN-1), `./mm food package --base-url
+https://github.com/JacobHeater/martian-macros-food-data/releases/download/<date>/`,
+then `gh release create <date> … --latest` with both packs, `manifest.json`,
+`report.txt` and `coverage.txt`, and pull both packs from Settings > Food
+database. The extract SQL was run once over the cache into a scratch folder
+on 2026-10-27 to check it parses and the three drinks come out as expected.
+
 ## The build
 
 Done in MM-383: the FNDDS source entry and the refreshed Foundation and

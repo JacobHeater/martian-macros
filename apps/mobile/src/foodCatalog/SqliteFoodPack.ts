@@ -3,6 +3,7 @@ import { FormatError } from '../lang/FormatError';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import type { SqlRow } from '../sql/SqlRow';
 import type { SqlValue } from '../sql/SqlValue';
+import { CatalogBasis } from './CatalogBasis';
 import { CatalogFood } from './CatalogFood';
 import type { CatalogServing } from './CatalogServing';
 import type { FoodPack } from './FoodPack';
@@ -132,21 +133,23 @@ export class SqliteFoodPack implements FoodPack {
   ): Promise<SearchHit[]> {
     const inGroup = group === undefined ? '' : 'AND f.food_group = ? ';
     const first = (column: string) => `(SELECT s.${column} FROM servings s WHERE s.food_id = f.id ORDER BY s.rowid LIMIT 1)`;
+    // A pack older than format 5 has no serving volumes (MM-650).
+    const firstMl = this.header.formatVersion < 5 ? 'NULL' : first('milliliters');
     const rows = await this.db.select(
-      `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score, ${first('description')} AS first_serving, ${first('grams')} AS first_serving_grams ` +
+      `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score, ${first('description')} AS first_serving, ` +
+        `${first('grams')} AS first_serving_grams, ${firstMl} AS first_serving_ml ` +
         'FROM foods_fts JOIN foods f ON f.id = foods_fts.rowid ' +
         `WHERE foods_fts MATCH ? ${inGroup}ORDER BY score, f.id LIMIT ? OFFSET ?`,
       group === undefined ? [match, limit, offset] : [match, group, limit, offset],
     );
     return rows.map((row) => {
       const description = row['first_serving'];
-      const grams = row['first_serving_grams'];
       return {
         food: this.food(row),
         score: number(row['score'], 'score'),
         firstServing:
-          typeof description === 'string' && typeof grams === 'number'
-            ? { description, grams: grams / FoodPackFormat.nutrientScale }
+          typeof description === 'string'
+            ? this.serving(description, row['first_serving_grams'], row['first_serving_ml'])
             : undefined,
       };
     });
@@ -178,13 +181,27 @@ export class SqliteFoodPack implements FoodPack {
 
   async servingsOf(food: CatalogFood): Promise<CatalogServing[]> {
     if (food.packId !== this.header.packId) return [];
-    const rows = await this.db.select('SELECT description, grams FROM servings WHERE food_id = ? ORDER BY rowid', [
+    const milliliters = this.header.formatVersion < 5 ? 'NULL AS milliliters' : 'milliliters';
+    const rows = await this.db.select(`SELECT description, grams, ${milliliters} FROM servings WHERE food_id = ? ORDER BY rowid`, [
       food.id,
     ]);
-    return rows.map((row) => ({
-      description: text(row['description'], 'serving description'),
-      grams: number(row['grams'], 'serving grams') / FoodPackFormat.nutrientScale,
-    }));
+    return rows.map((row) => this.serving(text(row['description'], 'serving description'), row['grams'], row['milliliters']));
+  }
+
+  /**
+   * A serving as the pack holds it: a weight, a volume (format 5, MM-650) or
+   * both, each stored times the nutrient scale. A serving with neither is a
+   * malformed pack, never a serving of nothing.
+   */
+  private serving(description: string, grams: SqlValue | undefined, milliliters: SqlValue | undefined): CatalogServing {
+    const g = optionalNumber(grams);
+    const ml = optionalNumber(milliliters);
+    if (g === undefined && ml === undefined) throw new FormatError(`The pack's serving "${description}" has neither grams nor millilitres.`);
+    return {
+      description,
+      grams: g === undefined ? undefined : g / FoodPackFormat.nutrientScale,
+      milliliters: ml === undefined ? undefined : ml / FoodPackFormat.nutrientScale,
+    };
   }
 
   close(): Promise<void> {
@@ -200,7 +217,7 @@ export class SqliteFoodPack implements FoodPack {
     if (version < 2) return formatOneColumns;
     const micros = [formatOneColumns, ...PackMicronutrient.values.map((n) => `f.${PackMicronutrient.column(n)}`)];
     if (version < 3) return micros.join(', ');
-    return [...micros, 'f.sugar_alcohols', ...(version < 4 ? [] : ['f.food_group'])].join(', ');
+    return [...micros, 'f.sugar_alcohols', ...(version < 4 ? [] : ['f.food_group']), ...(version < 5 ? [] : ['f.basis'])].join(', ');
   }
 
   /** The micronutrient columns a format 2 pack has; a format 1 pack has none (MM-307). */
@@ -244,6 +261,8 @@ export class SqliteFoodPack implements FoodPack {
       tierReason: text(row['tier_reason'], 'tier reason'),
       // A group this code does not know is no group, never a misread one.
       group: this.header.formatVersion < 4 ? undefined : FoodGroup.fromName(optionalText(row['food_group'])),
+      // A pack older than format 5 is per 100 g throughout (MM-650).
+      basis: this.header.formatVersion < 5 ? 'per100g' : CatalogBasis.fromCode(optionalText(row['basis'])),
     });
   }
 }

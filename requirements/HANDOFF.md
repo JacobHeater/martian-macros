@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-26, by Claude, Session 43.
+Last updated: 2026-10-27, by Claude, Session 44.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -17,7 +17,7 @@ protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
 
-**Open PRs at the end of Session 43:** only this handoff. A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 44:** none expected (the liquids build, #341, merges when green; #340 recorded the H-06 check). A new session still checks `gh pr list` first.
 
 **Food logging, the owner's push of 2026-10-26** (`docs/food-logging-plan.md`, WS-08 steps 18 to 23). Built and
 merged: MM-623 to MM-626 (reuse keeps every nutrient; saves said and pressed once; meal writes all or nothing
@@ -34,11 +34,12 @@ choosing), MM-645 (save a meal and log it again in one press; schema 30), MM-646
 into a meal says how it was measured, and Look up offers its matches; the plan's F-19), MM-648 (extras follow the
 amount, never a corrected calorie; F-20), MM-649 (focus after the chosen row is gone; MM-634's follow-up). The
 plan's status table in `docs/food-logging-plan.md` says what is built and what is not, and why. Still open:
-- **Liquids' volume** (the plan's C2, second half): Branded servings stated only in mL and Open Food Facts
-  per-100 mL liquids. The H-06 pack query ran on the dev Mac on 2026-10-27 and confirmed both bases
-  (`docs/food-packs-data.md`, "Liquids, measured"): 13.5% of Branded US rows are in mL and the extract drops
-  their serving today; 8% of Open Food Facts US servings are in mL and `serving_quantity` is that mL number.
-  C2's liquids half is unblocked and next to ticket.
+- **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
+  100 g or per 100 mL, a serving by weight, by volume or both; the extract reads Branded `ml`/`MLT` rows and
+  Open Food Facts mL servings as per 100 mL) and MM-651 (a drink by its can, the fluid ounce or the millilitre;
+  grams only with a density), PR #341. **The owner's step**: rebuild and publish the packs
+  (`docs/food-packs-data.md`, "Format 5"); until then the app reads the format-4 packs as before. Open: the
+  online path stays per 100 g; a recipe ingredient that is a drink is still weighed in grams.
 - **Owner's calls:** favorites pinned by the person (not built: Saved and usual-first cover it, say if a star is
   still wanted); F-21 (a re-logged analysed food becomes a label serving); whether "Select" is worded better.
 - **On a phone:** every new food-logging screen, the choosing bar at 200% text (a story exists), and View meal's
@@ -127,6 +128,7 @@ stays vibration only (MM-191); no helpline until a clinician reviews one
   categorical grade fills read as judging food (coaching/safety, MM-370).
 - **Phone checklist, to hand the owner when it is long enough** (they will do
   all physical-device testing at the end, 2026-10-16: keep adding, do not ask):
+  a drink from the rebuilt packs logged by its can and by fluid ounces, and its row's "per 100 mL" (MM-651);
   a real barcode on packaging (MM-43); a pack download over mobile data
   (MM-56); the pause and reminder screens on the device (MM-148, MM-146);
   Health Connect import (MM-68); Martian at low brightness, whether cards and

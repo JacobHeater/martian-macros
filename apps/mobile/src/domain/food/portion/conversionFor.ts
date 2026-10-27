@@ -39,7 +39,10 @@ export function conversionFor(
     return undefined;
   }
   if (unit === 'serving') {
-    return servingGrams === undefined ? undefined : { kind: 'servingWeight', gramsPerUnit: servingGrams };
+    if (servingGrams !== undefined) return { kind: 'servingWeight', gramsPerUnit: servingGrams };
+    const servingMl = reference.servingMilliliters;
+    const density = reference.densityGPerMl;
+    return servingMl === undefined || density === undefined ? undefined : { kind: 'density', gramsPerUnit: servingMl * density };
   }
   return undefined;
 }

@@ -159,7 +159,7 @@ describe('unmapped categories', () => {
 
 describe('the pack', () => {
   it('format 4 carries the group', () => {
-    expect(FoodPackFormat.version).toBe(4);
+    expect(FoodPackFormat.version).toBe(5);
     expect(FoodPackFormat.schema).toContain('food_group TEXT');
   });
 

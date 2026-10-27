@@ -12,14 +12,20 @@ import { microsOfPackFood } from '../microsOfPackFood';
  */
 export function copyOfPackFood(food: CatalogFood, servings: readonly CatalogServing[], barcode: string | undefined): CustomFood {
   const serving = servings[0];
-  const grams = serving?.grams ?? 100;
-  const f = grams / 100;
+  const liquid = food.basis === 'per100ml';
+  const density = food.densityGPerMl;
+  // The serving in the food's own basis (MM-650): a drink's millilitres, or 100 of either; a weight only with a density.
+  const throughDensity = (value: number | undefined, to: 'g' | 'ml') =>
+    value === undefined || density === undefined ? undefined : to === 'g' ? value * density : value / density;
+  const amount = liquid ? (serving?.milliliters ?? throughDensity(serving?.grams, 'ml') ?? 100) : (serving?.grams ?? 100);
+  const grams = liquid ? (serving?.grams ?? throughDensity(amount, 'g')) : amount;
+  const f = amount / 100;
   const scaled = (value: number | undefined) => (value === undefined ? undefined : value * f);
   return new CustomFood({
     id: 0,
     name: food.brand === undefined ? food.name : `${food.name}, ${food.brand}`,
     kind: 'food',
-    servingDescription: serving?.description ?? '100 g',
+    servingDescription: serving?.description ?? (liquid ? '100 mL' : '100 g'),
     servingGrams: grams,
     perServing: new NutritionTotals({ kcal: food.kcal * f, proteinG: food.proteinG * f, carbsG: food.carbsG * f, fatG: food.fatG * f }),
     barcode,

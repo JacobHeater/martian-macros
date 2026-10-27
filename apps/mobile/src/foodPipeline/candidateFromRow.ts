@@ -1,3 +1,4 @@
+import { CatalogBasis } from '../foodCatalog/CatalogBasis';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
 import { PackMicronutrient } from '../foodCatalog/PackMicronutrient';
 import { FormatError } from '../lang/FormatError';
@@ -12,8 +13,11 @@ function servingsIn(json: string): CatalogServing[] {
   const servings: CatalogServing[] = [];
   for (const item of decoded as unknown[]) {
     if (typeof item !== 'object' || item === null) continue;
-    const { d, g } = item as { d?: unknown; g?: unknown };
-    if (typeof d === 'string' && typeof g === 'number' && g > 0) servings.push({ description: d, grams: g });
+    // A weight ("g"), a volume in millilitres ("ml", MM-650) or both; neither is no serving.
+    const { d, g, ml } = item as { d?: unknown; g?: unknown; ml?: unknown };
+    const grams = typeof g === 'number' && g > 0 ? g : undefined;
+    const milliliters = typeof ml === 'number' && ml > 0 ? ml : undefined;
+    if (typeof d === 'string' && (grams !== undefined || milliliters !== undefined)) servings.push({ description: d, grams, milliliters });
   }
   return servings;
 }
@@ -72,5 +76,6 @@ export function candidateFromRow(header: readonly string[], row: readonly string
     versionKey: tryParseInt(text('version_key') ?? '') ?? 0,
     updatedAt: tryParseInt(text('updated_at') ?? '') ?? 0,
     category: text('category'),
+    basis: CatalogBasis.fromCode(text('basis')),
   });
 }
