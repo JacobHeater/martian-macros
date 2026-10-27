@@ -878,6 +878,23 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         <p className="food-label food-label-spaced">
           {perServing ? 'Nutrition per serving' : form.source === 'quickAdd' ? 'Nutrition for everything eaten' : 'Nutrition for this amount'}
         </p>
+        {/* Calories first, the number people know, then what makes it up (the owner, 2026-10-26, MM-643). */}
+        <MmTextField
+          label={perServing ? 'Calories per serving' : 'Calories'}
+          kind="number"
+          value={form.kcal}
+          hint={showsCarbsAndFat && fromMacros > 0 ? `${whole(fromMacros)} from macros` : undefined}
+          helper={
+            mismatch
+              // The kept basis, never a second "logged" figure beside the Logs line (the panel's PD-1, F2).
+              ? `Macros add up to ${whole(fromMacros)} kcal${perServing ? ' per serving' : ''}; the ${whole(typedKcal ?? 0)} typed is kept. Double-check the label.`
+              : showsCarbsAndFat
+                ? 'Leave blank to calculate from macros.'
+                : 'As the label states them.'
+          }
+          helperIsWarning={mismatch}
+          onChange={(kcal) => set({ kcal })}
+        />
         <div className="food-fields">
           <MmTextField label="Protein g" kind="number" dense value={form.protein} onChange={(protein) => set({ protein })} />
           {/* Simple detail asks for calories and protein only (MM-49); what is typed at another level is kept. */}
@@ -920,22 +937,6 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         ) : (
           <MmButton label="Includes alcohol?" kind="text" onPress={() => setAskAlcohol(true)} />
         )}
-        <MmTextField
-          label={perServing ? 'Calories per serving' : 'Calories'}
-          kind="number"
-          value={form.kcal}
-          hint={showsCarbsAndFat && fromMacros > 0 ? `${whole(fromMacros)} from macros` : undefined}
-          helper={
-            mismatch
-              // The kept basis, never a second "logged" figure beside the Logs line (the panel's PD-1, F2).
-              ? `Macros add up to ${whole(fromMacros)} kcal${perServing ? ' per serving' : ''}; the ${whole(typedKcal ?? 0)} typed is kept. Double-check the label.`
-              : showsCarbsAndFat
-                ? 'Leave blank to calculate from macros.'
-                : 'As the label states them.'
-          }
-          helperIsWarning={mismatch}
-          onChange={(kcal) => set({ kcal })}
-        />
       </>
     );
   };

@@ -25,7 +25,7 @@ Choices made without asking (say if any is wrong):
   swiping does not delete.
 - **A bar at the foot of the list**, kept in view as it scrolls, says how many foods are chosen. Its one
   action, "Change 2 foods", asks what to do: change time, move to another meal, move to another day, copy
-  to another day, or delete. "Done" stops choosing. The bar is a meal's card, as the meals are.
+  to another day, or delete. "Done" stops choosing (worded "Cancel" since MM-644). The bar is a meal's card, as the meals are.
 - **Only the field chosen changes**, in one step (MM-625), with Undo. A time opens on the foods' own time
   when they share one, and says "(now mixed)" when they do not. Deleting takes them all, and Undo puts
   them all back (meals as the same meals).

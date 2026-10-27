@@ -2623,7 +2623,10 @@
           "MM-641",
           "MM-635",
           "MM-636",
-          "MM-637"
+          "MM-637",
+          "MM-642",
+          "MM-643",
+          "MM-644"
         ],
         "remaining": [
           "MM-37",
@@ -2941,6 +2944,15 @@
           "title": "A search's own foods and log under their own heading, apart from the food database's (the owner, 2026-10-26, MM-637)",
           "tickets": [
             "MM-637"
+          ]
+        },
+        {
+          "step": 27,
+          "title": "The owner's choices on the sheet: the amount step folds the food's details under About this food (MM-642), calories first when typing (MM-643), Cancel on the choosing bar (MM-644), 2026-10-26",
+          "tickets": [
+            "MM-642",
+            "MM-643",
+            "MM-644"
           ]
         }
       ],

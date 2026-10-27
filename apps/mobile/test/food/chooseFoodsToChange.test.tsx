@@ -63,7 +63,7 @@ it('MM-634: two foods of dinner and a snack get one time; the rest are untouched
   expect((await byName('Apple'))?.eatenAt).toBe(18 * 60 + 30);
   expect((await byName('Apple'))?.meal, 'only the time changed').toBe('snack');
   expect((await byName('Rice'))?.eatenAt).toBe(19 * 60 + 10);
-  expect(screen.queryByRole('button', { name: 'Done' }), 'choosing ends').not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Cancel' }), 'choosing ends').not.toBeInTheDocument();
 });
 
 it('MM-634: a logged meal chosen counts as all its foods, and they move together', async () => {
@@ -88,9 +88,9 @@ it('MM-634: chosen foods deleted together come back together with Undo', async (
   await expect.poll(async () => (await logged()).map((f) => f.name).sort()).toEqual(['Apple', 'Rice', 'Salad', 'Salmon']);
 });
 
-it('MM-634: Done stops choosing and changes nothing', async () => {
+it('MM-634: Cancel stops choosing and changes nothing (MM-644)', async () => {
   await startFrom('Salmon');
-  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
   expect(screen.queryByRole('checkbox', { name: 'Salmon · 400 kcal' })).not.toBeInTheDocument();
   expect(await screen.findByRole('button', { name: 'Edit Salmon' })).toHaveFocus();
 });
