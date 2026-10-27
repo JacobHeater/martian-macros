@@ -35,6 +35,10 @@ export function SelectionBar({ entries, onAction, onDone }: SelectionBarProps) {
   return (
     <div className="food-selection-bar">
       <MmSection framed icon="check" title={entries.length === 0 ? 'Choose foods to change together' : `${count} chosen`}>
+        {/* The count is said as boxes are ticked, not only shown (the UX guard's follow-up, MM-640). */}
+        <span className="mm-visually-hidden" role="status">
+          {entries.length === 0 ? 'No foods chosen' : `${count} chosen`}
+        </span>
         <MmButton label={`Change ${count}`} expand onPress={entries.length === 0 ? undefined : () => choose()} />
         <MmButton label="Done" kind="text" expand onPress={onDone} />
       </MmSection>
