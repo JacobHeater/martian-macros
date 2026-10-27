@@ -119,9 +119,16 @@ it('MM-647: Look up offers the foods the name finds, and the one pressed gives i
   expect(within(sheet).queryByRole('button', { name: /^Chicken breast, raw/ }), 'the choice is made').not.toBeInTheDocument();
   expect(within(sheet).getByRole('textbox', { name: 'Calories' })).toHaveValue('165');
   await userEvent.click(within(within(sheet).getByRole('group', { name: 'How was it measured?' })).getByRole('button', { name: 'Weighed' }));
+  // What the pack does not state is still asked for (MM-587), never invented.
+  await userEvent.click(within(sheet).getByRole('button', { name: 'Add food' }));
+  expect(await within(sheet).findByRole('alert')).toHaveTextContent(/^Missing fiber, total sugars, saturated fat, sodium\./);
+  await typeIn(sheet, 'Fiber g', '0');
+  await typeIn(sheet, 'Sugars g', '0');
+  await typeIn(sheet, 'Sat. fat g', '1');
+  await typeIn(sheet, 'Sodium mg', '74');
   await userEvent.click(within(sheet).getByRole('button', { name: 'Add food' }));
   await expect.poll(async () => (await logged()).find((f) => f.name === 'chicken breast')?.kcal).toBe(165);
-  expect((await logged()).find((f) => f.name === 'chicken breast')?.evidence?.kind, 'matched, not typed').toBe('matched');
+  expect((await logged()).find((f) => f.name === 'chicken breast')?.proteinG).toBe(31);
 });
 
 it('MM-647: a name nothing matches is said, and nothing is offered', async () => {
