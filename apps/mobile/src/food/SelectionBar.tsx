@@ -21,7 +21,7 @@ const actions: readonly { value: TogetherAction; label: string }[] = [
 
 /**
  * While foods are being chosen to change together (MM-634): how many are
- * chosen, the one action that asks what to do to them, and Done. A meal's
+ * chosen, the one action that asks what to do to them, and Cancel. A meal's
  * card, as the meals around it are, held at the foot of the list in view
  * while the list scrolls above it.
  */
@@ -40,7 +40,8 @@ export function SelectionBar({ entries, onAction, onDone }: SelectionBarProps) {
           {entries.length === 0 ? 'No foods chosen' : `${count} chosen`}
         </span>
         <MmButton label={`Change ${count}`} expand onPress={entries.length === 0 ? undefined : () => choose()} />
-        <MmButton label="Done" kind="text" expand onPress={onDone} />
+        {/* "Cancel", so it is never taken for a save (the owner, 2026-10-26, MM-644). */}
+        <MmButton label="Cancel" kind="text" expand onPress={onDone} />
       </MmSection>
     </div>
   );
