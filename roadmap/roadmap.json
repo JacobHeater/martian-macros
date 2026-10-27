@@ -2614,7 +2614,8 @@
           "MM-629",
           "MM-630",
           "MM-632",
-          "MM-631"
+          "MM-631",
+          "MM-633"
         ],
         "remaining": [
           "MM-37",
@@ -2893,6 +2894,13 @@
           "title": "Several foods for one meal in one sitting: an In this meal list under the search, logged together as loose foods at one meal and time, asked before it is left (the owner's D-1 and D-2, 2026-10-26, MM-631)",
           "tickets": [
             "MM-631"
+          ]
+        },
+        {
+          "step": 22,
+          "title": "A copy says it was made with Undo, is made once, and a meal copies to any day (the food-logging plan's B3, 2026-10-26, MM-633)",
+          "tickets": [
+            "MM-633"
           ]
         }
       ],
