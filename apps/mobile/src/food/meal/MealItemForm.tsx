@@ -16,6 +16,7 @@ import { MmListRow } from '../../ui/MmListRow';
 import { MmTextField } from '../../ui/MmTextField';
 import { editableNumber } from '../editableNumber';
 import { matchedMealItem } from './matchedMealItem';
+import { per100Label } from '../../format/per100Label';
 import '../food.css';
 
 interface MealItemFormProps {
@@ -210,7 +211,7 @@ export function MealItemForm({ item, onSave, onCancel, requireComplete = false }
           key={`${food.packId}:${food.id}`}
           dense
           title={food.name}
-          subtitle={`${food.brand === undefined ? '' : `${food.brand} · `}${Fmt.kcal(food.kcal)} per 100 g · ${foodSourceLabel(food)}`}
+          subtitle={`${food.brand === undefined ? '' : `${food.brand} · `}${Fmt.kcal(food.kcal)} ${per100Label(food.basis)} · ${foodSourceLabel(food)}`}
           onPress={() => use(food)}
         />
       ))}

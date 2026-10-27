@@ -1,4 +1,4 @@
-import { type FoodEntry, gramsFor, PortionUnit, type ReferenceNutrition } from '../domain';
+import { type FoodEntry, gramsFor, millilitersFor, PortionUnit, type ReferenceNutrition } from '../domain';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { portionUnitOf } from './portionUnitOf';
 import { preparationLabel } from './preparationLabel';
@@ -37,7 +37,12 @@ export function portionSummary(entry: FoodEntry): string {
       : `${quantityText(quantity)} ${portionUnitOf(unit, quantity)}`;
   const hand = PortionUnit.isHand(unit);
   const grams = hand ? portion.impliedGrams : reference === undefined ? undefined : gramsFor(quantity, unit, reference);
-  const weight = grams === undefined || PortionUnit.isWeight(unit) ? '' : ` (${whole(grams)} g)`;
+  let weight = grams === undefined || PortionUnit.isWeight(unit) ? '' : ` (${whole(grams)} g)`;
+  // A drink stated per 100 mL with no density has no weight to say; its volume is said instead (MM-650).
+  if (grams === undefined && !hand && reference?.basis === 'per100ml' && unit !== 'milliliter') {
+    const ml = millilitersFor(quantity, unit, reference);
+    weight = ml === undefined ? '' : ` (${whole(ml)} mL)`;
+  }
   const preparation = portion.preparation;
   let state = '';
   if (preparation === 'packaged') state = `, ${preparationLabel(preparation)}`;

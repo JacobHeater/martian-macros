@@ -9,6 +9,7 @@ import type { TradeTarget } from '../engine/analysis/TradeTarget';
 import { gradeMicrosFrom } from '../engine/gradeMicrosFrom';
 import { gradeOfNutrition } from '../engine/gradeOfNutrition';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
+import type { CatalogServing } from '../foodCatalog/CatalogServing';
 import type { CatalogFoodLookup } from '../foodCatalog/CatalogFoodLookup';
 import type { CatalogSearch } from '../foodCatalog/CatalogSearch';
 import type { CatalogServingLookup } from '../foodCatalog/CatalogServingLookup';
@@ -56,9 +57,9 @@ export class CatalogTradeCatalog implements TradeCatalog {
       const listed: TradeCatalogFood[] = [];
       for (const hit of await catalog.search('', { group, limit: perGroup })) {
         if (hit.food.group !== group || !(hit.food.kcal > 0)) continue;
-        const grams = (await catalog.servingsOf(hit.food))[0]?.grams ?? 100;
-        if (!(grams > 0)) continue;
-        listed.push(tradeFoodOf(hit.food, group, grams));
+        const amount = tradeAmountOf(hit.food, (await catalog.servingsOf(hit.food))[0]);
+        if (amount === undefined) continue;
+        listed.push(tradeFoodOf(hit.food, group, amount));
       }
       foods.set(group, listed);
     }
@@ -81,9 +82,25 @@ export class CatalogTradeCatalog implements TradeCatalog {
   }
 }
 
-/** A pack food, stated per 100 g, at a serving of `grams`. */
-function tradeFoodOf(food: CatalogFood, group: FoodGroup, grams: number): TradeCatalogFood {
-  const scale = grams / 100;
+/**
+ * The amount a trade says a pack food at (MM-650): its first serving, or 100
+ * of its basis, as grams and as a multiple of that basis. A food stated per
+ * 100 mL is taken only through a density, since a trade is said in grams and
+ * nothing is guessed.
+ */
+function tradeAmountOf(food: CatalogFood, serving: CatalogServing | undefined): { grams: number; scale: number } | undefined {
+  if (food.basis === 'per100g') {
+    const grams = serving?.grams ?? 100;
+    return grams > 0 ? { grams, scale: grams / 100 } : undefined;
+  }
+  const density = food.densityGPerMl;
+  if (density === undefined || !(density > 0)) return undefined;
+  const ml = serving?.milliliters ?? (serving?.grams === undefined ? 100 : serving.grams / density);
+  return ml > 0 ? { grams: ml * density, scale: ml / 100 } : undefined;
+}
+
+/** A pack food at `amount`: its first serving, or 100 of its basis. */
+function tradeFoodOf(food: CatalogFood, group: FoodGroup, { grams, scale }: { grams: number; scale: number }): TradeCatalogFood {
   const scaled = (value: number | undefined) => (value === undefined ? undefined : value * scale);
   const grade = gradeOfNutrition({
     kcal: food.kcal,

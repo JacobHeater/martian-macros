@@ -15,6 +15,7 @@ import { FoodGrade } from '../FoodGrade';
 import { FoodTrustMark } from '../FoodTrustMark';
 import { gradeOfCatalogFood } from '../gradeOfCatalogFood';
 import { OnlineLookupAsk } from './OnlineLookupAsk';
+import { per100Label } from '../../format/per100Label';
 import '../food.css';
 
 interface OnlineSearchResultsProps {
@@ -114,7 +115,7 @@ export function OnlineSearchResults({ query, onPick }: OnlineSearchResultsProps)
                 title={entry.food.brand === undefined ? entry.food.name : `${entry.food.name} · ${entry.food.brand}`}
                 detail={
                   <>
-                    <span>{roundHalfAwayFromZero(entry.food.kcal) + 0} kcal per 100 g</span>
+                    <span>{`${roundHalfAwayFromZero(entry.food.kcal) + 0} kcal ${per100Label(entry.food.basis)}`}</span>
                     <FoodTrustMark food={entry.food} />
                   </>
                 }

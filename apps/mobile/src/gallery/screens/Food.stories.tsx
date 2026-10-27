@@ -1795,3 +1795,41 @@ export const SaveMealFailed = screenStory({
   walk: press('Save meal'),
 });
 
+
+/** MM-651: a drink the pack states per 100 mL: by the can, the fluid ounce or the millilitre; no weight without a density. */
+export const AddFoodAmountDrink = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: '1 can (355 mL)',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'cola classic' }),
+  walk: press(/^Cola, classic/),
+});
+
+/** MM-651: a drink with a density: grams and ounces offered too, and its cup said in grams. */
+export const AddFoodAmountDrinkWithDensity = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Grams',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'oat drink barista' }),
+  walk: press(/^Oat drink, barista/),
+});
+
+/** MM-651: a found drink's row says its can and its calories per 100 mL. */
+export const AddFoodSearchDrink = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /per 100 mL/,
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'cola classic' }),
+});
+
+/** MM-651: a logged can opened again: its serving and every volume, no weight, its numbers per 100 mL. */
+export const EditFoodDrink = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^Per 100 mL/,
+  open: ({ state, overlays, today }) => {
+    state.homeTab.put('food');
+    void showAddFoodSheet(overlays, today, { initialQuery: 'cola classic' });
+  },
+  walk: async (canvas) => {
+    await press(/^Cola, classic/)(canvas);
+    await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Log it' }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Edit Cola, classic/ }));
+  },
+});
