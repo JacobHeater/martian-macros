@@ -72,7 +72,8 @@ it('the order refines the tiers and never crosses them', () => {
   expect(highestLabel).toBeGreaterThan(highestCheckThis);
 });
 
-it('search lists the more reliable source first, then the better text match', async () => {
+// MM-627 (the owner, 2026-10-26) supersedes MM-383's reliability-first order for search: the closest name first, the more reliable source among names as close.
+it('search lists the closest name first, then the more reliable source among names as close', async () => {
   const catalog = new FoodCatalog([
     pack('a', [
       { food: food('off', { id: 1, name: 'Oats' }), score: -5 },
@@ -85,7 +86,9 @@ it('search lists the more reliable source first, then the better text match', as
     ]),
   ]);
   const hits = await catalog.search('oats');
-  expect(hits.map((h) => h.food.id)).toEqual([4, 2, 3, 5, 1]);
+  // "Oats cereal" and "Oats" are as close (one extra word at most): the branded record (50) above Open Food Facts (40).
+  // Then the names with two more words: Foundation (95), then SR Legacy (90) by the better text match.
+  expect(hits.map((h) => h.food.id)).toEqual([5, 1, 4, 2, 3]);
 });
 
 it('a scanned barcode takes the most reliable record across the packs, the tie going to the first pack', async () => {

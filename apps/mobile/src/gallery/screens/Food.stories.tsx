@@ -737,6 +737,16 @@ export const AddFoodNothingFound = screenStory({
   },
 });
 
+/** MM-627: a search whose every word finds nothing: the closest foods, said as such, with each row's serving. */
+export const AddFoodSearchClosest = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /^No exact match for/,
+  open: addFood,
+  walk: async (canvas) => {
+    await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken breast skinless');
+  },
+});
+
 /** MM-321: a food from the pack, logged and opened again: the amount drives the totals. */
 export const EditFoodFromThePack = screenStory({
   covers: ['AddFoodSheet'],

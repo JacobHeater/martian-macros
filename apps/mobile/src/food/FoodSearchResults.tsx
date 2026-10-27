@@ -3,7 +3,7 @@ import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfCatalogFood } from './gradeOfCatalogFood';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import type { SearchHit } from '../foodCatalog/SearchHit';
-import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { searchResultAmount } from '../format/searchResultAmount';
 import { useApp } from '../app/useApp';
 import { useAsync } from '../app/useAsync';
 import { useDebounced } from '../app/useDebounced';
@@ -53,7 +53,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
       catalog === undefined
         ? Promise.resolve(undefined)
         : catalog
-            .search(settled, { limit: limit + 1 })
+            .search(settled, { limit: limit + 1, closest: true })
             .then((found) => ({ found, limit, failed: false, attempt }))
             .catch(() => ({ found: [] as SearchHit[], limit, failed: true, attempt })),
     `${catalog?.packs.length ?? -1}:${settled}:${limit}:${attempt}`,
@@ -87,9 +87,12 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
       </p>
     );
   }
+  // Nothing matched every word: the closest are offered, and said to be (MM-627).
+  const closest = hits.every((hit) => hit.partial === true);
   return (
     <>
-      {hits.map(({ food }, at) => {
+      {closest ? <p className="app-caption food-reference-line">{`No exact match for "${settled.trim()}". Closest:`}</p> : null}
+      {hits.map(({ food, firstServing }, at) => {
         // Its grade (MM-370) beside the part that is pressed, so a question mark is a button of its own.
         const grade = preview.gradeOfFood?.(food.name) ?? gradeOfCatalogFood(food);
         return (
@@ -98,7 +101,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
             title={food.brand === undefined ? food.name : `${food.name} · ${food.brand}`}
             detail={
               <>
-                <span>{roundHalfAwayFromZero(food.kcal) + 0} kcal per 100 g</span>
+                <span>{searchResultAmount(food.kcal, firstServing)}</span>
                 <FoodTrustMark food={food} />
               </>
             }

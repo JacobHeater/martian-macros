@@ -8,23 +8,17 @@ import type { CatalogServing } from './CatalogServing';
 import type { CatalogServingLookup } from './CatalogServingLookup';
 import type { FoodPack } from './FoodPack';
 import { onlinePackId } from './online/onlinePackId';
+import { searchOrder } from './searchOrder';
 import type { SearchHit } from './SearchHit';
 import { sourceReliability } from './sourceReliability';
 
-/**
- * The more reliable source first, then the better text match (MM-42,
- * MM-153, MM-383). So a generic "Oats" from an analysed database lists
- * above a crowd-entered product that merely matches the word more tightly.
- */
-function byReliabilityThenMatch(a: SearchHit, b: SearchHit): number {
-  const byScore = sourceReliability(b.food) - sourceReliability(a.food);
-  return byScore !== 0 ? byScore : a.score - b.score;
-}
+/** How many matches each pack is asked for, at least, so the order across packs is chosen from enough of them (MM-627). */
+const pool = 100;
 
 /**
- * Several installed packs presented as one: search returns one ranked list,
- * and a barcode takes the most reliable record across the packs (MM-383),
- * the tie going to the pack listed first.
+ * Several installed packs presented as one: search returns one list, the
+ * closest name first (MM-627), and a barcode takes the most reliable record
+ * across the packs (MM-383), the tie going to the pack listed first.
  *
  * `owned` are the handles this catalog opened and closes with `close`
  * (MM-386): the pack files, never a pack it was lent, such as the foods
@@ -57,13 +51,20 @@ export class FoodCatalog implements CatalogSearch, CatalogBarcodeLookup, Catalog
 
   async search(
     query: string,
-    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+    {
+      limit = 25,
+      offset = 0,
+      group,
+      closest = false,
+    }: { limit?: number; offset?: number; group?: FoodGroup | undefined; closest?: boolean | undefined } = {},
   ): Promise<SearchHit[]> {
     const hits: SearchHit[] = [];
     for (const pack of this.packs) {
-      hits.push(...(await pack.search(query, { limit: limit + offset, group })));
+      hits.push(...(await pack.search(query, { limit: Math.max(limit + offset, pool), group, closest })));
     }
-    return hits.sort(byReliabilityThenMatch).slice(offset, offset + limit);
+    // A pack's closest partial matches are offered only when no pack matches every word (MM-627).
+    const whole = hits.filter((hit) => hit.partial !== true);
+    return (whole.length > 0 ? whole : hits).sort(searchOrder(query)).slice(offset, offset + limit);
   }
 
   async byBarcode(gtin14: string): Promise<CatalogFood | undefined> {

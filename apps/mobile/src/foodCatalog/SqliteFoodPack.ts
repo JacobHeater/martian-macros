@@ -85,7 +85,12 @@ export class SqliteFoodPack implements FoodPack {
 
   async search(
     query: string,
-    { limit = 25, offset = 0, group }: { limit?: number; offset?: number; group?: FoodGroup | undefined } = {},
+    {
+      limit = 25,
+      offset = 0,
+      group,
+      closest = false,
+    }: { limit?: number; offset?: number; group?: FoodGroup | undefined; closest?: boolean | undefined } = {},
   ): Promise<SearchHit[]> {
     const words = query.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
     // A pack older than format 4 holds no groups, so none of its foods is in one (MM-616).
@@ -98,15 +103,38 @@ export class SqliteFoodPack implements FoodPack {
       );
       return listed.map((row) => ({ food: this.food(row), score: number(row['score'], 'score') }));
     }
-    const match = words.map((w) => `"${w}"*`).join(' ');
+    const terms = words.map((w) => `"${w}"*`);
+    const found = await this.matching(terms.join(' '), { limit, offset, group });
+    // Every word typed found nothing: the closest foods by some of them, said as such (MM-627).
+    if (!closest || found.length > 0 || offset > 0 || words.length < 2) return found;
+    return (await this.matching(terms.join(' OR '), { limit, offset, group })).map((hit) => ({ ...hit, partial: true }));
+  }
+
+  /** The foods `match` finds, best text score first, each with its first serving (MM-627). */
+  private async matching(
+    match: string,
+    { limit, offset, group }: { limit: number; offset: number; group: FoodGroup | undefined },
+  ): Promise<SearchHit[]> {
     const inGroup = group === undefined ? '' : 'AND f.food_group = ? ';
+    const first = (column: string) => `(SELECT s.${column} FROM servings s WHERE s.food_id = f.id ORDER BY s.rowid LIMIT 1)`;
     const rows = await this.db.select(
-      `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score ` +
+      `SELECT ${this.columns}, bm25(foods_fts, 10.0, 1.0) AS score, ${first('description')} AS first_serving, ${first('grams')} AS first_serving_grams ` +
         'FROM foods_fts JOIN foods f ON f.id = foods_fts.rowid ' +
         `WHERE foods_fts MATCH ? ${inGroup}ORDER BY score, f.id LIMIT ? OFFSET ?`,
       group === undefined ? [match, limit, offset] : [match, group, limit, offset],
     );
-    return rows.map((row) => ({ food: this.food(row), score: number(row['score'], 'score') }));
+    return rows.map((row) => {
+      const description = row['first_serving'];
+      const grams = row['first_serving_grams'];
+      return {
+        food: this.food(row),
+        score: number(row['score'], 'score'),
+        firstServing:
+          typeof description === 'string' && typeof grams === 'number'
+            ? { description, grams: grams / FoodPackFormat.nutrientScale }
+            : undefined,
+      };
+    });
   }
 
   async byBarcode(gtin14: string): Promise<CatalogFood | undefined> {

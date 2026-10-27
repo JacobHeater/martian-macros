@@ -17,6 +17,9 @@ text match (MM-42, MM-153); a barcode was looked up pack by pack and the first h
 went to the fresher record at build time, Open Food Facts on a tie (MM-51).
 
 ## Decisions
+**Superseded for search on 2026-10-26 (the owner, MM-627):** search lists the closest name first, and this
+score orders only names as close. It still chooses between a barcode's records across packs.
+
 The product owner's (2026-10-18, by message, no questions): "a mandatory part of the requirements will be to add additional food
 data sources"; the ranking of barcode scanning on source reliability is left to the author; "use the panel of experts to add an
 additional food data source, and order the search in terms of the data source reliability, which is a score you will derive
