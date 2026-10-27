@@ -88,7 +88,7 @@ it('MM-648: two servings instead of one, typed per serving, doubles them, as the
   await repos.food.addFood(yogurt);
   const sheet = await openEdit('Greek yogurt');
   await press(sheet, 'Edit nutrition per serving');
-  await typeIn(sheet, /^How many/, '2');
+  await typeIn(sheet, /^(Servings eaten|Amount|How many)/, '2');
   await saveChanges(sheet);
   const saved = await only();
   expect(saved.kcal).toBe(200);
