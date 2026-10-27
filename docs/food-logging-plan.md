@@ -7,10 +7,25 @@ ticketed (MM-623 to MM-626), each with a regression test skipped under its
 ID, as `AGENTS.md` requires. Everything else here is a finding or a
 proposal, and no feature ticket has been allocated for it yet.
 
-**Since then (2026-10-26):** MM-623 to MM-626 were fixed, and W-A below is
-built. The food log gained one all-or-nothing batch write
-(`FoodEntryBatchWriter`), so a deleted meal now goes in one redraw rather
-than row by row.
+**Built since (2026-10-26):**
+
+| Increment | Ticket |
+| --- | --- |
+| W-A, the four defects | MM-623 to MM-626, with one all-or-nothing batch write, `FoodEntryBatchWriter`, so a deleted meal goes in one redraw |
+| B1, a unit change keeps the portion | MM-628 |
+| B2, recents say their amount, this meal's first | MM-629 |
+| B3, copies said, made once, to any day | MM-633 |
+| B4, a whole meal's time, meal or day | MM-630 |
+| C1, the meal session | MM-631 |
+| C3, choosing foods to change together | MM-634 |
+| C4, search by match first, part 1 | MM-627 |
+| The cup a digit short | MM-632 |
+
+Not built, each waiting on the owner:
+- **B5:** "Saved" logs a food.
+- **C2:** volume from the source data, a pack-format change the owner rebuilds and publishes.
+- **C5:** frequency.
+- **W-D.**
 
 How the evidence was gathered, and what it does not cover, is in
 [Coverage and limits](#coverage-and-limits). In short, it rests on source
