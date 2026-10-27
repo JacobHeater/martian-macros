@@ -182,6 +182,8 @@ export const AddFoodSearching = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken');
+    // The demo's log matches too, so their own come first (MM-652); the database's are a press away.
+    await press('Database')(canvas);
   },
 });
 
@@ -668,6 +670,8 @@ export const AddFoodMoreResults = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+    // The demo's log matches too, so their own come first (MM-652); the database's are a press away.
+    await press('Database')(canvas);
   },
 });
 
@@ -678,6 +682,7 @@ export const AddFoodMoreResultsShown = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'yogurt');
+    await press('Database')(canvas);
     await userEvent.click(await within(canvas).findByRole('button', { name: 'More results' }, { timeout: 10000 }));
     await waitFor(() => expect(within(canvas).queryByRole('button', { name: 'More results' })).toBeNull(), { timeout: 10000 });
   },
@@ -695,6 +700,7 @@ export const AddFoodSearchFailed = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'oats');
+    await press('Database')(canvas);
   },
 });
 
@@ -776,6 +782,7 @@ export const AddFoodAmountHand = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken');
+    await press('Database')(canvas);
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Chicken breast, cooked/ }, { timeout: 10000 }));
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Palm/ }, { timeout: 10000 }));
     const amount = await within(canvas).findByRole('textbox', { name: /^(How many|Amount)/ });
@@ -801,6 +808,7 @@ export const AddFoodSearchClosest = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), 'chicken breast skinless');
+    await press('Database')(canvas);
   },
 });
 
@@ -1283,13 +1291,63 @@ const typeSearch = (words: string) => async (canvas: HTMLElement) => {
   await userEvent.type(await within(canvas).findByRole('textbox', { name: 'Search foods' }), words);
 };
 
-/** MM-58: searching never asks online by itself: the action under the phone's results. */
+/** Chooses the online results at the top of the list (MM-652), where the Search online action is. */
+const chooseOnline = async (canvas: HTMLElement) => {
+  await press('Online')(canvas);
+};
+
+/** MM-58: searching never asks online by itself: the action under the Online choice of results (MM-652). */
 export const SearchOnlineOffered = screenStory({
   covers: ['AddFoodSheet'],
   shows: 'Search online',
   device: onlineFoods(),
   open: addFood,
-  walk: typeSearch('peanut noodle'),
+  walk: async (canvas) => {
+    await typeSearch('peanut noodle')(canvas);
+    await chooseOnline(canvas);
+  },
+});
+
+/** MM-652: a logged banana under "Yours", chosen for them because something of theirs matched. */
+export const SearchResultsYours = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /From your log/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'snack', name: 'Banana', kcal: 105, proteinG: 1, carbsG: 27, fatG: 0, source: 'quickAdd' }),
+    );
+  },
+  open: addFood,
+  walk: typeSearch('banana'),
+});
+
+/** MM-652: the food database's bananas, alone, once "Database" is chosen. */
+export const SearchResultsDatabase = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /1 medium \(118 g\)/,
+  scenario: async (repos, today) => {
+    await new DemoSeed(today).replace(repos);
+    await repos.food.addFood(
+      new FoodEntry({ id: 0, date: today.addDays(-1), meal: 'snack', name: 'Banana', kcal: 105, proteinG: 1, carbsG: 27, fatG: 0, source: 'quickAdd' }),
+    );
+  },
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('banana')(canvas);
+    await press('Database')(canvas);
+  },
+});
+
+/** MM-652: "Yours" chosen with nothing of theirs matching: said, with the other choices a press away. */
+export const SearchResultsYoursNothing = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: /Nothing of yours matches/,
+  open: addFood,
+  walk: async (canvas) => {
+    await typeSearch('quinoa')(canvas);
+    await press('Yours')(canvas);
+  },
 });
 
 /** MM-58: the first online search asks, saying only the words typed are sent. */
@@ -1300,6 +1358,7 @@ export const SearchOnlineAsks = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('peanut noodle')(canvas);
+    await chooseOnline(canvas);
     await press('Search online')(canvas);
   },
 });
@@ -1307,7 +1366,7 @@ export const SearchOnlineAsks = screenStory({
 /** MM-58: what a service found, listed under the phone's results with where each came from. */
 export const SearchOnlineFound = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'Found online',
+  shows: /Found online/,
   scenario: async (repos) => {
     await repos.preferences.saveOnlineLookup('always');
   },
@@ -1315,6 +1374,7 @@ export const SearchOnlineFound = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('peanut noodle')(canvas);
+    await chooseOnline(canvas);
     await press('Search online')(canvas);
   },
 });
@@ -1322,7 +1382,7 @@ export const SearchOnlineFound = screenStory({
 /** MM-58: what a service found, beside the phone's own results, on a phone with a pack installed (the panel's F16). */
 export const SearchOnlineBesidePack = screenStory({
   covers: ['AddFoodSheet'],
-  shows: 'Found online',
+  shows: /Found online/,
   scenario: async (repos) => {
     await repos.preferences.saveOnlineLookup('always');
   },
@@ -1330,6 +1390,7 @@ export const SearchOnlineBesidePack = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('noodle')(canvas);
+    await chooseOnline(canvas);
     await press('Search online')(canvas);
   },
 });
@@ -1345,6 +1406,7 @@ export const SearchOnlineNothing = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('quinoa')(canvas);
+    await chooseOnline(canvas);
     await press('Search online')(canvas);
   },
 });
@@ -1360,6 +1422,7 @@ export const SearchOnlineUnavailable = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await typeSearch('quinoa')(canvas);
+    await chooseOnline(canvas);
     await press('Search online')(canvas);
   },
 });
@@ -1676,6 +1739,8 @@ const addToMeal = (query: string, name: RegExp) => async (canvas: HTMLElement) =
   const search = await within(canvas).findByRole('textbox', { name: 'Search foods' }, { timeout: 10000 });
   await userEvent.clear(search);
   await userEvent.type(search, query);
+  // The database's results, whatever of the demo's log matched (MM-652).
+  await press('Database')(canvas);
   await press(name)(canvas);
   await press('Add another food')(canvas);
 };

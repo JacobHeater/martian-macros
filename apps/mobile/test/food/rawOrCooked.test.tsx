@@ -36,6 +36,7 @@ beforeEach(async () => {
 /** Searches and picks the pack's result called `name`, never the recent-food row of the same name. */
 async function search(sheet: HTMLElement, query: string, name: RegExp): Promise<void> {
   await typeIn(sheet, 'Search foods', query);
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Database' }));
   const results = await within(sheet).findAllByRole('button', { name });
   const fromPack = results.find((result) => !/Your recent food|From your log/.test(result.textContent ?? '')) ?? results[0];
   await userEvent.click(fromPack as HTMLElement);

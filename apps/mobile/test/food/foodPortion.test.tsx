@@ -87,6 +87,7 @@ async function openEntry(name: string): Promise<HTMLElement> {
 async function logBananaByWeight(): Promise<void> {
   const sheet = await openSheet({ manual: false });
   await typeIn(sheet, 'Search foods', 'banana');
+  await userEvent.click(await within(sheet).findByRole('button', { name: 'Database' }));
   await userEvent.click((await within(sheet).findAllByRole('button', { name: /Banana/ }))[0] as HTMLElement);
   await press(sheet, 'Grams');
   await typeIn(sheet, /^Amount/, '150');

@@ -228,6 +228,14 @@
 .food-sheet > .mm-list-row {
   margin-block: var(--space-8) 0;
 }
+/* Full-width actions stacked in a sheet stand 12 px apart (MM-653, the owner): never touching. */
+.food-sheet > .mm-button-expand + .mm-button-expand {
+  margin-top: var(--space-12);
+}
+/* A row of unit chips keeps the field's 12 px, not a row's 8 (MM-653). */
+.food-sheet > .food-chips {
+  margin-top: var(--space-12);
+}
 /* A text action's label lines up with the words above it: its tap area keeps its padding, which hangs out. */
 .food-sheet > .mm-button-text:not(.mm-button-expand) {
   margin-top: var(--space-4);
@@ -239,9 +247,22 @@
 .food-chips {
   margin-top: var(--space-12);
 }
-/* Scan, Saved and Estimate share the width of the button above them, and wrap whole on a narrow phone (MM-600). */
+/* Scan, Saved and Estimate share the width of the button above them, and wrap whole on a narrow phone (MM-600);
+   the unit chips share each row's width the same way, so no row ends ragged (MM-653). */
 .food-chips-fill > * {
   flex: 1 1 auto;
+}
+/* Where a search's results come from, chosen at the top of them (MM-652): the switch spans the sheet, 16 px under
+   the search or the meal's line, 8 px above the first row; three choices fit at 360 px. */
+.food-results-source {
+  margin-block: var(--space-16) var(--space-8);
+}
+.food-results-source > .mm-segmented {
+  display: grid;
+  width: 100%;
+}
+.food-results-source .mm-segment {
+  padding: 0 var(--space-8);
 }
 .food-fields {
   display: flex;
