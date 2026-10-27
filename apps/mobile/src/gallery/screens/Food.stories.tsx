@@ -1730,6 +1730,16 @@ export const AddFoodSavedMeals = screenStory({
   covers: ['AddFoodSheet', 'MyFoodsStep'],
   shows: 'Your meals',
   scenario: async (repos, today) => {
+    await repos.customFoods.saveCustomFood(
+      new CustomFood({
+        id: 0,
+        name: 'Protein bar',
+        kind: 'food',
+        servingDescription: '1 bar',
+        servingGrams: 60,
+        perServing: new NutritionTotals({ kcal: 220, proteinG: 20, carbsG: 22, fatG: 7 }),
+      }),
+    );
     await repos.savedMeals.saveMeal(
       'Usual breakfast',
       [
