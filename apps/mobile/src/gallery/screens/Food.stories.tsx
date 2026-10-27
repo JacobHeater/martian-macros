@@ -584,6 +584,12 @@ export const WaterBarNearlyThere = screenStory({
 const inSheet = (canvas: HTMLElement) => within(canvas.ownerDocument.body);
 
 /** Opens Add food, presses Enter manually, then the measuring method `method`. */
+/** Opens a saved food's editor from its menu in Saved: pressing it logs it (MM-635). */
+const editSaved = (name: string) => async (canvas: HTMLElement) => {
+  await press(`More actions for ${name}`)(canvas);
+  await userEvent.click(await inSheet(canvas).findByRole('menuitem', { name: 'Edit' }));
+};
+
 const manuallyAs = (method: string) => async (canvas: HTMLElement) => {
   await press('Enter manually')(canvas);
   const methods = await inSheet(canvas).findByRole('group', { name: 'How was it measured?' });
@@ -967,7 +973,7 @@ export const EditRecipe = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
-    await press(/^Demo chili/)(canvas);
+    await editSaved('Demo chili')(canvas);
     await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'rice');
     await press(/^White rice, cooked/)(canvas);
   },
@@ -1007,7 +1013,7 @@ export const EditRecipeLineMenu = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
-    await press(/^Demo chili/)(canvas);
+    await editSaved('Demo chili')(canvas);
     await press('More actions for Ground beef, lean, cooked')(canvas);
   },
 });
@@ -1046,7 +1052,7 @@ export const EditRecipeLineWeight = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
-    await press(/^Demo rice bowl/)(canvas);
+    await editSaved('Demo rice bowl')(canvas);
     await press('More actions for White rice, raw')(canvas);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
   },
@@ -1060,7 +1066,7 @@ export const EditRecipeLineWeightSaved = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
-    await press(/^Demo rice bowl/)(canvas);
+    await editSaved('Demo rice bowl')(canvas);
     await press('More actions for White rice, raw')(canvas);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
     const field = await inSheet(canvas).findByRole('textbox', { name: 'Weight g for White rice, raw' }, { timeout: 10000 });
@@ -1078,7 +1084,7 @@ export const EditRecipeLineFoodGone = screenStory({
   open: addFood,
   walk: async (canvas) => {
     await press('Saved')(canvas);
-    await press(/^Demo rice bowl/)(canvas);
+    await editSaved('Demo rice bowl')(canvas);
     await press('More actions for White rice, raw')(canvas);
   },
 });
