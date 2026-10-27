@@ -126,6 +126,7 @@ and WS-09 steps 1 and 8.
 22. **Copies said and undoable (MM-633).** The plan's B3 (2026-10-26): a copy says what was copied and where with Undo, is made once however often pressed, and a meal copies to any day from its menu.
 23. **Choose foods to change together (MM-634).** The plan's C3 (2026-10-26): "Select" from a food's or meal's menu turns the day's rows into boxes to tick, and a bar at the foot changes the chosen foods' time, meal or day, copies or deletes them, in one step with Undo.
 24. **Saved foods log when pressed (MM-635).** The owner, 2026-10-26: in Add food, a saved food is logged by pressing it; Edit and Delete are in its menu.
+25. **Volume through a volume serving (MM-636).** The owner, 2026-10-26 (the plan's C2): a serving's volume is read from its words ("1 cup, chopped"), and the food is offered cups, tablespoons and teaspoons weighed through it; no new pack format. Branded mL-only servings and Open Food Facts per-100 mL liquids wait on the plan's H-06 data check.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -176,6 +177,7 @@ workstream's.
 - Added 2026-10-26 (step 22): MM-633 (a copy says so with Undo, once, to any day; done).
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
 - Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
+- Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
