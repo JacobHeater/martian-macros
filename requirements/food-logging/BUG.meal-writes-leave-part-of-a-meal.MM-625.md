@@ -1,6 +1,6 @@
 ---
 id: MM-625
-status: proposed
+status: done
 component: food-logging
 related: [MM-47, MM-587, MM-591]
 ---
@@ -69,5 +69,11 @@ Choices made without asking (say if any is wrong):
   a time, as today. No new table and no schema change.
 
 ## Notes
-- Regression tests (skipped with this ID until fixed): `apps/mobile/test/food/mealWritesAllOrNothing.test.ts`.
+- Fixed 2026-10-26: `FoodEntryBatchWriter.applyFoodChanges` (in `FoodRepository`) adds, updates and
+  deletes in one transaction with one notice to the watchers; an update or delete of a food no longer in
+  the log fails the batch. `relogMeal`, `copyEntries`, `removeMeal` and its Undo, and View meal's
+  rename and moves use it. `MirroredFoodLog` tells the health platform after the commit, in the
+  background, so the screen never waits on it. `logMeal` keeps its own rollback (MM-591) for now.
+- Regression tests: `apps/mobile/test/food/mealWritesAllOrNothing.test.ts`; the contract cases "MM-625"
+  in `test/contracts/foodRepositoryContract.ts`; the mirror's in `test/healthWrite/mirroredLogs.test.ts`.
 - MM-624's food-plus-fat write and the plan's bulk edits build on the same writer.

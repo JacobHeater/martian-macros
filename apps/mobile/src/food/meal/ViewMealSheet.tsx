@@ -16,8 +16,10 @@ import { useLoaded } from '../../app/useLoaded';
 import { DayStepper } from '../../ui/DayStepper';
 import { MmButton } from '../../ui/MmButton';
 import { MmTextField } from '../../ui/MmTextField';
+import { Notice } from '../../ui/Notice';
 import { useOverlays } from '../../ui/useOverlays';
 import { MealChips } from '../MealChips';
+import { TimeEatenRow } from '../TimeEatenRow';
 import { useNetCarbs } from '../useNetCarbs';
 import { gradeOfLoggedMeal } from './gradeOfLoggedMeal';
 import { MealGradeRow } from './MealGradeRow';
@@ -53,6 +55,8 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
   const entries = useLoaded(state.foodForDay(day));
   const [editing, setEditing] = useState<number | 'new'>();
   const [name, setName] = useState<string>();
+  /** Whether the last change could not be saved (MM-624). */
+  const [failed, setFailed] = useState(false);
   const items = (entries ?? []).filter((entry) => entry.loggedMeal?.key === mealKey);
   if (entries === undefined) return null;
   if (items.length === 0) {
@@ -67,9 +71,18 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
   const tag = { key: loggedMeal.key, name: loggedMeal.name };
   const grade = gradeOfLoggedMeal(loggedMeal, { hand });
 
-  /** Every food of the meal, changed alike. */
+  /** Runs a change to the meal; one that cannot be saved is said above the meal's foods, never swallowed (MM-624). */
+  const attempt = async (work: () => Promise<void>) => {
+    try {
+      await work();
+      setFailed(false);
+    } catch {
+      setFailed(true);
+    }
+  };
+  /** Every food of the meal, changed alike, in one step: the meal never shows in two places (MM-625). */
   const updateAll = async (change: (item: FoodEntry) => FoodEntry) => {
-    for (const item of loggedMeal.items) await services.food.updateFood(change(item));
+    await services.food.applyFoodChanges({ update: loggedMeal.items.map(change) });
   };
   const rename = async () => {
     const typed = (name ?? loggedMeal.name).trim();
@@ -77,12 +90,14 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
     if (typed === '' || typed === loggedMeal.name) return;
     await updateAll((item) => item.copyWith({ loggedMeal: { key: loggedMeal.key, name: typed } }));
   };
-  const moveToSlot = (meal: Meal) => void updateAll((item) => item.copyWith({ meal }));
-  // A time eaten belongs to its day (MM-570): moved to another day, the meal has none until one is given.
+  const moveToSlot = (meal: Meal) => void attempt(() => updateAll((item) => item.copyWith({ meal })));
+  // Moved to another day, the meal keeps its time eaten, as a food does (MM-570; the owner, 2026-10-26, MM-626).
   const moveToDay = async (to: CalendarDate) => {
-    await updateAll((item) => item.copyWith({ date: to, eatenAt: undefined }));
+    await updateAll((item) => item.copyWith({ date: to }));
     setDay(to);
   };
+  // A meal's time is every food's, changed in one step (MM-626).
+  const changeTime = (eatenAt: number) => void attempt(() => updateAll((item) => item.copyWith({ eatenAt })));
   const save = async (entry: FoodEntry, changed: MealItemDraft) => {
     await services.food.updateFood(
       entryOfMealItem(changed, { id: entry.id, date: entry.date, meal: entry.meal, eatenAt: entry.eatenAt, loggedMeal: tag }),
@@ -125,6 +140,7 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
           `${whole(loggedMeal.fatG)} g fat`}
       </p>
       {grade === undefined ? null : <MealGradeRow grade={grade} subject={loggedMeal.name} />}
+      {failed ? <Notice icon="warning" text="That change could not be saved, so the meal is as it was. Try it again." /> : null}
       <p className="food-label food-label-spaced">Macro split</p>
       <MacroSplitChart
         netCarbs={netCarbs}
@@ -139,40 +155,41 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
           })
         }
       />
-      <MmTextField label="Meal name" value={name ?? loggedMeal.name} onChange={setName} onBlur={() => void rename()} onSubmit={() => void rename()} />
+      <MmTextField label="Meal name" value={name ?? loggedMeal.name} onChange={setName} onBlur={() => void attempt(rename)} onSubmit={() => void attempt(rename)} />
       <p className="food-label food-label-spaced">{loggedMeal.items.length === 1 ? '1 food' : `${loggedMeal.items.length} foods`}</p>
       {loggedMeal.items.map((entry) => (
         <Fragment key={entry.id}>
-          <MealItemRow item={mealItemOfEntry(entry)} onChange={() => setEditing(entry.id)} onRemove={() => void remove(entry)} />
+          <MealItemRow item={mealItemOfEntry(entry)} onChange={() => setEditing(entry.id)} onRemove={() => void attempt(() => remove(entry))} />
           {editing === entry.id ? (
             <MealItemForm
               item={mealItemOfEntry(entry)}
               requireComplete
-              onSave={(changed) => void save(entry, changed)}
+              onSave={(changed) => void attempt(() => save(entry, changed))}
               onCancel={() => setEditing(undefined)}
             />
           ) : null}
         </Fragment>
       ))}
       {editing === 'new' ? (
-        <MealItemForm requireComplete onSave={(added) => void add(added)} onCancel={() => setEditing(undefined)} />
+        <MealItemForm requireComplete onSave={(added) => void attempt(() => add(added))} onCancel={() => setEditing(undefined)} />
       ) : (
         <MmButton label="Add a food" kind="text" icon="plus" onPress={() => setEditing('new')} />
       )}
       <p className="food-label food-label-spaced">Logged in</p>
       <MealChips meal={loggedMeal.meal} onChange={moveToSlot} />
+      <TimeEatenRow eatenAt={loggedMeal.eatenAt} meal={loggedMeal.meal} onChange={changeTime} />
       <div className="app-gap-small" />
       <DayStepper
         name="Logged on"
         label={Fmt.day(day, today)}
-        onPrevious={() => void moveToDay(day.addDays(-1))}
-        onNext={day.isBefore(today) ? () => void moveToDay(day.addDays(1)) : undefined}
+        onPrevious={() => void attempt(() => moveToDay(day.addDays(-1)))}
+        onNext={day.isBefore(today) ? () => void attempt(() => moveToDay(day.addDays(1))) : undefined}
         onLabelPress={undefined}
       />
       <div className="app-gap" />
-      <MmButton label="Save to Saved" kind="secondary" icon="history" expand onPress={() => void saveToSaved()} />
+      <MmButton label="Save to Saved" kind="secondary" icon="history" expand onPress={() => attempt(saveToSaved)} />
       {/* The sheet's own ✕ closes it: no second Close beside Delete meal. */}
-      <MmButton label="Delete meal" kind="text" icon="delete" onPress={() => void deleteMeal()} />
+      <MmButton label="Delete meal" kind="text" icon="delete" onPress={() => attempt(deleteMeal)} />
     </div>
   );
 }

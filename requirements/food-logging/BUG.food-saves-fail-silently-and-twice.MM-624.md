@@ -1,6 +1,6 @@
 ---
 id: MM-624
-status: proposed
+status: done
 component: food-logging
 related: [MM-152, MM-220, MM-591]
 ---
@@ -55,7 +55,15 @@ Choices made without asking (say if any is wrong):
   sheet gets it the same way; which of the two is the builder's call with the UX guard.
 
 ## Notes
-- Regression tests (skipped with this ID until fixed): `apps/mobile/test/food/foodSaveFailures.test.tsx`.
-- Food plus fat in one write depends on MM-625's all-or-nothing writer, or a rollback like `logMeal`'s.
-- A single food's delete shows "Removed" and Undo before the delete is known to have worked
-  (`MealSection.remove`); it is a hypothesis in the plan (H-03), not part of this bug.
+- Fixed 2026-10-26:
+  - `MmButton` presses an action that gives a promise once: until it settles a second press does nothing,
+    and the button says it is busy (`aria-busy`) while keeping its focus, as a retry does (MM-183).
+  - Add food's save, the amount step, Estimate and View meal say a failed write above their action, keep
+    what was entered, and log nothing. A recent meal logged again says its failure in a snack (the row has
+    no form to keep) and is logged once however often it is pressed.
+  - The amount step logs the food and its fat in one batch (MM-625); remembering the usual fat comes after
+    and can no longer stop the fat being logged.
+- Regression tests: `apps/mobile/test/food/foodSaveFailures.test.tsx`. Stories: AddFoodLogFailed,
+  EditFoodSaveFailed, AddFoodAmountLogFailed, AddFoodEstimateLogFailed, ViewMealChangeFailed.
+- Not in this bug: a single food's delete shows "Removed" before the delete is known to have worked
+  (`MealSection.remove`; the plan's H-03), and "Copy to today" gives no feedback (the plan's F-17, B3).

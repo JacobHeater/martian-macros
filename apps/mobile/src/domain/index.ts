@@ -172,6 +172,7 @@ export * from './repositories/ExerciseProgressionReader';
 export * from './repositories/ExerciseProgressionRepository';
 export * from './repositories/ExerciseProgressionWriter';
 export * from './repositories/FoodDayReader';
+export * from './repositories/FoodEntryBatchWriter';
 export * from './repositories/FoodEntryWriter';
 export * from './repositories/FoodRangeReader';
 export * from './repositories/FoodRepository';

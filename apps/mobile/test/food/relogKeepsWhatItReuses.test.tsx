@@ -4,9 +4,12 @@ import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
+import { entryOfMealItem } from '../../src/domain/food/meal/entryOfMealItem';
+import { parseMealAnalysis } from '../../src/domain/food/meal/parseMealAnalysis';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { cleanMealAnswer } from '../../src/gallery/screens/storyMealAnswers';
 import { openAddFood, press, typeIn } from '../support/addFood';
 import { first } from '../support/first';
 import { renderApp } from '../support/renderApp';
@@ -15,8 +18,8 @@ import { renderApp } from '../support/renderApp';
  * MM-623: a recent food logged again kept only its name and macros. The
  * sheet's save read the extra nutrients from the entry being edited, which
  * a new log does not have, and the form refilled a calculated food as typed
- * totals, so a changed amount changed nothing. Skipped until MM-623 is
- * fixed: each case fails on main at f5a08b4.
+ * totals, so a changed amount changed nothing. Each case failed on main at
+ * f5a08b4.
  */
 const today = CalendarDate.of(2026, 10, 26);
 let repos: InMemoryRepositories;
@@ -80,7 +83,7 @@ const rice = new FoodEntry({
   sodiumMg: 1.8,
 });
 
-it.skip('MM-623: a recent label serving logged as two servings keeps and doubles its extras', async () => {
+it('MM-623: a recent label serving logged as two servings keeps and doubles its extras', async () => {
   await repos.food.addFood(yogurt);
   renderApp(repos, today);
   const sheet = await openAddFood();
@@ -96,7 +99,7 @@ it.skip('MM-623: a recent label serving logged as two servings keeps and doubles
   expect(again?.micros.of('calcium')).toBe(380);
 });
 
-it.skip('MM-623: a recent weighed food logged at another weight is calculated for that weight, from the same food', async () => {
+it('MM-623: a recent weighed food logged at another weight is calculated for that weight, from the same food', async () => {
   await repos.food.addFood(rice);
   renderApp(repos, today);
   const sheet = await openAddFood();
@@ -109,4 +112,26 @@ it.skip('MM-623: a recent weighed food logged at another weight is calculated fo
   expect(again?.portion?.basis).toBe('calculated');
   expect(again?.portion?.origin?.foodId, 'the food it came from is kept').toBe(42);
   expect(again?.fiberG).toBeCloseTo(0.8, 6);
+});
+
+it('MM-623: a food of an analysed meal found in the log keeps its extras for one usual portion', async () => {
+  const reading = parseMealAnalysis(cleanMealAnswer);
+  if (reading.kind !== 'read') throw new Error(reading.reason);
+  for (const item of reading.draft.items) {
+    await repos.food.addFood(
+      entryOfMealItem(item, { date: today.addDays(-3), meal: 'dinner', eatenAt: undefined, loggedMeal: { key: 'k1', name: reading.draft.name } }),
+    );
+  }
+  renderApp(repos, today);
+  const sheet = await openAddFood();
+  await typeIn(sheet, 'Search foods', 'grilled chicken');
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^Grilled chicken breast.*From your log/ }));
+  await press(sheet, 'Log it');
+  await expect.poll(async () => (await logged()).length).toBe(1);
+  const [again] = await logged();
+  // The meal had 150 g; one usual portion is 1 breast of 172 g.
+  expect(again?.kcal).toBeCloseTo((248 / 150) * 172, 6);
+  expect(again?.sodiumMg).toBeCloseTo((111 / 150) * 172, 6);
+  expect(again?.micros.of('potassium')).toBeCloseTo((384 / 150) * 172, 6);
+  expect(again?.fiberG, 'a known zero stays zero').toBe(0);
 });
