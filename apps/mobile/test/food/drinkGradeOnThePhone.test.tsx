@@ -179,4 +179,7 @@ it('MM-656, MM-657: a soda found online with no fiber or sugars stated, logged b
   await userEvent.click(await screen.findByRole('button', { name: /^Edit CRUSH, SODA, ORANGE, ORANGE/ }, slowly));
   const edit = await foodSheet('Edit food');
   expect(within(edit).getByText('Source: Manufacturer label (USDA), found online.')).toBeInTheDocument();
+  // The entry's own unit is among the chips, chosen (MM-658): the sheet offered cups and spoons and no fluid ounces.
+  expect(within(edit).getByRole('button', { name: 'Fluid ounces' })).toHaveAttribute('aria-pressed', 'true');
+  expect(within(edit).getByRole('textbox', { name: /^Amount/ })).toHaveValue('4');
 });
