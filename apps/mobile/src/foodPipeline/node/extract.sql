@@ -19,8 +19,11 @@
 -- Both files end with category (MM-616): the source's own category, which
 -- foodGroupTable maps to a food group: USDA Branded's branded_food_category,
 -- Foundation's and SR Legacy's food_category, FNDDS's WWEIA category; empty
--- for Open Food Facts.
--- All nutrients are per 100 g.
+-- for Open Food Facts; then basis (MM-650): 'g' when the nutrients are per
+-- 100 g, 'ml' for a liquid stated per 100 mL (a USDA Branded row whose
+-- serving unit is ml or MLT; an Open Food Facts product whose serving text
+-- states a number of millilitres). A serving is then {"d": text, "ml": mL}.
+-- All nutrients are per 100 g, or per 100 mL where basis is 'ml'.
 
 COPY (
   -- USDA Branded Foods: United States, one row per version of each product.
@@ -72,16 +75,23 @@ COPY (
     nut.kcal, nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
     nut.potassium_mg, nut.calcium_mg, nut.iron_mg, nut.magnesium_mg, nut.zinc_mg, nut.vitamin_a_ug, nut.vitamin_c_mg, coalesce(nut.vitamin_d_ug, nut.vitamin_d_iu / 40) AS vitamin_d_ug, nut.vitamin_b12_ug, nut.folate_ug, coalesce(nut.sugars_g, nut.sugars_nlea_g) AS sugars_g, nut.saturated_fat_g, nut.cholesterol_mg,
     CASE WHEN try_cast(bf.serving_size AS DOUBLE) > 0
-              AND lower(bf.serving_size_unit) IN ('g', 'grm')
+              AND lower(bf.serving_size_unit) IN ('g', 'grm', 'gm')
          THEN to_json([{'d': coalesce(nullif(bf.household_serving_fulltext, ''),
-                                      bf.serving_size || ' g'),
+                                      regexp_replace(bf.serving_size, '[.]0+$', '') || ' g'),
                         'g': try_cast(bf.serving_size AS DOUBLE)}])
+         -- A serving in millilitres (MM-650): a drink, whose figures are then per 100 mL.
+         WHEN try_cast(bf.serving_size AS DOUBLE) > 0
+              AND lower(bf.serving_size_unit) IN ('ml', 'mlt')
+         THEN to_json([{'d': coalesce(nullif(bf.household_serving_fulltext, ''),
+                                      regexp_replace(bf.serving_size, '[.]0+$', '') || ' mL'),
+                        'ml': try_cast(bf.serving_size AS DOUBLE)}])
     END AS servings,
     try_cast(bf.fdc_id AS BIGINT) AS version_key,
     CAST(epoch(try_cast(bf.modified_date AS DATE)) AS BIGINT) AS updated_at,
     nut.sugar_alcohols,
     'us' AS carbs_label,
-    nullif(trim(bf.branded_food_category), '') AS category
+    nullif(trim(bf.branded_food_category), '') AS category,
+    CASE WHEN try_cast(bf.serving_size AS DOUBLE) > 0 AND lower(bf.serving_size_unit) IN ('ml', 'mlt') THEN 'ml' ELSE 'g' END AS basis
   FROM bf
   JOIN fd USING (fdc_id)
   LEFT JOIN nut USING (fdc_id)
@@ -112,19 +122,37 @@ COPY (
     try_cast(sugars_100g AS DOUBLE),
     try_cast("saturated-fat_100g" AS DOUBLE),
     try_cast(cholesterol_100g AS DOUBLE) * 1000,
-    CASE WHEN try_cast(serving_quantity AS DOUBLE) > 0 AND serving_size <> ''
+    -- A serving in millilitres (serving_ml below) makes the product per 100 mL (MM-650); any other is grams.
+    CASE WHEN serving_ml IS NOT NULL THEN to_json([{'d': serving_size, 'ml': serving_ml}])
+         WHEN try_cast(serving_quantity AS DOUBLE) > 0 AND serving_size <> ''
          THEN to_json([{'d': serving_size, 'g': try_cast(serving_quantity AS DOUBLE)}])
     END,
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
     coalesce(try_cast(last_modified_t AS BIGINT), 0),
     try_cast(polyols_100g AS DOUBLE),
     CASE WHEN regexp_full_match(countries_tags, 'en:(united-states|canada)(,en:(united-states|canada))*') THEN 'us' ELSE 'unknown' END,
-    NULL
+    NULL,
+    CASE WHEN serving_ml IS NOT NULL THEN 'ml' ELSE 'g' END
   -- The export's brand column is `brands_en` since 2026 (MM-409); `strict_mode`
   -- off, because DuckDB 1.5 otherwise stops at the first row that is not
   -- standard CSV, where 1.1 skipped about 250,000 rows under `ignore_errors`.
-  FROM read_csv('{{cache}}/off.csv.gz', delim = chr(9), header = true, quote = '',
-                all_varchar = true, ignore_errors = true, sample_size = -1, strict_mode = false)
+  FROM (
+    SELECT *,
+      -- The serving's millilitres (MM-650): the millilitres its text states, when they are serving_quantity
+      -- (the export takes the last unit in the text, so "240 ml (245 g)" is grams), or its fluid ounces, which
+      -- the export converts to millilitres itself (the panel's IN-2 and IN-3). NULL for a weight.
+      CASE WHEN try_cast(serving_quantity AS DOUBLE) > 0
+                AND abs(coalesce(try_cast(replace(regexp_extract(serving_size, '(?i)([0-9]+(?:[.,][0-9]+)?)\s*ml\b', 1), ',', '.') AS DOUBLE), -1)
+                        - try_cast(serving_quantity AS DOUBLE)) < 0.5
+           THEN try_cast(serving_quantity AS DOUBLE)
+           WHEN try_cast(serving_quantity AS DOUBLE) > 0
+                AND abs(coalesce(try_cast(replace(regexp_extract(serving_size, '(?i)([0-9]+(?:[.,][0-9]+)?)\s*fl\.?\s*oz', 1), ',', '.') AS DOUBLE), -1) * 29.5735295625
+                        - try_cast(serving_quantity AS DOUBLE)) < 0.6
+           THEN try_cast(serving_quantity AS DOUBLE)
+      END AS serving_ml
+    FROM read_csv('{{cache}}/off.csv.gz', delim = chr(9), header = true, quote = '',
+                  all_varchar = true, ignore_errors = true, sample_size = -1, strict_mode = false)
+  )
   WHERE countries_tags LIKE '%en:united-states%'
 
   ORDER BY source, source_id
@@ -258,7 +286,8 @@ COPY (
     nut.protein, nut.carbs, nut.fat, nut.fiber, nut.sodium_mg, nut.alcohol,
     nut.potassium_mg, nut.calcium_mg, nut.iron_mg, nut.magnesium_mg, nut.zinc_mg, nut.vitamin_a_ug, nut.vitamin_c_mg, coalesce(nut.vitamin_d_ug, nut.vitamin_d_iu / 40) AS vitamin_d_ug, nut.vitamin_b12_ug, nut.folate_ug, coalesce(nut.sugars_g, nut.sugars_nlea_g) AS sugars_g, nut.saturated_fat_g, nut.cholesterol_mg,
     portions.servings, 0 AS version_key, 0 AS updated_at,
-    nullif(trim(cat.description), '') AS category
+    nullif(trim(cat.description), '') AS category,
+    'g' AS basis
   FROM fd
   LEFT JOIN nut ON nut.source = fd.source AND nut.fdc_id = fd.fdc_id
   LEFT JOIN portions ON portions.source = fd.source AND portions.fdc_id = fd.fdc_id

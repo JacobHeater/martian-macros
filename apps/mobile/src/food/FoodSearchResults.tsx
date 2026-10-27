@@ -103,7 +103,7 @@ export function FoodSearchResults({ query, onPick, alsoFound = false }: FoodSear
             title={food.brand === undefined ? food.name : `${food.name} · ${food.brand}`}
             detail={
               <>
-                <span>{searchResultAmount(food.kcal, firstServing)}</span>
+                <span>{searchResultAmount(food.kcal, firstServing, food.basis)}</span>
                 <FoodTrustMark food={food} />
               </>
             }

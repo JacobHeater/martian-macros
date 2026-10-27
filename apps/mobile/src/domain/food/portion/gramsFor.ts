@@ -45,7 +45,11 @@ export function gramsFor(
     return undefined;
   }
   if (unit === 'serving') {
-    return servingGrams === undefined ? undefined : quantity * servingGrams;
+    if (servingGrams !== undefined) return quantity * servingGrams;
+    // A serving the source states only as a volume weighs through the food's own density (MM-650), never a guessed one.
+    const servingMl = reference.servingMilliliters;
+    const density = reference.densityGPerMl;
+    return servingMl === undefined || density === undefined ? undefined : quantity * servingMl * density;
   }
   return undefined;
 }

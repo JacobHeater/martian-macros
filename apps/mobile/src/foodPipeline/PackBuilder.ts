@@ -69,15 +69,18 @@ export class PackBuilder {
     for await (const c of candidates) {
       report.countRead(c.source);
       if (c.updatedAt > asOfSeconds) asOfSeconds = c.updatedAt;
-      const problem = checkNutrition({
-        name: c.name,
-        kcal: c.kcal,
-        proteinG: c.proteinG,
-        carbsG: c.carbsG,
-        fatG: c.fatG,
-        fiberG: c.fiberG,
-        alcoholG: c.alcoholG,
-      });
+      const problem = checkNutrition(
+        {
+          name: c.name,
+          kcal: c.kcal,
+          proteinG: c.proteinG,
+          carbsG: c.carbsG,
+          fatG: c.fatG,
+          fiberG: c.fiberG,
+          alcoholG: c.alcoholG,
+        },
+        { basis: c.basis },
+      );
       if (problem !== undefined) {
         report.countDropped(c.source, byName(DropReason.values, problem));
         continue;

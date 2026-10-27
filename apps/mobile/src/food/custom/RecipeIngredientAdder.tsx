@@ -13,9 +13,10 @@ import { MmSegmented } from '../../ui/MmSegmented';
 import { MmTextField } from '../../ui/MmTextField';
 import { weighedConsequence } from '../weighedConsequence';
 import { weighedStateLabel } from '../weighedStateLabel';
+import { per100Label } from '../../format/per100Label';
 import '../food.css';
 
-const per100g = (food: CatalogFood) => `${roundHalfAwayFromZero(food.kcal) + 0} kcal per 100 g`;
+const per100g = (food: CatalogFood) => `${roundHalfAwayFromZero(food.kcal) + 0} kcal ${per100Label(food.basis)}`;
 
 /**
  * Adds one line to a recipe (MM-45): a food found by search and a weight,

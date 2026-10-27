@@ -1,4 +1,5 @@
 import type { FoodGroup } from '../domain/food/FoodGroup';
+import type { CatalogBasis } from './CatalogBasis';
 import type { PackMicros } from './PackMicros';
 import type { PreparationState } from './PreparationState';
 import type { TrustTier } from './TrustTier';
@@ -25,15 +26,23 @@ interface CatalogFoodInit {
   densityGPerMl?: number | undefined;
   sourceId?: string | undefined;
   group?: FoodGroup | undefined;
+  basis?: CatalogBasis | undefined;
 }
 
-/** One food as a pack states it, per 100 g. */
+/**
+ * One food as a pack states it, per 100 g, or per 100 mL for a liquid whose
+ * source states it so (`basis`, MM-650). Every per-100 figure below is for
+ * that basis.
+ */
 export class CatalogFood {
   /** Unique within its pack. */
   readonly id: number;
   readonly packId: string;
   readonly name: string;
   readonly brand: string | undefined;
+
+  /** What the per-100 figures are for: 100 g, or 100 mL of a liquid (MM-650). Per 100 g in a pack older than format 5. */
+  readonly basis: CatalogBasis;
   readonly kcal: number;
   readonly proteinG: number;
   readonly carbsG: number;
@@ -94,5 +103,6 @@ export class CatalogFood {
     this.densityGPerMl = init.densityGPerMl;
     this.sourceId = init.sourceId;
     this.group = init.group;
+    this.basis = init.basis ?? 'per100g';
   }
 }

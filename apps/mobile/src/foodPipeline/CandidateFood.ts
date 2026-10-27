@@ -1,3 +1,4 @@
+import type { CatalogBasis } from '../foodCatalog/CatalogBasis';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
 import type { PackMicros } from '../foodCatalog/PackMicros';
 import type { FoodKind } from './FoodKind';
@@ -22,6 +23,7 @@ interface CandidateFoodInit {
   versionKey?: number;
   updatedAt?: number;
   category?: string | undefined;
+  basis?: CatalogBasis | undefined;
 }
 
 /**
@@ -45,12 +47,12 @@ export class CandidateFood {
   readonly carbsG: number | undefined;
   readonly fatG: number | undefined;
   readonly fiberG: number | undefined;
-  /** Sugar alcohols per 100 g, when the source states them (MM-397). */
+  /** Sugar alcohols per 100 of the basis, when the source states them (MM-397). */
   readonly sugarAlcoholsG: number | undefined;
   readonly sodiumMg: number | undefined;
   readonly alcoholG: number | undefined;
 
-  /** The micronutrients besides sodium the source states, per 100 g (MM-307). */
+  /** The micronutrients besides sodium the source states, per 100 of the basis (MM-307). */
   readonly micros: PackMicros;
   readonly servings: readonly CatalogServing[];
 
@@ -72,6 +74,13 @@ export class CandidateFood {
    */
   readonly category: string | undefined;
 
+  /**
+   * What the per-100 figures are for (MM-650): 100 g, or 100 mL for a liquid
+   * the source states so (a USDA Branded row served in mL, an Open Food Facts
+   * product whose serving is a number of millilitres).
+   */
+  readonly basis: CatalogBasis;
+
   constructor(init: CandidateFoodInit) {
     this.source = init.source;
     this.sourceId = init.sourceId;
@@ -92,5 +101,6 @@ export class CandidateFood {
     this.versionKey = init.versionKey ?? 0;
     this.updatedAt = init.updatedAt ?? 0;
     this.category = init.category;
+    this.basis = init.basis ?? 'per100g';
   }
 }

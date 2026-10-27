@@ -12,7 +12,10 @@ import { microsOfPackFood } from '../microsOfPackFood';
  */
 export function matchedMealItem(item: MealItemDraft, food: CatalogFood): MealItemDraft {
   const grams = item.grams ?? 0;
-  const factor = grams / 100;
+  // A food stated per 100 mL (MM-650) takes the assistant's grams as millilitres unless it has a density: those
+  // grams are themselves an estimate, and a drink's density is near 1.
+  const amount = food.basis === 'per100ml' ? grams / (food.densityGPerMl ?? 1) : grams;
+  const factor = amount / 100;
   const pack = microsOfPackFood(food);
   const micros: Partial<Record<Micronutrient, number>> = {};
   for (const n of Micronutrient.values) {

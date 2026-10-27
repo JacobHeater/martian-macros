@@ -14,8 +14,10 @@ import { handUnitsFor } from '../domain/food/hand/handUnitsFor';
 import { conversionFor } from '../domain/food/portion/conversionFor';
 import { convertedQuantity } from '../domain/food/portion/convertedQuantity';
 import { gramsFor } from '../domain/food/portion/gramsFor';
+import { millilitersFor } from '../domain/food/portion/millilitersFor';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import { parseQuantity } from '../domain/food/portion/parseQuantity';
+import { referenceAmounts } from '../domain/food/portion/referenceAmounts';
 import { PortionUnit } from '../domain/food/portion/PortionUnit';
 import type { ReferenceNutrition } from '../domain/food/portion/ReferenceNutrition';
 import { scaleNutrition } from '../domain/food/portion/scaleNutrition';
@@ -24,6 +26,7 @@ import { FoodEntry } from '../domain/FoodEntry';
 import { IntakeDay } from '../domain/IntakeDay';
 import type { Meal } from '../domain/Meal';
 import type { QuantitySource } from '../domain/QuantitySource';
+import type { CatalogBasis } from '../foodCatalog/CatalogBasis';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
 import type { CatalogServing } from '../foodCatalog/CatalogServing';
 import { cookingFatEntryName } from '../format/cookingFatEntryName';
@@ -93,22 +96,40 @@ interface FoodAmountStepProps {
 
 const n = (value: number) => `${roundHalfAwayFromZero(value) + 0}`;
 
-const defaultQuantity = (choice: AmountChoice) => (choice.unit === 'gram' ? '100' : choice.unit === 'ounce' ? '4' : '1');
+/** A unit's usual figure until the person types one: 100 g or mL, 4 oz, 8 fl oz (a cup), one of anything else (MM-651). */
+const defaultQuantity = (choice: AmountChoice) => {
+  switch (choice.unit) {
+    case 'gram':
+    case 'milliliter':
+      return '100';
+    case 'ounce':
+      return '4';
+    case 'fluidOunce':
+      return '8';
+    default:
+      return '1';
+  }
+};
 
 function handMethod(unit: PortionUnit): QuantitySource | undefined {
   if (unit === 'palm' || unit === 'cuppedHand' || unit === 'thumb') return unit;
   return undefined;
 }
 
-const choiceLabel = (choice: AmountChoice) => {
+const choiceLabel = (choice: AmountChoice, basis: CatalogBasis) => {
   const serving = choice.serving;
-  if (serving === undefined) return portionUnitChipLabel(choice.unit);
+  // Beside fluid ounces, the ounce is said to be the weight (the plan's §5.2; the UX guard's UX-1).
+  if (serving === undefined) return choice.unit === 'ounce' && basis === 'per100ml' ? 'Ounces (weight)' : portionUnitChipLabel(choice.unit);
   // A volume weighed through a serving is of that serving's form: "Tablespoons, chopped" (MM-636).
   if (choice.unit !== 'serving') {
     const form = servingForm(serving.description);
     return form === undefined ? portionUnitChipLabel(choice.unit) : `${portionUnitChipLabel(choice.unit)}, ${form}`;
   }
-  return serving.grams > 0 ? `${serving.description} (${n(serving.grams)} g)` : serving.description;
+  // The serving's amount in the food's basis, unless its own words state it: "1 can (355 mL)", "28 g" (MM-650).
+  const unit = basis === 'per100ml' ? 'mL' : 'g';
+  const amount = basis === 'per100ml' ? serving.milliliters : serving.grams;
+  const stated = new RegExp(String.raw`(?:^\d+(?:\.\d+)?\s*${unit}$|\(\s*\d+(?:[.,]\d+)?\s*${unit}\s*\))`, 'i').test(serving.description.trim());
+  return amount !== undefined && amount > 0 && !stated ? `${serving.description} (${n(amount)} ${unit})` : serving.description;
 };
 
 /**
@@ -140,6 +161,15 @@ export function FoodAmountStep({
   const usualFat = useLoaded(state.usualCookingFat) ?? 'oil';
 
   const [choices] = useState<readonly AmountChoice[]>(() => {
+    if (custom === undefined && chosen.basis === 'per100ml') {
+      // A drink stated per 100 mL (MM-650, MM-651): its servings, then every volume, exact; a weight only through
+      // a density; no hand portion, since a drink is poured, not held.
+      return [
+        ...servings.map((serving) => ({ unit: 'serving' as const, serving })),
+        ...(['fluidOunce', 'milliliter', 'cup', 'tablespoon', 'teaspoon'] as const).map((unit) => ({ unit, serving: undefined })),
+        ...(chosen.densityGPerMl === undefined ? [] : (['gram', 'ounce'] as const).map((unit) => ({ unit, serving: undefined }))),
+      ];
+    }
     if (custom === undefined) {
       // The portion the food suits comes first: a palm of chicken, a thumb of butter (MM-46).
       const makeup = new NutritionTotals({ kcal: chosen.kcal, proteinG: chosen.proteinG, carbsG: chosen.carbsG, fatG: chosen.fatG });
@@ -206,12 +236,13 @@ export function FoodAmountStep({
           servingUnit: 'serving',
         }
       : {
-          basis: 'per100g',
+          // Per 100 g, or per 100 mL for a drink the pack states so (MM-650).
+          basis: food.basis,
           nutrition: new NutritionTotals({ kcal: food.kcal, proteinG: food.proteinG, carbsG: food.carbsG, fatG: food.fatG }),
           servingDescription: c.serving?.description,
           servingGrams: c.serving?.grams,
-          // The serving's volume, read from its own words, so a volume can be weighed through it (MM-636).
-          servingMilliliters: c.serving === undefined ? undefined : servingVolume(c.serving.description),
+          // The serving's volume: the pack's millilitres (MM-650), or read from its words (MM-636), so a volume is measured through it.
+          servingMilliliters: c.serving === undefined ? undefined : (c.serving.milliliters ?? servingVolume(c.serving.description)),
           servingUnit: c.serving === undefined ? undefined : 'serving',
           densityGPerMl: food.densityGPerMl,
         };
@@ -221,6 +252,9 @@ export function FoodAmountStep({
   const amount = converted !== undefined && quantity === converted.shown ? converted.value : parseQuantity(quantity);
   const totals = amount === undefined ? undefined : scaleNutrition(amount, choice.unit, reference, { hand });
   const grams = amount === undefined ? undefined : gramsFor(amount, choice.unit, reference, { hand });
+  /** How many of the food's reference amounts (100 g, or 100 mL of a drink) were eaten: what every extra scales by (MM-650). */
+  const amounts = amount === undefined ? undefined : referenceAmounts(amount, choice.unit, reference, { hand });
+  const milliliters = amount === undefined || food.basis !== 'per100ml' ? undefined : millilitersFor(amount, choice.unit, reference);
   const isHand = PortionUnit.isHand(choice.unit);
 
   /**
@@ -237,9 +271,8 @@ export function FoodAmountStep({
     return packaged ? 'labelServing' : 'householdMeasure';
   };
 
-  /** A per-100 g nutrient for the grams eaten, or undefined when not known. */
-  const extra = (per100g: number | undefined) =>
-    per100g === undefined || grams === undefined ? undefined : (per100g * grams) / 100;
+  /** A per-100 nutrient for the amount eaten (grams, or millilitres of a drink, MM-650), or undefined when not known. */
+  const extra = (per100: number | undefined) => (per100 === undefined || amounts === undefined ? undefined : per100 * amounts);
 
   // Carbs net of the fiber and sugar alcohols the food states, for the amount chosen (MM-396).
   const netCarbs = useNetCarbs();
@@ -262,7 +295,7 @@ export function FoodAmountStep({
       sugarAlcoholsG: extra(food.sugarAlcoholsG),
       sodiumMg: extra(food.sodiumMg),
       alcoholG: extra(food.alcoholG),
-      micros: grams === undefined ? undefined : microsOfPackFood(food).times(grams / 100),
+      micros: amounts === undefined ? undefined : microsOfPackFood(food).times(amounts),
       portion: {
         method: method(),
         basis: 'calculated',
@@ -356,8 +389,7 @@ export function FoodAmountStep({
     }
   };
 
-  const note =
-    grams === undefined || custom !== undefined ? undefined : roundedToZeroNote(food, { description: 'amount', grams });
+  const note = custom !== undefined ? undefined : roundedToZeroNote(food, { description: 'amount', grams, milliliters });
   const invalid = quantity.trim() !== '' && amount === undefined;
   const oilTotals = offersOil ? CookingFat.totals(oil, fat) : undefined;
   const showsCarbsAndFat = DetailLevel.showsCarbsAndFat(level);
@@ -371,12 +403,15 @@ export function FoodAmountStep({
       ? ''
       : ` Plus ${cookingFatEntryName(fat).toLowerCase()} as its own entry: about ${n(oilTotals.kcal)} kcal${showsCarbsAndFat ? ` · ${n(oilTotals.fatG)} g fat` : ''}.`;
   const wholeGrams = grams === undefined ? undefined : quantityText(roundHalfAwayFromZero(grams) + 0);
+  const wholeMl = milliliters === undefined ? undefined : quantityText(roundHalfAwayFromZero(milliliters) + 0);
   let helper: string | undefined;
   if (reenter && quantity.trim() === '') helper = 'Enter how much again in this unit.';
   else if (invalid || amount === undefined) helper = 'An amount above zero is needed.';
   else if (converted !== undefined && quantity === converted.shown) helper = `Same amount as ${converted.from}.`;
   else if (isHand && wholeGrams !== undefined) helper = `About ${wholeGrams} g (estimated)`;
   else if ((choice.unit === 'serving' || PortionUnit.isVolume(choice.unit)) && wholeGrams !== undefined) helper = `${wholeGrams} g`;
+  // A drink stated per 100 mL with no density has no weight to say: its volume is said instead (MM-651).
+  else if (choice.unit !== 'milliliter' && wholeMl !== undefined) helper = `${wholeMl} mL`;
 
   // With the meal's list, the action logs every food of it with this one and its fat, counted as they are (MM-631).
   const inList = listed > 0 && onLogWithList !== undefined;
@@ -405,7 +440,7 @@ export function FoodAmountStep({
       )}
       <div className="app-row" role="group" aria-label="Amount in">
         {choices.map((c) => (
-          <MmChoiceChip key={choiceLabel(c)} label={choiceLabel(c)} selected={c === choice} onSelect={() => pick(c)} />
+          <MmChoiceChip key={choiceLabel(c, chosen.basis)} label={choiceLabel(c, chosen.basis)} selected={c === choice} onSelect={() => pick(c)} />
         ))}
       </div>
       {alternate !== undefined && PortionUnit.isWeight(choice.unit) ? (
@@ -491,6 +526,10 @@ export function FoodAmountStep({
         <p className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</p>
         {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
         <p className="app-caption food-reference-line">{referenceLine}</p>
+        {/* Why a drink has no Grams chip: its density is not known, and none is guessed (MM-167; the UX guard's UX-3). */}
+        {food.basis === 'per100ml' && food.densityGPerMl === undefined ? (
+          <p className="app-caption">No weight is offered: its density is not known, so grams would be a guess.</p>
+        ) : null}
         {/* The split needs all three macros; at Simple detail it is not drawn (MM-49), as on the hero. It is the food's own: the fat is its own entry (the panel's PD-2). */}
         {totals === undefined || !showsCarbsAndFat ? null : (
           <>

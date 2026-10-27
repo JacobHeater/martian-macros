@@ -152,7 +152,9 @@ function servingsOf(json: string): CatalogServing[] {
   if (!Array.isArray(parsed)) return [];
   return parsed.flatMap((item: unknown) => {
     if (typeof item !== 'object' || item === null) return [];
-    const { description, grams } = item as { description?: unknown; grams?: unknown };
-    return typeof description === 'string' && typeof grams === 'number' && grams > 0 ? [{ description, grams }] : [];
+    const { description, grams, milliliters } = item as { description?: unknown; grams?: unknown; milliliters?: unknown };
+    const g = typeof grams === 'number' && grams > 0 ? grams : undefined;
+    const ml = typeof milliliters === 'number' && milliliters > 0 ? milliliters : undefined;
+    return typeof description === 'string' && (g !== undefined || ml !== undefined) ? [{ description, grams: g, milliliters: ml }] : [];
   });
 }
