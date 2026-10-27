@@ -123,6 +123,7 @@ and WS-09 steps 1 and 8.
 19. **Search by match first (MM-627).** The owner, 2026-10-26 (D-3 in `docs/food-logging-plan.md`): the closest name first, reliability among names as close (superseding MM-383's order for search), each row's first serving, and the closest partial matches when every word finds nothing.
 20. **Portions, recents and whole meals (MM-628, MM-629, MM-630).** The food-logging plan's B1, B2 and B4 (2026-10-26): a unit change converts the same portion, recent foods say their amount with this meal's first, and a meal's ⋯ menu sets one time, meal or day for all its foods with Undo.
 21. **Several foods for one meal (MM-631).** The owner's first priority and D-1, D-2 (2026-10-26): foods added one after another to an "In this meal" list and logged together, as loose foods, at one meal and time; the sheet asks before it is left with them.
+22. **Copies said and undoable (MM-633).** The plan's B3 (2026-10-26): a copy says what was copied and where with Undo, is made once however often pressed, and a meal copies to any day from its menu.
 
 ## Done enough to unblock others
 MM-42 and MM-49 are done: a food chosen from the pack is stored with every
@@ -170,6 +171,7 @@ workstream's.
 - Added 2026-10-26 (step 19, the owner's D-3): MM-627 (search lists the closest name first, with each food's serving; done).
 - Added 2026-10-26 (step 20): MM-628 (a unit change keeps the portion), MM-629 (recent foods say their amount, this meal's first), MM-630 (a meal's menu changes all its foods' time, meal or day), MM-632 (the cup was a digit short), all done.
 - Added 2026-10-26 (step 21): MM-631 (several foods for one meal in one sitting; done).
+- Added 2026-10-26 (step 22): MM-633 (a copy says so with Undo, once, to any day; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

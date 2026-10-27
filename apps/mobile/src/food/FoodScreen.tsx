@@ -11,6 +11,7 @@ import { useLoaded } from '../app/useLoaded';
 import { MmButton } from '../ui/MmButton';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
+import { useOverlays } from '../ui/useOverlays';
 import { AlcoholLine } from './AlcoholLine';
 import { CalorieHero } from './CalorieHero';
 import { LabelAccuracyNote } from './LabelAccuracyNote';
@@ -46,6 +47,16 @@ export function FoodScreen() {
   const shapeLimits = useCell(state.targetShapeLimits);
   const setup = useLoaded(state.setup);
   const guide = useCell(state.maintenanceGuide);
+  const overlays = useOverlays();
+  /** Copies yesterday's food to the day shown and says so with Undo (MM-633); the button is pressed once (MM-624). */
+  const copyYesterday = async () => {
+    try {
+      const ids = await copyEntries(services.food, entriesCopiedTo(day, yesterday));
+      overlays.snack("Copied yesterday's food", { label: 'Undo', onAction: () => void services.food.applyFoodChanges({ delete: ids }) });
+    } catch {
+      overlays.snack("Yesterday's food could not be copied, so nothing was.");
+    }
+  };
 
   // Pauses that cannot be read take out only what they decide: the day is drawn without them (MM-334).
   const pausesFailed = pausesRead.failed;
@@ -93,7 +104,7 @@ export function FoodScreen() {
             kind="secondary"
             icon="copy"
             expand
-            onPress={() => void copyEntries(services.food, entriesCopiedTo(day, yesterday))}
+            onPress={() => copyYesterday()}
           />
         </div>
       ) : null}

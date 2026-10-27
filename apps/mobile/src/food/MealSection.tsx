@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { FoodEntryInsight } from '../coach/FoodEntryInsight';
 import { useInsightPreview } from '../coach/useInsightPreview';
 import { gradeOfFoodEntry } from '../engine/gradeOfFoodEntry';
@@ -39,7 +40,7 @@ import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
 /** What a slot's ⋯ menu does (MM-597, MM-630). */
-type SlotAction = 'split' | 'time' | 'meal' | 'day';
+type SlotAction = 'split' | 'time' | 'meal' | 'day' | 'copy';
 
 interface MealSectionProps {
   meal: Meal;
@@ -115,6 +116,9 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
     const count = entries.length === 1 ? 'its food' : `all ${entries.length} foods`;
     if (action === 'split') {
       void showMealSplitSheet(overlays, day, meal, entries);
+    } else if (action === 'copy') {
+      const picked = await overlays.date({ helpText: `Copy ${name} to`, initial: today, first: today.addDays(-365), last: today, today });
+      if (picked !== undefined) await copyTo(picked);
     } else if (action === 'time') {
       const times = new Set(entries.map((entry) => entry.eatenAt));
       const picked = await overlays.timeOfDay({
@@ -134,8 +138,33 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
       const picked = await overlays.date({ helpText: `Move ${name} to`, initial: day, first: day.addDays(-365), last: today, today });
       // A food moved to another day keeps its time eaten (the owner, 2026-10-26).
       if (picked !== undefined && picked.epochDay !== day.epochDay) {
-        await changeAll((entry) => entry.copyWith({ date: picked }), `Moved ${name} to ${Fmt.day(picked, today)}`);
+        await changeAll((entry) => entry.copyWith({ date: picked }), `Moved ${name} to ${dayInSentence(picked)}`);
       }
+    }
+  };
+
+  /** A day as it reads inside a sentence: "today", "yesterday", or its date as written. */
+  const dayInSentence = (to: CalendarDate) => {
+    const said = Fmt.day(to, today);
+    return to.epochDay >= today.epochDay - 1 ? said.toLowerCase() : said;
+  };
+  /** Whether a copy is being made, so a second press does not copy again (MM-633). */
+  const copying = useRef(false);
+  /** Copies the meal's foods to `to`, says so with Undo, once however often pressed (MM-633). */
+  const copyTo = async (to: CalendarDate) => {
+    if (copying.current) return;
+    copying.current = true;
+    const name = label.toLowerCase();
+    try {
+      const ids = await copyEntries(services.food, entriesCopiedTo(to, entries));
+      overlays.snack(`Copied ${name} to ${dayInSentence(to)}`, {
+        label: 'Undo',
+        onAction: () => void services.food.applyFoodChanges({ delete: ids }),
+      });
+    } catch {
+      overlays.snack(`${label} could not be copied, so nothing was.`);
+    } finally {
+      copying.current = false;
     }
   };
 
@@ -180,7 +209,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
             <MmIconButton
               icon="copy"
               label={`Copy ${label.toLowerCase()} to today`}
-              onPress={() => void copyEntries(services.food, entriesCopiedTo(today, entries))}
+              onPress={() => void copyTo(today)}
             />
           ) : null}
           <MmIconButton
@@ -198,6 +227,7 @@ export function MealSection({ meal, day, entries }: MealSectionProps) {
                 { value: 'time', label: 'Change time' },
                 { value: 'meal', label: 'Move to another meal' },
                 { value: 'day', label: 'Move to another day' },
+                { value: 'copy', label: 'Copy to another day' },
               ]}
               onSelect={(action) => void slotAction(action)}
             />
