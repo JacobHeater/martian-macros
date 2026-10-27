@@ -25,6 +25,7 @@ import { scaleNutrition } from '../domain/food/portion/scaleNutrition';
 import { unitsOffered } from '../domain/food/portion/unitsOffered';
 import { FoodEntry } from '../domain/FoodEntry';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import type { SavedMeal } from '../domain/food/meal/SavedMeal';
 import { IntakeDay } from '../domain/IntakeDay';
 import { timesLoggedAt } from '../domain/food/meal/timesLoggedAt';
 import { macrosMatchEnergy } from '../domain/macrosMatchEnergy';
@@ -63,6 +64,7 @@ import { EstimateMealStep } from './estimate/EstimateMealStep';
 import { AnalyzeMealStep } from './meal/AnalyzeMealStep';
 import { gradeOfLoggedMeal } from './meal/gradeOfLoggedMeal';
 import { RecentMealRow } from './meal/RecentMealRow';
+import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { relogMeal } from './meal/relogMeal';
 import { FoodAmountStep } from './FoodAmountStep';
 import { FoodGrade } from './FoodGrade';
@@ -311,6 +313,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const lastWeeks = useLoaded(state.foodBefore(firstDay)) ?? [];
   const [allRecents, setAllRecents] = useState(false);
   const customFoods = useLoaded(state.customFoods) ?? [];
+  const savedMeals = useLoaded(state.savedMeals) ?? [];
   // The form shows the fields for the chosen level and stores what it holds (MM-49).
   const level = useLoaded(state.detailLevel) ?? 'standard';
   const showsCarbsAndFat = DetailLevel.showsCarbsAndFat(level);
@@ -673,6 +676,33 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     onDone();
   };
 
+  /**
+   * Logs a saved meal (MM-645): its foods, loose, on the sheet's day at its meal and time, in one step; with
+   * foods in the meal's list, they join it instead.
+   */
+  const logSavedMeal = async (saved: SavedMeal) => {
+    const foods = saved.foods.map((food) => food.copyWith({ id: 0, date: day, meal, eatenAt, loggedMeal: undefined }));
+    if (listed.length > 0) {
+      addToList(foods);
+      return;
+    }
+    // Once, however often pressed while it is being logged (the UX guard's UX-2), as a recent meal is.
+    if (relogging.current) return;
+    relogging.current = true;
+    let ids: number[];
+    try {
+      ids = await services.food.applyFoodChanges({ add: foods });
+    } catch {
+      overlays.snack(`${saved.name} could not be logged, so nothing was.`);
+      return;
+    } finally {
+      relogging.current = false;
+    }
+    // One press logs it, so one press takes it back (the UX guard's UX-1).
+    overlays.snack(`Logged ${saved.name}`, { label: 'Undo', onAction: () => void services.food.applyFoodChanges({ delete: ids }) });
+    onDone();
+  };
+
   /** Adds the typed food to the meal's list (MM-631). */
   const addTypedToList = () => {
     const saved = toSave();
@@ -719,7 +749,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
       />
     );
   }
-  if (step.at === 'myFoods') return <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} onPick={pickCustom} />;
+  if (step.at === 'myFoods') {
+    return (
+      <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} onPick={pickCustom} onPickMeal={(m) => void logSavedMeal(m)} />
+    );
+  }
   if (step.at === 'estimating') {
     return (
       <EstimateMealStep
@@ -750,7 +784,11 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const query = search.trim();
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
   /** Whether the search found any of the person's own foods or anything in their log (MM-596, MM-637). */
-  const ownFound = customFoods.some((food) => matches(food.name)) || (fromLog?.foods.length ?? 0) > 0 || (fromLog?.meals.length ?? 0) > 0;
+  const ownFound =
+    customFoods.some((food) => matches(food.name)) ||
+    savedMeals.some((m) => matches(m.name)) ||
+    (fromLog?.foods.length ?? 0) > 0 ||
+    (fromLog?.meals.length ?? 0) > 0;
   // The recent foods and meals as one list, newest first (MM-587): a meal by its newest food. What is usual at
   // the meal being added to comes first, most often first (MM-639), then what was last logged at it (MM-629).
   const newestOf = (m: LoggedMeal) => Math.max(...m.items.map((item) => item.id));
@@ -1121,6 +1159,14 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           <Notice icon="warning" text={`The foods could not be logged, so none were. Press Log ${foodsText(listed.length)} to try again.`} />
         ) : null}
         <MmButton label={`Log ${foodsText(listed.length)}`} icon="check" expand onPress={() => logNow()} />
+        {/* Kept to log again from Saved, as it will be logged now (MM-645). */}
+        <MmButton
+          label="Save as a meal"
+          kind="text"
+          icon="history"
+          expand
+          onPress={() => showSaveMealSheet(overlays, listed.map((food) => food.copyWith({ meal, eatenAt })))}
+        />
         <div className="app-gap" />
       </>
     );
@@ -1183,6 +1229,17 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                     opens
                     onPress={() => pickCustom(food)}
                     trailingAction={gradeBeside(food.name)}
+                  />
+                ))}
+              {/* The meals saved to log again (MM-645). */}
+              {savedMeals
+                .filter((m) => matches(m.name))
+                .map((m) => (
+                  <MmListRow
+                    key={`saved-meal-${m.id}`}
+                    title={m.name}
+                    subtitle={`Your meal · logs ${m.foods.length === 1 ? '1 food' : `${m.foods.length} foods`} · ${Fmt.kcal(m.foods.reduce((sum, f) => sum + f.kcal, 0))}`}
+                    onPress={() => void logSavedMeal(m)}
                   />
                 ))}
               {/* Everything ever logged that matches, not only the recent (MM-596). */}
