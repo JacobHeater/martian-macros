@@ -178,6 +178,7 @@ independent of step 3.
 - Added 2026-10-28 (the owner; step 16): MM-676 (one paradigm on the Coach tab: the hero and the summary the only cards, every other section a fold with a line, in the owner's order, done).
 - Added 2026-10-28 (the owner, after a Q&A; step 16): MM-678 (the coach reads cardio and steps: C1 and C2 against floors of 8,000 steps a day and 150 minutes a week, changeable in Settings › Coach; a stall put down to moving less before the estimate; the lines drafted for the owner to read on the phone). Needs WS-10's MM-677.
 - Added 2026-10-28 (the owner; step 16): MM-681 (the coach was mute on training, cardio and steps in the brief, the model's words and on 1d; the brief carries a training block, the model is held to it, and the day's findings include the week's accountability).
+- Added 2026-10-28 (the owner; step 21): MM-682 (epic: AI meal analysis with tools, the Q&A's decisions and the approved lines), MM-683 (a biscuit swapped for a chicken fillet on the latest build: swaps within the food's group only), MM-684 (one deterministic move per meal, ranked by the day's gap, on the sheet, under the foods and in the brief), MM-685 (the coach's tools and the tool loop for Gemini, OpenAI and Anthropic; privacy text amended), MM-686 (the sheet and the brief ask with tools; "Answer now" after 3 s), MM-687 (the inline lines phrased in one pass a day).
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `nextTargets.ts`. Do not add branches

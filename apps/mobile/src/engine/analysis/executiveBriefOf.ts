@@ -3,16 +3,13 @@ import type { FoodEntry } from '../../domain/FoodEntry';
 import { CalorieBand } from '../CalorieBand';
 import type { ExecutiveBrief } from './ExecutiveBrief';
 import type { TrainingBrief } from './TrainingBrief';
-import { adviceFoodOf } from './food/adviceFoodOf';
 import { countsAsFood } from './food/countsAsFood';
 import type { FoodAnalysisInput } from './food/FoodAnalysisInput';
-import { foodGroupOf } from './food/foodGroupOf';
-import { foodKeyOf } from './food/foodKeyOf';
 import { foodLimitsOf } from './food/foodLimitsOf';
 import { FoodSignalRule } from './food/FoodSignalRule';
 import { mealBreakdownOf } from './food/mealBreakdownOf';
 import { recordOnOf } from './food/recordOnOf';
-import { swapFor } from './swap/swapFor';
+import { mealMovesOf } from './moves/mealMovesOf';
 
 const sum = (values: readonly number[]) => values.reduce((s, v) => s + v, 0);
 
@@ -82,37 +79,31 @@ export function executiveBriefOf(
 
     if (worstEntry !== undefined && worstEntry.kcal >= 150) {
       const history56 = input.entries.filter((e) => !e.date.isBefore(today.addDays(-FoodSignalRule.historyDays)) && e.date.isBefore(today));
-      const adviceFood = adviceFoodOf(worstEntry.name, [worstEntry]);
-      const swap = swapFor({
-        food: { ...adviceFood, carbsG: worstEntry.carbsG },
-        group: foodGroupOf(foodKeyOf(worstEntry), [worstEntry], input.catalog),
-        meal: worstEntry.meal,
+      const meal = breakdown?.meal ?? worstEntry.meal;
+      // The meal's own fix for next time (MM-684): the first of its moves that is not today's order.
+      const move = mealMovesOf({
+        meal,
+        mealEntries: todayEntries.filter((e) => e.meal === meal),
+        dayEntries: todayEntries,
+        dailyKcalTarget: kcalTarget,
+        dailyProteinTargetG: proteinTargetG,
         goal: record.mode,
         history: [...history56, worstEntry],
         catalog: input.catalog,
         safeguards: input.safeguards,
         cautions: input.safeguards.cautions,
-      });
+        snoozed: input.snoozed,
+      }).moves.find((m) => m.kind !== 'nextMeal');
       const overKcal = Math.max(0, kcalLogged - kcalTarget);
       primaryDriver = {
-        meal: breakdown?.meal ?? worstEntry.meal,
+        meal,
         mealName: breakdown?.name ?? worstEntry.loggedMeal?.name.trim(),
         foodName: worstEntry.name.trim(),
         kcal: worstEntry.kcal,
         proteinG: worstEntry.proteinG,
         fatG: worstEntry.fatG,
         ...(overKcal > 0 ? { withoutKcalOver: overKcal - worstEntry.kcal } : {}),
-        ...(swap === undefined
-          ? {}
-          : {
-              replacement: {
-                name: swap.name,
-                kcal: swap.kcal,
-                proteinG: swap.proteinG,
-                caloriesSaved: Math.max(0, worstEntry.kcal - (swap.kcal ?? worstEntry.kcal)),
-                proteinGained: Math.max(0, (swap.proteinG ?? worstEntry.proteinG) - worstEntry.proteinG),
-              },
-            }),
+        ...(move === undefined ? {} : { move }),
       };
     }
   }
@@ -164,7 +155,7 @@ export function executiveBriefOf(
     Math.round(proteinTargetG),
     Math.round(proteinLoggedG),
     primaryDriver?.foodName ?? '',
-    primaryDriver?.replacement?.name ?? '',
+    primaryDriver?.move?.kind ?? '',
     loggedDays,
     calorieAdherenceDays,
     proteinFloorHitDays,

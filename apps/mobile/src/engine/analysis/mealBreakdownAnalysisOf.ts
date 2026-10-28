@@ -4,21 +4,17 @@ import type { FoodEntry } from '../../domain/FoodEntry';
 import type { GoalMode } from '../../domain/GoalMode';
 import type { Meal } from '../../domain/Meal';
 import type { InsightSafeguards } from '../InsightSafeguards';
-import { adviceFoodOf } from './food/adviceFoodOf';
-import { countsAsFood } from './food/countsAsFood';
-import { foodGroupOf } from './food/foodGroupOf';
-import { foodKeyOf } from './food/foodKeyOf';
 import { foodLimitsOf } from './food/foodLimitsOf';
-import { isSameFoodName } from './food/isSameFoodName';
 import type { MealBreakdownAnalysis } from './MealBreakdownAnalysis';
-import { swapFor } from './swap/swapFor';
+import { mealMovesOf } from './moves/mealMovesOf';
 import type { TradeCatalog } from './TradeCatalog';
 
 const sum = (values: readonly number[]) => values.reduce((s, v) => s + v, 0);
 
 /**
  * Computes the deterministic on-demand `MealBreakdownAnalysis` for `mealEntries`
- * within `dayEntries` against the day's calorie and protein targets (MM-663).
+ * within `dayEntries` against the day's calorie and protein targets (MM-663),
+ * with the meal's moves and the one the coach orders (`mealMovesOf`, MM-684).
  */
 export function mealBreakdownAnalysisOf(input: {
   readonly meal: Meal;
@@ -36,6 +32,7 @@ export function mealBreakdownAnalysisOf(input: {
   readonly safeguards?: InsightSafeguards | undefined;
   readonly protectedPath?: boolean | undefined;
   readonly cautions?: ReadonlySet<Caution> | undefined;
+  readonly snoozed?: ReadonlySet<string> | undefined;
 }): MealBreakdownAnalysis {
   const defaultSafeguards: InsightSafeguards = {
     adult: true,
@@ -52,7 +49,7 @@ export function mealBreakdownAnalysisOf(input: {
   const dailyKcalTarget = input.dailyKcalTarget ?? input.kcalTarget ?? 0;
   const dailyProteinTargetG = input.dailyProteinTargetG ?? input.proteinTargetG ?? 0;
   const goal: GoalMode = input.goal ?? 'fatLoss';
-  const rawHistory = input.history ?? input.candidates ?? [];
+  const history = input.history ?? input.candidates ?? [];
 
   const mealKcal = sum(input.mealEntries.map((e) => e.kcal));
   const mealProteinG = sum(input.mealEntries.map((e) => e.proteinG));
@@ -74,55 +71,28 @@ export function mealBreakdownAnalysisOf(input: {
   const proteinUnrecoverable =
     !protectedPath && !limits.noMoreProtein && kcalRemaining >= 0 && proteinRemainingG > 0 && minKcalForProtein > kcalRemaining;
 
-  const countable = input.mealEntries.filter((e) => countsAsFood(e) && e.kcal > 0);
-  const densityOf = (e: FoodEntry) => (e.kcal > 0 ? (e.proteinG * 4) / e.kcal : 0);
-  const unbackedOf = (e: FoodEntry) => e.kcal - (targetProteinDensity > 0 ? (e.proteinG * 4) / targetProteinDensity : 0);
-
-  // Rank by lowest protein density and highest unbacked calorie displacement.
-  const sorted = [...countable].sort((a, b) => unbackedOf(b) - unbackedOf(a) || densityOf(a) - densityOf(b));
-  const worst = !protectedPath ? sorted[0] : undefined;
-
-  let outlierItem: MealBreakdownAnalysis['outlierItem'];
-  let suggestedSwap: MealBreakdownAnalysis['suggestedSwap'];
-
-  if (worst !== undefined) {
-    outlierItem = {
-      name: worst.name.trim(),
-      kcal: worst.kcal,
-      proteinG: worst.proteinG,
-      fatG: worst.fatG,
-      proteinDensity: densityOf(worst),
-    };
-    const adviceFood = adviceFoodOf(worst.name, [worst]);
-    // What is already on the plate is no swap for what else is on it (the owner, 2026-10-28: the chicken fillet
-    // offered in place of the biscuit beside it, MM-674): only the food itself stays among the candidates.
-    const onThePlate = input.mealEntries.filter((e) => e !== worst && foodKeyOf(e) !== foodKeyOf(worst));
-    const offThePlate = (e: FoodEntry) => !onThePlate.some((plated) => isSameFoodName(plated.name, e.name));
-    const candidates = rawHistory.filter((e) => foodKeyOf(e) === foodKeyOf(worst) || offThePlate(e));
-    const history = candidates.includes(worst) ? candidates : [...candidates, worst];
-    const found = swapFor({
-      food: { ...adviceFood, carbsG: worst.carbsG },
-      group: foodGroupOf(foodKeyOf(worst), [worst], input.catalog),
-      meal: input.meal,
-      goal,
-      history,
-      catalog: input.catalog,
-      safeguards,
-      cautions: input.cautions ?? safeguards.cautions,
-    });
-    // A catalog or table swap can still name a food on the plate, under its own spelling.
-    const swap = found !== undefined && onThePlate.some((plated) => isSameFoodName(plated.name, found.name)) ? undefined : found;
-    if (swap !== undefined) {
-      suggestedSwap = {
-        originalName: worst.name.trim(),
-        replacementName: swap.name,
-        replacementKcal: swap.kcal,
-        replacementProteinG: swap.proteinG,
-        caloriesSaved: Math.max(0, worst.kcal - (swap.kcal ?? worst.kcal)),
-        proteinGained: Math.max(0, (swap.proteinG ?? worst.proteinG) - worst.proteinG),
-      };
-    }
-  }
+  const moves = protectedPath
+    ? { outlier: undefined, moves: [], best: undefined }
+    : mealMovesOf({
+        meal: input.meal,
+        mealEntries: input.mealEntries,
+        dayEntries: input.dayEntries,
+        dailyKcalTarget,
+        dailyProteinTargetG,
+        goal,
+        history,
+        catalog: input.catalog,
+        safeguards,
+        cautions: input.cautions ?? safeguards.cautions,
+        snoozed: input.snoozed,
+      });
+  const outlier = moves.outlier;
+  const outlierItem =
+    outlier === undefined
+      ? undefined
+      : { name: outlier.name, kcal: outlier.kcal, proteinG: outlier.proteinG, fatG: outlier.fatG ?? 0, proteinDensity: outlier.proteinDensity };
+  const best = moves.best;
+  const bestName = best === undefined ? '' : best.kind === 'nextMeal' ? (best.food?.name ?? '') : best.kind === 'addProtein' ? best.added.name : best.kind === 'swapSameGroup' ? best.replacement.name : '';
 
   const analysisHash = [
     day.toString(),
@@ -133,7 +103,8 @@ export function mealBreakdownAnalysisOf(input: {
     Math.round(kcalRemaining),
     Math.round(proteinRemainingG),
     outlierItem?.name ?? '',
-    suggestedSwap?.replacementName ?? '',
+    best?.kind ?? '',
+    bestName,
   ].join(':');
 
   return {
@@ -154,6 +125,6 @@ export function mealBreakdownAnalysisOf(input: {
     proteinUnrecoverable,
     analysisHash,
     ...(outlierItem === undefined ? {} : { outlierItem }),
-    ...(suggestedSwap === undefined ? {} : { suggestedSwap }),
+    moves,
   };
 }

@@ -1,5 +1,6 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { Meal } from '../../domain/Meal';
+import type { MealMove } from './moves/MealMove';
 import type { TrainingBrief } from './TrainingBrief';
 
 /**
@@ -46,15 +47,8 @@ export interface ExecutiveBrief {
         readonly proteinG: number;
         readonly fatG: number;
         readonly withoutKcalOver?: number | undefined;
-        readonly replacement?:
-          | {
-              readonly name: string;
-              readonly kcal?: number | undefined;
-              readonly proteinG?: number | undefined;
-              readonly caloriesSaved: number;
-              readonly proteinGained: number;
-            }
-          | undefined;
+        /** The meal's own fix for next time (MM-684): a same-group swap, a protein food added, or a cut; none when nothing qualifies. */
+        readonly move?: MealMove | undefined;
       }
     | undefined;
   /** 7-day strategic accountability summary (energy balance, protein floor hits, consistency). */

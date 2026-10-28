@@ -158,6 +158,7 @@ import { currentValueOf } from '../lang/currentValueOf';
 import type { AppServices } from './AppServices';
 import type { Cell } from './Cell';
 import { CheckIn } from './CheckIn';
+import { AppCoachToolbox } from './AppCoachToolbox';
 import { CoachAnalysis } from './CoachAnalysis';
 import { DerivedCell } from './DerivedCell';
 import type { HealthConnection } from './HealthConnection';
@@ -250,6 +251,9 @@ export class AppState {
 
   /** "What your data says" on the Coach tab (MM-610): the span chosen, the spans offered, and the findings. */
   readonly coachAnalysis: CoachAnalysis;
+
+  /** The tools the coach's model may call (MM-685), answered from the state and the engine. */
+  readonly coachToolbox: AppCoachToolbox;
 
   /** The weigh-ins the user typed, and nothing imported. */
   readonly typedWeights: Cell<Loadable<WeightObservation[]>>;
@@ -1468,6 +1472,11 @@ export class AppState {
 
     this.checkIn = this.makeCheckIn();
     this.coachAnalysis = this.makeCoachAnalysis();
+    this.coachToolbox = new AppCoachToolbox({
+      foodInput: () => this.coachAnalysis.foodInput.peek(),
+      brief: () => this.coachAnalysis.executiveBrief.peek(),
+      catalog: () => Loadable.valueOf(this.foodCatalog.peek()),
+    });
   }
 
   /** Reads again which packs are installed, and the catalog made of them. */

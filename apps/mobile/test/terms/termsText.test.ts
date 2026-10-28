@@ -35,6 +35,12 @@ describe('the full terms', () => {
     expect(full).toContain('We do not promise that you will lose fat, gain muscle or reach any weight in any time.');
   });
 
+  // MM-685: the coach's tools, with a key, send more than the summary figures.
+  it('say that with a key the model may ask the app for more, and what goes to the provider', () => {
+    expect(full).toContain('the model may ask the app for more, and the app answers from your data on the phone');
+    expect(full).toContain('food database lookups');
+  });
+
   it('say only what the app does with records, and nothing absolute it cannot keep to', () => {
     expect(full).toContain('The app does not send your records anywhere.');
     // The scanner is Google's, and Google says it reports on itself: no "nothing ever leaves this phone".

@@ -3,6 +3,7 @@ import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { Fmt } from '../Fmt';
 import { mealLabel } from '../mealLabel';
 import { foodInSentence } from './foodInSentence';
+import { mealMoveOrder } from './mealMoveOrder';
 import { phrasingIndex } from './phrasingIndex';
 import { trainingBriefText } from './trainingBriefText';
 
@@ -48,12 +49,11 @@ function foodBriefText(brief: ExecutiveBrief): string {
   }
 
   const driver = brief.primaryDriver;
+  // The drag named with its figures and the meal's own fix for next time (MM-684).
   const driverClause =
     driver === undefined
       ? ''
-      : driver.replacement !== undefined
-        ? ` ${mealLabel(driver.meal)} drove the squeeze (${foodInSentence(driver.foodName)}, ${Fmt.kcal(driver.kcal)}); swap it for ${driver.replacement.name} next time.`
-        : ` ${mealLabel(driver.meal)} drove the squeeze (${foodInSentence(driver.foodName)}, ${Fmt.kcal(driver.kcal)}).`;
+      : ` ${mealLabel(driver.meal)} drove the squeeze: ${foodInSentence(driver.foodName)}, ${Fmt.kcal(driver.kcal)} for ${Fmt.grams(driver.proteinG)}.${driver.move === undefined ? '' : ` ${mealMoveOrder(driver.move, driver.meal)}`}`;
 
   switch (brief.runwayState) {
     case 'proteinUnrecoverable': {

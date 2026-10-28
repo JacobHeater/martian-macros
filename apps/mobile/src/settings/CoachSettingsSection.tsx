@@ -91,7 +91,8 @@ export function CoachSettingsSection() {
     try {
       const trimmed = keyDraft.trim();
       if (trimmed !== aiConfig.apiKey) await services.coachAi.saveConfig({ provider: aiConfig.provider, apiKey: trimmed });
-      setTested(await services.coachNarrator.probe(executiveBriefNarrationRequest(brief), { fresh: true }));
+      // Asked with the day's tools (MM-685), so the test exercises the loop the Coach tab runs.
+      setTested(await services.coachNarrator.probe(executiveBriefNarrationRequest(brief, state.coachToolbox.forDay(state.today.peek())), { fresh: true }));
     } finally {
       setTesting(false);
     }

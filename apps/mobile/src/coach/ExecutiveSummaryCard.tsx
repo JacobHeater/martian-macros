@@ -1,10 +1,9 @@
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { executiveBriefNarrationRequest } from '../format/coach/executiveBriefNarrationRequest';
-import { coachAnalysisWords } from '../format/coachAnalysisWords';
 import { Fmt } from '../format/Fmt';
 import { minutesText } from '../format/minutesText';
-import { MmBusyLine } from '../ui/MmBusyLine';
+import { CoachWritingLine } from './CoachWritingLine';
 import { MmSection } from '../ui/MmSection';
 import { StatRow } from '../ui/StatRow';
 import { useCoachNarration } from '../app/useCoachNarration';
@@ -22,7 +21,9 @@ export function ExecutiveSummaryCard() {
   const { state } = useApp();
   const brief = useCell(state.coachAnalysis.executiveBrief);
   // The wait is shown while the person's own model writes; the built-in words only once it failed (MM-673).
-  const narration = useCoachNarration(brief === undefined ? undefined : executiveBriefNarrationRequest(brief));
+  const today = useCell(state.today);
+  // Asked with the day's tools (MM-685); the wait can be cut short with "Answer now" (MM-686).
+  const narration = useCoachNarration(brief === undefined ? undefined : executiveBriefNarrationRequest(brief, state.coachToolbox.forDay(today)));
 
   if (brief === undefined) return null;
   const training = brief.training;
@@ -51,7 +52,7 @@ export function ExecutiveSummaryCard() {
   return (
     <MmSection framed icon="coach" title="Executive summary">
       {narration.waiting || narration.text === undefined ? (
-        <MmBusyLine label={coachAnalysisWords.writing} />
+        <CoachWritingLine onAnswerNow={narration.answerNow} />
       ) : (
         <p className="app-text">{narration.text}</p>
       )}
