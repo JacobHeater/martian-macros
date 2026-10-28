@@ -32,10 +32,11 @@ describe('a meal’s suggested swap', () => {
       protectedPath: false,
     });
     expect(analysis.outlierItem?.name).toBe('Biscuit, home recipe');
-    const swap = analysis.suggestedSwap;
-    if (swap !== undefined) {
-      expect(isSameFoodName(swap.replacementName, fillet), swap.replacementName).toBe(false);
-      expect(isSameFoodName(swap.replacementName, 'LARGE EGGS'), swap.replacementName).toBe(false);
+    for (const move of analysis.moves.moves) {
+      const named = move.kind === 'swapSameGroup' ? move.replacement.name : move.kind === 'addProtein' ? move.added.name : move.kind === 'nextMeal' ? move.food?.name : undefined;
+      if (named === undefined) continue;
+      expect(isSameFoodName(named, fillet), named).toBe(false);
+      expect(isSameFoodName(named, 'LARGE EGGS'), named).toBe(false);
     }
   });
 

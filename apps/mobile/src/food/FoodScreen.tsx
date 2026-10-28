@@ -14,6 +14,7 @@ import { MmButton } from '../ui/MmButton';
 import { ReadFailedNotice } from '../ui/ReadFailedNotice';
 import { ScreenLoading } from '../ui/ScreenLoading';
 import { useOverlays } from '../ui/useOverlays';
+import { InlineNarrationProvider } from '../coach/InlineNarrationProvider';
 import { AlcoholLine } from './AlcoholLine';
 import { CalorieHero } from './CalorieHero';
 import { LabelAccuracyNote } from './LabelAccuracyNote';
@@ -186,17 +187,20 @@ export function FoodScreen() {
           />
         </div>
       ) : null}
-      {Meal.values.map((meal) => (
-        <MealSection
-          key={meal}
-          meal={meal}
-          day={day}
-          entries={entries.filter((e) => e.meal === meal)}
-          selection={selected === undefined ? undefined : { selected, toggle }}
-          onStartSelection={startChoosing}
-          focusKey={focusKey}
-        />
-      ))}
+      {/* The lines under the foods in the model's words, asked once for the day (MM-687). */}
+      <InlineNarrationProvider day={day}>
+        {Meal.values.map((meal) => (
+          <MealSection
+            key={meal}
+            meal={meal}
+            day={day}
+            entries={entries.filter((e) => e.meal === meal)}
+            selection={selected === undefined ? undefined : { selected, toggle }}
+            onStartSelection={startChoosing}
+            focusKey={focusKey}
+          />
+        ))}
+      </InlineNarrationProvider>
       <WaterSection day={day} />
       {/* The day's rows: completeness and its grade once anything is logged; its Refeed or Day off for any day up to
           today, with or without entries (MM-611, MM-655: a day off may have nothing logged). */}

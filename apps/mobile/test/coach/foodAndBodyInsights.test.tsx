@@ -64,8 +64,8 @@ it('says under a logged food what the coach noticed, with the numbers behind it'
   await servings('lunch', 'Garlic bread', 4, 350);
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByText(/^Most of this food’s calories come from fat \(76%\)/)).toBeInTheDocument();
-  expect(screen.getByText(/^14 g of protein in 640 kcal/)).toBeInTheDocument();
+  expect(await screen.findByText(/^Mostly fat: \d+ kcal, 76% from fat\./)).toBeInTheDocument();
+  expect(screen.getByText(/^Light on protein: 640 kcal for 14 g\./)).toBeInTheDocument();
   expect(screen.getByText(/^Logged as 4 servings \(350 kcal\); one serving is 30 g/)).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: /^Coach: 14 g of protein/ }));
   expect(screen.getByText('Your protein minimum')).toBeInTheDocument();
@@ -79,8 +79,8 @@ it('with an eating-disorder history, only the protein line shows', async () => {
   await servings('lunch', 'Garlic bread', 4, 350);
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByText(/^14 g of protein in 640 kcal/)).toBeInTheDocument();
-  expect(screen.queryByText(/^Most of this food/)).toBeNull();
+  expect(await screen.findByText(/^Light on protein: 640 kcal for 14 g\./)).toBeInTheDocument();
+  expect(screen.queryByText(/^Mostly fat:/)).toBeNull();
   expect(screen.queryByText(/^Logged as/)).toBeNull();
 });
 
@@ -90,7 +90,7 @@ it('with kidney disease, no protein line: the minimum is a ceiling there', async
   await add('snack', 'Peanut butter', 190, 7, 7, 16);
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByText(/^Most of this food/)).toBeInTheDocument();
+  expect(await screen.findByText(/^Mostly fat:/)).toBeInTheDocument();
   expect(screen.queryByText(/^14 g of protein/)).toBeNull();
 });
 
@@ -140,7 +140,7 @@ it('a food that two rules hold on shows both lines under it, the higher priority
   renderApp(repos, today);
   await openTab('Food');
   const portion = await screen.findByRole('button', { name: /^Coach: Logged as 3 servings \(780 kcal\)/ });
-  const protein = screen.getByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ });
+  const protein = screen.getByRole('button', { name: /^Coach: Light on protein: 780 kcal for 12 g/ });
   expect(portion.compareDocumentPosition(protein) & Node.DOCUMENT_POSITION_FOLLOWING, 'the portion check comes first').toBeTruthy();
   expect(portion.closest('.mm-swipe'), 'both lines sit under the one entry').toBe(protein.closest('.mm-swipe'));
 });
@@ -150,7 +150,7 @@ it('snoozing one of two lines under a food leaves the other (MM-393, MM-378)', a
   await repos.insightSnoozes.saveInsightSnooze({ kind: 'portionCheck', subject: 'Biscuits', item: 'Biscuits, breakfast', resumesOn: undefined });
   renderApp(repos, today);
   await openTab('Food');
-  expect(await screen.findByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: /^Coach: Light on protein: 780 kcal for 12 g/ })).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: /^Coach: Logged as/ })).toBeNull();
 });
 
@@ -159,7 +159,7 @@ it('snoozing the second of two lines puts the focus on the first', async () => {
   await biscuits();
   renderApp(repos, today);
   await openTab('Food');
-  const protein = await screen.findByRole('button', { name: /^Coach: 12 g of protein in 780 kcal/ });
+  const protein = await screen.findByRole('button', { name: /^Coach: Light on protein: 780 kcal for 12 g/ });
   await userEvent.click(protein);
   await userEvent.click(screen.getByRole('button', { name: /^Snooze… Light on protein for Biscuits/ }));
   const dialog = await screen.findByRole('dialog', { name: /^Snooze “Light on protein” for Biscuits/ });

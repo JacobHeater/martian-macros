@@ -1,9 +1,11 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { Meal } from '../../domain/Meal';
+import type { MealMoves } from './moves/MealMoves';
 
 /**
  * Deterministic meal-level breakdown for the Food tab's on-demand
- * "Coach breakdown" sheet (MM-663, MM-666).
+ * "Coach breakdown" sheet (MM-663, MM-666), with the meal's moves and the
+ * one the coach orders (MM-684).
  */
 export interface MealBreakdownAnalysis {
   readonly meal: Meal;
@@ -27,7 +29,7 @@ export interface MealBreakdownAnalysis {
   readonly requiredRestOfDayDensity: number;
   /** True when `proteinRemainingG * 4 > kcalRemaining` (and `kcalRemaining >= 0`). */
   readonly proteinUnrecoverable: boolean;
-  /** Stable cache hash of the meal breakdown inputs and swap outcome. */
+  /** Stable cache hash of the meal breakdown inputs and the move. */
   readonly analysisHash: string;
   /** The single item in the meal contributing the most unbacked calories for the least protein. */
   readonly outlierItem?:
@@ -39,15 +41,6 @@ export interface MealBreakdownAnalysis {
         readonly proteinDensity: number;
       }
     | undefined;
-  /** Deterministic higher-efficiency substitution for `outlierItem`, when one qualifies. */
-  readonly suggestedSwap?:
-    | {
-        readonly originalName: string;
-        readonly replacementName: string;
-        readonly replacementKcal?: number | undefined;
-        readonly replacementProteinG?: number | undefined;
-        readonly caloriesSaved: number;
-        readonly proteinGained: number;
-      }
-    | undefined;
+  /** The meal's moves, ranked by the day's gap, and the one ordered (MM-684). */
+  readonly moves: MealMoves;
 }

@@ -7,9 +7,9 @@ import type { Meal } from '../domain/Meal';
 import type { MealBreakdownAnalysis } from '../engine/analysis/MealBreakdownAnalysis';
 import { mealBreakdownAnalysisOf } from '../engine/analysis/mealBreakdownAnalysisOf';
 import { mealBreakdownNarrationRequest } from '../format/coach/mealBreakdownNarrationRequest';
-import { coachAnalysisWords } from '../format/coachAnalysisWords';
+import { mealMoveRow } from '../format/coach/mealMoveRow';
 import { useCoachNarration } from '../app/useCoachNarration';
-import { MmBusyLine } from '../ui/MmBusyLine';
+import { CoachWritingLine } from '../coach/CoachWritingLine';
 import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
@@ -79,20 +79,10 @@ function buildRows(analysis: MealBreakdownAnalysis): readonly BreakdownRow[] {
     ]);
   }
 
-  if (analysis.suggestedSwap !== undefined) {
-    const swap = analysis.suggestedSwap;
-    const deltas: string[] = [];
-    if (swap.caloriesSaved > 0) deltas.push(`−${Fmt.kcal(swap.caloriesSaved)}`);
-    if (swap.proteinGained > 0) deltas.push(`+${Fmt.grams(swap.proteinGained)} protein`);
-    const trailing =
-      deltas.length > 0
-        ? deltas.join(' · ')
-        : `${Fmt.kcal(swap.replacementKcal ?? 0)} · ${Fmt.grams(swap.replacementProteinG ?? 0)} protein`;
-    rows.push([
-      'Suggested swap',
-      `${swap.replacementName} in place of ${swap.originalName}`,
-      trailing,
-    ]);
+  // The one move the coach orders (MM-684), in a few words with its figures.
+  if (analysis.moves.best !== undefined) {
+    const row = mealMoveRow(analysis.moves.best);
+    rows.push(['Your move', row.subtitle, row.trailing]);
   }
 
   return rows;
@@ -101,8 +91,8 @@ function buildRows(analysis: MealBreakdownAnalysis): readonly BreakdownRow[] {
 /**
  * On-demand coaching breakdown for a meal slot (MM-666): tactical runway
  * impact, protein density ($P\%$), the highest-calorie low-protein outlier item,
- * a deterministic swap from the user's foods or installed catalog, and the
- * coaching narration (offline archetype or BYOK model).
+ * the one move the coach orders (MM-684), and the coaching narration
+ * (offline archetype or BYOK model).
  */
 export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetProps) {
   const { state } = useApp();
@@ -125,10 +115,12 @@ export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetPro
     kcalTarget,
     proteinTargetG,
     protectedPath,
+    snoozed: foodInput?.snoozed,
   });
 
-  // The wait is shown while the person's own model writes; the archetype only once it failed (MM-673).
-  const narration = useCoachNarration(mealBreakdownNarrationRequest(analysis));
+  // The wait is shown while the person's own model writes; the archetype only once it failed (MM-673). The model is
+  // asked with the meal's tools (MM-685), and the wait can be cut short with "Answer now" (MM-686).
+  const narration = useCoachNarration(mealBreakdownNarrationRequest(analysis, state.coachToolbox.forMeal(day, meal)));
 
   const rows = buildRows(analysis);
 
@@ -136,7 +128,7 @@ export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetPro
     <div className="food-sheet">
       <h2 className="app-headline">{mealLabel(meal)}</h2>
       <p className="food-label">Coach breakdown</p>
-      {narration.text === undefined ? <MmBusyLine label={coachAnalysisWords.writing} /> : <p className="app-body">{narration.text}</p>}
+      {narration.text === undefined ? <CoachWritingLine onAnswerNow={narration.answerNow} /> : <p className="app-body">{narration.text}</p>}
       <MmListGroup>
         {rows.map(([title, subtitle, trailing]) => (
           <MmListRow key={title} title={title} subtitle={subtitle} trailing={trailing} />

@@ -32,9 +32,8 @@ export function itemInsightText(insight: ItemInsight, fmt: Fmt): { line: string;
   switch (insight.kind) {
     case 'mostlyFat':
       return {
-        line:
-          `Most of this food’s calories come from fat (${percent(figure('fatShare'))}). ` +
-          'A protein food alongside balances the meal.',
+        // The approved shape (MM-682, MM-684): the fact, then the order; a move of the food's own replaces the order (MM-687).
+        line: `Mostly fat: ${whole(figure('kcal'))} kcal, ${percent(figure('fatShare'))} from fat. A protein food alongside next time.`,
         evidence: [
           ['Fat', `${whole(figure('fatG'))} g, ${percent(figure('fatShare'))} of calories`],
           ['Protein', `${whole(figure('proteinG'))} g`],
@@ -43,7 +42,7 @@ export function itemInsightText(insight: ItemInsight, fmt: Fmt): { line: string;
       };
     case 'lightOnProtein':
       return {
-        line: `${whole(figure('proteinG'))} g of protein in ${whole(figure('kcal'))} kcal. A protein food alongside is the easiest way to add some.`,
+        line: `Light on protein: ${whole(figure('kcal'))} kcal for ${whole(figure('proteinG'))} g. A protein food alongside next time.`,
         evidence: [
           ['Protein', `${whole(figure('proteinG'))} g, ${percent(figure('proteinG') * 4 / Math.max(1, figure('kcal')))} of calories`],
           ['Calories', whole(figure('kcal'))],

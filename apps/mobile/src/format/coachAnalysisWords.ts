@@ -17,5 +17,7 @@ export const coachAnalysisWords = {
   openOnCoach: 'Open on Coach',
   /** While the person's own model writes the words (MM-673). */
   writing: 'The coach is writing…',
+  /** The way out of the wait after three seconds (MM-686): the built-in words at once. */
+  answerNow: 'Answer now',
   dismiss: 'Dismiss',
 } as const;
