@@ -116,3 +116,22 @@ function seedOf(foodId: number, name: string): TradeCatalogSeed {
     sodiumMg: 100,
   };
 }
+
+it('lists the everyday proteins by name past the first foods of their group (MM-688)', async () => {
+  const meat = (foodId: number, name: string, kcal: number, proteinG: number, fatG: number): PackEntry =>
+    packEntryOf({ ...seedOf(foodId, name), group: 'meatAndPoultry', grams: 100, kcal, proteinG, carbsG: 0, fatG });
+  const catalog = await catalogOf([
+    meat(1, 'Beef, variety meats and by-products, heart, cooked', 160, 28, 5),
+    meat(2, 'Beaver', 210, 35, 7),
+    meat(3, 'Chicken breast, baked, broiled, or roasted, skin not eaten, from raw', 161, 30, 3.5),
+    meat(4, 'Chicken breast tenders, breaded, cooked, microwaved', 252, 16, 13),
+  ]);
+  // The group lists its first two foods as the pack stores them: the owner's pack has chicken breast past a thousand
+  // beef cuts and game, and the brief of 2026-10-28 named a beaver.
+  const trades = await CatalogTradeCatalog.load(catalog, [], { perGroup: 2 });
+  const names = trades.candidatesIn('meatAndPoultry', { minKcal: 0, maxKcal: undefined }).map((f) => f.name);
+  expect(names).toContain('Chicken breast, baked, broiled, or roasted, skin not eaten, from raw');
+  expect(names).toContain('Beaver');
+  expect(names).not.toContain('Chicken breast tenders, breaded, cooked, microwaved');
+  expect(names.filter((n) => n.startsWith('Chicken breast, baked'))).toHaveLength(1);
+});
