@@ -38,12 +38,14 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
   const state = useMemo(() => new AppState(services), [services]);
   const scope = useMemo(() => ({ services, state }), [services, state]);
   // Folds are kept in the state (MM-286), so a destination finds its sections as they were left.
+  const allOpen = useCell(state.foldsAllOpen);
   const folds = useMemo<MmFolds>(
     () => ({
       get: (key) => state.folds.peek().get(key),
       set: (key, expanded) => state.folds.put(new Map(state.folds.peek()).set(key, expanded)),
+      allOpen,
     }),
-    [state],
+    [state, allOpen],
   );
 
   const preview = useCell(state.themePreview);

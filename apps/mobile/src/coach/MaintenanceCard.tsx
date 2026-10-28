@@ -44,7 +44,7 @@ export function MaintenanceCard() {
     );
   }
   return (
-    <MmSection framed icon="flag" title="Maintaining">
+    <MmSection icon="flag" title="Maintaining" summary="Holding your weight: how it is going" collapsible initiallyExpanded={false} remember="coach.maintaining">
       {rebound ? <Notice text={reboundText(fmt)} /> : null}
       {lines.map((line) => (
         <p key={line} className="app-text">

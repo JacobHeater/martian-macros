@@ -4,7 +4,7 @@ import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { DemoSeed } from '../../src/fixtures/DemoSeed';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -19,7 +19,7 @@ async function openProgress(): Promise<InMemoryRepositories> {
   await repos.preferences.saveThemePreference('martian');
   await new DemoSeed(today).replace(repos);
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByText(/^Trend weight/);
   return repos;
 }
@@ -36,6 +36,9 @@ it('the hero has one figure, the trend weight, and the changes as one line benea
 it('the lifts are rows, four at most, with one disclaimer, and a row opens the lift’s history', async () => {
   await openProgress();
   const section = (await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement;
+  // Every fold starts closed (MM-676).
+  const header = within(section).queryByRole('button', { name: /^Strength trends/ });
+  if (header?.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
   const rows = [...section.querySelectorAll('.mm-list-row')].filter((row) => !row.textContent?.startsWith('All lift histories'));
   expect(rows).toHaveLength(4);
   for (const row of rows) expect(row.textContent).toMatch(/Est\. max/);

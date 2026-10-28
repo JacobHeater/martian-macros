@@ -147,6 +147,11 @@ export function DashboardScreen() {
     today,
   }).targetsAllowed;
   const open = (destination: HomeDestination) => state.homeTab.put(destination);
+  // The weight and waist rows open the Coach tab's body fold, which starts closed (MM-676), so the trend is in sight.
+  const openBody = () => {
+    state.folds.put(new Map(state.folds.peek()).set('coach.body-measurements', true));
+    open('progress');
+  };
   const intake = intakeDayFrom(today, entries);
 
   const trend = coach?.trend ?? [];
@@ -163,10 +168,13 @@ export function DashboardScreen() {
     overlays.snack(message, {
       label: 'Open Progress',
       onAction: () => {
+        // The body fold on Coach starts closed (MM-676): opened, with the waist's fold inside it when that is the way.
+        const folds = new Map(state.folds.peek()).set('coach.body-measurements', true);
         if (shows === 'waist') {
-          state.folds.put(new Map(state.folds.peek()).set('progress.waist', true));
+          state.folds.put(folds.set('progress.waist', true));
           state.progressReveal.put('waist');
         } else {
+          state.folds.put(folds);
           state.destinationScroll.put(new Map(state.destinationScroll.peek()).set('coach', 0));
         }
         open('coach');
@@ -251,7 +259,7 @@ export function DashboardScreen() {
             subtitle={fmt.readingsShown ? 'Today’s weigh-in · the trend starts tomorrow' : 'The trend starts tomorrow'}
             opens
             autoFocus={justSaved === 'weight'}
-            onPress={() => open('progress')}
+            onPress={() => openBody()}
           />
         ) : (
           <RowWithInsight insights={designedRow('weight') ?? weightOwn}>
@@ -269,7 +277,7 @@ export function DashboardScreen() {
                     ].join(' · ') || 'Weighed in today'
               }
               opens
-              onPress={() => open('progress')}
+              onPress={() => openBody()}
             />
           </RowWithInsight>
         )}
@@ -295,7 +303,7 @@ export function DashboardScreen() {
               title={waistAmount(latestWaist.waistCm, fmt)}
               subtitle={`Waist · ${Fmt.day(latestWaist.date, today)}`}
               opens
-              onPress={() => open('progress')}
+              onPress={() => openBody()}
             />
           </RowWithInsight>
         )}

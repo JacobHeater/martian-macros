@@ -8,7 +8,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -41,12 +41,12 @@ async function cutting({
   for (let i = 0; i <= daysAgo + 14; i++) await repos.weights.saveWeight(today.addDays(-i), 80 + (i * 0.5) / 7);
 }
 
-const goalSection = async () => (await screen.findByRole('heading', { name: /^Goal:/ })).closest('.mm-section') as HTMLElement;
+const goalSection = async () => (await screen.findByRole('heading', { name: 'Goal' })).closest('.mm-section') as HTMLElement;
 
 /** Opens the goal body fat sheet from the Coach and types `percent` in it. */
 async function typeGoal(percent: string): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(within(await goalSection()).getByRole('button', { name: /^Goal body fat/ }));
   const sheet = await screen.findByRole('dialog', { name: 'Goal body fat' });
   const field = within(sheet).getByRole('textbox', { name: /^Goal body fat/ });
@@ -93,7 +93,7 @@ it('a goal of 18% is kept across a restart, and the plan runs the cut to it', as
   cleanup();
 
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   expect(await within(section).findByText(/^18%, set /)).toBeInTheDocument();
   expect(within(section).getByText('At your current pace, when the lower end of your body-fat range reaches 18%.')).toBeInTheDocument();
@@ -103,7 +103,7 @@ it('a goal cleared goes back to the plan’s own line', async () => {
   await cutting({ percent: 22 });
   await repos.goalBodyFat.saveGoalBodyFat({ percent: 18, setOn: today.addDays(-7) });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(within(await goalSection()).getByRole('button', { name: /^Goal body fat/ }));
   const sheet = await screen.findByRole('dialog', { name: 'Goal body fat' });
   // The goal in force cannot be set again as it is.
@@ -117,7 +117,7 @@ it('a goal cleared goes back to the plan’s own line', async () => {
 it('with an eating-disorder history no goal body fat is offered', async () => {
   await cutting({ eatingDisorderHistory: true });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   expect(within(section).getByText('This phase')).toBeInTheDocument();
   expect(within(section).queryByRole('button', { name: /^Goal body fat/ })).not.toBeInTheDocument();
@@ -136,7 +136,7 @@ it('a partial value raises no alert while it is typed', async () => {
 it.each(['leanGain', 'maintenance'] as const)('in %s no goal body fat is offered', async (goalMode) => {
   await cutting({ goalMode });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   expect(within(section).getByRole('button', { name: /^What to expect/ })).toBeInTheDocument();
   expect(within(section).queryByRole('button', { name: /^Goal body fat/ })).not.toBeInTheDocument();
@@ -145,6 +145,6 @@ it.each(['leanGain', 'maintenance'] as const)('in %s no goal body fat is offered
 it('in recomp the goal body fat is offered', async () => {
   await cutting({ goalMode: 'recomp' });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await within(await goalSection()).findByRole('button', { name: /^Goal body fat/ })).toBeInTheDocument();
 });

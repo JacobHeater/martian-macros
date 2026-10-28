@@ -19,7 +19,7 @@ export function RecompReviewCard() {
   const setup = useLoaded(state.setup);
   if (review === undefined || setup === undefined) return null;
   return (
-    <MmSection framed icon="insight" title={`Recomp review, week ${review.week}`}>
+    <MmSection icon="insight" title={`Recomp review, week ${review.week}`} collapsible initiallyExpanded={false} remember="coach.recomp-review">
       <RecompReviewBody review={review} fmt={new Fmt(setup.unitSystem, { weightDisplay })} />
     </MmSection>
   );

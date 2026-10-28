@@ -6,7 +6,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { topLayer } from '../support/topLayer';
 
@@ -160,7 +160,7 @@ describe('theme preference (MM-165)', () => {
 it('the Coach screen names every input of the starting estimate', async () => {
   await repos.preferences.saveThemePreference('martian');
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: /Your metabolism estimate/ }));
   expect(
     await screen.findByText(/sex, age, height, weight, daily activity and training days/),

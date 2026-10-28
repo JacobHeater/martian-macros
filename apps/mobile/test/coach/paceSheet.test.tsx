@@ -7,7 +7,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -39,7 +39,7 @@ const history = () => first(repos.targets.watchTargetsHistory());
 it('the Coach shows the pace in force and opens the three paces with what each costs today', async () => {
   await seed();
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('Standard')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Change pace' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a pace' });
@@ -54,7 +54,7 @@ it('the Coach shows the pace in force and opens the three paces with what each c
 it('choosing a pace stores it and the targets change at once, without a step limit', async () => {
   await seed({ kcal: 2200 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change pace' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a pace' });
   await userEvent.click(within(sheet).getByRole('button', { name: /^Gentle/ }));
@@ -75,8 +75,8 @@ it('choosing a pace stores it and the targets change at once, without a step lim
 it('recomp has no pace control', async () => {
   await seed({ goal: 'recomp', kcal: 2700 });
   renderApp(repos, today);
-  await openTab('Coach');
-  await screen.findByRole('heading', { name: 'Goal: Recomp' });
+  await openCoach();
+  await screen.findByText('Recomp', { selector: '.mm-section-summary' });
   expect(screen.queryByRole('button', { name: 'Change pace' })).not.toBeInTheDocument();
 });
 
@@ -87,7 +87,7 @@ it('a pace the coach will not run is listed with its reason and cannot be chosen
     typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }).copyWith({ bodyFatPercent: 18 }),
   );
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change pace' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a pace' });
   expect(within(sheet).queryByRole('button', { name: /^Faster/ })).not.toBeInTheDocument();

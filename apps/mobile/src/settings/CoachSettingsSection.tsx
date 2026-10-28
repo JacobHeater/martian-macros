@@ -9,13 +9,17 @@ import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { MmTextField } from '../ui/MmTextField';
+import { Notice } from '../ui/Notice';
 import { useOverlays } from '../ui/useOverlays';
 import { useCell } from '../app/useCell';
 import { CarbFatBalance } from '../domain/CarbFatBalance';
 import { CoachAiConfig } from '../domain/integration/CoachAiConfig';
+import type { CoachNarrationOutcome } from '../domain/integration/CoachNarrationOutcome';
 import { CoachAiProvider } from '../domain/integration/CoachAiProvider';
 import { TargetShape } from '../domain/TargetShape';
 import { coachAiProviderLabel } from '../format/coachAiProviderLabel';
+import { coachAiTestText } from '../format/coach/coachAiTestText';
+import { executiveBriefNarrationRequest } from '../format/coach/executiveBriefNarrationRequest';
 import { weekdayLabel } from '../format/weekdayLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useSettingsSection } from './useSettingsSection';
@@ -41,6 +45,10 @@ export function CoachSettingsSection() {
   const ease = useLoaded(state.easeIntoMaintenance) ?? false;
   const aiConfig = useLoaded(state.coachAiConfig) ?? CoachAiConfig.off;
   const [keyDraft, setKeyDraft] = useState(aiConfig.apiKey);
+  // "Test AI coach" (MM-671): the model's words on today's brief, or why there are none.
+  const brief = useCell(state.coachAnalysis.executiveBrief);
+  const [tested, setTested] = useState<CoachNarrationOutcome | undefined>(undefined);
+  const [testing, setTesting] = useState(false);
   useEffect(() => {
     setKeyDraft(aiConfig.apiKey);
   }, [aiConfig.apiKey, aiConfig.provider]);
@@ -67,6 +75,21 @@ export function CoachSettingsSection() {
       overlays.snack(trimmed === '' ? 'API key cleared.' : 'API key saved on this device.');
     });
   };
+
+  // The key as typed is what is tested: it is saved first, as Save key saves it.
+  const testAiCoach = async () => {
+    if (brief === undefined) return;
+    setTesting(true);
+    setTested(undefined);
+    try {
+      const trimmed = keyDraft.trim();
+      if (trimmed !== aiConfig.apiKey) await services.coachAi.saveConfig({ provider: aiConfig.provider, apiKey: trimmed });
+      setTested(await services.coachNarrator.probe(executiveBriefNarrationRequest(brief), { fresh: true }));
+    } finally {
+      setTesting(false);
+    }
+  };
+  const testResult = tested === undefined ? undefined : coachAiTestText(tested, aiConfig.provider);
 
   const aiSubtitle =
     aiConfig.provider === 'none'
@@ -107,16 +130,38 @@ export function CoachSettingsSection() {
             title="API key"
             subtitle="Kept on this phone outside backup files. Leave blank and save to clear."
             entry={
-              <div className="number-entry">
-                <div className="number-entry__field">
+              // The field across the row, its two actions 12 px under it, side by side (MM-669, MM-671).
+              <div>
+                <div className="app-stack-item">
                   <MmTextField
-                    label="Coaching API key"
+                    name="Coaching API key"
+                    dense
                     value={keyDraft}
                     hint="Paste your API key"
+                    onSubmit={saveApiKey}
                     onChange={setKeyDraft}
                   />
                 </div>
-                <MmButton label="Save key" kind="secondary" onPress={saveApiKey} />
+                <div className="app-row">
+                  <MmButton label="Save key" kind="secondary" onPress={saveApiKey} />
+                  <MmButton
+                    label={testing ? 'Testing…' : 'Test AI coach'}
+                    name="Test AI coach"
+                    icon="coach"
+                    kind="secondary"
+                    onPress={brief === undefined || testing ? undefined : testAiCoach}
+                  />
+                </div>
+                {testResult === undefined ? null : (
+                  <div className="settings-ai-test">
+                    <Notice
+                      kind={testResult.trouble ? 'caution' : 'info'}
+                      icon={testResult.trouble ? undefined : 'coach'}
+                      title={testResult.title}
+                      text={testResult.text}
+                    />
+                  </div>
+                )}
               </div>
             }
           />

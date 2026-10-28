@@ -8,7 +8,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { underEatingText } from '../../src/format/underEatingText';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 
@@ -49,7 +49,7 @@ it('sustained low intake shows the notice with both figures', async () => {
   expect(notice()).toBeInTheDocument();
   expect(screen.getByText(/average 1,050 kcal/)).toBeInTheDocument();
   expect(screen.getByText(/would ever suggest for you is/)).toBeInTheDocument();
-  await openTab('Coach');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Body' });
   expect(notice()).toBeInTheDocument();
 });

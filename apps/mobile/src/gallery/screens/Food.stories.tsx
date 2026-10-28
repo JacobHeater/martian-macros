@@ -25,6 +25,7 @@ import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import { writingCoach } from './writingCoach';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { storyToday } from './storyToday';
@@ -132,6 +133,35 @@ export const MealCoachBreakdown = screenStory({
     const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
     if (options !== undefined) await userEvent.click(options);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+  },
+});
+
+/** MM-673: the breakdown with a BYOK coach writing: the wait where its words will stand, the rows under it as ever. */
+export const MealCoachBreakdownWriting = screenStory({
+  covers: ['FoodScreen', 'MealBreakdownSheet'],
+  shows: 'The coach is writing…',
+  device: writingCoach,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+  },
+});
+
+/** MM-675: the breakdown on a 360 px phone, scrolled: the grip and Close stay at the top while the words pass under. */
+export const MealCoachBreakdownScrolled = screenStory({
+  covers: ['FoodScreen', 'MealBreakdownSheet'],
+  shows: 'Meal impact',
+  viewport: 'smallPhone',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+    const sheet = await within(canvas.ownerDocument.body).findByRole('dialog');
+    await within(sheet).findByText('Meal impact');
+    sheet.scrollTop = 400;
   },
 });
 

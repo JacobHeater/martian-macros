@@ -9,6 +9,7 @@ import { countsAsFood } from './food/countsAsFood';
 import { foodGroupOf } from './food/foodGroupOf';
 import { foodKeyOf } from './food/foodKeyOf';
 import { foodLimitsOf } from './food/foodLimitsOf';
+import { isSameFoodName } from './food/isSameFoodName';
 import type { MealBreakdownAnalysis } from './MealBreakdownAnalysis';
 import { swapFor } from './swap/swapFor';
 import type { TradeCatalog } from './TradeCatalog';
@@ -93,8 +94,13 @@ export function mealBreakdownAnalysisOf(input: {
       proteinDensity: densityOf(worst),
     };
     const adviceFood = adviceFoodOf(worst.name, [worst]);
-    const history = rawHistory.includes(worst) ? rawHistory : [...rawHistory, worst];
-    const swap = swapFor({
+    // What is already on the plate is no swap for what else is on it (the owner, 2026-10-28: the chicken fillet
+    // offered in place of the biscuit beside it, MM-674): only the food itself stays among the candidates.
+    const onThePlate = input.mealEntries.filter((e) => e !== worst && foodKeyOf(e) !== foodKeyOf(worst));
+    const offThePlate = (e: FoodEntry) => !onThePlate.some((plated) => isSameFoodName(plated.name, e.name));
+    const candidates = rawHistory.filter((e) => foodKeyOf(e) === foodKeyOf(worst) || offThePlate(e));
+    const history = candidates.includes(worst) ? candidates : [...candidates, worst];
+    const found = swapFor({
       food: { ...adviceFood, carbsG: worst.carbsG },
       group: foodGroupOf(foodKeyOf(worst), [worst], input.catalog),
       meal: input.meal,
@@ -104,6 +110,8 @@ export function mealBreakdownAnalysisOf(input: {
       safeguards,
       cautions: input.cautions ?? safeguards.cautions,
     });
+    // A catalog or table swap can still name a food on the plate, under its own spelling.
+    const swap = found !== undefined && onThePlate.some((plated) => isSameFoodName(plated.name, found.name)) ? undefined : found;
     if (swap !== undefined) {
       suggestedSwap = {
         originalName: worst.name.trim(),

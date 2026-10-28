@@ -4,7 +4,7 @@ import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-155: the protocol drawn for the first three measurements and one tap down after; the chart of the record. */
@@ -22,7 +22,7 @@ const figureName = 'Drawing: where the tape sits, level around the waist at the 
 
 async function openWaist(): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   const card = (await screen.findByRole('heading', { name: 'Waist' })).closest('.mm-section') as HTMLElement;
   await userEvent.click(within(card).getByRole('button', { name: /^Waist/ }));
   return card;

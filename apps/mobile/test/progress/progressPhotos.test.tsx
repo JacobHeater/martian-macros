@@ -14,7 +14,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { topLayer } from '../support/topLayer';
 
@@ -81,7 +81,7 @@ async function photoDrawn(name: string): Promise<void> {
 
 /** Opens Progress, then its photos. */
 async function openPhotos(): Promise<void> {
-  await openTab('Progress');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: /^Progress photos/ }));
 }
 
@@ -340,7 +340,7 @@ describe('Eating-disorder history', () => {
 
   it('the photos are not offered anywhere until turned on in Settings', async () => {
     render();
-    await openTab('Progress');
+    await openCoach();
     await screen.findAllByText(/Waist/);
     expect(screen.queryByRole('button', { name: /^Progress photos/ })).not.toBeInTheDocument();
     const settings = await openSettings();
@@ -366,7 +366,7 @@ describe('Eating-disorder history', () => {
   it('turned on, they are offered on Progress', async () => {
     await repos.progressPhotos.savePhotoSettings({ offered: true, backUp: false });
     render();
-    await openTab('Progress');
+    await openCoach();
     expect(await screen.findByRole('button', { name: /^Progress photos/ })).toBeInTheDocument();
   });
 });

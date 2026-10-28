@@ -32,8 +32,10 @@
   background: var(--ember);
   color: var(--on-ember);
 }
+/* A secondary is outlined in the text colour, not the field's violet (MM-669): outlined in `--outline-strong` it
+   was the same frame as the field beside it, so "Save key" read as a second field. */
 .mm-button-secondary {
-  border-color: var(--outline-strong);
+  border-color: var(--text2);
   color: var(--text);
 }
 /* A text action is the heading rung, in the text colour, never Ember (MM-288, the panel's PD-2): Ember
@@ -898,10 +900,26 @@
   border-radius: 50%;
   animation: mm-spin var(--motion-turn) linear infinite;
 }
+.mm-spinner-dense {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
 @keyframes mm-spin {
   to {
     transform: rotate(360deg);
   }
+}
+/* A wait in a line of text (MM-673): the dense spinner beside the words that say what is waited for, where the words
+   will stand, so the page keeps its shape. Said once to assistive technology, as a status. */
+.mm-busy-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 24px;
+  margin: 0 0 var(--space-12);
+  color: var(--text2);
+  font: var(--type-body);
 }
 
 /* A bar takes its meaning and its weight, never a colour or a size (MM-278). */
@@ -1760,7 +1778,14 @@
   overflow-y: auto;
   border-radius: var(--radius-sheet-top) var(--radius-sheet-top) 0 0;
   background: var(--raised);
+  /* Its own layer from the start (MM-675): promoted at the first drag, the text re-rasterised with a visible flash. */
+  will-change: transform;
   animation: mm-sheet-rise var(--motion-slow) ease-out;
+}
+/* Risen once, it never rises again (MM-675): with the drag classes carrying `animation: none`, letting go ran the
+   rise-in over from nothing, a flash the owner read as a reload. */
+.mm-sheet-risen {
+  animation: none;
 }
 .mm-sheet-tall {
   height: 90%;
@@ -1770,22 +1795,43 @@
 }
 @keyframes mm-sheet-rise {
   from {
-    transform: translateY(var(--space-32));
+    transform: translate3d(0, var(--space-32), 0);
     opacity: 0;
   }
 }
-.mm-sheet-dragging {
+/* Under the finger the panel follows at once on the compositor alone (MM-675): a 3D transform set on the element,
+   on the layer it has had since it rose, no transition. Let go, it springs back or slides off on a transform
+   transition, and the scrim fades with it. */
+.mm-sheet-dragging,
+.mm-sheet-settling,
+.mm-sheet-leaving {
   animation: none;
+}
+.mm-sheet-dragging {
   transition: none;
 }
-/* The handle is the drag target: 48 dp tall, with the close action beside it. */
+.mm-sheet-settling {
+  transition: transform var(--motion-base) ease-out;
+}
+.mm-sheet-leaving {
+  transition: transform var(--motion-slow) ease-in;
+}
+.mm-scrim-leaving {
+  opacity: 0;
+  transition: opacity var(--motion-slow) ease-in;
+}
+/* The handle is the drag target: 48 dp tall, with the close action beside it. The head stays at the top of the
+   sheet while the content scrolls under it, as a sheet's grabber does on the phone (MM-675). */
 .mm-sheet-head {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
   min-height: 48px;
+  background: var(--raised);
 }
 .mm-sheet-grip {
   display: grid;
@@ -2109,13 +2155,25 @@
 .mm-section.mm-section-framed + .mm-section.mm-section-framed {
   margin-top: var(--space-12);
 }
+/* A card after a section, or a section after a card, stands 12 px from it too (MM-668). A section carries a top
+   margin and a surface or list group a bottom one, so a section before a card touched it (the owner, 2026-10-28:
+   the Dashboard's insight on its rows, the Coach's summary on the weigh-in) and a card before a framed section
+   stood 24 px off. */
+.mm-section + .mm-surface,
+.mm-section + .mm-list-group {
+  margin-top: var(--space-12);
+}
+.mm-surface + .mm-section-framed,
+.mm-list-group + .mm-section-framed {
+  margin-top: 0;
+}
 /* The card's padding ends it, not the last line's own margin. */
 .mm-section-framed .mm-section-body > :last-child {
   margin-bottom: 0;
 }
-/* A text button's label lines up with the words beside it: the button keeps its tap area, its padding hangs out. */
-.mm-section-body > .mm-button-text:first-child,
-.mm-section-body > p + .mm-button-text {
+/* A text button's label lines up with the words beside it, wherever it stands in the body (after a disclosure as
+   much as after a paragraph, MM-668): the button keeps its tap area, its padding hangs out. */
+.mm-section-body > .mm-button-text:not(.mm-button-expand) {
   margin-inline-start: calc(-1 * var(--space-12));
 }
 .mm-section-head > .mm-button-text:last-child {
@@ -2271,6 +2329,36 @@
   margin-left: calc(-1 * (24px + var(--space-12)));
 }
 
+/* ---- Pull to refresh (MM-670): a strip at the top of the body, as tall as the pull, over the body's own padding. ---- */
+
+.mm-pull {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  height: var(--mm-pull, 0px);
+  margin: calc(-1 * var(--space-8)) calc(-1 * var(--space-16)) 0;
+  overflow: hidden;
+  color: var(--text2);
+  font: var(--type-caption);
+  transition: height var(--motion-base);
+}
+/* Under the finger the strip follows it at once; it eases only when let go. */
+.mm-pull[data-phase='pulling'] {
+  transition: none;
+}
+.mm-pull-mark {
+  display: inline-grid;
+  transition: transform var(--motion-base);
+}
+.mm-pull[data-phase='ready'] .mm-pull-mark {
+  transform: rotate(180deg);
+}
+.mm-pull[data-phase='refreshing'] .mm-pull-mark {
+  animation: mm-spin var(--motion-turn) linear infinite;
+}
+
 /* ---- The rhythm strip (MM-253, rule 3): seven days as dots; shape and fill, no colour of their own. ---- */
 
 .mm-rhythm {
@@ -2404,6 +2492,7 @@
    surface, the hero, the swipe row, the year list or a drum. ---- */
 
 .mm-list-group :focus-visible,
+.mm-pull :focus-visible,
 .mm-segmented :focus-visible,
 .mm-surface-flush :focus-visible,
 .mm-hero :focus-visible,

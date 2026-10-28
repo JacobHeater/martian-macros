@@ -9,7 +9,7 @@ import { HealthImporter } from '../../src/healthIngest/HealthImporter';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { failing } from '../support/failing';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-250: a night of sleep typed on Progress, beside the nights read from the health platform. */
@@ -41,7 +41,7 @@ let section: HTMLElement;
 
 async function openSleep(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   section = (await screen.findByRole('heading', { name: 'Sleep' })).closest('.mm-section') as HTMLElement;
   // Folded to its line once last night is recorded (MM-257); open when it is not.
   if (within(section).queryByRole('button', { name: 'Save night' }) === null) {
@@ -151,7 +151,7 @@ it('when the nights cannot be read the section says so and offers to try again',
       },
     }),
   });
-  await openTab('Progress');
+  await openCoach();
   section = (await screen.findByRole('heading', { name: 'Sleep' })).closest('.mm-section') as HTMLElement;
   expect(within(section).getByText('Could not read your nights of sleep')).toBeInTheDocument();
   expect(within(section).queryByText(/nights recorded/)).not.toBeInTheDocument();

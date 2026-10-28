@@ -17,6 +17,7 @@ import { reveal } from './reveal';
 import { frequentWeighingScenario } from './frequentWeighingScenario';
 import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
+import { writingCoach } from './writingCoach';
 import { waistDownScenario } from './waistDownScenario';
 import { waistDueScenario } from './waistDueScenario';
 import { waitingRead } from './waitingRead';
@@ -375,6 +376,14 @@ export const InsightFromAnalysis = screenStory({
   walk: async (canvas) => {
     reveal(await within(canvas).findByRole('button', { name: /^Open on Coach/ }));
   },
+});
+
+/** MM-673: the same insight with a BYOK coach writing: the wait where its sentence will stand, the title and numbers as ever. */
+export const InsightWriting = screenStory({
+  covers: ['DashboardScreen'],
+  shows: 'The coach is writing…',
+  scenario: analysisFatWeekScenario(),
+  device: writingCoach,
 });
 
 /** MM-130: the first fortnight after a cut: under the weigh-in, why the scale rises, said before it does. */

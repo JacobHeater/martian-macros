@@ -80,9 +80,27 @@ describe('an overlay', () => {
     const grip = sheet.querySelector('.mm-sheet-grip') as HTMLElement;
     fireEvent.pointerDown(grip, { clientY: 100, pointerId: 1 });
     fireEvent.pointerMove(grip, { clientY: 160, pointerId: 1 });
-    expect(sheet.style.transform).toBe('translateY(60px)');
+    // MM-675: moved on the compositor, by a 3D transform set on the element itself.
+    expect(sheet.style.transform).toBe('translate3d(0, 60px, 0)');
+    expect(sheet.classList.contains('mm-sheet-dragging')).toBe(true);
     fireEvent.pointerUp(grip, { clientY: 200, pointerId: 1 });
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  // MM-675: a drag down and back up, let go, replayed the sheet's rise-in from nothing: a flash read as a reload.
+  it('a sheet dragged and let go short springs back in place, the same sheet, and never rises in again', async () => {
+    await asking((o) => o.sheet('Height', () => <p>Inside</p>));
+    const sheet = await screen.findByRole('dialog');
+    const grip = sheet.querySelector('.mm-sheet-grip') as HTMLElement;
+    fireEvent.pointerDown(grip, { clientY: 100, pointerId: 1 });
+    fireEvent.pointerMove(grip, { clientY: 160, pointerId: 1 });
+    fireEvent.pointerMove(grip, { clientY: 110, pointerId: 1 });
+    fireEvent.pointerUp(grip, { clientY: 110, pointerId: 1 });
+    expect(screen.getByRole('dialog')).toBe(sheet);
+    expect(sheet.classList.contains('mm-sheet-dragging')).toBe(false);
+    expect(sheet.classList.contains('mm-sheet-risen')).toBe(true);
+    expect(sheet.style.transform).toBe('');
+    expect(within(sheet).getByText('Inside')).toBeInTheDocument();
   });
 });
 

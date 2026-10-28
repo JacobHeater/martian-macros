@@ -4,7 +4,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { waitingRead } from '../../src/gallery/screens/waitingRead';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-343: weighed, with the weight events still being read: the trend waits, and never asks for a weigh-in. */
@@ -15,7 +15,7 @@ it('a trend still being worked out does not ask for a weigh-in', async () => {
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-20), healthCheckConfirmedOn: today }));
   for (let d = 20; d >= 0; d--) await repos.weights.saveWeight(today.addDays(-d), 84);
   renderApp(repos, today, { change: waitingRead('weightEvents', 'watchWeightEvents') });
-  await openTab('Progress');
+  await openCoach();
   expect(await screen.findByText('Weight trend')).toBeInTheDocument();
   expect(screen.queryByText(/^No trend yet\./)).not.toBeInTheDocument();
 });

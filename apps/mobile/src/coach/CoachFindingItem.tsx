@@ -1,12 +1,13 @@
 import type { CoachFinding } from '../engine/analysis/CoachFinding';
 import { coachAnalysisWords } from '../format/coachAnalysisWords';
-import { coachFindingText } from '../format/coach/coachFindingText';
 import { findingControlName } from '../format/findingControlName';
 import type { Fmt } from '../format/Fmt';
+import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmIcon } from '../ui/MmIcon';
 import { StatRow } from '../ui/StatRow';
+import { useNarratedFinding } from './useNarratedFinding';
 import './coach.css';
 
 /**
@@ -16,7 +17,8 @@ import './coach.css';
  * secondary text colour, named aloud), the sentence, "The numbers behind
  * this" folded under it as label and value rows, as the confidence section
  * has them, and then the text button to dismiss it, so the reading order
- * is the finding's own. Flat on the section's card, so nothing nests.
+ * is the finding's own. Flat on the section's card, so nothing nests. The
+ * sentence is the model's where a BYOK coach is set up (MM-672).
  */
 export function CoachFindingItem({
   finding,
@@ -34,7 +36,8 @@ export function CoachFindingItem({
   /** Hides it for 28 days; absent for what cannot be dismissed (1d's "what is left"). */
   onDismiss?: (() => void) | undefined;
 }) {
-  const [title, body, evidence] = coachFindingText(finding, fmt);
+  // The sentence in the person's own model's words when one is set up, the built-in coach's otherwise (MM-672).
+  const [title, body, evidence] = useNarratedFinding(finding, fmt);
   const Heading = level === 3 ? 'h3' : 'h4';
   const mark =
     finding.kind === 'holdingUp'
@@ -54,7 +57,7 @@ export function CoachFindingItem({
           {title}
         </Heading>
       </div>
-      <p className="app-text">{body}</p>
+      {body === undefined ? <MmBusyLine label={coachAnalysisWords.writing} /> : <p className="app-text">{body}</p>}
       <MmDisclosure title={coachAnalysisWords.numbersBehind} name={findingControlName('numbers', title)}>
         {evidence.map(([label, value], at) => (
           <StatRow key={`${at}-${label}`} label={label} value={value} />

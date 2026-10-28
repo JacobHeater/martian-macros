@@ -8,7 +8,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { Fmt } from '../../src/format/Fmt';
 import { whatToExpectClosing } from '../../src/format/whatToExpectClosing';
 import { whatToExpectPoints } from '../../src/format/whatToExpectPoints';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -84,7 +84,7 @@ describe('on the Coach tab', () => {
     await repos.weights.saveWeight(today, 70);
     await repos.targets.saveTargets(targetsFrom(today.addDays(-3), { kcal: 1900, tdeeKcal: 2400, weeklyRateFraction: -0.005 }));
     renderApp(repos, today);
-    await openTab('Coach');
+    await openCoach();
     await userEvent.click(await screen.findByRole('button', { name: /^What to expect/ }));
     expect(await screen.findByRole('heading', { name: 'What to expect' })).toBeInTheDocument();
     expect(screen.getByText(/^Your plan aims for about/)).toBeInTheDocument();

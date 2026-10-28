@@ -6,7 +6,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -72,7 +72,7 @@ it('history granted before the app opens is read as it opens', async () => {
   await source.permit(new Set(['weight']));
   source.permitHistory();
   renderApp(repos, today, { change: (services) => ({ ...services, healthSource: source }) });
-  await openTab('Progress');
+  await openCoach();
   await expect.poll(stored).toBe(180);
   expect(await repos.healthSamples.backfilledFrom('weight')).toBeDefined();
 });

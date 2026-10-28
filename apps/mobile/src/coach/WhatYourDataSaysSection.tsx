@@ -104,7 +104,18 @@ export function WhatYourDataSaysSection() {
         {findings.map(item(4))}
       </div>
     );
+  // The fold's line (MM-676): how many findings of each kind, said once (the words inside say them in full).
+  const fixes = worthChanging.length + moreFixes.length;
+  const holding = holdingUp.length + moreHolding.length;
   const nothingEver = view.nothingLogged;
+  const feedbackSummary =
+    fixes + holding === 0
+      ? nothingEver
+        ? 'Log a day to start'
+        : 'Nothing to flag yet'
+      : [fixes === 0 ? undefined : `${fixes} worth changing`, holding === 0 ? undefined : `${holding} holding up`]
+          .filter((part) => part !== undefined)
+          .join(' · ');
   // A day over target says what caused it before how to finish it (MM-617's voice standard).
   const leftAfterCause = verdict?.kind === 'over' && left !== undefined && worthChanging.length > 0 && !nothingEver;
   // History, but nothing logged today: 1d says so, with what is left at the whole of today's targets (MM-612).
@@ -117,7 +128,14 @@ export function WhatYourDataSaysSection() {
     holdingUp.length === 0 &&
     more.length === 0;
   return (
-    <MmSection framed icon="insight" title={coachAnalysisWords.title}>
+    <MmSection
+      icon="insight"
+      title={coachAnalysisWords.title}
+      summary={feedbackSummary}
+      collapsible
+      initiallyExpanded={false}
+      remember="coach.feedback"
+    >
       {view.underEating ? (
         <div className="app-stack-item">
           <Notice text={underEatingPointerText(view.underEatingNoticeShown)} />

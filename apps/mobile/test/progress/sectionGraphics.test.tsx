@@ -5,7 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { SleepNight } from '../../src/domain/SleepNight';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -24,13 +24,13 @@ beforeEach(async () => {
 
 async function section(title: string): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   return (await screen.findByRole('heading', { name: new RegExp(`^${title}`) })).closest('.mm-section') as HTMLElement;
 }
 
 async function open(title: string): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   // Its header is a button once what it folds has been read.
   const header = await screen.findByRole('button', { name: new RegExp(`^${title}`) });
   await userEvent.click(header);
@@ -39,7 +39,7 @@ async function open(title: string): Promise<HTMLElement> {
 
 it('with no weigh-in, the trend chart’s place says what starts it', async () => {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   expect(await screen.findByText('No trend yet. Your first weigh-in starts it.')).toBeInTheDocument();
 });
 
@@ -69,7 +69,7 @@ it('an event older than the trend’s range is listed, and the line says none is
 
 it('with no night recorded, sleep says so under its open slots, 0 of 14', async () => {
   await repos.weights.saveWeight(today, 82);
-  const sleep = await section('Sleep');
+  const sleep = await open('Sleep');
   expect(await within(sleep).findByText('No nights recorded in the last 14 yet, 0 of 14. Tap a night to type it.')).toBeInTheDocument();
   const chart = within(sleep).getByRole('img', { name: /^Hours asleep, the last 14 nights: 0 recorded\./ });
   expect(chart.querySelectorAll('.chart-night-missing')).toHaveLength(14);
@@ -79,7 +79,7 @@ it('a recorded night is a bar; the others are open slots', async () => {
   await repos.weights.saveWeight(today, 82);
   await repos.sleep.saveSleepNight(new SleepNight({ date: today.addDays(-1), minutesAsleep: 420, source: 'typed' }));
   // Last night not recorded: the section is open already.
-  const sleep = await section('Sleep');
+  const sleep = await open('Sleep');
   const chart = await within(sleep).findByRole('img', { name: /^Hours asleep, the last 14 nights: 1 recorded\./ });
   expect(chart.querySelectorAll('.chart-night')).toHaveLength(1);
   expect(chart.querySelectorAll('.chart-night-missing')).toHaveLength(13);

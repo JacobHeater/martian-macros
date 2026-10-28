@@ -82,7 +82,7 @@ export function StrengthSection() {
   return (
     // Keyed apart from the loading and failed sections, and anew when a first recent lift arrives: it starts folded
     // with none and open with some, as it says, rather than as the section before it was left.
-    <MmSection key={`trends-${opened}`} icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={recent.length > 0} remember={`progress.strength.${recent.length > 0}`}>
+    <MmSection key={`trends-${opened}`} icon="train" title="Strength trends" summary={summary} collapsible initiallyExpanded={false} remember={`progress.strength.${recent.length > 0}`}>
       {all.length === 0 ? (
         <ChartPlaceholder text="No strength history yet. Finish a workout in Train; each lift you train gets a line here." />
       ) : (

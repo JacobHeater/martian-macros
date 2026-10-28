@@ -4,7 +4,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import type { UnitSystem } from '../../src/domain/UnitSystem';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { workoutOn } from '../support/workoutOn';
 
@@ -55,7 +55,7 @@ async function trained({ rising = true }: { rising?: boolean } = {}): Promise<vo
 
 async function openProgress(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Strength trends' });
 }
 

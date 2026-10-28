@@ -1285,12 +1285,31 @@ export const HealthCheckEatingDisorderWeightDisplay = screenStory({
   open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
 });
 
-/** MM-665: Settings > Coach with a BYOK provider chosen and its API key field shown. */
+/**
+ * MM-665: Settings > Coach with a BYOK provider chosen and its API key field shown. "Test AI coach" pressed shows
+ * the model's words on the person's numbers (MM-671; the gallery's narrator answers with the built-in coach's).
+ */
 export const CoachAiProviderConfigured = screenStory({
   covers: ['SettingsScreen'],
   shows: /Google Gemini \(your key\)/,
   device: async (services) => {
     await services.coachAi.saveConfig({ provider: 'gemini', apiKey: 'AIzaSyDemoKey' });
+    return services;
+  },
+  open: settingsAt('coach'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Test AI coach' }));
+    await within(canvas).findByText('Google Gemini, on your numbers');
+  },
+});
+
+/** MM-669: the key row at 360 px with a key as long as a real one: the field and "Save key" share the width. */
+export const CoachAiProviderConfiguredSmallPhone = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Google Gemini \(your key\)/,
+  viewport: 'smallPhone',
+  device: async (services) => {
+    await services.coachAi.saveConfig({ provider: 'gemini', apiKey: 'AIzaSyDemoKeyAb8RN6I4YPPTnOqMI7c3ENQnoZvRTBWr' });
     return services;
   },
   open: settingsAt('coach'),

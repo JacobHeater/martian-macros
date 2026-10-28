@@ -250,6 +250,13 @@ export function CoachScreen() {
     confidence: snapshot.confidence,
     eatingDisorderHistory: setup.screening.eatingDisorderHistory,
   });
+  // The body fold's line (MM-676): the trend, or the pace in words with the weight hidden, or the ask to weigh in.
+  const lastTrend = snapshot.trend[snapshot.trend.length - 1];
+  const bodySummary = fmt.weightHidden
+    ? (paceInWords ?? 'Weigh in daily; measure once a week.')
+    : lastTrend === undefined
+      ? 'Not weighed yet. Once a day is enough.'
+      : `Trend ${fmt.weight(lastTrend.levelKg)}`;
   const headsUp = [
     ...[...snapshot.policy.cautions].map(cautionMessage),
     ...(current === undefined
@@ -277,23 +284,15 @@ export function CoachScreen() {
           onStatusPress={() => void navigator.push(() => <TargetsHistoryScreen />)}
         />
       )}
-      {/* The health check's cautions, then the target flags: one section under the hero, folded to its count (MM-553, overriding MM-256's "in full"). */}
-      <HeadsUpSection notes={headsUp} />
-      {current !== undefined && breakRebound ? (
-        <div className="app-stack-item">
-          <Notice text={reboundText(fmt)} />
-        </div>
-      ) : null}
-      {trainingNote === undefined ? null : (
-        <div className="app-stack-item">
-          <Notice text={trainingNote} />
-        </div>
-      )}
-      {/* The goal first, under the figures and the warnings (MM-299). */}
-      <MmSection framed
+      {/* The summary card, then the goal (the owner's order, MM-676). */}
+      <ExecutiveSummaryCard />
+      <MmSection
         icon="flag"
-        title={`Goal: ${goalModeLabel(setup.goalMode)}`}
-        trailing={<MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />}
+        title="Goal"
+        summary={goalModeLabel(setup.goalMode)}
+        collapsible
+        initiallyExpanded={false}
+        remember="coach.goal"
       >
         <p className="app-text">{goalModeBlurb(setup.goalMode)}</p>
         {/* The phase, its projected end, and once it ends the next one (MM-36). */}
@@ -338,14 +337,34 @@ export function CoachScreen() {
           opens
           onPress={() => void navigator.push(() => <WhatToExpectScreen />)}
         />
+        {/* Inside the fold, with what it changes (the owner, MM-676). */}
+        <MmButton label="Change goal" kind="text" onPress={() => void changeGoal()} />
       </MmSection>
+      {/* The one thing to do, under the goal (MM-299). */}
       <OneThingRow />
-      <ExecutiveSummaryCard />
-      <ProgressScreen />
-      {/* What the coach reads in the log (MM-610): under the one thing to do, above the targets; the safeguards stay above. */}
+      {/* What the coach reads in the log (MM-610), then the body: the weigh-in, the trend and the measurements, one
+          fold with their own sections inside, as Dashboard's History holds its charts (MM-583, MM-676). */}
       <WhatYourDataSaysSection />
+      <MmSection
+        icon="scale"
+        title="Body measurements and weigh-in"
+        summary={bodySummary}
+        flush
+        collapsible
+        initiallyExpanded={false}
+        remember="coach.body-measurements"
+      >
+        <ProgressScreen />
+      </MmSection>
       {current === undefined ? null : (
-        <MmSection framed icon="tune" title="Your targets">
+        <MmSection
+          icon="tune"
+          title="Your targets"
+          summary={shownTargets === undefined ? undefined : `${Fmt.kcal(shownTargets.kcal)} · ${Fmt.grams(shownTargets.proteinG)} protein`}
+          collapsible
+          initiallyExpanded={false}
+          remember="coach.targets"
+        >
           {shownTargets?.proteinMinimumG === undefined ? null : (
             <StatRow label="Protein minimum" value={Fmt.grams(shownTargets.proteinMinimumG)} />
           )}
@@ -397,6 +416,18 @@ export function CoachScreen() {
           )}
         </MmSection>
       )}
+      {/* The health check's cautions, then the target flags: one section folded to its count (MM-553), after the targets they are about (MM-676). */}
+      <HeadsUpSection notes={headsUp} />
+      {current !== undefined && breakRebound ? (
+        <div className="app-stack-item">
+          <Notice text={reboundText(fmt)} />
+        </div>
+      ) : null}
+      {trainingNote === undefined ? null : (
+        <div className="app-stack-item">
+          <Notice text={trainingNote} />
+        </div>
+      )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />
       <MaintenanceCard />
       <StallCard />
@@ -409,11 +440,11 @@ export function CoachScreen() {
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />
       <ReportsCard />
-      <MmSection framed icon="bolt" title="Your metabolism" collapsible remember="coach.metabolism-section">
+      <MmSection icon="bolt" title="Your metabolism" summary={`About ${Fmt.kcal(snapshot.tdee.kcal)} a day`} collapsible initiallyExpanded={false} remember="coach.metabolism-section">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
         {gaps.includes('history') ? <DataGapNote gap="history" /> : null}
       </MmSection>
-      <MmSection framed icon="coach" title={`Coach confidence · ${confidence}`} collapsible remember="coach.confidence">
+      <MmSection icon="coach" title={`Coach confidence · ${confidence}`} collapsible initiallyExpanded={false} remember="coach.confidence">
         {snapshot.confidence.level === 'learning' ? (
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
@@ -425,7 +456,7 @@ export function CoachScreen() {
           <StatRow label="Stability" value={confidenceLabel(snapshot.confidence.stability)} />
         </MmDisclosure>
       </MmSection>
-      <MmSection framed icon="body" title="Body" collapsible remember="coach.body">
+      <MmSection icon="body" title="Body" summary={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} collapsible initiallyExpanded={false} remember="coach.body">
         {fmt.weightHidden && paceInWords !== undefined ? (
           <StatRow label="Your trend" value={paceInWords} detail="Against your plan’s pace" />
         ) : null}

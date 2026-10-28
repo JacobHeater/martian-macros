@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -7,8 +6,10 @@ import type { FoodEntry } from '../domain/FoodEntry';
 import type { Meal } from '../domain/Meal';
 import type { MealBreakdownAnalysis } from '../engine/analysis/MealBreakdownAnalysis';
 import { mealBreakdownAnalysisOf } from '../engine/analysis/mealBreakdownAnalysisOf';
-import { mealBreakdownArchetypeText } from '../format/coach/mealBreakdownArchetypeText';
 import { mealBreakdownNarrationRequest } from '../format/coach/mealBreakdownNarrationRequest';
+import { coachAnalysisWords } from '../format/coachAnalysisWords';
+import { useCoachNarration } from '../app/useCoachNarration';
+import { MmBusyLine } from '../ui/MmBusyLine';
 import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
@@ -104,7 +105,7 @@ function buildRows(analysis: MealBreakdownAnalysis): readonly BreakdownRow[] {
  * coaching narration (offline archetype or BYOK model).
  */
 export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetProps) {
-  const { services, state } = useApp();
+  const { state } = useApp();
   const dayEntries = useLoaded(state.foodForDay(day)) ?? entries;
   const targets = useCell(state.currentTargets)?.targets;
   const foodInput = useCell(state.coachAnalysis.foodInput);
@@ -126,20 +127,8 @@ export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetPro
     protectedPath,
   });
 
-  const fallback = mealBreakdownArchetypeText(analysis);
-  const [narration, setNarration] = useState(fallback);
-
-  useEffect(() => {
-    let cancelled = false;
-    setNarration(fallback);
-    const req = mealBreakdownNarrationRequest(analysis);
-    void services.coachNarrator.narrate(req).then((text) => {
-      if (!cancelled) setNarration(text);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [analysis.analysisHash, fallback, services.coachNarrator]);
+  // The wait is shown while the person's own model writes; the archetype only once it failed (MM-673).
+  const narration = useCoachNarration(mealBreakdownNarrationRequest(analysis));
 
   const rows = buildRows(analysis);
 
@@ -147,7 +136,7 @@ export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetPro
     <div className="food-sheet">
       <h2 className="app-headline">{mealLabel(meal)}</h2>
       <p className="food-label">Coach breakdown</p>
-      <p className="app-body">{narration}</p>
+      {narration.text === undefined ? <MmBusyLine label={coachAnalysisWords.writing} /> : <p className="app-body">{narration.text}</p>}
       <MmListGroup>
         {rows.map(([title, subtitle, trailing]) => (
           <MmListRow key={title} title={title} subtitle={subtitle} trailing={trailing} />

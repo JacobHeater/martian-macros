@@ -11,6 +11,7 @@ import type { StoryScenario } from '../../src/gallery/screens/StoryScenario';
 import { weightLossMedicationScenario } from '../../src/gallery/screens/weightLossMedicationScenario';
 import { Fmt } from '../../src/format/Fmt';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { coachBannedWords } from '../support/coachBannedWords';
 import { renderApp } from '../support/renderApp';
 
@@ -28,7 +29,7 @@ async function onCoach(scenario: StoryScenario, then?: (repos: InMemoryRepositor
   await scenario(repos, today);
   await then?.(repos);
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   return repos;
 }
 
@@ -92,7 +93,7 @@ describe('opens on today', () => {
     await choose('2w');
     expect(await (await section()).findByText('14 days through yesterday · 14 fully logged')).toBeInTheDocument();
     await openTab('Food');
-    await openTab('Coach');
+    await openCoach();
     expect(await (await section()).findByText('Today so far')).toBeInTheDocument();
   });
 });

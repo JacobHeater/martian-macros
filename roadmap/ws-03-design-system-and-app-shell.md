@@ -148,6 +148,10 @@ conflicts with this one.
 - Placed 2026-10-13 in step 1: MM-260 (the date dialog's chevron and flat surface; the phone's date control follows the palette and the dialog floats).
 - Placed 2026-10-13 (the component walk): MM-262 (epic), MM-263 date picker, MM-264 time picker, MM-265 select, MM-266 checkbox and slider, MM-267 pressed states, MM-268 menus, MM-271 overlays, MM-272 snack, MM-273 stories, MM-274 tokens, MM-275 focus ring, MM-276 Ember tint and glyph, MM-277 sheet and cards, MM-279 field errors, MM-280 destructive kind, MM-281 48 dp, MM-282 the document.
 - Added 2026-10-19 (step 20): MM-403 (the iOS shell); MM-407 (the health section stopped folding when it became platform-aware, found by the panel and fixed the same day, done).
+- Added 2026-10-28 (the owner; step 15): MM-668 (cards stand 12 px apart whichever comes first, a section or a surface; a text button in a section body lines up with its words wherever it stands, done).
+- Added 2026-10-28 (the owner; step 15): MM-669 ("Save key" in one row with its field, 12 px apart; a secondary button outlined in the text colour, never the field's violet, done).
+- Added 2026-10-28 (the owner; step 15): MM-673 (a wait on the network is shown as a wait: `MmBusyLine`, `useCoachNarration`, the built-in words only once an ask failed or at once when off, done).
+- Added 2026-10-28 (the owner; step 15): MM-675 (the sheet's head stays put while its content scrolls; its drag and leaving run on the compositor, done).
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.

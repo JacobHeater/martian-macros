@@ -7,4 +7,6 @@
 export interface MmFolds {
   get(key: string): boolean | undefined;
   set(key: string, expanded: boolean): void;
+  /** Every fold open unless left otherwise: the design register draws each fold's inside (MM-321, MM-676). */
+  readonly allOpen?: boolean;
 }

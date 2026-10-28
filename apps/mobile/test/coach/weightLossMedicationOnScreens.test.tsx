@@ -9,6 +9,7 @@ import { dashboardLoaded } from '../support/dashboardLoaded';
 import { openHeadsUp } from '../support/openHeadsUp';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -67,7 +68,7 @@ async function openFood(): Promise<void> {
 
 async function openCoach(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoachTab();
   await screen.findByRole('heading', { name: 'Body' });
 }
 
@@ -160,7 +161,7 @@ it('ticked with no training days, Coach says resistance training with enough pro
 it('ticked with training days set, or not ticked, there is no training note', async () => {
   await seed({ screening: ticked, trainingDaysPerWeek: 3 });
   const view = renderApp(repos, today);
-  await openTab('Coach');
+  await openCoachTab();
   await screen.findByRole('heading', { name: 'Body' });
   expect(screen.queryByText(/best-supported way to keep muscle/)).not.toBeInTheDocument();
   view.unmount();

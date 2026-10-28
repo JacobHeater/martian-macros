@@ -6,7 +6,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -36,7 +36,7 @@ const history = () => first(repos.targets.watchTargetsHistory());
 it('shows the new targets beside the current ones and keeps them only when asked', async () => {
   await seed();
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const button = await screen.findByRole('button', { name: 'Check in now' });
   expect(button).toBeEnabled();
   await userEvent.click(button);
@@ -67,7 +67,7 @@ it('shows the new targets beside the current ones and keeps them only when asked
 it('is off, with an info notice saying why, without a weigh-in from the last seven days', async () => {
   await seed({ lastWeighInDaysAgo: 8 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const button = await screen.findByRole('button', { name: 'Check in now' });
   expect(button).toBeDisabled();
   const note = screen.getByText(/your last weigh-in is more than 7 days old\. Weigh in to turn it on\./);
@@ -80,6 +80,6 @@ it('is off, with an info notice saying why, without a weigh-in from the last sev
 it('a weigh-in six days old is recent enough', async () => {
   await seed({ lastWeighInDaysAgo: 6 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByRole('button', { name: 'Check in now' })).toBeEnabled();
 });
