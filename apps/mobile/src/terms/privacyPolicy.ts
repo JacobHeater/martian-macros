@@ -64,11 +64,12 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
     {
       heading: '4. When the app uses the internet',
       paragraphs: [
-        'The app makes a request over the internet in two cases only, and each starts with you.',
+        'The app makes a request over the internet only in the cases below, and each starts with you.',
         'The food database. When you ask to see which food databases are available, and again when you download one, your phone fetches a file from GitHub, which hosts them. GitHub sees your IP address, which file was asked for, when, and the technical details your phone sends with any download, such as its operating system. Nothing about you or your records is sent.',
         'Looking a food up online. If you allow it, when the food database on this phone does not have a food, the app sends the barcode number you scanned or typed, or the words you searched for, to Open Food Facts and, where the app offers it, to USDA FoodData Central. The request names the app, and the request to USDA FoodData Central carries a key issued to the app, not to you. Those services see your IP address and what was asked. Nothing about you or your records is sent. The app asks before the first lookup; you can choose always, just for now (until you close the app) or never, and change that in Settings, under Data. A food found this way is kept on this phone.',
+        'Coaching phrasing with your own key. If you enter your own API key for Gemini, OpenAI or Anthropic in Settings, under Coach, the app sends the day’s or meal’s summary numbers and food names to the provider you chose, with your key, so it can phrase the coaching note. The provider sees your IP address, your key and the summary sent with the request, under its own privacy policy. No request is made unless you enter a key, and you can remove the key at any time in Settings.',
         'The public page, which is neither. In Settings, under About, "On the web" opens the page where this policy and the terms of use are published, in your phone’s browser. The browser fetches it, not the app, and the app hands it nothing but the page’s address. The page is hosted on GitHub Pages, so GitHub sees your IP address and what your browser sends with the request, under GitHub’s privacy policy and your browser’s own.',
-        'Open Food Facts, USDA FoodData Central and GitHub handle what they receive under their own privacy policies.',
+        'Open Food Facts, USDA FoodData Central, Gemini, OpenAI, Anthropic and GitHub handle what they receive under their own privacy policies.',
       ],
     },
     {

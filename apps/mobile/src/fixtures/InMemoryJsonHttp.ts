@@ -10,8 +10,8 @@ export class InMemoryJsonHttp implements JsonHttp {
   /** Each answer, keyed by text the address must contain; the first match answers. */
   readonly answers = new Map<string, JsonResponse>();
 
-  /** Every request made, in order, with the headers it carried. */
-  readonly requests: { url: URL; headers: Readonly<Record<string, string>> }[] = [];
+  /** Every request made, in order, with the headers and optional body it carried. */
+  readonly requests: { url: URL; headers: Readonly<Record<string, string>>; body?: unknown }[] = [];
 
   /** Throw on every request, as a phone with no connection would. */
   offline = false;
@@ -23,6 +23,14 @@ export class InMemoryJsonHttp implements JsonHttp {
 
   async getJson(url: URL, options?: { headers?: Readonly<Record<string, string>> | undefined }): Promise<JsonResponse> {
     this.requests.push({ url, headers: options?.headers ?? {} });
+    if (this.offline) throw new Error('No connection.');
+    const text = url.toString();
+    for (const [key, response] of this.answers) if (text.includes(key)) return response;
+    return { statusCode: 404, body: undefined };
+  }
+
+  async postJson(url: URL, body: unknown, options?: { headers?: Readonly<Record<string, string>> | undefined }): Promise<JsonResponse> {
+    this.requests.push({ url, headers: options?.headers ?? {}, body });
     if (this.offline) throw new Error('No connection.');
     const text = url.toString();
     for (const [key, response] of this.answers) if (text.includes(key)) return response;

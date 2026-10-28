@@ -1,13 +1,21 @@
+import { useEffect, useState } from 'react';
 import { useApp } from '../app/useApp';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
+import { MmButton } from '../ui/MmButton';
+import { MmIconButton } from '../ui/MmIconButton';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { MmSwitchRow } from '../ui/MmSwitchRow';
+import { MmTextField } from '../ui/MmTextField';
+import { useOverlays } from '../ui/useOverlays';
 import { useCell } from '../app/useCell';
 import { CarbFatBalance } from '../domain/CarbFatBalance';
+import { CoachAiConfig } from '../domain/integration/CoachAiConfig';
+import { CoachAiProvider } from '../domain/integration/CoachAiProvider';
 import { TargetShape } from '../domain/TargetShape';
+import { coachAiProviderLabel } from '../format/coachAiProviderLabel';
 import { weekdayLabel } from '../format/weekdayLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useSettingsSection } from './useSettingsSection';
@@ -16,8 +24,9 @@ import { CoachSettingsScreen } from './CoachSettingsScreen';
 import { WeekShapeScreen } from './WeekShapeScreen';
 
 /**
- * Settings' Coach section (MM-364): one row that opens the coaching
- * insights' switches, as Pause opens its screen from Today's setup; and the
+ * Settings' Coach section (MM-364, MM-665): one row that opens the coaching
+ * insights' switches, as Pause opens its screen from Today's setup; optional
+ * BYOK provider and API key configuration for coaching narration; and the
  * switches for exact targets (MM-123) and easing into maintenance (MM-130),
  * both off by default; and the rows that open the balance of carbs and fat
  * (MM-122) and the week's shape (MM-124).
@@ -26,9 +35,44 @@ export function CoachSettingsSection() {
   // Folds in place, closed until opened (MM-398).
   const fold = useSettingsSection('coach');
   const navigator = useNavigator();
+  const overlays = useOverlays();
   const { services, state } = useApp();
   const exact = useLoaded(state.exactTargets) ?? false;
   const ease = useLoaded(state.easeIntoMaintenance) ?? false;
+  const aiConfig = useLoaded(state.coachAiConfig) ?? CoachAiConfig.off;
+  const [keyDraft, setKeyDraft] = useState(aiConfig.apiKey);
+  useEffect(() => {
+    setKeyDraft(aiConfig.apiKey);
+  }, [aiConfig.apiKey, aiConfig.provider]);
+
+  const chooseAiProvider = () =>
+    void overlays
+      .options({
+        title: 'AI coaching phrasing',
+        options: CoachAiProvider.values.map((value) => ({ value, label: coachAiProviderLabel(value) })),
+        selected: aiConfig.provider,
+      })
+      .then((chosen) => {
+        if (chosen !== undefined) {
+          void services.coachAi.saveConfig({
+            provider: chosen.value,
+            apiKey: chosen.value === 'none' ? '' : aiConfig.apiKey,
+          });
+        }
+      });
+
+  const saveApiKey = () => {
+    const trimmed = keyDraft.trim();
+    void services.coachAi.saveConfig({ provider: aiConfig.provider, apiKey: trimmed }).then(() => {
+      overlays.snack(trimmed === '' ? 'API key cleared.' : 'API key saved on this device.');
+    });
+  };
+
+  const aiSubtitle =
+    aiConfig.provider === 'none'
+      ? `${coachAiProviderLabel('none')}. All coaching numbers are worked out on this phone.`
+      : `${coachAiProviderLabel(aiConfig.provider)}${aiConfig.apiKey.trim() === '' ? ' · enter your API key below' : ' · key saved on this device'}. Numbers stay deterministic.`;
+
   const shape = TargetShape.on(useLoaded(state.targetShapes) ?? [], useCell(state.today));
   const fatShare = shape?.balance?.fatShare ?? CarbFatBalance.issuedFatShare;
   const balanceName =
@@ -50,6 +94,33 @@ export function CoachSettingsSection() {
           opens
           onPress={() => void navigator.push(() => <CoachSettingsScreen />)}
         />
+        <MmListRow
+          leadingIcon="coach"
+          title="AI coaching phrasing"
+          subtitle={aiSubtitle}
+          trailingAction={
+            <MmIconButton icon="edit" label="Change AI coaching provider" opens="listbox" onPress={chooseAiProvider} />
+          }
+        />
+        {aiConfig.provider === 'none' ? null : (
+          <MmListRow
+            title="API key"
+            subtitle="Kept on this phone outside backup files. Leave blank and save to clear."
+            entry={
+              <div className="number-entry">
+                <div className="number-entry__field">
+                  <MmTextField
+                    label="Coaching API key"
+                    value={keyDraft}
+                    hint="Paste your API key"
+                    onChange={setKeyDraft}
+                  />
+                </div>
+                <MmButton label="Save key" kind="secondary" onPress={saveApiKey} />
+              </div>
+            }
+          />
+        )}
         <MmListRow
           leadingIcon="percent"
           title="Carbs and fat balance"

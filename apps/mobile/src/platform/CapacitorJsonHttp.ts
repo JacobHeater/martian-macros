@@ -19,4 +19,20 @@ export class CapacitorJsonHttp implements JsonHttp {
     });
     return { statusCode: response.status, body: response.data };
   }
+
+  async postJson(url: URL, body: unknown, options?: { headers?: Readonly<Record<string, string>> | undefined }): Promise<JsonResponse> {
+    const response = await CapacitorHttp.post({
+      url: url.toString(),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        ...(options?.headers ?? {}),
+      },
+      data: body,
+      responseType: 'json',
+      connectTimeout: 15_000,
+      readTimeout: 15_000,
+    });
+    return { statusCode: response.status, body: response.data };
+  }
 }

@@ -1284,3 +1284,14 @@ export const HealthCheckEatingDisorderWeightDisplay = screenStory({
   scenario: demoWith({ screening: { eatingDisorderHistory: true } }),
   open: ({ navigator }) => void navigator.push(() => <HealthCheckScreen />),
 });
+
+/** MM-665: Settings > Coach with a BYOK provider chosen and its API key field shown. */
+export const CoachAiProviderConfigured = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Google Gemini \(your key\)/,
+  device: async (services) => {
+    await services.coachAi.saveConfig({ provider: 'gemini', apiKey: 'AIzaSyDemoKey' });
+    return services;
+  },
+  open: settingsAt('coach'),
+});
