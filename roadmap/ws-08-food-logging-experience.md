@@ -198,7 +198,7 @@ workstream's.
   day's mark is a row after the meals, not a flag in the header; done), MM-656 (an unstated fiber is counted as
   none, so a soda is graded; done), MM-657 (a logged entry says where its numbers came from; done), MM-658 (the fluid ounce under "Cup / spoon"
   for every food; done), MM-659 (the edit sheet shows the entry's grade; done), MM-660 (a fried or sweet-and-fatty food grades no
-  better than C-; done).
+  better than C-; done), MM-661 (a long press on a food starts choosing, with a haptic tap; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

@@ -373,6 +373,12 @@
   cursor: pointer;
   transition: background var(--motion-fast);
 }
+/* A hold that means something (MM-661): no text selection or callout under the finger meanwhile. */
+.mm-pressable-holds {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* ---- Fields ---- */
 

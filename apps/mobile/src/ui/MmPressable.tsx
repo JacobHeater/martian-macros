@@ -1,6 +1,10 @@
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import type { MmAnchor } from './MmAnchor';
 import './ui.css';
+
+/** How long a finger holds still before the hold counts (MM-661), and how far it may drift meanwhile. */
+const holdMs = 500;
+const holdSlopPx = 8;
 
 interface MmPressableProps {
   /** What pressing does, said aloud when the content does not say it. */
@@ -14,6 +18,11 @@ interface MmPressableProps {
   onPress: (anchor: MmAnchor) => void;
   /** Takes focus when it first draws: where focus goes back to after something it stood for was replaced (MM-634). */
   autoFocus?: boolean | undefined;
+  /**
+   * What a long press does (MM-661): the finger held still for half a second. The press that follows the hold
+   * is not also a press. A finger that drifts, as a swipe begins, is not holding.
+   */
+  onLongPress?: (() => void) | undefined;
   children: ReactNode;
 }
 
@@ -23,17 +32,57 @@ interface MmPressableProps {
  * nothing of its own, so the content keeps its look, and it is the one way
  * a screen makes a region pressable without a raw button (MM-246).
  */
-export function MmPressable({ label, expanded, controls, describedBy, onPress, children, autoFocus = false }: MmPressableProps) {
+export function MmPressable({ label, expanded, controls, describedBy, onPress, children, autoFocus = false, onLongPress }: MmPressableProps) {
+  const hold = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number }>();
+  const held = useRef(false);
+  const letGo = () => {
+    if (hold.current !== undefined) clearTimeout(hold.current.timer);
+    hold.current = undefined;
+  };
+  const holds = onLongPress !== undefined;
   return (
     <button
       type="button"
-      className="mm-pressable"
+      className={`mm-pressable${holds ? ' mm-pressable-holds' : ''}`}
       aria-label={label}
       aria-expanded={expanded}
       aria-controls={controls}
       aria-describedby={describedBy}
       autoFocus={autoFocus}
-      onClick={(event) => onPress(event.currentTarget.getBoundingClientRect())}
+      onPointerDown={
+        !holds
+          ? undefined
+          : (event) => {
+              letGo();
+              held.current = false;
+              const timer = setTimeout(() => {
+                hold.current = undefined;
+                held.current = true;
+                onLongPress();
+              }, holdMs);
+              hold.current = { timer, x: event.clientX, y: event.clientY };
+            }
+      }
+      onPointerMove={
+        !holds
+          ? undefined
+          : (event) => {
+              const start = hold.current;
+              if (start !== undefined && Math.hypot(event.clientX - start.x, event.clientY - start.y) > holdSlopPx) letGo();
+            }
+      }
+      onPointerUp={holds ? letGo : undefined}
+      onPointerCancel={holds ? letGo : undefined}
+      onPointerLeave={holds ? letGo : undefined}
+      // The phone's own long-press menu never shows over a hold that means something here.
+      onContextMenu={holds ? (event) => event.preventDefault() : undefined}
+      onClick={(event) => {
+        if (held.current) {
+          held.current = false;
+          return;
+        }
+        onPress(event.currentTarget.getBoundingClientRect());
+      }}
     >
       {children}
     </button>

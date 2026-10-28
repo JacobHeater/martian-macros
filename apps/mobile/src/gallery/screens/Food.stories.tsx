@@ -1,5 +1,5 @@
 import type { Meta } from '@storybook/react-vite';
-import { expect, screen, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { showSaveMealSheet } from '../../food/meal/showSaveMealSheet';
 import { showEasyToMissSheet } from '../../food/showEasyToMissSheet';
@@ -132,6 +132,21 @@ export const FoodChoosing = screenStory({
     const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
     if (more !== undefined) await userEvent.click(more);
     await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Select' }));
+  },
+});
+
+/** MM-661 (the owner): a long press on a food starts choosing with it ticked, one tap under the finger. */
+export const FoodChoosingByLongPress = screenStory({
+  covers: ['FoodScreen'],
+  shows: /chosen$/,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [row] = await within(canvas).findAllByRole('button', { name: /^Edit / });
+    if (row === undefined) return;
+    const at = { clientX: 100, clientY: 100, pointerId: 1 };
+    fireEvent.pointerDown(row, at);
+    await new Promise((resolve) => setTimeout(resolve, 650));
+    fireEvent.pointerUp(row, at);
   },
 });
 
