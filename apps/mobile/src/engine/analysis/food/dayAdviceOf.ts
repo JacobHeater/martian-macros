@@ -77,7 +77,8 @@ export function dayAdviceOf(finding: CoachFinding, c: DayAdviceContext, named: R
     kind: 'add',
     nutrient: 'protein',
     ...(c.proteinLeftG > 0 ? { amountG: c.proteinLeftG } : {}),
-    ...(fit === undefined || c.kcalLeft <= 0 ? {} : { addFood: fit.name }),
+    ...(c.kcalLeft >= 0 ? { amountKcal: c.kcalLeft } : {}),
+    ...(fit === undefined || c.kcalLeft <= 0 || c.proteinLeftG * 4 > c.kcalLeft ? {} : { addFood: fit.name }),
   };
 
   switch (finding.kind === 'fix' ? finding.signal : finding.kind) {

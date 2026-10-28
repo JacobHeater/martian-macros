@@ -27,6 +27,8 @@ export interface MealBreakdownAnalysis {
   readonly requiredRestOfDayDensity: number;
   /** True when `proteinRemainingG * 4 > kcalRemaining` (and `kcalRemaining >= 0`). */
   readonly proteinUnrecoverable: boolean;
+  /** Stable cache hash of the meal breakdown inputs and swap outcome. */
+  readonly analysisHash: string;
   /** The single item in the meal contributing the most unbacked calories for the least protein. */
   readonly outlierItem?:
     | {
