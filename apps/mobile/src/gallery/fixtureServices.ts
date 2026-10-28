@@ -14,6 +14,8 @@ import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoo
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
 import { InMemoryClipboard } from '../fixtures/InMemoryClipboard';
+import { InMemoryCoachAiStore } from '../fixtures/InMemoryCoachAiStore';
+import { InMemoryCoachNarrator } from '../fixtures/InMemoryCoachNarrator';
 import { InMemoryHaptics } from '../fixtures/InMemoryHaptics';
 import { InMemoryMealShare } from '../fixtures/InMemoryMealShare';
 import { InMemoryPhotoLibrary } from '../fixtures/InMemoryPhotoLibrary';
@@ -55,6 +57,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     // Never the phone's picker or share sheet: photos are fixtures, and what is sent is only kept (MM-599).
     photoLibrary: new InMemoryPhotoLibrary(),
     mealShare: new InMemoryMealShare(),
+    coachAi: new InMemoryCoachAiStore(),
+    coachNarrator: new InMemoryCoachNarrator(),
     // Never the device's notifications.
     reminderScheduler: new InMemoryReminderScheduler(),
     // Exact alarms allowed, unless a story or a test is about asking (MM-248).

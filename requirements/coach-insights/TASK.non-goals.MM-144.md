@@ -63,7 +63,7 @@ Choices I made without asking (say if any is wrong). The list, each with its rea
 **Product**
 - **No social feed, leaderboards, challenges or public sharing of weight** (MM-74).
 - **No streaks or rewards tied to weight, deficit or under-eating** (MM-92).
-- **No AI-generated advice at run time** (MM-141). Every sentence the coach says is a reviewed rule.
+- **No AI-generated advice at run time** (MM-141). Every sentence the coach says is a reviewed rule. *Amended by the product owner on 2026-10-27 (MM-664, MM-665):* all coaching math and invariants stay deterministic with offline archetypes; a person may optionally supply their own API key (Gemini, OpenAI, Anthropic) to phrase the deterministic brief, bounded by `verifyCoachNarration`.
 - **No engagement notifications**: nothing is sent to bring the user back for its own sake (MM-146).
 
 ## Description
