@@ -83,7 +83,10 @@ function buildRows(analysis: MealBreakdownAnalysis): readonly BreakdownRow[] {
     const deltas: string[] = [];
     if (swap.caloriesSaved > 0) deltas.push(`−${Fmt.kcal(swap.caloriesSaved)}`);
     if (swap.proteinGained > 0) deltas.push(`+${Fmt.grams(swap.proteinGained)} protein`);
-    const trailing = deltas.length > 0 ? deltas.join(' · ') : `${Fmt.kcal(swap.replacementKcal)} · ${Fmt.grams(swap.replacementProteinG)} protein`;
+    const trailing =
+      deltas.length > 0
+        ? deltas.join(' · ')
+        : `${Fmt.kcal(swap.replacementKcal ?? 0)} · ${Fmt.grams(swap.replacementProteinG ?? 0)} protein`;
     rows.push([
       'Suggested swap',
       `${swap.replacementName} in place of ${swap.originalName}`,
@@ -102,7 +105,7 @@ function buildRows(analysis: MealBreakdownAnalysis): readonly BreakdownRow[] {
  */
 export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetProps) {
   const { services, state } = useApp();
-  const dayEntries = useLoaded(state.foodFor(day)) ?? entries;
+  const dayEntries = useLoaded(state.foodForDay(day)) ?? entries;
   const targets = useCell(state.currentTargets)?.targets;
   const foodInput = useCell(state.coachAnalysis.foodInput);
   const safeguards = useCell(state.insightSafeguards);
@@ -113,11 +116,11 @@ export function MealBreakdownSheet({ meal, day, entries }: MealBreakdownSheetPro
 
   const analysis = mealBreakdownAnalysisOf({
     meal,
+    day,
     mealEntries: entries,
     dayEntries,
     candidates: foodInput?.entries ?? dayEntries,
     catalog: foodInput?.catalog,
-    snoozed: foodInput?.snoozed,
     kcalTarget,
     proteinTargetG,
     protectedPath,

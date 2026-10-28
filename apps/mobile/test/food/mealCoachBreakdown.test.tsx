@@ -17,25 +17,30 @@ describe('Meal Coach breakdown sheet and inline food swaps (MM-666)', () => {
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
     await repos.weights.saveWeight(today, 82);
 
-    // Log a higher-protein food yesterday so a swap candidate exists.
-    await repos.food.addFood(
-      new FoodEntry({
-        id: 1,
-        date: today.addDays(-1),
-        meal: 'lunch',
-        name: 'Grilled chicken wrap',
-        kcal: 420,
-        proteinG: 42,
-        carbsG: 36,
-        fatG: 10,
-        source: 'weighed',
-      }),
-    );
+    // Log a higher-protein food on two prior days so a swap candidate meets TradeRule.loggedMinDays.
+    for (const [id, daysAgo] of [
+      [1, 1],
+      [2, 2],
+    ] as const) {
+      await repos.food.addFood(
+        new FoodEntry({
+          id,
+          date: today.addDays(-daysAgo),
+          meal: 'lunch',
+          name: 'Grilled chicken wrap',
+          kcal: 420,
+          proteinG: 42,
+          carbsG: 36,
+          fatG: 10,
+          source: 'weighed',
+        }),
+      );
+    }
 
     // Log a low-protein, calorie-dense lunch item today.
     await repos.food.addFood(
       new FoodEntry({
-        id: 2,
+        id: 3,
         date: today,
         meal: 'lunch',
         name: 'Creamy Alfredo pasta',
