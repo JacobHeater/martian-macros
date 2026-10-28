@@ -167,9 +167,9 @@ export function DashboardScreen() {
           state.folds.put(new Map(state.folds.peek()).set('progress.waist', true));
           state.progressReveal.put('waist');
         } else {
-          state.destinationScroll.put(new Map(state.destinationScroll.peek()).set('progress', 0));
+          state.destinationScroll.put(new Map(state.destinationScroll.peek()).set('coach', 0));
         }
-        open('progress');
+        open('coach');
       },
     });
   const trainedThisWeek = workouts.filter(

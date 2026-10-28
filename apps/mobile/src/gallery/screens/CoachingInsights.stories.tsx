@@ -1,7 +1,6 @@
 import type { Meta } from '@storybook/react-vite';
 import { userEvent, within } from 'storybook/test';
 import type { InsightPreview } from '../../coach/InsightPreview';
-import type { RecentInsight } from '../../coach/RecentInsight';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
 import type { Portion } from '../../domain/food/portion/Portion';
@@ -11,7 +10,6 @@ import { Workout } from '../../domain/training/Workout';
 import { WorkoutExercise } from '../../domain/training/WorkoutExercise';
 import { WorkoutSet } from '../../domain/training/WorkoutSet';
 import { FoodGradeRule } from '../../engine/FoodGradeRule';
-import { ItemAnchor } from '../../engine/ItemAnchor';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
 import { FoodGradeLetter } from '../../domain/food/grade/FoodGradeLetter';
@@ -28,7 +26,6 @@ import { screensMeta } from './screensMeta';
 import { screenStory } from './screenStory';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
-import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
 
 /**
@@ -518,11 +515,6 @@ export const WorkoutInsightOpen = screenStory({
   },
 });
 
-/** The line the workout stories show, for the Coach tab's list: the demo's step-week bench (3 sets, MM-289) and the extra day's 6. */
-const chestJump =
-  '9 sets for chest in the 7 days to this workout. Your usual is about 2 a week. A jump this big can bring more ' +
-  'soreness; adding sets more slowly is easier to recover from.';
-
 // ---- The Dashboard: the waist and water ----
 
 /**
@@ -569,100 +561,6 @@ export const DashboardLargeText = screenStory({
   scenario: waistAndWater,
   textScale: 2,
   walk: async (canvas) => void (await revealed(/^Coach: Water logged on 4/)(canvas)),
-});
-
-// ---- The Coach tab: what was said inline ----
-
-const recent: readonly RecentInsight[] = [
-  { area: 'food', item: 'Peanut butter, snack', day: storyToday.addDays(-1), line: 'Most of this food’s calories come from fat (76%). A protein food alongside balances the meal.' },
-  { area: 'food', item: 'Pasta with cream sauce, lunch', day: storyToday.addDays(-1), line: '14 g of protein in 640 kcal. A protein food alongside is the easiest way to add some.' },
-  { area: 'food', item: 'Granola bar, snack', day: storyToday.addDays(-6), line: 'Logged as 4 servings (480 kcal); one serving is 40 g. Right as logged? If not, the amount can be edited.', changed: true },
-  { area: 'training', item: 'Barbell bench press', day: storyToday, line: chestJump },
-  { area: 'body', item: 'Waist', day: storyToday, line: 'About the same as 4 weeks ago. A difference under 0.75 in is within what a tape can tell.' },
-];
-
-/** Opens the folded Recent insights section and brings it into view. */
-const onCoach = async (canvas: HTMLElement) => {
-  const header = await within(canvas).findByRole('button', { name: /^Recent insights/ }, { timeout: 10000 });
-  await userEvent.click(header);
-  reveal(header);
-};
-
-/** MM-363 (the panel's PD-6): folded to its count, as Monthly reports is. */
-export const CoachRecentInsightsFolded = screenStory({
-  covers: ['CoachScreen'],
-  shows: /^5 in the last 14 days/,
-  preview: { recent },
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: async (canvas) => reveal(await within(canvas).findByRole('button', { name: /^Recent insights/ }, { timeout: 10000 })),
-});
-
-/** MM-363: grouped by area, newest first; an item since changed says so and leads nowhere. */
-export const CoachRecentInsights = screenStory({
-  covers: ['CoachScreen'],
-  shows: 'Item since changed',
-  preview: { recent },
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: onCoach,
-});
-
-/** MM-363: a recent insight pressed leads back to its item's day on Food. */
-export const CoachRecentInsightOpensItem = screenStory({
-  covers: ['CoachScreen', 'FoodScreen'],
-  shows: 'Yesterday',
-  preview: { recent },
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: async (canvas) => {
-    await onCoach(canvas);
-    await userEvent.click(await within(canvas).findByRole('button', { name: /^Peanut butter, snack/ }));
-  },
-});
-
-/** The demo with the chest jump, and its line logged as shown today. */
-const loggedChestJump: StoryScenario = demoWith({
-  then: async (repos, today) => {
-    await extraChestDay(repos, today);
-    const workout = (await valueOf(repos.workouts.watchWorkouts()))[0];
-    if (workout === undefined) return;
-    await repos.inlineInsightLog.recordInlineInsightShown({
-      kind: 'volumeJump',
-      area: 'training',
-      anchor: ItemAnchor.exercise(workout.id, 'barbell-bench-press'),
-      item: 'Barbell bench press',
-      line: chestJump,
-      firstShownOn: today,
-    });
-  },
-});
-
-/** MM-363: what the app logged once the workout's line was shown, listed under Training and leading back to it. */
-export const CoachRecentInsightsLogged = screenStory({
-  covers: ['CoachScreen'],
-  shows: /^1 in the last 14 days/,
-  scenario: loggedChestJump,
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: onCoach,
-});
-
-/** MM-363: a lift's entry pressed opens the workout it was said in, with the line under the bench press. */
-export const CoachRecentInsightOpensWorkout = screenStory({
-  covers: ['CoachScreen', 'WorkoutScreen'],
-  shows: /^9 sets for chest in the 7 days to this workout/,
-  scenario: loggedChestJump,
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: async (canvas) => {
-    await onCoach(canvas);
-    await userEvent.click(await within(canvas).findByRole('button', { name: /^Barbell bench press/ }));
-  },
-});
-
-/** MM-363: nothing said inline in 14 days. */
-export const CoachRecentInsightsNone = screenStory({
-  covers: ['CoachScreen'],
-  shows: /^The coach leaves an insight under a food/,
-  preview: { recent: [] },
-  open: ({ state }) => state.homeTab.put('coach'),
-  walk: onCoach,
 });
 
 // ---- Settings > Coach ----
