@@ -34,7 +34,8 @@ Choices made without asking (say if any is wrong):
 - **After an action, choosing ends.** Showing another day ends it too.
 - **It is the same code as MM-630's**, so a meal's menu and a choice say things the same way.
 - **Focus and what is said** (the UX guard's UX-1): when choosing starts, the box it started from holds
-  the focus and "Choosing: tick the foods to change together" is said. When it ends, focus is back on the
+  the focus and "Choosing: tick the foods to change together" is said (the snack removed by MM-662, the owner,
+  2026-10-27: redundant). When it ends, focus is back on the
   row it started from. The bar stays clear of a snack (MM-302, the designer's PD-1).
 - Follow-ups, since built: the bar's count spoken as it changes (MM-640); focus when the row it started
   from was deleted or moved away, and a story of the bar at 200% text (MM-649); "Done" is "Cancel" (MM-644).
