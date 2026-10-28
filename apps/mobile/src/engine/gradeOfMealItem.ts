@@ -16,9 +16,11 @@ export function gradeOfMealItem(item: MealItemDraft): FoodGradeValue | undefined
   }
   const scale = 100 / grams;
   const per100 = (value: number | undefined) => (value === undefined ? undefined : value * scale);
-  return gradeOfNutrition({
+  return gradeOfNutrition(
+    {
     kcal: kcal * scale,
     proteinG: proteinG * scale,
+    fatG: item.fatG === undefined ? undefined : item.fatG * scale,
     carbsG: carbsG * scale,
     fiberG: per100(item.fiberG),
     sodiumMg: per100(item.micros.of('sodium')),
@@ -26,5 +28,7 @@ export function gradeOfMealItem(item: MealItemDraft): FoodGradeValue | undefined
     saturatedFatG: per100(item.micros.of('saturatedFat')),
     alcoholG: undefined,
     micros: gradeMicrosFrom((n) => item.micros.of(n), scale),
-  });
+    },
+    { name: item.name },
+  );
 }
