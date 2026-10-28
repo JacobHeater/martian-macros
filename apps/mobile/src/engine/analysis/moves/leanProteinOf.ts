@@ -5,6 +5,7 @@ import { isSameFoodName } from '../food/isSameFoodName';
 import { readableFood } from '../swap/readableFood';
 import type { TradeCatalog } from '../TradeCatalog';
 import { TradeRule } from '../TradeRule';
+import { everydayProteinRankOf } from './everydayProteinRankOf';
 import type { MoveFood } from './MoveFood';
 import { MoveRule } from './MoveRule';
 import { proteinGroups } from './proteinGroups';
@@ -20,10 +21,12 @@ const lean = (food: Figures) => food.kcal > 0 && (food.proteinG * 4) / food.kcal
 /**
  * The lean protein food that closes the most of the protein gap inside
  * `maxKcal` (MM-684): the catalog first (the owner, 2026-10-28), from the
- * protein groups at each food's default serving; then the person's own
- * foods logged at `meal` on `TradeRule.loggedMinDays` days, at their
- * median portion. Never a food on the plate, under any spelling, nor one
- * snoozed. The most protein wins, then the fewer calories, then the name.
+ * everyday proteins only (MM-688), the first on that list the catalog
+ * holds a fitting serving of, at each food's default serving; then the
+ * person's own foods logged at `meal` on `TradeRule.loggedMinDays` days,
+ * at their median portion. Never a food on the plate, under any spelling,
+ * nor one snoozed. Among the same everyday food, and among the person's
+ * own, the most protein wins, then the fewer calories, then the name.
  * Undefined when nothing fits.
  */
 export function leanProteinOf(input: {
@@ -40,15 +43,17 @@ export function leanProteinOf(input: {
   const better = (a: MoveFood, b: MoveFood) => b.proteinG - a.proteinG || a.kcal - b.kcal || (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 
   if (input.catalog !== undefined) {
-    const found: MoveFood[] = [];
+    const found: { readonly rank: number; readonly food: MoveFood }[] = [];
     for (const group of proteinGroups) {
       for (const food of input.catalog.candidatesIn(group, { minKcal: 1, maxKcal: input.maxKcal })) {
         if (!readableFood(food) || !lean(food) || barred(food.name)) continue;
-        found.push({ name: food.name, kcal: food.kcal, proteinG: food.proteinG, fatG: food.fatG, source: 'catalog' });
+        const rank = everydayProteinRankOf(food);
+        if (rank === undefined) continue;
+        found.push({ rank, food: { name: food.name, kcal: food.kcal, proteinG: food.proteinG, fatG: food.fatG, source: 'catalog' } });
       }
     }
-    found.sort(better);
-    if (found[0] !== undefined) return found[0];
+    found.sort((a, b) => a.rank - b.rank || better(a.food, b.food));
+    if (found[0] !== undefined) return found[0].food;
   }
 
   const byKey = new Map<string, FoodEntry[]>();

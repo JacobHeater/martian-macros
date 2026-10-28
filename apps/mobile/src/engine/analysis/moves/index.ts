@@ -1,6 +1,9 @@
 /** One move per meal, ranked by the day's gap (MM-684). */
 export * from './addProteinOf';
 export * from './cutPortionOf';
+export * from './EverydayProtein';
+export * from './everydayProteinRankOf';
+export * from './everydayProteins';
 export * from './foodMovesOf';
 export * from './leanProteinOf';
 export * from './MealAfter';

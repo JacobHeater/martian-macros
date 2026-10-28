@@ -14,12 +14,32 @@ const forbiddenPatterns: readonly RegExp[] = [
 ];
 
 /**
+ * Words about the figures, the instructions or the tools instead of the
+ * day (MM-689): the owner's brief of 2026-10-28 opened "I'll work from
+ * the JSON you supplied; the protein gap is marked as unable to fit".
+ */
+const metaTalk: readonly RegExp[] = [
+  /\bjson\b/i,
+  /\b(you|that\s+you)\s+(supplied|provided|sent|gave\s+me)\b/i,
+  /\bI\s+(was|have\s+been|(?:'|’)ve\s+been)\s+(given|supplied|provided|sent)\b/i,
+  /\b(supplied|provided|given)\s+(json|data|figures|numbers|input|payload)\b/i,
+  /\b(data|figures|numbers|input|payload)\s+(you\s+|that\s+you\s+)?(supplied|provided|gave|sent)\b/i,
+  /\b(according\s+to|based\s+on|from)\s+(the|your)\s+(json|data|figures|payload|input)\b/i,
+  /\bI(?:'|’)?(?:ll|\s+will|\s+am\s+going\s+to|(?:'|’)m\s+going\s+to)\s+(work|go|start)\s+(from|with|off|straight)\b/i,
+  /\b(is|are|was|were)\s+(marked|flagged)\s+as\b/i,
+  /\b(the|a|my|your)\s+(tools?|function|tool\s+calls?|instructions?|prompt|system\s+prompt)\b/i,
+  /\b(tool|function)\s+(call|calls|answer|result|results|output)s?\b/i,
+];
+
+/**
  * Why a candidate coaching narration (such as one returned by a BYOK LLM
  * provider) may not be shown, in a few words, or undefined when it may: it
  * must be non-empty, bounded in length, free of banned words, respect the
  * protected eating-disorder safeguard, not contradict the mathematical
  * invariant when protein is unrecoverable, and cite only the figures it was
- * given (MM-663). The reason is shown by Settings' test of the voice (MM-671).
+ * given (MM-663), and speak of the day, never of its figures, its
+ * instructions or its tools (MM-689). The reason is shown by Settings' test
+ * of the voice (MM-671).
  */
 export function whyCoachNarrationRejected(
   text: string,
@@ -33,6 +53,9 @@ export function whyCoachNarrationRejected(
   if (trimmed.length < 20) return 'It said too little';
   if (trimmed.length > 900) return 'It said too much';
   if (trimmed.includes('!')) return 'It used an exclamation mark';
+  for (const pattern of metaTalk) {
+    if (pattern.test(trimmed)) return 'It spoke of its figures or tools instead of the day';
+  }
   // A JSON field read aloud ("Because proteinUnrecoverable is true", the owner's breakdown, MM-674).
   const fieldName = /\b[a-z]+[A-Z][A-Za-z]*\b/.exec(trimmed)?.[0];
   if (fieldName !== undefined) return `It read out a field name (${fieldName})`;
