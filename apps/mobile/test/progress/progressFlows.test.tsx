@@ -9,6 +9,7 @@ import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -26,7 +27,7 @@ beforeEach(async () => {
 
 async function openProgress() {
   const view = renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Weight trend' });
   return view;
 }

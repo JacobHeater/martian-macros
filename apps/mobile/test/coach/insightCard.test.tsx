@@ -15,6 +15,7 @@ import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 
 /**
  * MM-141: one rationed insight, in fixed words, with its evidence. Carried over from insight_card_test.dart. Since
@@ -247,7 +248,7 @@ describe('on the dashboard', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
     expect(card()).toBeNull();
     expect(await first(repos.trendLog.watchFindingDismissals())).toEqual([{ findingId: 'proteinMinimum:level', dismissedOn: today }]);
-    await openTab('Coach');
+    await openCoach();
     const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     await userEvent.click(await section.findByRole('button', { name: '2w' }));
     await userEvent.click(await section.findByRole('button', { name: '1 finding hidden' }));
@@ -258,7 +259,7 @@ describe('on the dashboard', () => {
     const repos = await shortOnProtein();
     renderApp(repos, today);
     await screen.findByRole('heading', { name: /^Protein minimum met on 0 of 14 days/ });
-    await openTab('Coach');
+    await openCoach();
     const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     await userEvent.click(await section.findByRole('button', { name: '2w' }));
     await userEvent.click(await section.findByRole('button', { name: 'Dismiss: Protein minimum met on 0 of 14 days' }));
@@ -270,7 +271,10 @@ describe('on the dashboard', () => {
   it('pressed, the card opens its section on the Coach tab, on the span it reads', async () => {
     const repos = await shortOnProtein();
     renderApp(repos, today);
-    await userEvent.click(await screen.findByRole('button', { name: /^Open on Coach: Protein minimum met on 0 of 14 days/ }));
+    const open = await screen.findByRole('button', { name: /^Open on Coach: Protein minimum met on 0 of 14 days/ });
+    // MM-668: directly in the section body, where the rule that lines its label up with the words reaches it.
+    expect(open.parentElement?.classList.contains('mm-section-body')).toBe(true);
+    await userEvent.click(open);
     const section = within(await screen.findByRole('region', { name: 'Coach’s feedback' }, { timeout: 5000 }));
     expect(await section.findByRole('heading', { name: 'Protein minimum met on 0 of 14 days' })).toBeInTheDocument();
   });

@@ -199,6 +199,8 @@ export class AppState {
 
   /** Counts imports from the health platform; what was imported is read again when it changes. */
   private readonly imports = new ValueCell(0);
+  /** How many times the Coach tab was pulled to refresh (MM-670): the coach's words are asked for afresh each time. */
+  readonly coachRefreshes = new ValueCell(0);
 
   readonly setup: StreamCell<UserSetup | undefined>;
 
@@ -220,6 +222,8 @@ export class AppState {
 
   /** Every remembered fold (MM-286), by the key its section or disclosure gives, as it was left. */
   readonly folds = new ValueCell<ReadonlyMap<string, boolean>>(new Map());
+  /** Every fold open unless left otherwise (MM-676): set by the design register, so each fold's inside is drawn; never by the app. */
+  readonly foldsAllOpen = new ValueCell(false);
 
   /** How far each destination was scrolled when it was left (MM-286), so a return finds it there. */
   readonly destinationScroll = new ValueCell<ReadonlyMap<HomeDestination, number>>(new Map());
@@ -1750,6 +1754,16 @@ export class AppState {
   /** Reads the day from the clock again; call when the app comes back to the front. */
   refreshToday(): void {
     this.today.put(this.services.clock.today());
+  }
+
+  /**
+   * Everything the Coach tab shows, read again (MM-670, a pull to refresh): the day from the clock, the health
+   * platform's new weigh-ins and workouts, and the coach's words asked of the person's own model afresh.
+   */
+  async refreshCoach(): Promise<void> {
+    this.refreshToday();
+    this.coachRefreshes.put(this.coachRefreshes.peek() + 1);
+    await this.syncHealth('asked');
   }
 
   /** Call after an import from the health platform, so what was imported is read again. */

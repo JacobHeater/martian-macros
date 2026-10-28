@@ -5,7 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -25,7 +25,7 @@ beforeEach(async () => {
 
 async function openProgress(): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   // Folded to its line (MM-578): opened here, as a person would.
   const header = await screen.findByRole('button', { name: /^Weight events/ });
   await userEvent.click(header);

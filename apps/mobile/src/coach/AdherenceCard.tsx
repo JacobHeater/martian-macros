@@ -18,9 +18,18 @@ export function AdherenceCard() {
   // On a weight-loss medication the protein-minimum days are the first line (MM-113, MM-510).
   const weightLossMedication = useLoaded(state.setup)?.screening.weightLossMedication ?? false;
   if (summary === undefined || floor === undefined) return null;
+  const lines = adherenceLines(summary, { floorKcal: floor, underEatingNotice, weightLossMedication });
+  const first = lines[0];
   return (
-    <MmSection framed icon="checklist" title="Your last 7 days">
-      {adherenceLines(summary, { floorKcal: floor, underEatingNotice, weightLossMedication }).map(({ label, value, detail }) => (
+    <MmSection
+      icon="checklist"
+      title="Your last 7 days"
+      summary={first === undefined ? undefined : `${first.label}: ${first.value}`}
+      collapsible
+      initiallyExpanded={false}
+      remember="coach.adherence"
+    >
+      {lines.map(({ label, value, detail }) => (
         <StatRow key={label} label={label} value={value} detail={detail} />
       ))}
       <p className="app-caption">

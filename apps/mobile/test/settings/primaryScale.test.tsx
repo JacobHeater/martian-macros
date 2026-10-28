@@ -8,7 +8,7 @@ import { HealthImporter } from '../../src/healthIngest/HealthImporter';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { first } from '../support/first';
 import { openEverySection, openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -61,7 +61,7 @@ const weighIn = () => screen.getByRole<HTMLInputElement>('textbox', { name: 'Tod
 
 async function openProgress(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Weight trend' });
 }
 

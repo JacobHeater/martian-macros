@@ -9,7 +9,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { topLayer } from '../support/topLayer';
 
@@ -156,7 +156,7 @@ it('the Coach screen says it is paused and offers the way out', async () => {
   await seed();
   await repos.pauses.savePause(pause(-2, 5));
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('Paused until Oct 10')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Manage pause' }));
   expect(await within(topLayer()).findByRole('button', { name: 'Resume now' })).toBeInTheDocument();

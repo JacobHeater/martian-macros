@@ -6,7 +6,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-155: a waist entry of three readings, or of one. Carried over from waist_entry_test.dart. */
@@ -27,7 +27,7 @@ let card: HTMLElement;
 
 async function openWaist(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   card = (await screen.findByRole('heading', { name: 'Waist' })).closest('.mm-section') as HTMLElement;
   // Folded to its line until opened (MM-257).
   await userEvent.click(within(card).getByRole('button', { name: /^Waist/ }));

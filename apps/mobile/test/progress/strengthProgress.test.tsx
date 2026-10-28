@@ -17,7 +17,7 @@ import { AppState } from '../../src/state/AppState';
 import { failsFirst } from '../support/failsFirst';
 import { first } from '../support/first';
 import { never } from '../support/never';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { overriding } from '../support/overriding';
 import { renderApp } from '../support/renderApp';
 import { servicesOf } from '../support/servicesOf';
@@ -42,8 +42,19 @@ async function fresh(units: UnitSystem = 'metric'): Promise<InMemoryRepositories
 
 async function open(repos: InMemoryRepositories, change?: (services: AppServices) => AppServices): Promise<void> {
   renderApp(repos, today, change === undefined ? {} : { change });
-  await openTab('Progress');
-  await screen.findByRole('heading', { name: 'Strength trends' });
+  await openCoach();
+  // Every fold starts closed (MM-676): opened here, as a person would.
+  const heading = await screen.findByRole('heading', { name: 'Strength trends' });
+  // Its header is a button once the lifts are read; while they load, or failed, the heading stands alone.
+  await openStrength(heading.closest('.mm-section') as HTMLElement);
+}
+
+/** Opens the Strength trends fold, which starts closed (MM-676), once its header is a button; nothing where it never is. */
+async function openStrength(section: HTMLElement): Promise<void> {
+  const header = await within(section)
+    .findByRole('button', { name: /^Strength trends/ })
+    .catch(() => null);
+  if (header?.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
 }
 
 /** The lifts shown under "Strength trends": its rows, less the one that opens every lift (MM-344). */
@@ -88,6 +99,8 @@ it('loading, read failure and retry are explicit', async () => {
   const before = read.attempts();
   read.recover();
   await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+  // Read at last, the fold is drawn anew, closed (MM-676): opened again.
+  await openStrength((await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement);
   expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
   expect(read.attempts()).toBeGreaterThan(before);
 });
@@ -130,6 +143,7 @@ for (const exerciseRead of [false, true]) {
     const before = read.attempts();
     read.recover();
     await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    await openStrength((await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement);
     expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
     expect(read.attempts()).toBeGreaterThan(before);
   });
@@ -158,8 +172,6 @@ it('the detail chart includes older history', async () => {
   const repos = await fresh();
   await repos.workouts.saveWorkout(workout({ daysAgo: 200 }));
   await open(repos);
-  // No lift in the last 90 days: the section starts folded (MM-578), and is opened by its header.
-  await userEvent.click(screen.getByRole('button', { name: /^Strength trends/ }));
   await userEvent.click(screen.getByRole('button', { name: /^All lift histories/ }));
   await userEvent.click(await screen.findByRole('button', { name: /^Barbell bench press/ }));
   const chart = await within(topLayer()).findByRole('img', { name: /history, / });
@@ -173,6 +185,8 @@ it('empty data is honest and a new workout appears as it is saved', async () => 
   await open(repos);
   expect(screen.getByText('Finish a workout in Train to start your strength history.')).toBeInTheDocument();
   const id = await repos.workouts.saveWorkout(workout());
+  // The fold is drawn anew with its first lift (MM-578), closed (MM-676): opened again.
+  await openStrength((await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement);
   expect(await screen.findByText(/^Est\. max 120\.0 kg · /)).toBeInTheDocument();
   expect(cards()).toHaveLength(1);
   await repos.workouts.saveWorkout(workout({ load: 80 }).copyWith({ id }));

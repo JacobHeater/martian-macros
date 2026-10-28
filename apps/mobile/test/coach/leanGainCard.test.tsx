@@ -8,7 +8,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { leanGainScenario } from '../../src/gallery/screens/leanGainScenario';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -44,7 +44,7 @@ describe('the lean-gain card', () => {
 
   async function openCoach(): Promise<void> {
     renderApp(repos, today);
-    await openTab('Coach');
+    await openCoachTab();
     await screen.findByRole('heading', { name: 'Body' });
   }
 

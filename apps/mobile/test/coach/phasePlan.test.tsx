@@ -6,7 +6,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -46,7 +46,7 @@ async function phase({
   for (let i = 0; i <= daysAgo + 14; i++) await repos.weights.saveWeight(today.addDays(-i), 80 + (i * kgPerWeek) / 7);
 }
 
-const goalSection = async () => (await screen.findByRole('heading', { name: /^Goal:/ })).closest('.mm-section') as HTMLElement;
+const goalSection = async () => (await screen.findByRole('heading', { name: 'Goal' })).closest('.mm-section') as HTMLElement;
 
 it('a steady cut toward its goal shows how long it has run and about when the goal is reached', async () => {
   // Six weeks in: the start of a cut frees the trend's slope while glycogen settles (MM-131), so two weeks in the pace is not yet
@@ -54,7 +54,7 @@ it('a steady cut toward its goal shows how long it has run and about when the go
   // well before the sixteen weeks.
   await phase({ percent: 20, daysAgo: 42 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   expect(within(section).getByText('This phase')).toBeInTheDocument();
   expect(within(section).getByText('6 weeks')).toBeInTheDocument();
@@ -66,13 +66,13 @@ it('a steady cut toward its goal shows how long it has run and about when the go
 it('a man cut to 12% is recommended maintenance, then a lean gain, says why, and the goal changes only when he takes it', async () => {
   await phase({ percent: 12, daysAgo: 70 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   const notice = within(section).getByText('Next: Maintenance, then Lean gain').closest('.mm-notice') as HTMLElement;
   expect(within(notice).getByText(/^The lower end of your body-fat range has reached 15%, this cut’s goal\./)).toBeInTheDocument();
   expect((await first(repos.setup.watchSetup()))?.goalMode).toBe('fatLoss');
   await userEvent.click(within(notice).getByRole('button', { name: 'Start maintenance' }));
-  await screen.findByRole('heading', { name: 'Goal: Maintenance' });
+  await screen.findByText('Maintenance', { selector: '.mm-section-summary' });
   expect((await first(repos.setup.watchSetup()))?.goalMode).toBe('maintenance');
 });
 
@@ -80,7 +80,7 @@ it('with an eating-disorder history the phase shows, and nothing is projected or
   // A gain at 19%, whose range would otherwise end it (MM-129's line); a deficit is not offered with this history.
   await phase({ goal: 'leanGain', percent: 19, daysAgo: 70, kgPerWeek: -0.25, eatingDisorderHistory: true });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const section = await goalSection();
   expect(within(section).getByText('This phase')).toBeInTheDocument();
   expect(within(section).queryByText('Projected end')).not.toBeInTheDocument();
@@ -99,7 +99,7 @@ it('a gain past its line: the end is said once, on the lean-gain card, and the g
     );
   }
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await screen.findByRole('heading', { name: /^Lean gain, week/ });
   expect(screen.getAllByText(/recommends ending/)).toHaveLength(1);
   expect(screen.getAllByText(/^Next: Maintenance, then Fat loss$/)).toHaveLength(1);

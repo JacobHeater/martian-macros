@@ -21,6 +21,9 @@ beforeEach(async () => {
   await new DemoSeed(today).replace(repos);
 });
 
+/** Opens the body fold, which starts closed (MM-676); on a return it is remembered open. */
+const openBody = async () => userEvent.click(await screen.findByRole('button', { name: /^Body measurements and weigh-in/ }));
+
 const waistHeader = async () => {
   const section = (await screen.findByRole('heading', { name: 'Waist' })).closest('.mm-section') as HTMLElement;
   return within(section).getByRole('button', { name: /^Waist/ });
@@ -29,6 +32,8 @@ const waistHeader = async () => {
 it('a fold opened on Progress is still open after a visit to Food', async () => {
   renderApp(repos, today);
   await openTab('Progress');
+  // Every fold starts closed (MM-676): the body fold first, then the waist inside it.
+  await openBody();
   expect(await waistHeader()).toHaveAttribute('aria-expanded', 'false');
   await userEvent.click(await waistHeader());
   expect(await waistHeader()).toHaveAttribute('aria-expanded', 'true');
@@ -42,6 +47,7 @@ it('a fold opened on Progress is still open after a visit to Food', async () => 
 it('the range chosen on the trend survives a visit to Coach', async () => {
   renderApp(repos, today);
   await openTab('Progress');
+  await openBody();
   const range = async () => within(await screen.findByRole('group', { name: 'Trend range' }));
   await userEvent.click((await range()).getByRole('button', { name: '90d' }));
   expect((await range()).getByRole('button', { name: '90d' })).toHaveAttribute('aria-pressed', 'true');
@@ -55,6 +61,7 @@ it('the range chosen on the trend survives a visit to Coach', async () => {
 it('how far a destination was scrolled is kept and put back on return', async () => {
   const { repos: stores } = renderApp(repos, today);
   await openTab('Progress');
+  await openBody();
   await screen.findByText(/^Trend weight/);
   const body = document.querySelector('main.app-body') as HTMLElement;
   // The test browser lays nothing out: the body is given a height to scroll in.

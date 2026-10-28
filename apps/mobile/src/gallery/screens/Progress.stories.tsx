@@ -25,6 +25,7 @@ import { reveal } from './reveal';
 import { screensMeta } from './screensMeta';
 import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
+import { unfolded } from './unfolded';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
 import { waistDownScenario } from './waistDownScenario';
@@ -45,14 +46,14 @@ export default meta;
 export const Progress = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Weight trend',
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
 });
 
 /** MM-91: Progress on a 360 px phone: the weigh-in, the figure and the chart inside the width, the range switch beside its heading. */
 export const ProgressSmallPhone = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Weight trend',
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
   viewport: 'smallPhone',
 });
 
@@ -60,7 +61,7 @@ export const ProgressSmallPhone = screenStory({
 export const ProgressLargeText = screenStory({
   covers: ['ProgressScreen'],
   shows: 'Weight trend',
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
   textScale: 2,
 });
 
@@ -76,7 +77,7 @@ export const PeriodDays = screenStory({
     }
     for (let i = 10; i >= 6; i--) await repos.flowDays.markFlowDay(today.addDays(-i));
   },
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
   walk: async (canvas) => {
     reveal(await within(canvas).findByRole('heading', { name: 'Period days' }));
   },
@@ -86,7 +87,7 @@ export const AddWeightEvent = screenStory({
   covers: ['WeightEventEntrySheet'],
   shows: 'Add a weight event',
   open: ({ state, overlays, today }) => {
-    state.homeTab.put('progress');
+    unfolded(state, 'progress');
     void overlays.sheet<void>('Add a weight event', (close) => (
       <WeightEventEntrySheet today={today} onDone={() => close()} />
     ));
@@ -107,12 +108,14 @@ export const LiftHistory = screenStory({
 
 // ---- MM-321: the Progress screen's states no story drew ----
 
-const onProgress = ({ state }: StoryStage) => state.homeTab.put('progress');
+const onProgress = ({ state }: StoryStage) => unfolded(state, 'progress');
 
 /** Presses the button named `name`, once it is there. */
 const pressNamed = (name: string | RegExp) => async (canvas: HTMLElement) => {
   const button = await within(canvas).findByRole('button', { name }, { timeout: 5000 });
   reveal(button);
+  // A fold already open (the register draws them open, MM-676) is left open.
+  if (button.getAttribute('aria-expanded') === 'true') return;
   await userEvent.click(button);
 };
 
@@ -546,7 +549,8 @@ export const ProgressPickedJump = screenStory({
 const openWaist = async (canvas: HTMLElement) => {
   const header = await within(canvas).findByRole('button', { name: /^Waist/ }, { timeout: 5000 });
   reveal(header);
-  await userEvent.click(header);
+  // Fold-proof: the register draws the folds open (MM-676).
+  if (header.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
 };
 
 /** MM-155: two measurements so far: the protocol drawn in full beside its steps, and the chart of the two. */
@@ -642,7 +646,7 @@ export const ProgressWithPhotos = screenStory({
   covers: ['ProgressScreen'],
   shows: /^Last set /,
   scenario: photosScenario,
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
 });
 
 /** MM-157: no photos yet: what a set is, and how often is enough. */
@@ -665,7 +669,7 @@ export const ProgressPhotosFromProgress = screenStory({
   covers: ['ProgressScreen', 'ProgressPhotosScreen'],
   shows: 'Compare two days',
   scenario: photosScenario,
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
   walk: pressNamed(/^Progress photos/),
 });
 
@@ -766,7 +770,8 @@ export const PhotoCompareOneDay = screenStory({
 const openMeasurements = async (canvas: HTMLElement) => {
   const header = await within(canvas).findByRole('button', { name: /^More measurements/ }, { timeout: 5000 });
   reveal(header);
-  await userEvent.click(header);
+  // Fold-proof: the register draws the folds open (MM-676).
+  if (header.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
 };
 
 /** The demo as a woman on recomp who measures only her waist (MM-156). */
@@ -916,13 +921,13 @@ export const ProgressWeightTrendOnly = screenStory({
   covers: ['ProgressScreen'],
   shows: /single weigh-ins are not shown/,
   scenario: weightDisplayScenario('trendOnly'),
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
   // The words are under the chart's "How to read this", folded until opened.
   walk: async (canvas) => {
     const [header] = await within(canvas).findAllByRole('button', { name: /^How to read this/ }, { timeout: 5000 });
     if (header === undefined) return;
     reveal(header);
-    await userEvent.click(header);
+    if (header.getAttribute('aria-expanded') !== 'true') await userEvent.click(header);
   },
 });
 
@@ -931,7 +936,7 @@ export const ProgressWeightHidden = screenStory({
   covers: ['ProgressScreen'],
   shows: /Your weight is hidden; the coach still uses every weigh-in/,
   scenario: weightDisplayScenario('hidden'),
-  open: ({ state }) => state.homeTab.put('progress'),
+  open: ({ state }) => unfolded(state, 'progress'),
 });
 
 // ---- MM-156: the measurements section's ways in, pressed ----
@@ -941,6 +946,7 @@ const pressAnywhereNamed = (name: string | RegExp) => async (canvas: HTMLElement
   const [button] = await within(canvas.ownerDocument.body).findAllByRole('button', { name }, { timeout: 5000 });
   if (button === undefined) return;
   reveal(button);
+  if (button.getAttribute('aria-expanded') === 'true') return;
   await userEvent.click(button);
 };
 

@@ -9,7 +9,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { topLayer } from '../support/topLayer';
 
@@ -45,7 +45,7 @@ const settings = () => first(repos.measurementSettings.watchMeasurementSettings(
 /** Opens Progress at its "More measurements" section, unfolded. */
 async function openMeasurements(): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   const section = (await screen.findByRole('heading', { name: 'More measurements' })).closest('.mm-section') as HTMLElement;
   await userEvent.click(within(section).getByRole('button', { name: /^More measurements/ }));
   return section;

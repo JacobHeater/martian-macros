@@ -71,7 +71,7 @@ export function RecoveryCard({ answeredAbove = false }: RecoveryCardProps) {
   return (
     // Drawn anew each time it falls due, which may be after the check-ins are read, so it opens then;
     // answering leaves it open with the answers (MM-339).
-    <MmSection framed key={timesDue} icon="heart" title={recoverySectionTitle} summary={summary} collapsible initiallyExpanded={due} remember={`coach.recovery.${timesDue}`}>
+    <MmSection key={timesDue} icon="heart" title={recoverySectionTitle} summary={summary} collapsible initiallyExpanded={false} remember={`coach.recovery.${timesDue}`}>
       {/* The record, not the check-in's word for it (MM-250): typed on Progress or read from the health platform. */}
       <StatRow label={`Sleep, last ${SleepRule.windowNights} nights`} value={sleepValue} detail={sleepDetail} />
       {latest === undefined ? (

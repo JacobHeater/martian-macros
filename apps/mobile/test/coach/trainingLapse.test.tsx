@@ -9,7 +9,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openHeadsUp } from '../support/openHeadsUp';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { workoutOn } from '../support/workoutOn';
@@ -58,7 +58,7 @@ const history = () => first(repos.targets.watchTargetsHistory());
 it('choosing lean gain without training shows the note and needs one acknowledgement', async () => {
   await seed({ goal: 'fatLoss', trainingDays: 0, targetsDaysAgo: 3 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   expect(within(sheet).getAllByText(/This goal works through resistance training. Without it, a surplus is stored as fat./).length).toBe(2);
@@ -76,7 +76,7 @@ it('choosing lean gain without training shows the note and needs one acknowledge
 it('recomp without training shows the note and needs no acknowledgement', async () => {
   await seed({ goal: 'leanGain', trainingDays: 0, targetsDaysAgo: 3 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   await userEvent.click(within(sheet).getByRole('button', { name: /^Recomp/ }));
@@ -87,7 +87,7 @@ it('recomp without training shows the note and needs no acknowledgement', async 
 it('training lapses on a gain: targets go to maintenance at the check-in, flagged, with the reason; a workout brings them back', async () => {
   await seed({ goal: 'leanGain', lastWorkoutDaysAgo: 25, targetsDaysAgo: 7 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('The surplus is paused')).toBeInTheDocument();
   await expect.poll(async () => (await history()).length).toBe(2);
   const last = (await history())[1];
@@ -101,7 +101,7 @@ it('training lapses on a gain: targets go to maintenance at the check-in, flagge
 it('between two and three weeks on a gain it is a notice and the targets stand', async () => {
   await seed({ goal: 'leanGain', lastWorkoutDaysAgo: 16, targetsDaysAgo: 3 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('Training is what the gain is for')).toBeInTheDocument();
   expect((await history()).length).toBe(1);
 });
@@ -109,7 +109,7 @@ it('between two and three weeks on a gain it is a notice and the targets stand',
 it('training lapses on a cut: a notice, and targets unchanged', async () => {
   await seed({ goal: 'fatLoss', lastWorkoutDaysAgo: 16, targetsDaysAgo: 3 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('Lifting keeps the muscle')).toBeInTheDocument();
   expect(screen.getByText(/Lifting is what tells your body to keep muscle while you lose weight/)).toBeInTheDocument();
   expect((await history()).length).toBe(1);
@@ -119,8 +119,8 @@ it('paused: no notice, and the gain is suspended without comment', async () => {
   await seed({ goal: 'leanGain', lastWorkoutDaysAgo: 25, targetsDaysAgo: 7 });
   await repos.pauses.savePause(new Pause({ from: today.addDays(-2), to: today.addDays(5), reason: 'injury' }));
   renderApp(repos, today);
-  await openTab('Coach');
-  await screen.findByRole('heading', { name: /^Goal: Lean gain/ });
+  await openCoach();
+  await screen.findByText('Lean gain', { selector: '.mm-section-summary' });
   expect(screen.queryByText('The surplus is paused')).not.toBeInTheDocument();
   expect(screen.queryByText('Training is what the gain is for')).not.toBeInTheDocument();
 });
@@ -128,7 +128,7 @@ it('paused: no notice, and the gain is suspended without comment', async () => {
 it('no training days set on a gain: the surplus pauses at once', async () => {
   await seed({ goal: 'leanGain', trainingDays: 0, targetsDaysAgo: 3 });
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('The surplus is paused')).toBeInTheDocument();
   await expect.poll(async () => (await history()).length).toBe(2);
   expect((await history())[1]?.explanation?.lines.some((l) => l.reason === 'trainingLapse')).toBe(true);

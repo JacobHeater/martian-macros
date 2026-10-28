@@ -1,38 +1,28 @@
-import { useEffect, useState } from 'react';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
-import { executiveBriefArchetypeText } from '../format/coach/executiveBriefArchetypeText';
 import { executiveBriefNarrationRequest } from '../format/coach/executiveBriefNarrationRequest';
+import { coachAnalysisWords } from '../format/coachAnalysisWords';
 import { Fmt } from '../format/Fmt';
+import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmSection } from '../ui/MmSection';
 import { StatRow } from '../ui/StatRow';
+import { useCoachNarration } from '../app/useCoachNarration';
 
 /**
  * The top-level executive summary on the unified Coach screen (MM-667):
  * narrates the 7-day accountability brief via Track 1 (deterministic archetype)
  * or Track 2 (BYOK LLM narrator) alongside the 7-day calorie adherence,
- * protein floor hits, and today's remaining runway.
+ * protein floor hits, and today's remaining runway. The wait on the model is
+ * shown as such; the archetype is only the fallback (MM-673).
  */
 export function ExecutiveSummaryCard() {
-  const { services, state } = useApp();
+  const { state } = useApp();
   const brief = useCell(state.coachAnalysis.executiveBrief);
-  const [narration, setNarration] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (brief === undefined) return;
-    let cancelled = false;
-    setNarration(executiveBriefArchetypeText(brief));
-    void services.coachNarrator.narrate(executiveBriefNarrationRequest(brief)).then((text) => {
-      if (!cancelled) setNarration(text);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [brief, services.coachNarrator]);
+  // The wait is shown while the person's own model writes; the built-in words only once it failed (MM-673).
+  const narration = useCoachNarration(brief === undefined ? undefined : executiveBriefNarrationRequest(brief));
 
   if (brief === undefined) return null;
 
-  const text = narration ?? executiveBriefArchetypeText(brief);
   const adherenceValue = brief.protectedPath
     ? `${brief.sevenDay.loggedDays} / 7 days logged`
     : brief.sevenDay.loggedDays === 0
@@ -56,7 +46,11 @@ export function ExecutiveSummaryCard() {
 
   return (
     <MmSection framed icon="coach" title="Executive summary">
-      <p className="app-text">{text}</p>
+      {narration.waiting || narration.text === undefined ? (
+        <MmBusyLine label={coachAnalysisWords.writing} />
+      ) : (
+        <p className="app-text">{narration.text}</p>
+      )}
       <StatRow label="7-day calorie adherence" value={adherenceValue} />
       <StatRow label="7-day protein floor" value={proteinValue} />
       <StatRow label="Today’s runway" value={runwayValue} detail={runwayDetail} />

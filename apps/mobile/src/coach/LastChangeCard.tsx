@@ -46,20 +46,25 @@ export function LastChangeCard({ history, today, holdNote }: LastChangeCardProps
       explanationLineText(largest);
   }
   return (
-    <MmSection framed
+    <MmSection
       icon="history"
-      title={`Last change · ${Fmt.day(current.effectiveFrom, today)}`}
-      trailing={
-        <MmButton label="History" kind="text" onPress={() => void navigator.push(() => <TargetsHistoryScreen />)} />
-      }
+      title="Last change"
+      summary={Fmt.day(current.effectiveFrom, today)}
+      collapsible
+      initiallyExpanded={false}
+      remember="coach.last-change"
     >
       <p className="app-text">{summary}</p>
       {holdNote === undefined ? null : <p className="app-caption">{holdNote}</p>}
-      <MmButton
-        label="See why"
-        kind="text"
-        onPress={() => void showTargetChangeSheet(overlays, services.targets, history)}
-      />
+      {/* Both ways on, inside the fold (the owner, MM-676). */}
+      <div className="app-row">
+        <MmButton
+          label="See why"
+          kind="text"
+          onPress={() => void showTargetChangeSheet(overlays, services.targets, history)}
+        />
+        <MmButton label="History" kind="text" onPress={() => void navigator.push(() => <TargetsHistoryScreen />)} />
+      </div>
     </MmSection>
   );
 }

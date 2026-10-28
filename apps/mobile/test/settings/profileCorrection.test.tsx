@@ -11,7 +11,7 @@ import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { giveDate, openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
@@ -159,7 +159,7 @@ it('no longer breastfeeding removes the 400 kcal and offers every goal again', a
   // Every goal is offered again.
   await back();
   await back();
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const goals = await screen.findByRole('dialog', { name: 'Choose a goal' });
   for (const label of ['Fat loss', 'Recomp', 'Lean gain', 'Maintenance']) {

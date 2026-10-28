@@ -7,7 +7,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-20: period days marked on Progress, so the trend expects the water; never offered to a male profile. */
@@ -29,7 +29,7 @@ async function seed({ sex, menopause = false }: { sex: 'male' | 'female'; menopa
 it('a female profile marks and unmarks the last two weeks, and the marks are stored', async () => {
   await seed({ sex: 'female' });
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   const card = (await screen.findByRole('heading', { name: 'Period days' })).closest('.mm-section') as HTMLElement;
   const group = within(card).getByRole('group', { name: 'Period days, the last two weeks' });
   expect(within(group).getAllByRole('button')).toHaveLength(14);
@@ -45,7 +45,7 @@ it('the chart shades the days around a start, from five days before through two 
   await seed({ sex: 'female' });
   for (let i = 10; i >= 6; i--) await repos.flowDays.markFlowDay(today.addDays(-i));
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Period days' });
   await screen.findByText('Weight trend');
   await expect.poll(() => document.querySelector('.chart-cycle')).not.toBeNull();
@@ -58,7 +58,7 @@ it('the chart shades the days around a start, from five days before through two 
 it('a male profile never sees it', async () => {
   await seed({ sex: 'male' });
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByText('Weight trend');
   expect(screen.queryByRole('heading', { name: 'Period days' })).not.toBeInTheDocument();
 });
@@ -66,7 +66,7 @@ it('a male profile never sees it', async () => {
 it('after menopause it is not offered either', async () => {
   await seed({ sex: 'female', menopause: true });
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByText('Weight trend');
   expect(screen.queryByRole('heading', { name: 'Period days' })).not.toBeInTheDocument();
   expect(new Profile({ sex: 'female', birthDate: CalendarDate.of(1990, 1, 1), heightCm: 165 }).sex).toBe('female');

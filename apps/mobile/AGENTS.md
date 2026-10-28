@@ -97,11 +97,23 @@ You don't run these locally, but CI fails on them, so write code that passes:
   and `--mm-snack-clearance` for anything placed at the bottom.
 - Food is added only from a meal's "+" on Food (MM-438); no screen has an
   "Add food" button.
+- **A wait on the network is shown as a wait (owner, 2026-10-28, MM-673).**
+  Wherever a screen asks a service over the network (the BYOK coach's
+  words, a download, a lookup), it shows a loading indicator from the first
+  draw, in the place the answer will stand (`MmBusyLine` in a line of text,
+  `MmSpinner` or `ScreenLoading` for a block), until the answer is in. It
+  never shows a provisional answer and swaps the real one over it: the
+  built-in or cached words appear only once the request failed, or at once
+  when the service is off. Nothing is asked when it is off. A story draws
+  the waiting state (`writingCoach` for the coach) so the register holds it.
 - Device and emulator screenshots verify native behavior only, never the
   design.
 
 ## Tests
 
 - Test helpers are in `test/support/` (`renderApp`, `openTab`,
-  `openAddFood`, ...). Reuse them.
+  `openAddFood`, ...). Reuse them. Every fold on the Coach tab starts closed
+  (MM-676): a test that reads inside one opens the tab with `openCoach()`,
+  and a story with `unfolded(state, 'coach')`; the tab's own story opens it
+  plainly, as first seen.
 - The test clock is noon unless a test sets `hour`.

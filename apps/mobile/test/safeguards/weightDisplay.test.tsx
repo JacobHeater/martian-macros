@@ -21,6 +21,7 @@ import { StrengthTrendCard } from '../../src/ui/StrengthTrendCard';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -64,7 +65,7 @@ it('Trend only: the chart is a line and band with no dots, and no raw reading ap
   renderApp(repos, today);
   expect(await screen.findByText(/^Trend [\d.]+ kg$/)).toBeInTheDocument();
   expect(document.body.textContent).not.toContain(`${todaysReading}`);
-  await openTab('Progress');
+  await openCoach();
   await screen.findAllByText(/last 7 days/);
   expect(document.querySelector('.chart-trend')).not.toBeNull();
   expect(dots()).toBe(0);
@@ -77,7 +78,7 @@ it('Switching back: with Everything the full history of readings is shown', asyn
   await repos.preferences.saveWeightDisplay('everything');
   renderApp(repos, today);
   expect(await screen.findByText(new RegExp(`^Today ${todaysReading} kg`))).toBeInTheDocument();
-  await openTab('Progress');
+  await openCoach();
   await screen.findAllByText(/last 7 days/);
   expect(dots()).toBeGreaterThan(20);
 });
@@ -88,7 +89,9 @@ it('Hidden: no screen shows a weight in any unit, and the dashboard says the pac
   expect(await screen.findByText(/^(So far, )?(on pace|On pace|slower than planned|Slower than planned|faster than planned|Faster than planned|steady|Steady)$/)).toBeInTheDocument();
   expect(document.body.textContent).not.toMatch(weightFigure);
   for (const tab of ['Progress', 'Coach']) {
-    await openTab(tab);
+    // The pace line sits in a fold that starts closed (MM-676): the Coach opener opens the folds.
+    if (tab === 'Progress') await openCoach();
+    else await openTab(tab);
     await screen.findAllByText(tab === 'Progress' ? /Against your plan’s pace/ : 'Your metabolism');
     expect(document.body.textContent, tab).not.toMatch(weightFigure);
   }
@@ -98,7 +101,7 @@ it('Hidden: no screen shows a weight in any unit, and the dashboard says the pac
 it('The coach still works: with the weight hidden, what it works out is what it works out with Everything', async () => {
   const metabolism = async () => {
     renderApp(repos, today);
-    await openTab('Coach');
+    await openCoach();
     const heading = await screen.findByRole('heading', { name: 'Your metabolism' });
     return (heading.closest('.mm-section') as HTMLElement).textContent;
   };

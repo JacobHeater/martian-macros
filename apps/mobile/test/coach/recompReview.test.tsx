@@ -10,7 +10,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { recompReviewText } from '../../src/format/recompReviewText';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
@@ -130,7 +130,7 @@ describe('on the Coach screen', () => {
 
   async function openCoach(): Promise<void> {
     renderApp(repos, today);
-    await openTab('Coach');
+    await openCoachTab();
     await screen.findByRole('heading', { name: 'Body' });
   }
 
@@ -169,8 +169,9 @@ describe('on the Coach screen', () => {
     await openCoach();
     // Coaching began 100 days ago and recomp 84: the third report covers
     // days 40 to 67 of it, and the week 8 review fell due on day 56.
-    // Folded to one line when no report is new (MM-256): open it first.
-    await userEvent.click(screen.getByRole('button', { name: /^Monthly reports/ }));
+    // Folded to one line (MM-676): opened here unless the tab's opener already did.
+    const reportsHeader = screen.getByRole('button', { name: /^Monthly reports/ });
+    if (reportsHeader.getAttribute('aria-expanded') === 'false') await userEvent.click(reportsHeader);
     const reports = screen.getByRole('heading', { name: 'Monthly reports' }).closest('.mm-section') as HTMLElement;
     const rows = within(reports).getAllByRole('button', { name: /^[A-Z][a-z]{2} \d+ – / });
     expect(rows).toHaveLength(3);

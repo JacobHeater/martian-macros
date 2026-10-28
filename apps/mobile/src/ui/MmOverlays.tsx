@@ -159,9 +159,11 @@ export function MmOverlays({ children }: { children: ReactNode }) {
       },
 
       sheet(label, content, options) {
+        // The sheet asks `mayLeave` itself, so a refused leave never starts its leaving motion (MM-675); the host's
+        // own dismissal (the system back) keeps asking through `leave`.
         return ask(
-          (finish, leave) => (
-            <MmSheet label={label} size={options?.size} onDismiss={leave}>
+          (finish) => (
+            <MmSheet label={label} size={options?.size} mayLeave={options?.mayLeave} onDismiss={() => finish(undefined)}>
               {content(finish)}
             </MmSheet>
           ),

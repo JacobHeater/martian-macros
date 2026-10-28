@@ -10,7 +10,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { recoveryQuestionText } from '../../src/format/recoveryQuestionText';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-116: twenty seconds a week on how the user is holding up. Carried over from recovery_check_in_test.dart. */
@@ -32,7 +32,7 @@ const answered = (daysAgo: number, hunger = 3) =>
 /** The card on the Coach screen. */
 async function openCoach(): Promise<HTMLElement> {
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoachTab();
   const title = await screen.findByRole('heading', { name: 'How you are holding up' });
   const section = title.closest('.mm-section') as HTMLElement;
   // Folded to one line unless the check-in is due (MM-256).

@@ -5,7 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { openHeadsUp } from '../support/openHeadsUp';
 import { renderApp } from '../support/renderApp';
 
@@ -25,7 +25,7 @@ it('entering a deficit confirms health answers before saving the goal', async ()
   await repos.weights.saveWeight(today, 80);
   renderApp(repos, today);
 
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   await userEvent.click(within(sheet).getByText('Fat loss'));
@@ -51,7 +51,7 @@ it('Coach shows insulin and weight-affecting medication cautions', async () => {
   await repos.weights.saveWeight(today, 80);
   renderApp(repos, today);
 
-  await openTab('Coach');
+  await openCoach();
   await openHeadsUp();
   expect(await screen.findByText(/limits loss to the gentlest pace/)).toBeInTheDocument();
   expect(screen.getByText(/Some medications can change weight or water retention/)).toBeInTheDocument();

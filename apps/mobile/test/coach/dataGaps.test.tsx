@@ -15,7 +15,7 @@ import { recordedHealthHistory } from '../../src/healthIngest/testing/recordedHe
 import type { HealthConnection } from '../../src/state/HealthConnection';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -99,7 +99,7 @@ describe('on Coach', () => {
   async function openCoach(): Promise<void> {
     renderApp(repos, today, { change: (services) => ({ ...services, healthSource: source }) });
     await dashboardLoaded();
-    await openTab('Coach');
+    await openCoachTab();
   }
 
   it('weigh-ins not allowed: beside the trend, what that costs and where to allow them', async () => {

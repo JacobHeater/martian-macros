@@ -10,6 +10,7 @@ import { waitingRead } from '../../src/gallery/screens/waitingRead';
 import { openAddFood, press, typeIn } from '../support/addFood';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -79,14 +80,14 @@ it('MM-340: Coach with no weigh-in offers a way to log one', async () => {
   await empty.preferences.saveThemePreference('martian');
   await empty.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-3), healthCheckConfirmedOn: today }));
   renderApp(empty, today);
-  await openTab('Coach');
+  await openCoach();
   await screen.findByText('The coach starts from your first weigh-in.');
   expect(screen.getByRole('textbox', { name: 'Today’s weigh-in' })).toBeInTheDocument();
 });
 
 it('MM-340: weighed in, and a record the coach needs unread: Coach says so, never a spinner for good', async () => {
   renderApp(repos, today, { change: failingRead('pauses', 'watchPauses') });
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText('Could not read what your coach works from')).toBeInTheDocument();
   expect(screen.getByRole('alert')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
@@ -101,7 +102,7 @@ it('MM-342: the last 7 days hold figures in their value column, not sentences', 
     await repos.dayMarks.setCompleteness(today.addDays(-i), 'complete');
   }
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const label = await screen.findByText('Average intake');
   const row = label.parentElement as HTMLElement;
   const value = row.querySelector('.mm-stat-value')?.textContent ?? '';
@@ -115,8 +116,11 @@ it('MM-344: the strength trends on Progress are rows of their section, not cards
   const demo = new InMemoryRepositories();
   await new DemoSeed(today).replace(demo);
   renderApp(demo, today);
-  await openTab('Progress');
+  await openCoach();
   const section = (await screen.findByRole('heading', { name: 'Strength trends' })).closest('.mm-section') as HTMLElement;
+  // Every fold starts closed (MM-676).
+  const header = within(section).getByRole('button', { name: /^Strength trends/ });
+  if (header.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
   await within(section).findAllByText(/^Est\. max /);
   expect(section.querySelector('.mm-info-card, .mm-surface')).toBeNull();
 });

@@ -7,7 +7,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { adherenceLines } from '../../src/format/adherenceLines';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /** MM-149: the week described as facts, never scored. Carried over from adherence_summary_test.dart. */
@@ -122,7 +122,7 @@ it('the Coach screen shows the card from stored days', async () => {
   }
   await repos.weights.saveWeight(today, 82);
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const card = (await screen.findByRole('heading', { name: 'Your last 7 days' })).closest('.mm-section');
   expect(card).toHaveTextContent(/Days logged\s*5\s*all complete/);
   expect(card).toHaveTextContent(/Weigh-ins\s*7/);

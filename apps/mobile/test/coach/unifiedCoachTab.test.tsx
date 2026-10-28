@@ -4,7 +4,7 @@ import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { DemoSeed } from '../../src/fixtures/DemoSeed';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -32,7 +32,7 @@ it('shows four destinations in the bottom bar and unifies Executive summary, Wei
     'Coach',
   ]);
 
-  await openTab('Coach');
+  await openCoach();
   const summaryHeading = await screen.findByRole('heading', { name: 'Executive summary' });
   const summarySection = summaryHeading.closest('.mm-section') as HTMLElement;
   expect(within(summarySection).getByText('7-day calorie adherence')).toBeInTheDocument();
@@ -49,7 +49,8 @@ it('shows four destinations in the bottom bar and unifies Executive summary, Wei
 
   // Telemetry sections at the bottom are collapsible.
   const metabolism = screen.getByRole('heading', { name: 'Your metabolism' }).closest('.mm-section') as HTMLElement;
-  const metabolismButton = within(metabolism).getByRole('button', { name: 'Your metabolism' });
+  // The fold's button is named by its title and its line (MM-676).
+  const metabolismButton = within(metabolism.querySelector('.mm-section-head') as HTMLElement).getByRole('button', { name: /^Your metabolism/ });
   expect(metabolismButton).toHaveAttribute('aria-expanded', 'true');
   await userEvent.click(metabolismButton);
   expect(metabolismButton).toHaveAttribute('aria-expanded', 'false');

@@ -26,3 +26,7 @@
   flex-wrap: wrap;
   gap: var(--space-8);
 }
+/* What "Test AI coach" came to (MM-671), under the key's two actions. */
+.settings-ai-test {
+  margin-top: var(--space-12);
+}

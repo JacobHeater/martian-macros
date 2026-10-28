@@ -97,6 +97,7 @@ export function ProgressScreen() {
 
   return (
     <>
+      {/* On its surface inside the body fold (MM-676), as the waist chart is: a field never sits bare (MM-291). */}
       <MmSurface>
         <h2 className="progress-hero-title">Today’s weigh-in</h2>
         {/* Unless every reading is shown, today's is not put back in the field: what was typed is seen, and nothing after (MM-118). */}

@@ -29,7 +29,7 @@ export function StallCard() {
   const actionFor = (option: string): (() => void) | undefined =>
     /gentler pace/.test(option) && openPaceSheet !== undefined ? () => void openPaceSheet() : undefined;
   return (
-    <MmSection framed icon="trend" title="Progress has slowed">
+    <MmSection icon="trend" title="Progress has slowed" summary={`Over the last ${stall.windowDays} days`} collapsible initiallyExpanded={false} remember="coach.stall">
       <p className="app-text">{body}</p>
       {options.length === 0 ? null : (
         <>

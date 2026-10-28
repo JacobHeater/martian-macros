@@ -84,7 +84,7 @@ describe('on Coach', () => {
     await repos.preferences.saveThemePreference('martian');
   });
 
-  it('holds the cautions, then the target flags, folded under the hero; opening says each in full', async () => {
+  it('holds the cautions, then the target flags, folded under the targets; opening says each in full', async () => {
     await seed({ screening: new ScreeningAnswers({ sleepDisorder: true }), flags: new Set<TargetFlag>(['rateLimited']) });
     const toggle = await screen.findByRole('button', { name: /^Heads up/ });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
@@ -94,10 +94,11 @@ describe('on Coach', () => {
 
     const section = toggle.closest('.mm-section') as HTMLElement;
     const hero = document.querySelector('.app-layer:not([hidden]) .mm-hero') as HTMLElement;
-    const goal = screen.getByRole('heading', { name: /^Goal:/ });
+    // MM-676: under the targets it is about, after the goal; the hero still above it.
+    const targets = screen.getByRole('heading', { name: 'Your targets' });
     const follows = (a: Node, b: Node) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
     expect(follows(hero, section)).toBe(true);
-    expect(follows(section, goal)).toBe(true);
+    expect(follows(targets, section)).toBe(true);
 
     await userEvent.click(toggle);
     const notes = [...section.querySelectorAll('.mm-section-body p')].map((p) => p.textContent);
@@ -115,7 +116,7 @@ describe('on Coach', () => {
 
   it('with no caution and no flag, there is no Heads up section', async () => {
     await seed({});
-    await screen.findByRole('heading', { name: /^Goal:/ });
+    await screen.findByRole('heading', { name: 'Goal' });
     expect(screen.queryByRole('button', { name: /^Heads up/ })).not.toBeInTheDocument();
   });
 });

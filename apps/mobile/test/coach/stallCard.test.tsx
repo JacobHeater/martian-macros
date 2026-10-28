@@ -8,7 +8,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { Fmt } from '../../src/format/Fmt';
 import { stallText } from '../../src/format/stallText';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -152,7 +152,7 @@ it('a flat month on target shows the card on the Coach screen', async () => {
     await repos.dayMarks.setCompleteness(day, 'complete');
   }
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   const title = await screen.findByRole('heading', { name: 'Progress has slowed' });
   expect(title.closest('.mm-section')).toHaveTextContent('your weight has held');
 });

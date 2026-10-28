@@ -41,6 +41,8 @@ import { checkInNowScenario } from './checkInNowScenario';
 import { screensMeta } from './screensMeta';
 import { weightDisplayScenario } from './weightDisplayScenario';
 import { screenStory } from './screenStory';
+import { unfolded } from './unfolded';
+import { writingCoach } from './writingCoach';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 import { analysisBalancedScenario } from './analysisBalancedScenario';
@@ -65,6 +67,7 @@ export default meta;
 export const Coach = screenStory({
   covers: ['CoachScreen'],
   shows: 'Your metabolism',
+  // As first seen: every fold closed (MM-676); the other stories draw the folds open.
   open: ({ state }) => state.homeTab.put('coach'),
 });
 
@@ -84,14 +87,14 @@ export const CheckInDue = screenStory({
   covers: ['CoachScreen'],
   shows: 'Answer this week’s five questions',
   scenario: checkInDueScenario,
-  open: ({ state }) => state.homeTab.put('coach'),
+  open: ({ state }) => unfolded(state, 'coach'),
 });
 
 export const WhyYourTargets = screenStory({
   covers: ['TargetChangeSheet'],
   shows: 'Why your targets are what they are',
   open: async ({ state, services, overlays }) => {
-    state.homeTab.put('coach');
+    unfolded(state, 'coach');
     const history = await valueOf(services.targets.watchTargetsHistory());
     void showTargetChangeSheet(overlays, services.targets, history);
   },
@@ -137,12 +140,13 @@ export const Pause = screenStory({
 
 // ---- MM-321: the Coach screen's states no story drew ----
 
-const onCoach = ({ state }: StoryStage) => state.homeTab.put('coach');
+const onCoach = ({ state }: StoryStage) => unfolded(state, 'coach');
 
-/** Presses the button named `name` on the Coach screen, once it is there. */
+/** Presses the button named `name` on the Coach screen, once it is there; a fold already open (MM-676) is left open. */
 const pressOnCoach = (name: string | RegExp) => async (canvas: HTMLElement) => {
   const button = await within(canvas).findByRole('button', { name }, { timeout: 5000 });
   reveal(button);
+  if (button.getAttribute('aria-expanded') === 'true') return;
   await userEvent.click(button);
 };
 
@@ -663,7 +667,7 @@ export const MonthlyReportWithRecords = screenStory({
     // The section is open in the week a report arrives (MM-256); fold-proof either way.
     if (within(canvas).queryAllByRole('button', { name: report }).length === 0) {
       reveal(header);
-      await userEvent.click(header);
+      if (header.getAttribute('aria-expanded') !== 'true') await userEvent.click(header);
     }
     const [row] = await within(canvas).findAllByRole('button', { name: report });
     if (row !== undefined) {
@@ -738,7 +742,7 @@ const explainedScenario = (explanation: TargetsExplanation): StoryScenario => as
 };
 
 const openWhy = async ({ state, services, overlays }: StoryStage) => {
-  state.homeTab.put('coach');
+  unfolded(state, 'coach');
   const history = await valueOf(services.targets.watchTargetsHistory());
   void showTargetChangeSheet(overlays, services.targets, history);
 };
@@ -1067,7 +1071,7 @@ export const CoachWeightHidden = screenStory({
   covers: ['CoachScreen'],
   shows: 'Against your plan’s pace',
   scenario: weightDisplayScenario('hidden'),
-  open: ({ state }) => state.homeTab.put('coach'),
+  open: ({ state }) => unfolded(state, 'coach'),
 });
 
 // ---- MM-610: "What your data says", under the one thing to do ----
@@ -1127,7 +1131,7 @@ export const CoachAnalysisDismissed = screenStory({
     const [first] = await within(canvas).findAllByRole('button', { name: /^Dismiss: / }, { timeout: 5000 });
     if (first === undefined) return;
     reveal(first);
-    await userEvent.click(first);
+    if (first.getAttribute('aria-expanded') !== 'true') await userEvent.click(first);
   },
 });
 
@@ -1176,7 +1180,7 @@ export const CoachAnalysisSpanChosen = screenStory({
     const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
     if (numbers === undefined) return;
     reveal(numbers);
-    await userEvent.click(numbers);
+    if (numbers.getAttribute('aria-expanded') !== 'true') await userEvent.click(numbers);
   },
 });
 
@@ -1215,7 +1219,7 @@ export const CoachAnalysisHiddenOpened = screenStory({
     const [first] = await within(canvas).findAllByRole('button', { name: /^Dismiss: / }, { timeout: 5000 });
     if (first === undefined) return;
     reveal(first);
-    await userEvent.click(first);
+    if (first.getAttribute('aria-expanded') !== 'true') await userEvent.click(first);
     await pressOnCoach('1 finding hidden')(canvas);
   },
 });
@@ -1230,7 +1234,8 @@ export const CoachAnalysisTodayNumbers = screenStory({
     const [numbers] = await within(canvas).findAllByRole('button', { name: /^The numbers behind this: / }, { timeout: 5000 });
     if (numbers === undefined) return;
     reveal(numbers);
-    await userEvent.click(numbers);
+    // Drawn open by the register (MM-676): pressed only where it is still folded.
+    if (numbers.getAttribute('aria-expanded') !== 'true') await userEvent.click(numbers);
   },
 });
 
@@ -1277,5 +1282,13 @@ export const CoachAnalysisNothingToday = screenStory({
 export const CoachExecutiveSummary = screenStory({
   covers: ['CoachScreen'],
   shows: 'Executive summary',
+  open: onCoach,
+});
+
+/** MM-673: a BYOK coach set up and writing: the wait stands where the summary's words and each finding's will. */
+export const CoachWriting = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'The coach is writing…',
+  device: writingCoach,
   open: onCoach,
 });

@@ -15,5 +15,7 @@ export const coachAnalysisWords = {
   numbersBehind: 'The numbers behind this',
   /** The Dashboard card's way to the section, on the card's span. */
   openOnCoach: 'Open on Coach',
+  /** While the person's own model writes the words (MM-673). */
+  writing: 'The coach is writing…',
   dismiss: 'Dismiss',
 } as const;

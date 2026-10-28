@@ -15,7 +15,7 @@ interface HeadsUpSectionProps {
 export function HeadsUpSection({ notes }: HeadsUpSectionProps) {
   if (notes.length === 0) return null;
   return (
-    <MmSection framed
+    <MmSection
       icon="warning"
       kind="caution"
       title="Heads up"

@@ -8,7 +8,7 @@ import { MmFoldsContext } from './MmFoldsContext';
  */
 export function useFold(remember: string | undefined, initial: boolean): [expanded: boolean, setExpanded: (next: boolean) => void] {
   const folds = useContext(MmFoldsContext);
-  const [expanded, setExpanded] = useState((remember === undefined ? undefined : folds?.get(remember)) ?? initial);
+  const [expanded, setExpanded] = useState((remember === undefined ? undefined : folds?.get(remember)) ?? (folds?.allOpen === true ? true : initial));
   const set = useCallback(
     (next: boolean) => {
       setExpanded(next);

@@ -7,7 +7,7 @@ import { TargetsExplanation } from '../../src/engine/TargetsExplanation';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
@@ -102,7 +102,7 @@ it('an unseen target change is shown once and remains in history', async () => {
   await dashboardLoaded();
   expect(screen.queryByRole('dialog', { name: 'Why your targets are what they are' })).not.toBeInTheDocument();
 
-  await openTab('Coach');
+  await openCoach();
   await userEvent.click(await screen.findByRole('button', { name: 'History' }));
   expect(await within(topLayer()).findByRole('heading', { name: 'Target history' })).toBeInTheDocument();
   await userEvent.click(within(topLayer()).getAllByRole('button', { name: /kcal · P/ })[0] as HTMLElement);

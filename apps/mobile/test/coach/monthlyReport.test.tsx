@@ -8,7 +8,7 @@ import { TargetsExplanation } from '../../src/engine/TargetsExplanation';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 import { topLayer } from '../support/topLayer';
@@ -63,7 +63,7 @@ async function open(today: CalendarDate): Promise<void> {
 
 async function openFirstReport(today: CalendarDate): Promise<void> {
   await open(today);
-  await openTab('Coach');
+  await openCoach();
   const reports = (await screen.findByRole('heading', { name: 'Monthly reports' })).closest('.mm-section') as HTMLElement;
   // The section is open in the week a report arrives and folded after (MM-256).
   if (within(reports).queryByRole('button', { name: /^Sep 1 – Sep 28/ }) === null) {
@@ -82,7 +82,7 @@ it('no report until 28 days have passed', async () => {
   await seed({ daysSinceOnboarding: 27 });
   await open(onboarded.addDays(27));
   expect(screen.queryByText('Your first month is done')).not.toBeInTheDocument();
-  await openTab('Coach');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Body' });
   expect(screen.queryByRole('heading', { name: 'Monthly reports' })).not.toBeInTheDocument();
 });

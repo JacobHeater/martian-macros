@@ -19,15 +19,14 @@ export function ReportsCard() {
   const today = useCell(state.today);
   if (periods.length === 0) return null;
   const latest = periods[periods.length - 1];
-  const fresh = latest !== undefined && latest.readyOn.daysUntil(today) < 7;
   return (
-    <MmSection framed
+    <MmSection
       icon="report"
       title="Monthly reports"
       summary={`${periods.length} ${periods.length === 1 ? 'report' : 'reports'}, newest ${Fmt.shortDay(latest!.from)} – ${Fmt.shortDay(latest!.to)}`}
       collapsible
+      initiallyExpanded={false}
       remember={`coach.reports.${latest?.index ?? 0}`}
-      initiallyExpanded={fresh}
     >
       {[...periods].reverse().map((period) => (
         <MmListRow

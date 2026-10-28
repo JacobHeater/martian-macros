@@ -11,7 +11,7 @@ import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSourc
 import { recordedHealthHistory } from '../../src/healthIngest/testing/recordedHealthHistory';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -276,7 +276,7 @@ describe('opening the app', () => {
 
   async function openProgress(): Promise<HTMLInputElement> {
     renderApp(repos, today, { change: (services) => ({ ...services, healthSource: source }) });
-    await openTab('Progress');
+    await openCoach();
     return screen.findByRole<HTMLInputElement>('textbox', { name: 'Today’s weigh-in' });
   }
 

@@ -171,6 +171,11 @@ independent of step 3.
 - Added 2026-10-19 (step 13): MM-405 (reminders on iOS).
 - Added 2026-10-24 (step 15): MM-614, MM-615 (two pattern rules that state patterns that are not there). (step 16): MM-604 (epic: the coach analyses your data), MM-605, MM-606, MM-607, MM-608, MM-609, MM-610, MM-612, MM-617 (the coach tells you straight). (step 17): MM-618 (spike: a small on-device model phrases the coach).
 - Added 2026-10-25 (step 18): MM-620 (the span switcher hides without saying why; the section named "Coach's feedback"). (step 19): MM-621 (7d reads every day logged in the last 7, today included). (step 20): MM-622 ("sauce on the side" said when nothing had sauce).
+- Added 2026-10-28 (the owner; step 16): MM-670 (the Coach tab pulled down from its top reads the day, the health platform and the coach's words again, done).
+- Added 2026-10-28 (the owner; step 17): MM-671 ("Test AI coach" in Settings shows the model's words or the one reason there are none; Gemini told not to think, done).
+- Added 2026-10-28 (the owner; step 17): MM-672 (each finding of "Coach's feedback" said in the person's own model's words, the built-in sentence its fallback, done).
+- Added 2026-10-28 (the owner; step 17): MM-674 (no JSON field name read aloud by the model; a meal's swap is never a food already on the plate, done).
+- Added 2026-10-28 (the owner; step 16): MM-676 (one paradigm on the Coach tab: the hero and the summary the only cards, every other section a fold with a line, in the owner's order, done).
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `nextTargets.ts`. Do not add branches

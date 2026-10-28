@@ -29,6 +29,8 @@ import { MmSection } from '../ui/MmSection';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSlider } from '../ui/MmSlider';
 import { MmSpinner } from '../ui/MmSpinner';
+import { MmBusyLine } from '../ui/MmBusyLine';
+import { MmPullToRefresh } from '../ui/MmPullToRefresh';
 import { MmStatusChip } from '../ui/MmStatusChip';
 import { MmSurface } from '../ui/MmSurface';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
@@ -156,6 +158,9 @@ export function ComponentsCatalog() {
         <MmIconButton icon="plus" kind="add" label="Add" onPress={nothing} />
         <MmSpinner />
       </div>
+      {/* A wait in a line of text (MM-673), and the pull-to-refresh strip let go past its threshold (MM-670). */}
+      <MmBusyLine label="The coach is writing…" />
+      <MmPullToRefresh pull={{ phase: 'ready', distance: 72 }} />
       <MmSection icon="calendar" title="Weight events" summary="2 this month" trailing={<MmIconButton icon="plus" kind="add" label="Add a weight event" onPress={nothing} />}>
         <MmListRow title="Travel" subtitle="Yesterday · Scale noise widened around this event." leadingIcon="travel" />
       </MmSection>

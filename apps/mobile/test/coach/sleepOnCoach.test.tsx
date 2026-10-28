@@ -12,7 +12,7 @@ import { dashboardLoaded } from '../support/dashboardLoaded';
 import { openHeadsUp } from '../support/openHeadsUp';
 import { failing } from '../support/failing';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -41,7 +41,7 @@ const history = (): Promise<TargetsRecord[]> => first(repos.targets.watchTargets
 async function openCoach(): Promise<void> {
   renderApp(repos, today);
   await dashboardLoaded();
-  await openTab('Coach');
+  await openCoachTab();
 }
 
 /** The "How you are holding up" section, opened: it is folded to one line unless the check-in is due (MM-256). */
@@ -85,7 +85,7 @@ it('when the nights cannot be read the line says so', async () => {
     }),
   });
   await dashboardLoaded();
-  await openTab('Coach');
+  await openCoachTab();
   const section = await holdingUp();
   expect(within(section).getByText('Not read')).toBeInTheDocument();
   expect(within(section).queryByText('Not recorded')).not.toBeInTheDocument();

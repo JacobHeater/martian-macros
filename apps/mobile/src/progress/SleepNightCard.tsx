@@ -104,7 +104,7 @@ export function SleepNightCard() {
   if (anyImported) count += ` A night you type is used instead of one read from ${platform}.`;
 
   return (
-    <MmSection icon="sleep" title="Sleep" summary={summary} collapsible initiallyExpanded={lastNight === undefined}>
+    <MmSection icon="sleep" title="Sleep" summary={summary} collapsible initiallyExpanded={false}>
       <p className="app-caption progress-sleep-how">
         Hours asleep, not hours in bed. Each night goes under the morning it ended, so last night is the one that ended
         today.

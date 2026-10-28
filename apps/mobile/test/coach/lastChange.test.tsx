@@ -10,7 +10,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { explanationLineText } from '../../src/format/explanationLineText';
 import { Fmt } from '../../src/format/Fmt';
-import { openTab } from '../support/openTab';
+import { openCoach as openCoachTab } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -43,7 +43,7 @@ async function seed(history: readonly TargetsRecord[]): Promise<void> {
 
 async function openCoach(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoachTab();
   await screen.findByRole('heading', { name: /^Last change/ });
 }
 

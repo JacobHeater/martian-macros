@@ -8,6 +8,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
 import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -39,26 +40,31 @@ async function seedHistory(days: number, dayOneKcal: number): Promise<void> {
 }
 
 async function chooseMaintenance(): Promise<void> {
-  await openTab('Coach');
-  expect(await screen.findByRole('heading', { name: 'Goal: Fat loss' })).toBeInTheDocument();
+  await openCoach();
+  // MM-676: the goal is a fold, its mode the line under the title.
+  expect(await screen.findByRole('heading', { name: 'Goal' })).toBeInTheDocument();
+  expect(await screen.findByText('Fat loss', { selector: '.mm-section-summary' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Change goal' }));
   const sheet = await screen.findByRole('dialog', { name: 'Choose a goal' });
   await userEvent.click(within(sheet).getByText('Maintenance'));
 }
 
-// MM-299: the goal is the first section, under the hero and its warnings, before the one thing to do.
-it('puts the goal first under the hero, before the one thing to do', async () => {
+// MM-299: the goal comes before the one thing to do; MM-676 put it under the hero and the Executive summary.
+it('puts the goal under the summary, before the one thing to do', async () => {
   await seedHistory(30, 2600);
   renderApp(repos, today);
-  await openTab('Coach');
-  const goal = await screen.findByRole('heading', { name: 'Goal: Fat loss' });
+  await openCoach();
+  const goal = await screen.findByRole('heading', { name: 'Goal' });
+  const summary = await screen.findByRole('heading', { name: 'Executive summary' });
   const oneThing = await screen.findByText('Answer this week’s five questions');
   const hero = document.querySelector('.mm-hero') as HTMLElement;
   const follows = (a: Node, b: Node) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
-  expect(follows(hero, goal)).toBe(true);
+  expect(follows(hero, summary)).toBe(true);
+  expect(follows(summary, goal)).toBe(true);
   expect(follows(goal, oneThing)).toBe(true);
-  // The first section after the hero's Heads up, when there is one (MM-553).
-  expect([...document.querySelectorAll('.mm-section')].find((section) => !section.classList.contains('mm-section-caution'))?.contains(goal)).toBe(true);
+  // The first fold after the summary's card.
+  expect([...document.querySelectorAll('.mm-section:not(.mm-section-framed)')][0]?.contains(goal)).toBe(true);
+  expect(screen.getByText('Fat loss', { selector: '.mm-section-summary' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Change goal' })).toBeInTheDocument();
 });
 
@@ -66,7 +72,7 @@ it('changing the goal applies at once', async () => {
   await seedHistory(30, 2500);
   renderApp(repos, today);
   await chooseMaintenance();
-  expect(await screen.findByRole('heading', { name: 'Goal: Maintenance' })).toBeInTheDocument();
+  expect(await screen.findByText('Maintenance', { selector: '.mm-section-summary' })).toBeInTheDocument();
   expect((await repos.setup.loadSetup())?.goalMode).toBe('maintenance');
 });
 
@@ -74,7 +80,7 @@ it('targets follow a goal change in the app', async () => {
   await seedHistory(30, 2000);
   const view = renderApp(repos, today);
   await chooseMaintenance();
-  await screen.findByRole('heading', { name: 'Goal: Maintenance' });
+  await screen.findByText('Maintenance', { selector: '.mm-section-summary' });
   let history = await first(repos.targets.watchTargetsHistory());
   await expect
     .poll(async () => {
@@ -114,7 +120,7 @@ it('Learning explains the target hold and what to do next', async () => {
   // The confidence word is said with its label, never alone (MM-254).
   expect(within(document.querySelector('.mm-hero') as HTMLElement).getByText('Coach confidence: Learning')).toBeInTheDocument();
 
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText(/^About .* so far$/)).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Coach confidence · Learning' })).toBeInTheDocument();
   expect(screen.getByText('Targets are held while the coach learns.')).toBeInTheDocument();
@@ -150,7 +156,7 @@ for (const tab of ['Dashboard', 'Coach']) {
 it('the Coach screen has no calorie figure of its own', async () => {
   await seedArc();
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText(/left of 2,000/)).toBeInTheDocument();
   // The old hero card said "kcal a day" under a figure of its own.
   expect(screen.queryByText('kcal a day')).not.toBeInTheDocument();
@@ -164,7 +170,7 @@ it('during a pause the Coach arc is the guide, never over', async () => {
     foodOn(today, { name: 'Wedding dinner', kcal: 3400, proteinG: 120, carbsG: 380, fatG: 140 }),
   );
   renderApp(repos, today);
-  await openTab('Coach');
+  await openCoach();
   expect(await screen.findByText(/paused, guide/)).toBeInTheDocument();
   expect(arcs()).toHaveLength(1);
   expect(screen.queryByText(/^over [\d,]+/)).not.toBeInTheDocument();

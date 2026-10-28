@@ -5,7 +5,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { foodOn } from '../support/foodOn';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
 
@@ -28,7 +28,7 @@ beforeEach(async () => {
 
 async function openProgress() {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   return screen.findByRole('img', { name: /^Weight trend over the last 30 days\./ });
 }
 

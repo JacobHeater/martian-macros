@@ -7,7 +7,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { HealthImporter } from '../../src/healthIngest/HealthImporter';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { first } from '../support/first';
-import { openTab } from '../support/openTab';
+import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -52,7 +52,7 @@ beforeEach(async () => {
 
 async function openProgress(): Promise<void> {
   renderApp(repos, today);
-  await openTab('Progress');
+  await openCoach();
   await screen.findByRole('heading', { name: 'Weight trend' });
 }
 
