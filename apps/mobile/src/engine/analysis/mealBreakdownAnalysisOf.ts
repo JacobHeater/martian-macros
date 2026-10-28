@@ -38,6 +38,8 @@ export function mealBreakdownAnalysisOf(input: {
 }): MealBreakdownAnalysis {
   const defaultSafeguards: InsightSafeguards = {
     adult: true,
+    eatingDisorderHistory: input.protectedPath === true,
+    weightHidden: false,
     paused: false,
     underEating: false,
     cautions: input.protectedPath === true ? new Set<Caution>(['eatingDisorderHistory']) : new Set<Caution>(),
