@@ -202,3 +202,11 @@
 .coach-finding-dismiss {
   margin-inline-start: calc(-1 * var(--space-12));
 }
+
+/* The wait on the model and, after three seconds, the way out under it (MM-686). */
+.coach-writing-line {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-12);
+}

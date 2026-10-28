@@ -149,6 +149,21 @@ export const MealCoachBreakdownWriting = screenStory({
   },
 });
 
+/** MM-686: the model writing past three seconds: "Answer now" under the wait, at phone width, the built-in words at a press. */
+export const MealCoachBreakdownAnswerNow = screenStory({
+  covers: ['FoodScreen', 'MealBreakdownSheet'],
+  shows: 'Answer now',
+  device: writingCoach,
+  viewport: 'smallPhone',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+    await within(canvas.ownerDocument.body).findByRole('button', { name: 'Answer now' }, { timeout: 5000 });
+  },
+});
+
 /** MM-675: the breakdown on a 360 px phone, scrolled: the grip and Close stay at the top while the words pass under. */
 export const MealCoachBreakdownScrolled = screenStory({
   covers: ['FoodScreen', 'MealBreakdownSheet'],

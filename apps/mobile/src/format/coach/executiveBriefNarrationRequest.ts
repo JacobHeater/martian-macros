@@ -1,21 +1,29 @@
 import type { CoachNarrationRequest } from '../../domain/integration/CoachNarrationRequest';
+import type { CoachToolbox } from '../../domain/integration/CoachToolbox';
 import type { ExecutiveBrief } from '../../engine/analysis/ExecutiveBrief';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { executiveBriefArchetypeText } from './executiveBriefArchetypeText';
+import { mealMoveFigures } from '../../engine/analysis/moves/mealMoveFigures';
 
 const systemPrompt =
-  'You are the Martian Macros nutrition coach. Write 2 to 3 concise, direct sentences summarizing the user position from the supplied JSON only. ' +
+  'You are the Martian Macros coach: direct, specific and accountable, a real coach, never a page of numbers. Write 2 to 4 short sentences on where the person stands today and this week from the supplied JSON, ending in one order. ' +
+  'When the JSON names a primary driver, name that food with its calories and protein as the drag, and give its move where one is given. ' +
   'Use only numbers present in the JSON, written as they are given, as whole numbers. Never use exclamation marks. Never moralize food. ' +
   'Speak in plain words: never say a JSON field name (a camelCase word) or a true or false value. ' +
   'When the JSON marks the protein left as unable to fit inside the calories left today, say that the protein gap cannot fit inside today’s calorie cap, tell the person to hold their calorie ceiling tonight, and to front-load protein in the morning. ' +
   'When the JSON has a training block, hold the person to it in one or two blunt sentences: lifting sessions this week against the sessions they set, and, where cardio is held, cardio minutes and steps a day against their floors, ordering the shortfall. Never offer exercise as a way to make up for food.';
 
+/** What the model is told when it has tools (MM-685): look, price, then order; every number from what it was given or looked up. */
+const toolGuidance =
+  ' You have tools. Before you order, read today_meals, week and training; search_catalog for a food when you want to name one; price any move you propose with price_move, and give only a move it allows. ' +
+  'Every number you say must come from the JSON or a tool’s answer. Then answer in words alone, with no tool call.';
+
 /**
  * Builds a `CoachNarrationRequest` from an `ExecutiveBrief`, pairing the
  * deterministic state hash and allowed numbers with the offline archetype
- * fallback (MM-665).
+ * fallback (MM-665); with the day's tools when a toolbox is given (MM-685).
  */
-export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarrationRequest {
+export function executiveBriefNarrationRequest(brief: ExecutiveBrief, toolbox?: CoachToolbox): CoachNarrationRequest {
   // Every figure goes to the model whole: given 2176.903968363784 kcal it wrote it back, digit for digit (the
   // owner's first answer from Anthropic, MM-671). The engine's figures stay as they are; only what is said is rounded.
   const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -41,16 +49,7 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
           proteinG: whole(driver.proteinG),
           fatG: whole(driver.fatG),
           withoutKcalOver: wholeOr(driver.withoutKcalOver),
-          replacement:
-            driver.replacement === undefined
-              ? undefined
-              : {
-                  name: driver.replacement.name,
-                  kcal: wholeOr(driver.replacement.kcal),
-                  proteinG: wholeOr(driver.replacement.proteinG),
-                  caloriesSaved: whole(driver.replacement.caloriesSaved),
-                  proteinGained: whole(driver.replacement.proteinGained),
-                },
+          move: driver.move === undefined ? undefined : mealMoveFigures(driver.move).figures,
         };
   const t = brief.training;
   const training =
@@ -104,12 +103,7 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
   if (primaryDriver !== undefined) {
     allowedNumbers.push(primaryDriver.kcal, primaryDriver.proteinG, primaryDriver.fatG);
     if (primaryDriver.withoutKcalOver !== undefined) allowedNumbers.push(primaryDriver.withoutKcalOver);
-    const replacement = primaryDriver.replacement;
-    if (replacement !== undefined) {
-      if (replacement.kcal !== undefined) allowedNumbers.push(replacement.kcal);
-      if (replacement.proteinG !== undefined) allowedNumbers.push(replacement.proteinG);
-      allowedNumbers.push(replacement.caloriesSaved, replacement.proteinGained);
-    }
+    if (driver?.move !== undefined) allowedNumbers.push(...mealMoveFigures(driver.move).numbers);
   }
   if (training !== undefined) {
     // Minutes may come back as hours and minutes ("1 h 36 min"): both parts are allowed too.
@@ -128,11 +122,12 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
   }
   return {
     cacheKey: `exec:${brief.briefHash}`,
-    systemPrompt,
+    systemPrompt: toolbox === undefined ? systemPrompt : `${systemPrompt}${toolGuidance}`,
     userPrompt: JSON.stringify(payload),
     fallbackText: executiveBriefArchetypeText(brief),
     protectedPath: brief.protectedPath,
     proteinUnrecoverable: brief.proteinUnrecoverable,
     allowedNumbers,
+    ...(toolbox === undefined ? {} : { toolbox }),
   };
 }

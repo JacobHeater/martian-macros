@@ -10,14 +10,14 @@ import { renderApp } from '../support/renderApp';
 
 const today = CalendarDate.of(2026, 10, 20);
 
-describe('Meal Coach breakdown sheet and inline food swaps (MM-666)', () => {
-  it('opens Coach breakdown from the meal overflow menu alongside Macro split and shows tactical impact and swap', async () => {
+describe('Meal Coach breakdown sheet and inline food moves (MM-666, MM-684)', () => {
+  it('opens Coach breakdown from the meal overflow menu alongside Macro split and shows tactical impact and the move', async () => {
     const repos = new InMemoryRepositories();
     await repos.preferences.saveThemePreference('martian');
     await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
     await repos.weights.saveWeight(today, 82);
 
-    // Log a higher-protein food on two prior days so a swap candidate meets TradeRule.loggedMinDays.
+    // A lean food logged at lunch on two prior days (TradeRule.loggedMinDays): the add's own-food candidate (MM-684).
     for (const [id, daysAgo] of [
       [1, 1],
       [2, 2],
@@ -28,10 +28,10 @@ describe('Meal Coach breakdown sheet and inline food swaps (MM-666)', () => {
           date: today.addDays(-daysAgo),
           meal: 'lunch',
           name: 'Grilled chicken wrap',
-          kcal: 420,
-          proteinG: 42,
-          carbsG: 36,
-          fatG: 10,
+          kcal: 280,
+          proteinG: 36,
+          carbsG: 20,
+          fatG: 6,
           source: 'weighed',
         }),
       );
@@ -55,8 +55,8 @@ describe('Meal Coach breakdown sheet and inline food swaps (MM-666)', () => {
     renderApp(repos, today);
     await openTab('Food');
 
-    // Inline insight under Creamy Alfredo pasta should surface the concrete swap.
-    expect(await screen.findByText(/Swap for Grilled chicken wrap/i)).toBeInTheDocument();
+    // The inline line under the pasta ends in the food's own move (MM-684): the wrap added, in the approved words.
+    expect(await screen.findByText('Light on protein: 640 kcal for 12 g. Add grilled chicken wrap, 280 kcal for 36 g, alongside next time.')).toBeInTheDocument();
 
     // Open Lunch overflow menu and verify both "Coach breakdown" and "Macro split" are present.
     const optionsBtn = await screen.findByRole('button', { name: 'Options for lunch' });
@@ -70,7 +70,10 @@ describe('Meal Coach breakdown sheet and inline food swaps (MM-666)', () => {
     expect(within(dialog).getByText('Meal protein density (P%)')).toBeInTheDocument();
     expect(within(dialog).getByText('Remaining runway')).toBeInTheDocument();
     expect(within(dialog).getByText('Highest calorie drag')).toBeInTheDocument();
-    expect(within(dialog).getByText('Suggested swap')).toBeInTheDocument();
-    expect(within(dialog).getByText(/Grilled chicken wrap in place of Creamy Alfredo pasta/)).toBeInTheDocument();
+    expect(within(dialog).getByText('Your move')).toBeInTheDocument();
+    expect(within(dialog).getByText('Add grilled chicken wrap next time')).toBeInTheDocument();
+    expect(within(dialog).getByText('+280 kcal · +36 g protein')).toBeInTheDocument();
+    // The built-in words (no model set up): the drag named, the one order, and the next meal carrying today.
+    expect(within(dialog).getByText(/Lunch was 640 kcal for 12 g of protein, 8% protein\. The Creamy Alfredo pasta is the drag: 640 kcal for 12 g\. Next time build it around protein: add grilled chicken wrap, 280 kcal for 36 g, and lunch stands at 48 g\. You have [\d,]+ kcal left for \d+ g today\. Dinner carries it\./)).toBeInTheDocument();
   });
 });

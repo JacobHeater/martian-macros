@@ -1,3 +1,5 @@
+import type { CoachToolbox } from './CoachToolbox';
+
 /**
  * A bounded request for coaching narration over a deterministic pre-calculated
  * brief or meal breakdown (MM-665).
@@ -17,4 +19,6 @@ export interface CoachNarrationRequest {
   readonly proteinUnrecoverable: boolean;
   /** Numbers from the deterministic brief that the narration is permitted to cite. */
   readonly allowedNumbers: readonly number[];
+  /** The tools the model may call before it answers (MM-685); none, and it answers from the prompt alone. */
+  readonly toolbox?: CoachToolbox | undefined;
 }

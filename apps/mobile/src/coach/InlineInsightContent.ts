@@ -16,4 +16,6 @@ export interface InlineInsightContent {
   readonly logged?: Omit<InlineInsightLogEntry, 'firstShownOn'>;
   /** What a snooze of it quiets (MM-378): the kind on this item, and the item's name for the Snoozed list. */
   readonly snooze?: { readonly kind: string; readonly subject: string; readonly item: string };
+  /** The person's own model is phrasing the day's lines (MM-687): the wait is drawn in the line's place. */
+  readonly waiting?: boolean | undefined;
 }

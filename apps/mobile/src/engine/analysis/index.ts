@@ -49,5 +49,7 @@ export * from './coachVerdictOf';
 export * from './trainingAdviceOf';
 export * from './language';
 export * from './swap';
+// One move per meal, ranked by the day's gap (MM-684).
+export * from './moves';
 // The coach's accountability (MM-617): its record of advice shown, and its follow-ups.
 export * from './accountability';

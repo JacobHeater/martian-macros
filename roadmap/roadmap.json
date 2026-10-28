@@ -3162,7 +3162,13 @@
      "MM-617",
      "MM-618",
      "MM-678",
-     "MM-681"
+     "MM-681",
+     "MM-682",
+     "MM-683",
+     "MM-684",
+     "MM-685",
+     "MM-686",
+     "MM-687"
     ]
    },
    "sequence": [
@@ -3362,6 +3368,18 @@
      "title": "\"Sauce on the side\" said when nothing had sauce: sauced food only, no sauce fallback, foods found inside a meal logged as one (the owner, 2026-10-25, MM-622)",
      "tickets": [
       "MM-622"
+     ]
+    },
+    {
+     "step": 21,
+     "title": "AI meal analysis with tools (the owner, 2026-10-28, MM-682): one deterministic move per meal ranked by the day's gap, same-group swaps only, the catalog first; the model with the person's key given tools that call the engine, every number from a tool; \"Answer now\" after 3 s; the inline lines in one pass a day",
+     "tickets": [
+      "MM-682",
+      "MM-683",
+      "MM-684",
+      "MM-685",
+      "MM-686",
+      "MM-687"
      ]
     }
    ],

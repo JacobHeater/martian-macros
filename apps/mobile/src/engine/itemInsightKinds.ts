@@ -23,7 +23,7 @@ export const itemInsightKinds: readonly ItemInsightKind[] = [
     id: 'lightOnProtein',
     area: 'food',
     title: 'Light on protein',
-    example: '9 g of protein in 520 kcal. A protein food alongside is the easiest way to add some.',
+    example: 'Light on protein: 520 kcal for 9 g. Half of it next time keeps 260 kcal for protein.',
     priority: 'pattern',
     // No minimum after bariatric surgery; a ceiling, not a floor, with kidney disease (the panel's NU-3, SA-7).
     notWithCautions: ['bariatricSurgery', 'chronicKidneyDisease'],
@@ -32,7 +32,7 @@ export const itemInsightKinds: readonly ItemInsightKind[] = [
     id: 'mostlyFat',
     area: 'food',
     title: 'Mostly fat',
-    example: 'Most of this food’s calories come from fat (76%). A protein food alongside balances the meal.',
+    example: 'Mostly fat: 640 kcal, 76% from fat. Add chicken breast, 165 kcal for 31 g, alongside next time.',
     priority: 'pattern',
     notWithEatingDisorderHistory: true,
     notWhileUnderEating: true,

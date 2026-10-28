@@ -12,6 +12,7 @@ import { WorkoutSet } from '../../domain/training/WorkoutSet';
 import { FoodGradeRule } from '../../engine/FoodGradeRule';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
+import { writingCoach } from './writingCoach';
 import { FoodGradeLetter } from '../../domain/food/grade/FoodGradeLetter';
 import type { FoodGradeValue } from '../../domain/food/grade/FoodGradeValue';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
@@ -121,11 +122,11 @@ const revealed = (name: string | RegExp, role = 'button') => async (canvas: HTML
 /** MM-362, MM-370: the coach's lines under three foods, every entry, meal and the day graded. */
 export const FoodWithInsights = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this food’s calories come from fat/,
+  shows: /^Mostly fat:/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Mostly fat:/)(canvas)),
 });
 
 /** MM-365: lunch with two lines, one under each of its foods. */
@@ -135,7 +136,7 @@ export const FoodTwoInsightsInOneMeal = screenStory({
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: 14 g of protein in 640 kcal/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Light on protein: 640 kcal for 14 g/)(canvas)),
 });
 
 /**
@@ -165,10 +166,19 @@ const biscuits: StoryScenario = async (repos, today) => {
   );
 };
 
+/** MM-687: a BYOK coach set up and phrasing the day's lines: the wait stands under the food where its line will. */
+export const FoodLinesWriting = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'The coach is writing…',
+  scenario: demoWith({ then: biscuits }),
+  device: writingCoach,
+  open: yesterdaysFood,
+});
+
 /** MM-393: two rules hold on one food, and each says its own line under it. */
 export const FoodTwoInsightsOnOneEntry = screenStory({
   covers: ['FoodScreen'],
-  shows: /^12 g of protein in 780 kcal/,
+  shows: /^Light on protein: 780 kcal for 12 g/,
   scenario: demoWith({ then: biscuits }),
   open: yesterdaysFood,
   walk: async (canvas) => void (await revealed(/^Coach: Logged as 3 servings/)(canvas)),
@@ -204,7 +214,7 @@ const croissants: StoryScenario = async (repos, today) => {
 /** MM-393: three rules hold on one food: three lines, the portion check first. */
 export const FoodThreeInsightsOnOneEntry = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this food’s calories come from fat \(57%\)/,
+  shows: /^Mostly fat: \d+ kcal, 57% from fat/,
   scenario: demoWith({ then: croissants }),
   open: yesterdaysFood,
   walk: async (canvas) => void (await revealed(/^Coach: Logged as 4 servings/)(canvas)),
@@ -218,7 +228,7 @@ export const FoodInsightOpen = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Mostly fat:/)(canvas));
     reveal(await within(canvas).findByRole('button', { name: 'Settings for “Mostly fat”' }));
   },
 });
@@ -231,7 +241,7 @@ export const FoodInsightSnooze = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Mostly fat:/)(canvas));
     reveal(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
   },
 });
@@ -244,7 +254,7 @@ export const FoodInsightSnoozeLengths = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Mostly fat:/)(canvas));
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
   },
 });
@@ -257,7 +267,7 @@ export const FoodInsightSnoozed = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Mostly fat:/)(canvas));
     await userEvent.click(await within(canvas).findByRole('button', { name: /^Snooze…/ }));
     const dialog = await within(canvas).findByRole('dialog', { name: /^Snooze “Mostly fat”/ });
     await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
@@ -272,7 +282,7 @@ export const FoodInsightToSettings = screenStory({
   preview: foodPreview,
   open: yesterdaysFood,
   walk: async (canvas) => {
-    await userEvent.click(await revealed(/^Coach: Most of this food/)(canvas));
+    await userEvent.click(await revealed(/^Coach: Mostly fat:/)(canvas));
     await userEvent.click(await within(canvas).findByRole('button', { name: 'Settings for “Mostly fat”' }));
   },
 });
@@ -358,12 +368,12 @@ export const FoodDayGradeMeaning = screenStory({
 /** MM-362, MM-370 (the panel's UX-4): the food log at 200% text, the line under Peanut butter in view. */
 export const FoodLargeText = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this food’s calories come from fat/,
+  shows: /^Mostly fat:/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   textScale: 2,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Mostly fat:/)(canvas)),
 });
 
 /** MM-372 (the panel's UX-1, UX-4): the Snacks question mark at 200% text: the popover inside both edges. */
@@ -382,12 +392,12 @@ export const FoodMealGradeWhyLargeText = screenStory({
 /** The panel's UX-4: the food log on a 320 px phone: the entry's calories, grade and More beside a narrow name. */
 export const FoodNarrow = screenStory({
   covers: ['FoodScreen'],
-  shows: /^Most of this food’s calories come from fat/,
+  shows: /^Mostly fat:/,
   scenario: demoWith({ then: extraFoods }),
   preview: foodPreview,
   viewport: 'narrowPhone',
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: Most of this food/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Mostly fat:/)(canvas)),
 });
 
 /** MM-370: a food that can't be graded: the question mark opens why. */
@@ -417,11 +427,11 @@ export const FoodMealGradeWhy = screenStory({
 /** MM-362, MM-370: eating-disorder history: grades as for anyone, no line about fat, protein's line kept. */
 export const FoodWithInsightsEatingDisorder = screenStory({
   covers: ['FoodScreen'],
-  shows: /^14 g of protein in 640 kcal/,
+  shows: /^Light on protein: 640 kcal for 14 g/,
   scenario: demoWith({ screening: { eatingDisorderHistory: true }, then: extraFoods }),
   preview: foodPreview,
   open: yesterdaysFood,
-  walk: async (canvas) => void (await revealed(/^Coach: 14 g of protein in 640 kcal/)(canvas)),
+  walk: async (canvas) => void (await revealed(/^Coach: Light on protein: 640 kcal for 14 g/)(canvas)),
 });
 
 /** A grade for every food in the pack, from its name: the design's own letters, and one the method can't grade. */
