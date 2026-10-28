@@ -12,6 +12,7 @@ import { first } from '../support/first';
 import { renderApp } from '../support/renderApp';
 import { ReminderRule } from '../../src/engine/ReminderRule';
 import { Fmt } from '../../src/format/Fmt';
+import { CardioSession } from '../../src/domain/training/CardioSession';
 
 /** The Dashboard. Carried over from dashboard_test.dart. */
 const today = CalendarDate.of(2026, 10, 5);
@@ -301,4 +302,30 @@ it('"Open Progress" from the weigh-in confirmation lands at the top', async () =
   await screen.findByText(/^Trend weight/);
   expect((document.querySelector('main.app-body') as HTMLElement).scrollTop).toBe(0);
   expect(screen.getByRole('button', { name: /^Waist/ })).toHaveAttribute('aria-expanded', 'false');
+});
+
+// MM-677 (the owner): today's steps and the week's cardio from the wearable against their floors, opening Train.
+it('shows today\'s steps and the week\'s cardio against the floors, and opens Train', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  const start = new Date(2026, 9, 4, 7, 5);
+  await repos.cardioSessions.saveCardioSessions([
+    new CardioSession({ platformId: 'hk-walk', sourceName: 'Watch', activity: 'walking', start, end: new Date(start.getTime() + 42 * 60000) }),
+    new CardioSession({ platformId: 'hk-run', sourceName: 'Watch', activity: 'running', start: new Date(2026, 9, 2, 18), end: new Date(2026, 9, 2, 18, 54) }),
+  ]);
+  await repos.dailySteps.saveDailySteps([
+    { date: today, steps: 6100 },
+    { date: today.addDays(-1), steps: 9000 },
+  ]);
+  renderApp(repos, today);
+  const row = await screen.findByRole('button', { name: /^6,100 steps today · 1 h 36 min of cardio this week/ });
+  expect(row).toHaveTextContent('Floors 8,000 a day · 2 h 30 min a week');
+  await userEvent.click(row);
+  expect(await screen.findByRole('button', { name: /^Cardio/ })).toBeInTheDocument();
+});
+
+it('without a wearable the cardio row says what would bring it', async () => {
+  await seed({ history: [targets(today.addDays(-30), 2400)] });
+  renderApp(repos, today);
+  const row = await screen.findByRole('button', { name: /^Cardio/ });
+  expect(row).toHaveTextContent('Comes from a watch or phone through Health Connect, which this phone does not have.');
 });

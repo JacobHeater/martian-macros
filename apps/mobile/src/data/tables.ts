@@ -37,4 +37,6 @@ export const tables = [
   'coach_advice_given',
   'saved_meals',
   'saved_meal_foods',
+  'cardio_sessions',
+  'daily_steps',
 ] as const;

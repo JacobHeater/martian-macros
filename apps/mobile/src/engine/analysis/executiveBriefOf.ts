@@ -2,6 +2,7 @@ import type { CalendarDate } from '../../domain/CalendarDate';
 import type { FoodEntry } from '../../domain/FoodEntry';
 import { CalorieBand } from '../CalorieBand';
 import type { ExecutiveBrief } from './ExecutiveBrief';
+import type { TrainingBrief } from './TrainingBrief';
 import { adviceFoodOf } from './food/adviceFoodOf';
 import { countsAsFood } from './food/countsAsFood';
 import type { FoodAnalysisInput } from './food/FoodAnalysisInput';
@@ -27,7 +28,7 @@ const sum = (values: readonly number[]) => values.reduce((s, v) => s + v, 0);
 export function executiveBriefOf(
   input: FoodAnalysisInput,
   today: CalendarDate,
-  options: { readonly weighIns7d?: number | undefined } = {},
+  options: { readonly weighIns7d?: number | undefined; readonly training?: TrainingBrief | undefined } = {},
 ): ExecutiveBrief | undefined {
   const limits = foodLimitsOf(input.safeguards);
   if (limits.nothing || limits.minorOrPaused) return undefined;
@@ -152,6 +153,8 @@ export function executiveBriefOf(
   }
 
   const proteinUnrecoverable = runwayState === 'proteinUnrecoverable';
+  // Nothing of training on the protected path (MM-681): the brief then speaks of protein alone.
+  const training = limits.proteinOnly ? undefined : options.training;
   const briefHash = [
     today.toString(),
     limits.proteinOnly ? 'protected' : 'full',
@@ -166,6 +169,10 @@ export function executiveBriefOf(
     calorieAdherenceDays,
     proteinFloorHitDays,
     options.weighIns7d ?? 0,
+    // The training figures too (MM-681), so a session logged or a walk read is narrated anew.
+    ...(training === undefined
+      ? []
+      : [training.sessionsThisWeek, training.sessionsTarget, training.daysSinceSession ?? -1, training.cardioMinutes, training.stepsPerDay ?? -1, training.wearableInUse ? 1 : 0]),
   ].join(':');
 
   return {
@@ -191,5 +198,6 @@ export function executiveBriefOf(
       averageProteinG: loggedDays > 0 ? totalProteinG / loggedDays : 0,
       weighIns: options.weighIns7d ?? 0,
     },
+    ...(training === undefined ? {} : { training }),
   };
 }

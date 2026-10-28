@@ -4,6 +4,7 @@ import { Fmt } from '../Fmt';
 import { mealLabel } from '../mealLabel';
 import { foodInSentence } from './foodInSentence';
 import { phrasingIndex } from './phrasingIndex';
+import { trainingBriefText } from './trainingBriefText';
 
 /**
  * Synthesizes a cohesive, whole-situation coaching paragraph from an
@@ -13,6 +14,13 @@ import { phrasingIndex } from './phrasingIndex';
  * the guaranteed fallback whenever a remote narration fails verification.
  */
 export function executiveBriefArchetypeText(brief: ExecutiveBrief): string {
+  // The food first, then what the person is held to in training (MM-681).
+  const food = foodBriefText(brief);
+  return brief.training === undefined ? food : `${food} ${trainingBriefText(brief.training)}`;
+}
+
+/** The food end of the brief: the runway and the week's consistency. */
+function foodBriefText(brief: ExecutiveBrief): string {
   const seed = (slot: string, length: number) => phrasingIndex(`exec|${slot}|${brief.date.epochDay}|${brief.runwayState}`, length);
   const pick = (slot: string, options: readonly string[]) => options[seed(slot, options.length)] ?? options[0]!;
 

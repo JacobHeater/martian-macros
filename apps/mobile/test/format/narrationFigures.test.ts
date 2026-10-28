@@ -5,6 +5,9 @@ import { executiveBriefNarrationRequest } from '../../src/format/coach/executive
 import { mealBreakdownNarrationRequest } from '../../src/format/coach/mealBreakdownNarrationRequest';
 import { whyCoachNarrationRejected } from '../../src/format/coach/whyCoachNarrationRejected';
 import { food, inputOf, today, yesterday } from '../engine/support/foodAnalysis';
+import { CardioSession } from '../../src/domain/training/CardioSession';
+import { trainingBriefOf } from '../../src/engine/analysis/trainingBriefOf';
+import { trainingInput } from '../engine/support/trainingInput';
 
 /**
  * MM-671: the owner's first answer from Anthropic was good words refused for "903968363784": the brief went to the
@@ -35,6 +38,26 @@ describe('the figures sent to the model', () => {
     expect(sent.every(Number.isInteger), req.userPrompt).toBe(true);
     expect(req.allowedNumbers.every(Number.isInteger)).toBe(true);
     expect(req.systemPrompt).toContain('as whole numbers');
+  });
+
+  // MM-681: the training figures go to the model too, and may be said back, in hours and minutes as well.
+  it('carry the training block, whole, with its minutes allowed back as hours and minutes', () => {
+    const start = new Date(today.year, today.month - 1, today.day - 1, 7, 5);
+    const training = trainingBriefOf(
+      trainingInput(today, {
+        goal: 'fatLoss',
+        cardio: [new CardioSession({ platformId: 'w', sourceName: 'Watch', activity: 'walking', start, end: new Date(start.getTime() + 96.4 * 60000) })],
+        steps: [{ date: today, steps: 6100 }],
+      }),
+      today,
+    );
+    const req = executiveBriefNarrationRequest({ ...brief(), training });
+    const sent = JSON.parse(req.userPrompt) as { training: Record<string, unknown> };
+    expect(sent.training).toMatchObject({ liftingSessionsThisWeek: 0, liftingSessionsSet: 4, cardioMinutesThisWeek: 96, cardioMinutesFloor: 150, cardioMinutesMore: 54, stepsPerDay: 6100, stepsFloor: 8000, stepsMorePerDay: 1900 });
+    expect(everyNumber(sent).every(Number.isInteger)).toBe(true);
+    for (const allowed of [4, 96, 150, 54, 6100, 8000, 1900, 1, 36, 2, 30]) expect(req.allowedNumbers).toContain(allowed);
+    expect(req.systemPrompt).toContain('hold the person to it');
+    expect(req.fallbackText).toContain('Cardio 1 h 36 min against the 2 h 30 min floor');
   });
 
   it('are whole in a meal’s request too', () => {

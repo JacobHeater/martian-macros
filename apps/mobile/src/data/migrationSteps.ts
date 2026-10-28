@@ -501,4 +501,27 @@ CREATE INDEX "saved_meal_foods_meal" ON "saved_meal_foods" ("saved_meal_id")
 `);
     },
   ],
+  // 30 to 31 (MM-677, MM-678): the wearable's cardio sessions and the platform's daily steps, none yet (the next read
+  // brings them); and the floors the coach holds cardio to, unset until the person sets them.
+  [
+    30,
+    async (db) => {
+      await db.execute(
+        'CREATE TABLE "cardio_sessions" (' +
+          '"platform_id" TEXT NOT NULL PRIMARY KEY, ' +
+          '"source_name" TEXT NOT NULL, ' +
+          '"activity" TEXT NOT NULL CHECK ("activity" IN (\'walking\', \'running\', \'hiking\', \'cycling\', \'elliptical\', \'rowing\', \'stairClimbing\', \'swimming\', \'intervals\', \'other\')), ' +
+          '"started_at_ms" INTEGER NOT NULL, ' +
+          '"ended_at_ms" INTEGER NOT NULL CHECK ("ended_at_ms" > "started_at_ms"), ' +
+          '"date_epoch_day" INTEGER NOT NULL)',
+      );
+      await db.execute('CREATE TABLE "daily_steps" ("epoch_day" INTEGER NOT NULL PRIMARY KEY, "steps" INTEGER NOT NULL CHECK ("steps" > 0))');
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN cardio_steps_floor INTEGER NULL CHECK (cardio_steps_floor IS NULL OR cardio_steps_floor BETWEEN 1000 AND 30000)',
+      );
+      await db.execute(
+        'ALTER TABLE user_preferences ADD COLUMN cardio_minutes_floor INTEGER NULL CHECK (cardio_minutes_floor IS NULL OR cardio_minutes_floor BETWEEN 0 AND 1000)',
+      );
+    },
+  ],
 ]);

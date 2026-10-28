@@ -11,6 +11,7 @@ import type { PreferencesRepository } from '../domain/repositories/PreferencesRe
 import { TermsAcceptance } from '../domain/TermsAcceptance';
 import { ThemePreference } from '../domain/ThemePreference';
 import { WeightDisplay } from '../domain/WeightDisplay';
+import { CardioFloors } from '../domain/training/CardioFloors';
 import { WeighInWindow } from '../healthIngest/WeighInWindow';
 import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
 import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
@@ -141,6 +142,18 @@ export class SqlPreferencesRepository implements PreferencesRepository, WeighInW
       weigh_in_window_start_minute: orNull(window?.startMinute),
       weigh_in_window_end_minute: orNull(window?.endMinute),
     });
+  }
+
+  watchCardioFloors(): Watched<CardioFloors> {
+    return this.watch((row) =>
+      row === undefined
+        ? CardioFloors.none
+        : { stepsPerDay: optionalInteger(row, 'cardio_steps_floor'), minutesPerWeek: optionalInteger(row, 'cardio_minutes_floor') },
+    );
+  }
+
+  saveCardioFloors(floors: CardioFloors): Promise<void> {
+    return this.save({ cardio_steps_floor: orNull(floors.stepsPerDay), cardio_minutes_floor: orNull(floors.minutesPerWeek) });
   }
 
   watchMacroPicture(): Watched<MacroPicture> {

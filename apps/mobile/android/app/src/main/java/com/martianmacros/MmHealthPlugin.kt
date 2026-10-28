@@ -133,6 +133,28 @@ class MmHealthPlugin : Plugin() {
         ExerciseSessionRecord.EXERCISE_TYPE_CALISTHENICS,
     )
 
+    /** What the app calls a non-strength session (MM-677), by the names of its `CardioActivity`; any other type is "other". */
+    private val cardioActivities = mapOf(
+        ExerciseSessionRecord.EXERCISE_TYPE_WALKING to "walking",
+        ExerciseSessionRecord.EXERCISE_TYPE_RUNNING to "running",
+        ExerciseSessionRecord.EXERCISE_TYPE_RUNNING_TREADMILL to "running",
+        ExerciseSessionRecord.EXERCISE_TYPE_HIKING to "hiking",
+        ExerciseSessionRecord.EXERCISE_TYPE_BIKING to "cycling",
+        ExerciseSessionRecord.EXERCISE_TYPE_BIKING_STATIONARY to "cycling",
+        ExerciseSessionRecord.EXERCISE_TYPE_ELLIPTICAL to "elliptical",
+        ExerciseSessionRecord.EXERCISE_TYPE_ROWING to "rowing",
+        ExerciseSessionRecord.EXERCISE_TYPE_ROWING_MACHINE to "rowing",
+        ExerciseSessionRecord.EXERCISE_TYPE_STAIR_CLIMBING to "stairClimbing",
+        ExerciseSessionRecord.EXERCISE_TYPE_STAIR_CLIMBING_MACHINE to "stairClimbing",
+        ExerciseSessionRecord.EXERCISE_TYPE_SWIMMING_POOL to "swimming",
+        ExerciseSessionRecord.EXERCISE_TYPE_SWIMMING_OPEN_WATER to "swimming",
+        ExerciseSessionRecord.EXERCISE_TYPE_HIGH_INTENSITY_INTERVAL_TRAINING to "intervals",
+    )
+
+    /** A session's activity as the app names it (MM-677): "" for strength, else its cardio name, "other" for any type not listed. */
+    private fun activityOf(exerciseType: Int): String =
+        if (exerciseType in strengthTypes) "" else cardioActivities[exerciseType] ?: "other"
+
     /** Where the plugin keeps that writing `kind` is on (MM-70). */
     private fun writingKey(kind: String) = "writing_$kind"
 
@@ -694,6 +716,8 @@ class MmHealthPlugin : Plugin() {
             .put("id", record.metadata.id)
             .put("clientId", record.metadata.clientRecordId ?: "")
             .put("strength", record.exerciseType in strengthTypes)
+            // Every non-strength session is cardio, by name (MM-677).
+            .put("activity", activityOf(record.exerciseType))
             .put("startMs", record.startTime.toEpochMilli())
             .put("endMs", record.endTime.toEpochMilli())
             .put("sourceId", record.metadata.dataOrigin.packageName)

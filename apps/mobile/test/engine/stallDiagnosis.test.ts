@@ -11,6 +11,7 @@ import {
   type WeightEvent,
   type WeightObservation,
 } from '../../src/domain';
+import type { StepsDay } from '../../src/domain/training/StepsDay';
 import type { Workout } from '../../src/domain/training/Workout';
 import {
   assessStall,
@@ -139,6 +140,7 @@ const assess = ({
   events = [],
   workouts = [],
   sleepAverage,
+  steps = [],
 }: {
   sex?: BiologicalSex;
   snap?: CoachSnapshot;
@@ -149,6 +151,7 @@ const assess = ({
   events?: WeightEvent[];
   workouts?: Workout[];
   sleepAverage?: SleepAverage;
+  steps?: StepsDay[];
 } = {}) =>
   assessStall({
     setup: setupFor(sex),
@@ -160,6 +163,7 @@ const assess = ({
     weightEvents: events,
     workouts,
     sleepAverage,
+    steps,
     today,
   });
 
@@ -331,5 +335,34 @@ it('lean gain has the mirror: no gain, intake below target', () => {
   const a = assess({ history: [record({ rate: 0.0025 })], intake: ate(1850) });
   expect(a.status).toBe('stalled');
   expect(a.gaining).toBe(true);
+  expect(a.diagnosis).toBe('intake');
+});
+
+// MM-678: a stall with intake on target is put down to moving less when steps a day fell 20% or more against the four
+// weeks before the window, each with enough days; before the estimate is called wrong.
+const stepped = (perDay: (daysAgo: number) => number | undefined, days = 60): StepsDay[] =>
+  Array.from({ length: days }, (_, i) => ({ date: today.addDays(-1 - i), steps: perDay(1 + i) ?? 0 })).filter((d) => d.steps > 0);
+
+it('steps down a fifth or more against the four weeks before: the activity diagnosis, with both averages', () => {
+  const a = assess({ steps: stepped((daysAgo) => (daysAgo <= 21 ? 5200 : 8100)) });
+  expect(a.diagnosis).toBe('activity');
+  expect(a.stepsNowPerDay).toBe(5200);
+  expect(a.stepsBeforePerDay).toBe(8100);
+  expect(a.expectedChangeKcal, 'the target does not come down this check-in').toBeUndefined();
+});
+
+it('steps held, down less than a fifth, or too few days to compare leave the estimate diagnosis', () => {
+  expect(assess({ steps: stepped(() => 8100) }).diagnosis).toBe('estimate');
+  const slight = assess({ steps: stepped((daysAgo) => (daysAgo <= 21 ? 7000 : 8100)) });
+  expect(slight.diagnosis).toBe('estimate');
+  expect(slight.stepsNowPerDay).toBe(7000);
+  const few = assess({ steps: stepped((daysAgo) => (daysAgo <= 21 ? 5200 : daysAgo <= 30 ? 8100 : undefined)) });
+  expect(few.diagnosis).toBe('estimate');
+  expect(few.stepsBeforePerDay).toBeUndefined();
+  expect(assess().stepsNowPerDay).toBeUndefined();
+});
+
+it('intake off target comes before moving less', () => {
+  const a = assess({ intake: ate(2350), steps: stepped((daysAgo) => (daysAgo <= 21 ? 5200 : 8100)) });
   expect(a.diagnosis).toBe('intake');
 });

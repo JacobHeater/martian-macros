@@ -167,12 +167,15 @@ should read this list as closely as any feature.
 - **Detail:** MM-79
 - **Reopen if:** A qualified coach is part of the product.
 
-### No cardio prescriptions and no "burn it off"
+### No "burn it off"
 
 - **Why:** "Burning off" food moralizes eating and encourages compensation.
-  The only activity suggestion anywhere is more daily walking, as one option
-  in a stall.
-- **Detail:** MM-140
+  Cardio and steps are a standing part of a fat-loss or recomp program (the
+  owner, 2026-10-28: MM-677, MM-678), held to floors and ordered by the coach;
+  they are never said as making up for food, and no calories are worked out
+  from them (MM-23). The earlier "no cardio prescriptions" (MM-140) was
+  reopened by the owner on 2026-10-28.
+- **Detail:** MM-140, MM-677, MM-678
 - **Reopen if:** Never as "burn it off".
 
 ## Health

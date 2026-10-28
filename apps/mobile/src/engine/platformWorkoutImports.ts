@@ -1,17 +1,11 @@
 import type { Exercise } from '../domain/training/Exercise';
 import type { PlatformWorkout } from '../domain/training/PlatformWorkout';
 import { Workout } from '../domain/training/Workout';
+import { spanOverlapShare } from './spanOverlapShare';
 import { workoutFromPlatform } from './workoutFromPlatform';
 
 /** How much of the shorter of two spans must overlap for them to be one session (MM-490). */
 const sameSessionOverlap = 0.8;
-
-/** The share of the shorter span that `a` and `b` overlap, 0 when either has no length. */
-function overlapShare(a: { start: number; end: number }, b: { start: number; end: number }): number {
-  const shorter = Math.min(a.end - a.start, b.end - b.start);
-  if (!(shorter > 0)) return 0;
-  return Math.max(0, Math.min(a.end, b.end) - Math.max(a.start, b.start)) / shorter;
-}
 
 /**
  * What a read of the platform's workouts changes in the log (MM-490): the
@@ -60,7 +54,7 @@ export function platformWorkoutImports({
     if (existing === undefined) {
       const span = { start: read.start.getTime(), end: read.end.getTime() };
       const duplicate = spans.some(
-        (other) => (other.source === undefined || other.source !== read.sourceName) && overlapShare(span, other) >= sameSessionOverlap,
+        (other) => (other.source === undefined || other.source !== read.sourceName) && spanOverlapShare(span, other) >= sameSessionOverlap,
       );
       if (duplicate) continue;
       spans.push({ ...span, source: read.sourceName });

@@ -1,4 +1,5 @@
 import { Fmt } from '../Fmt';
+import { minutesText } from '../minutesText';
 import { MuscleGroup } from '../../domain/training/MuscleGroup';
 import type { CoachAdvice } from '../../engine/analysis/CoachAdvice';
 import type { CoachAdviceFood } from '../../engine/analysis/CoachAdviceFood';
@@ -232,6 +233,12 @@ export function coachAdviceText(
         break;
       case 'keepLifting':
         order(say('orderKeepLifting'));
+        break;
+      case 'cardio':
+        order(say('orderCardio', { more: minutesText(a.minutes ?? 0) }));
+        break;
+      case 'steps':
+        order(say('orderSteps', { floor: Fmt.whole(a.steps ?? 0), short: Fmt.whole(a.stepsShort ?? 0) }));
         break;
     }
   }

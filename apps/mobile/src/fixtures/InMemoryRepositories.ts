@@ -1,5 +1,7 @@
 import { InMemoryProgressPhotoRepository } from './InMemoryProgressPhotoRepository';
+import type { CardioSessionRepository } from '../domain/repositories/CardioSessionRepository';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
+import type { DailyStepsRepository } from '../domain/repositories/DailyStepsRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { SavedMealRepository } from '../domain/repositories/SavedMealRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
@@ -66,6 +68,8 @@ import { InMemoryWaterRepository } from './InMemoryWaterRepository';
 import { InMemoryWeightEventRepository } from './InMemoryWeightEventRepository';
 import { InMemoryWeightRepository } from './InMemoryWeightRepository';
 import { InMemoryWorkoutRepository } from './InMemoryWorkoutRepository';
+import { InMemoryCardioSessionRepository } from './InMemoryCardioSessionRepository';
+import { InMemoryDailyStepsRepository } from './InMemoryDailyStepsRepository';
 
 /**
  * Every repository, in memory, sharing state where the real ones do (the
@@ -108,6 +112,9 @@ export class InMemoryRepositories {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
+  /** The wearable's cardio sessions and the platform's daily steps (MM-677). */
+  readonly cardioSessions: CardioSessionRepository;
+  readonly dailySteps: DailyStepsRepository;
   readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   /** The progress photos (MM-157), erased with everything else. */
@@ -142,6 +149,8 @@ export class InMemoryRepositories {
     const recovery = new InMemoryRecoveryCheckInRepository();
     const workouts = new InMemoryWorkoutRepository();
     const customExercises = new InMemoryCustomExerciseRepository();
+    const cardioSessions = new InMemoryCardioSessionRepository();
+    const dailySteps = new InMemoryDailyStepsRepository();
     const healthSamples = new InMemoryHealthSampleStore();
     const exerciseProgressions = new InMemoryExerciseProgressionRepository();
     const progressPhotos = new InMemoryProgressPhotoRepository();
@@ -176,6 +185,8 @@ export class InMemoryRepositories {
     this.recovery = recovery;
     this.workouts = workouts;
     this.customExercises = customExercises;
+    this.cardioSessions = cardioSessions;
+    this.dailySteps = dailySteps;
     this.healthSamples = healthSamples;
     this.exerciseProgressions = exerciseProgressions;
     this.progressPhotos = progressPhotos;
@@ -207,6 +218,8 @@ export class InMemoryRepositories {
       () => recovery.clear(),
       () => workouts.clear(),
       () => customExercises.clear(),
+      () => cardioSessions.clear(),
+      () => dailySteps.clear(),
       () => healthSamples.clear(),
       () => exerciseProgressions.clear(),
       () => progressPhotos.eraseAll(),

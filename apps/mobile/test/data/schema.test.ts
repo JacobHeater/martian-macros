@@ -125,6 +125,9 @@ const tablesAddedSince: readonly string[] = [
   // Version 30 (MM-645): the meals saved to log again, and their foods.
   'saved_meals',
   'saved_meal_foods',
+  // Version 31 (MM-677): the wearable's cardio sessions and the platform's daily steps.
+  'cardio_sessions',
+  'daily_steps',
 ];
 
 /** The Dart database's tables since removed. */

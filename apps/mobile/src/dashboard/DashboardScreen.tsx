@@ -15,7 +15,10 @@ import { nextCheckIn } from '../engine/nextCheckIn';
 import { ReminderRule } from '../engine/ReminderRule';
 import { coachLineText } from '../format/coachLineText';
 import { confidenceLabel } from '../format/confidenceLabel';
+import { cardioDisclosureText } from '../format/cardioDisclosureText';
 import { Fmt } from '../format/Fmt';
+import { healthPlatformName } from '../format/healthPlatformName';
+import { minutesText } from '../format/minutesText';
 import { waistAmount } from '../format/waistAmount';
 import type { HomeDestination } from '../state/HomeDestination';
 import { Loadable } from '../state/Loadable';
@@ -74,6 +77,9 @@ export function DashboardScreen() {
   const intakeDays = useLoaded(state.intakeDays) ?? [];
   const waist = useLoaded(state.waist) ?? [];
   const workouts = useLoaded(state.workouts) ?? [];
+  // The week's cardio from the wearable (MM-677), and the platform it comes through.
+  const cardio = useLoaded(state.cardioWeek);
+  const connection = useLoaded(state.healthConnection);
   const current = useCell(state.currentTargets);
   // Today's targets as the user shaped them (MM-122, MM-124).
   const shapes = useLoaded(state.targetShapes) ?? [];
@@ -325,6 +331,24 @@ export function DashboardScreen() {
           opens
           onPress={() => open('train')}
         />
+        {/* Today's steps and the week's cardio from the wearable against their floors (MM-677, the owner); opens Train. */}
+        {cardio === undefined ? null : cardio.inUse ? (
+          <MmListRow
+            leadingIcon="walk"
+            title={`${cardio.stepsToday === undefined ? 'No steps counted today' : `${Fmt.whole(cardio.stepsToday)} steps today`} · ${minutesText(cardio.current.minutes)} of cardio this week`}
+            subtitle={`Floors ${Fmt.whole(cardio.floors.stepsPerDay)} a day · ${minutesText(cardio.floors.minutesPerWeek)} a week`}
+            opens
+            onPress={() => open('train')}
+          />
+        ) : (
+          <MmListRow
+            leadingIcon="walk"
+            title="Cardio"
+            subtitle={cardioDisclosureText(connection, healthPlatformName(services.platform))}
+            opens
+            onPress={() => open('train')}
+          />
+        )}
         <ProcessCard />
       </MmListGroup>
       {/* Named for 7 or 30 days, not for a week (MM-176); a section like the other screens' (owner), not a bare disclosure. */}

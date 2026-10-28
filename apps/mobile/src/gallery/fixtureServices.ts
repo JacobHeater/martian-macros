@@ -110,6 +110,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     recovery: repos.recovery,
     workouts: repos.workouts,
     customExercises: repos.customExercises,
+    cardioSessions: repos.cardioSessions,
+    dailySteps: repos.dailySteps,
     healthSamples: repos.healthSamples,
     exerciseProgressions: repos.exerciseProgressions,
     eraser: repos.eraser,

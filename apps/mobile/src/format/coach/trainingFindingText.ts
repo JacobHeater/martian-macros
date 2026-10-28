@@ -4,6 +4,7 @@ import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { StateError } from '../../lang/StateError';
 import { toStringAsFixed } from '../../lang/toStringAsFixed';
 import { Fmt } from '../Fmt';
+import { minutesText } from '../minutesText';
 import { muscleGroupLabel } from '../muscleGroupLabel';
 import { sleepDurationText } from '../sleepDurationText';
 import { waterAmount } from '../waterAmount';
@@ -250,6 +251,46 @@ export function trainingFindingText(f: CoachFinding, fmt: Fmt): readonly [title:
           ['Days with water logged', `${n('loggedDays')} of ${n('days')}`],
           ['Training days at the goal', `${n('atGoalDays')} of ${n('trainingDays')}`],
           ['Goal', water('goalMl')],
+        ],
+      ];
+    // The wearable's cardio and steps against their floors (MM-678).
+    case 'cardioMinutes:fix':
+      return [
+        `${minutesText(raw('minutes'))} of cardio this week`,
+        body(say('leadCardioShort', { minutes: minutesText(raw('minutes')), floor: minutesText(raw('floor')) }), say('cardioWhy')),
+        [period, ['Cardio this week', minutesText(raw('minutes'))], ['Floor', `${minutesText(raw('floor'))} a week`], ['Sessions', `${n('sessions')}`]],
+      ];
+    case 'cardioMinutes:holdingUp':
+      return [
+        `Cardio over the floor for ${n('weeks')} weeks`,
+        held(say('leadCardioHeld', { weeks: `${n('weeks')}`, minutes: minutesText(raw('minutes')) })),
+        [
+          period,
+          ['Cardio this week', minutesText(raw('minutes'))],
+          ['Floor', `${minutesText(raw('floor'))} a week`],
+          ['Weeks over the floor', `${n('weeks')} of ${n('weeks')}`],
+        ],
+      ];
+    case 'stepsPerDay:fix':
+      return [
+        `About ${Fmt.whole(raw('steps'))} steps a day`,
+        body(say('leadStepsShort', { steps: Fmt.whole(raw('steps')), floor: Fmt.whole(raw('floor')) })),
+        [
+          period,
+          ['Steps a day, average', Fmt.whole(raw('steps'))],
+          ['Days with steps', `${n('days')} of 7`],
+          ['Floor', `${Fmt.whole(raw('floor'))} a day`],
+        ],
+      ];
+    case 'stepsPerDay:holdingUp':
+      return [
+        `Over ${Fmt.whole(raw('floor'))} steps a day for ${n('weeks')} weeks`,
+        held(say('leadStepsHeld', { weeks: `${n('weeks')}`, floor: Fmt.whole(raw('floor')), steps: Fmt.whole(raw('steps')) })),
+        [
+          period,
+          ['Steps a day, average', Fmt.whole(raw('steps'))],
+          ['Floor', `${Fmt.whole(raw('floor'))} a day`],
+          ['Weeks over the floor', `${n('weeks')} of ${n('weeks')}`],
         ],
       ];
     default:
