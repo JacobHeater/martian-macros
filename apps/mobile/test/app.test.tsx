@@ -26,11 +26,11 @@ beforeEach(async () => {
 
 const bar = () => screen.findByRole('navigation', { name: 'Destinations' });
 
-describe('the five destinations', () => {
+describe('the four destinations', () => {
   it('are in a bottom bar, Dashboard first and current', async () => {
     renderApp(repos, today);
     const places = within(await bar()).getAllByRole('button');
-    expect(places.map((place) => place.textContent)).toEqual(['Dashboard', 'Food', 'Train', 'Progress', 'Coach']);
+    expect(places.map((place) => place.textContent)).toEqual(['Dashboard', 'Food', 'Train', 'Coach']);
     expect(places[0]).toHaveAttribute('aria-current', 'page');
     // The Dashboard is named Dashboard, as the bar names it (MM-254).
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Dashboard');
@@ -39,10 +39,10 @@ describe('the five destinations', () => {
   it('show the chosen one and mark it current in words', async () => {
     renderApp(repos, today);
     const destinations = await bar();
-    await userEvent.click(within(destinations).getByRole('button', { name: 'Progress' }));
-    expect(within(destinations).getByRole('button', { name: 'Progress' })).toHaveAttribute('aria-current', 'page');
+    await userEvent.click(within(destinations).getByRole('button', { name: 'Coach' }));
+    expect(within(destinations).getByRole('button', { name: 'Coach' })).toHaveAttribute('aria-current', 'page');
     expect(within(destinations).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Progress');
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Coach');
   });
 });
 

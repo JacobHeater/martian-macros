@@ -8,7 +8,6 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
 import { openSettings } from '../support/openSettings';
-import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 import { finishedWorkout, layer, openTrain, set, workoutRows } from '../support/train';
 
@@ -53,19 +52,13 @@ it('says under the lift what the coach noticed, with the numbers behind it one t
   expect(layer().getByText('About 9')).toBeInTheDocument();
 });
 
-it('once shown, the Coach tab lists it under Training, and it leads back to the workout', async () => {
+it('once shown, the inline insight log records it under Training with its anchor', async () => {
   await openLatestWorkout();
   await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ });
   await expect.poll(async () => (await first(repos.inlineInsightLog.watchInlineInsightLog({ since: today.addDays(-13) }))).length).toBe(1);
-  cleanup();
-
-  renderApp(repos, today);
-  await openTab('Coach');
-  await userEvent.click(await screen.findByRole('button', { name: /^Recent insights/ }, { timeout: 10000 }));
-  const row = await layer().findByRole('button', { name: /^Barbell bench press/ });
-  expect(row).toHaveTextContent('14 sets for chest');
-  await userEvent.click(row);
-  expect(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ })).toBeInTheDocument();
+  const [entry] = await first(repos.inlineInsightLog.watchInlineInsightLog({ since: today.addDays(-13) }));
+  expect(entry?.item).toBe('Barbell bench press');
+  expect(entry?.line).toMatch(/14 sets for chest/);
 });
 
 it('"Settings for “Volume jump”" opens training’s kinds with that one named and its switch focused', async () => {
@@ -141,15 +134,15 @@ it('a snooze that has run out no longer quiets the line (MM-378)', async () => {
   expect(await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ })).toBeInTheDocument();
 });
 
-it('the Coach tab does not list a snoozed insight while it is quiet (MM-378)', async () => {
+it('a snoozed insight is quiet on the workout while the snooze is in force (MM-378)', async () => {
   await openLatestWorkout();
   await layer().findByRole('button', { name: /^Coach: 14 sets for chest/ });
   await expect.poll(async () => (await first(repos.inlineInsightLog.watchInlineInsightLog({ since: today.addDays(-13) }))).length).toBe(1);
   await repos.insightSnoozes.saveInsightSnooze({ kind: 'volumeJump', subject: 'barbell-bench-press', item: 'Barbell bench press', resumesOn: today.addDays(8) });
   cleanup();
-  renderApp(repos, today);
-  await openTab('Coach');
-  expect(await screen.findByText('None in the last 14 days', {}, { timeout: 10000 })).toBeInTheDocument();
+  await openLatestWorkout();
+  await layer().findByRole('heading', { name: 'Barbell bench press' });
+  expect(layer().queryByRole('button', { name: /^Coach:/ })).toBeNull();
 });
 
 

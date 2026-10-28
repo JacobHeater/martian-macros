@@ -11,7 +11,6 @@ import { useTargetChangeSummaries } from '../coach/useTargetChangeSummaries';
 import { DashboardScreen } from '../dashboard/DashboardScreen';
 import { FoodDayHeader } from '../food/FoodDayHeader';
 import { FoodScreen } from '../food/FoodScreen';
-import { ProgressScreen } from '../progress/ProgressScreen';
 import { TrainScreen } from '../train/TrainScreen';
 import { useShownDay } from '../food/useShownDay';
 import { destinations } from './destinations';
@@ -24,14 +23,15 @@ import { useNavigator } from './useNavigator';
 import './app.css';
 
 /**
- * The frame every destination sits in (MM-90, MM-99): its name and the way
- * to Settings above, the five destinations below. A swipe in from the right
+ * The frame every destination sits in (MM-90, MM-99, MM-667): its name and the way
+ * to Settings above, the four destinations below. A swipe in from the right
  * goes to the next destination, from the left to the one before (MM-582).
  */
 export function HomeShell() {
   const { state } = useApp();
   const navigator = useNavigator();
-  const current = useCell(state.homeTab);
+  const rawCurrent = useCell(state.homeTab);
+  const current: HomeDestination = rawCurrent === 'progress' ? 'coach' : rawCurrent;
   const shownDay = useShownDay();
   const today = useCell(state.today);
   useTargetChangeSummaries();
@@ -72,8 +72,6 @@ export function HomeShell() {
           <DashboardScreen />
         ) : current === 'food' ? (
           <FoodScreen />
-        ) : current === 'progress' ? (
-          <ProgressScreen />
         ) : current === 'train' ? (
           <TrainScreen />
         ) : (

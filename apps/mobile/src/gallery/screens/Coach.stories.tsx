@@ -1272,3 +1272,10 @@ export const CoachAnalysisNothingToday = screenStory({
   scenario: quietWeekScenario(),
   open: onCoach,
 });
+
+/** MM-667: the unified Coach screen with its Executive summary card, weight trend chart, and collapsible telemetry. */
+export const CoachExecutiveSummary = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Executive summary',
+  open: onCoach,
+});
