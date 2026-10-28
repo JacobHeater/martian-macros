@@ -5,9 +5,11 @@ import { gradeOfNutrition } from '../engine/gradeOfNutrition';
 
 /** A pack food's grade (MM-382): its values are per 100 g already. */
 export function gradeOfCatalogFood(food: CatalogFood): FoodGradeValue {
-  return gradeOfNutrition({
+  return gradeOfNutrition(
+    {
     kcal: food.kcal,
     proteinG: food.proteinG,
+    fatG: food.fatG,
     carbsG: food.carbsG,
     fiberG: food.fiberG,
     sodiumMg: food.sodiumMg,
@@ -15,5 +17,7 @@ export function gradeOfCatalogFood(food: CatalogFood): FoodGradeValue {
     saturatedFatG: food.micros.saturatedFat,
     alcoholG: food.alcoholG,
     micros: gradeMicrosFrom((n) => food.micros[n]),
-  });
+    },
+    { name: food.name },
+  );
 }

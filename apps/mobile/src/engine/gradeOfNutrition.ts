@@ -1,4 +1,6 @@
+import { friedByName } from '../domain/food/grade/friedByName';
 import type { FoodGradeValue } from '../domain/food/grade/FoodGradeValue';
+import type { GradeCap } from '../domain/food/grade/GradeCap';
 import { FoodGradeRule } from './FoodGradeRule';
 import { gradeLetterOf } from './gradeLetterOf';
 import type { GradeNutrition } from './GradeNutrition';
@@ -14,9 +16,13 @@ import { nutrientDensityScore } from './nutrientDensityScore';
  * fiber stated had no grade): the letter can then only be a step too low,
  * never too high. Sugars, saturated fat and the vitamins and minerals are
  * counted when stated, and the grade says when they were not. The score
- * comes with the grade so meals and days can be averaged by it.
+ * comes with the grade so meals and days can be averaged by it. A fried
+ * food, by the words of `name`, or a sweet and fatty one, by its numbers,
+ * is held to C- (MM-660, the owner, `FoodGradeRule.cap`): a nutrient table
+ * cannot see a fryer, and per calorie a battered, sauced dish can look like
+ * a grilled one.
  */
-export function gradeOfNutrition(per100g: GradeNutrition): FoodGradeValue {
+export function gradeOfNutrition(per100g: GradeNutrition, { name }: { name?: string | undefined } = {}): FoodGradeValue {
   if (per100g.alcoholG !== undefined && per100g.alcoholG > FoodGradeRule.alcoholLimitG) {
     return { kind: 'ungradable', reason: 'Alcoholic drinks aren’t graded.' };
   }
@@ -26,7 +32,7 @@ export function gradeOfNutrition(per100g: GradeNutrition): FoodGradeValue {
   if (per100g.sodiumMg === undefined) {
     return { kind: 'ungradable', reason: 'Sodium isn’t stated for this food, so it can’t be graded.' };
   }
-  const { score, notCounted, statedMicronutrients } = nutrientDensityScore({
+  const { score, points, notCounted, statedMicronutrients } = nutrientDensityScore({
     kcal: per100g.kcal,
     proteinG: per100g.proteinG,
     fiberG: per100g.fiberG ?? 0,
@@ -35,11 +41,27 @@ export function gradeOfNutrition(per100g: GradeNutrition): FoodGradeValue {
     saturatedFatG: per100g.saturatedFatG,
     micros: per100g.micros,
   });
+  const cap = capOf(per100g, name, points.protein + points.fiber + points.micronutrients);
+  const held = cap === undefined ? score : Math.min(score, FoodGradeRule.cap.score);
   return {
     kind: 'graded',
-    letter: gradeLetterOf(score),
-    score,
+    letter: gradeLetterOf(held),
+    score: held,
     notCounted: per100g.fiberG === undefined ? ['fiber', ...notCounted] : notCounted,
     statedMicronutrients,
+    ...(cap === undefined ? {} : { cap }),
   };
+}
+
+/** The cap that holds the food, if one does: its name's words first, then its numbers (MM-660). */
+function capOf(per100g: GradeNutrition, name: string | undefined, pointsFor: number): GradeCap | undefined {
+  if (name !== undefined && friedByName(name)) return 'fried';
+  const rule = FoodGradeRule.cap.sweetAndFatty;
+  if (per100g.fatG === undefined || per100g.sugarsG === undefined) return undefined;
+  const sweetAndFatty =
+    per100g.kcal >= rule.minKcalPer100 &&
+    (per100g.fatG * 9) / per100g.kcal >= rule.fatShare &&
+    per100g.sugarsG >= rule.sugarsGPer100 &&
+    pointsFor < rule.maxPointsFor;
+  return sweetAndFatty ? 'sweetAndFatty' : undefined;
 }

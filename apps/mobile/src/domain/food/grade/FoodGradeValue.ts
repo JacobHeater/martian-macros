@@ -1,4 +1,5 @@
 import type { FoodGradeLetter } from './FoodGradeLetter';
+import type { GradeCap } from './GradeCap';
 import type { GradeOmission } from './GradeOmission';
 
 /**
@@ -18,5 +19,7 @@ export type FoodGradeValue =
       readonly score: number;
       readonly notCounted: readonly GradeOmission[];
       readonly statedMicronutrients: number;
+      /** Why the letter is held to C- (MM-660), when it is. */
+      readonly cap?: GradeCap | undefined;
     }
   | { readonly kind: 'ungradable'; readonly reason: string };

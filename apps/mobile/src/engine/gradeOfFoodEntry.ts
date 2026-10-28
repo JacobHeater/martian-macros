@@ -23,9 +23,11 @@ export function gradeOfFoodEntry(entry: FoodEntry, { hand }: { hand?: HandSize |
   }
   const scale = 100 / amount;
   const per100 = (value: number | undefined) => (value === undefined ? undefined : value * scale);
-  return gradeOfNutrition({
+  return gradeOfNutrition(
+    {
     kcal: entry.kcal * scale,
     proteinG: entry.proteinG * scale,
+    fatG: entry.fatG * scale,
     carbsG: entry.carbsG * scale,
     fiberG: per100(entry.fiberG),
     sodiumMg: per100(entry.sodiumMg),
@@ -33,7 +35,9 @@ export function gradeOfFoodEntry(entry: FoodEntry, { hand }: { hand?: HandSize |
     saturatedFatG: per100(entry.micros.of('saturatedFat')),
     alcoholG: per100(entry.alcoholG),
     micros: gradeMicrosFrom((n) => entry.micros.of(n), scale),
-  });
+    },
+    { name: entry.name },
+  );
 }
 
 /**

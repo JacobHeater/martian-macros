@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { MmGradeBadge } from '../ui/MmGradeBadge';
 import { useOverlays } from '../ui/useOverlays';
 import type { FoodGradeValue } from '../domain/food/grade/FoodGradeValue';
+import type { GradeCap } from '../domain/food/grade/GradeCap';
 import { GradeOmission } from '../domain/food/grade/GradeOmission';
 import { GradeMicronutrient } from '../engine/GradeMicronutrient';
 
@@ -29,8 +30,11 @@ const meaning = {
  * stated, so they weren’t counted either." A food counted from fewer
  * than the ten says so: "Vitamins and minerals counted from the 4 stated."
  */
-function notCountedSentences(grade: { notCounted: readonly GradeOmission[]; statedMicronutrients: number }): string[] {
+function notCountedSentences(grade: { notCounted: readonly GradeOmission[]; statedMicronutrients: number; cap?: GradeCap | undefined }): string[] {
   const sentences: string[] = [];
+  // The cap (MM-660): why the letter stops at C-, before what was not counted.
+  if (grade.cap === 'fried') sentences.push('Fried, battered or breaded, by its name, so no better than C-.');
+  if (grade.cap === 'sweetAndFatty') sentences.push('Mostly fat and sugar, with little that counts for it, so no better than C-.');
   const of = GradeMicronutrient.values.length;
   // A fiber that is not stated is counted as none (MM-656): it can only count for a food, so the letter is never too high.
   if (grade.notCounted.includes('fiber')) sentences.push('Fiber isn’t stated for this food, so none was counted; stated, it could only raise the grade.');

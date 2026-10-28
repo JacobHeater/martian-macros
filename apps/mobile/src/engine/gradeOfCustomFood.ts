@@ -19,9 +19,11 @@ export function gradeOfCustomFood(food: CustomFood): FoodGradeValue {
   }
   const scale = 100 / grams;
   const per100 = (value: number | undefined) => (value === undefined ? undefined : value * scale);
-  return gradeOfNutrition({
+  return gradeOfNutrition(
+    {
     kcal: food.perServing.kcal * scale,
     proteinG: food.perServing.proteinG * scale,
+    fatG: food.perServing.fatG * scale,
     carbsG: food.perServing.carbsG * scale,
     fiberG: per100(food.fiberG),
     sodiumMg: per100(food.micros.of('sodium')),
@@ -29,5 +31,7 @@ export function gradeOfCustomFood(food: CustomFood): FoodGradeValue {
     saturatedFatG: per100(food.micros.of('saturatedFat')),
     alcoholG: undefined,
     micros: gradeMicrosFrom((n) => food.micros.of(n), scale),
-  });
+    },
+    { name: food.name },
+  );
 }
