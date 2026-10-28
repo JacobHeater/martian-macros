@@ -49,7 +49,7 @@ async function openVolume(repos: InMemoryRepositories, change?: (services: AppSe
   renderApp(repos, today, change === undefined ? {} : { change });
   await openTrain();
   // The fold opens in place (MM-680): its rows are on Train, no screen.
-  await userEvent.click(screen.getByRole('button', { name: 'Weekly training volume' }));
+  await userEvent.click(screen.getByRole('button', { name: /^Weekly training volume/ }));
   await screen.findByRole('img', { name: /^Chest: / }).catch(() => undefined);
 }
 
@@ -76,7 +76,7 @@ it('MM-195: the volume can be reached during a workout', async () => {
   renderApp(repos, today);
   await openTrain();
   expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: 'Weekly training volume' }));
+  await userEvent.click(screen.getByRole('button', { name: /^Weekly training volume/ }));
   expect(await screen.findByRole('img', { name: /^Chest: / })).toBeInTheDocument();
 });
 

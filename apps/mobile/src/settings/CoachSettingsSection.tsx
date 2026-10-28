@@ -196,7 +196,7 @@ export function CoachSettingsSection() {
           title="Steps a day floor"
           subtitle={
             floors.stepsPerDay === undefined
-              ? `The coach's default is ${Fmt.whole(CardioRule.stepsPerDay)} a day on fat loss and recomp. Type your own to change it.`
+              ? `The coach's default is ${Fmt.whole(CardioRule.stepsPerDay)} a day on fat loss and recomp. Yours to change below.`
               : 'Yours. The coach holds you to it on fat loss and recomp.'
           }
           entry={
@@ -220,7 +220,7 @@ export function CoachSettingsSection() {
           title="Cardio minutes a week floor"
           subtitle={
             floors.minutesPerWeek === undefined
-              ? `The coach's default is ${CardioRule.minutesPerWeek} minutes a week, every session on the watch that is not strength. Type your own to change it.`
+              ? `The coach's default is ${CardioRule.minutesPerWeek} minutes a week, every session on the watch that is not strength. Yours to change below.`
               : 'Yours. Every session on the watch that is not strength counts.'
           }
           entry={
