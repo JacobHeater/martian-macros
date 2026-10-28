@@ -123,6 +123,18 @@ export const MealSplit = screenStory({
   },
 });
 
+/** MM-666: a slot's menu opens the coach breakdown of the meal's tactical impact, outlier and swap. */
+export const MealCoachBreakdown = screenStory({
+  covers: ['FoodScreen', 'MealBreakdownSheet'],
+  shows: 'Meal impact',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+  },
+});
+
 /** MM-634: choosing foods of the day to change together: each row a box to tick, the bar at the foot of the list. */
 export const FoodChoosing = screenStory({
   covers: ['FoodScreen'],
