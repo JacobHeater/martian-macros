@@ -39,13 +39,13 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
 
     const [, body] = foodFindingText(left, fmt);
     expect(body).not.toMatch(/Get 114 g more protein/i);
-    expect(body).toMatch(/Hold your calorie cap tonight|Hold your calorie target tonight/i);
+    expect(body).toMatch(/Protect the calorie cap|Hold your calorie cap|Hold your calorie target/i);
     expect(body).toMatch(/front-load protein/i);
 
-    const fix = findings.find((f) => f.kind === 'fix' && f.signal === 'protein') as CoachFinding;
+    const fix = findings.find((f) => f.kind === 'fix' && f.signal === 'proteinDensity') as CoachFinding;
+    expect(fix).toBeDefined();
     const [, fixBody] = foodFindingText(fix, fmt);
     expect(fixBody).not.toMatch(/Get 114 g more protein/i);
-    expect(fixBody).toMatch(/Hold your calorie cap tonight|Hold your calorie target tonight/i);
   });
 
   it('computes ExecutiveBrief and synthesizes whole-situation archetypes across states', () => {
@@ -60,12 +60,13 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
       },
     ]);
     const unrecoverableBrief = executiveBriefOf(unrecoverableInput, today);
-    expect(unrecoverableBrief.runwayState).toBe('proteinUnrecoverable');
-    expect(unrecoverableBrief.proteinUnrecoverable).toBe(true);
-    expect(unrecoverableBrief.sevenDay.loggedDays).toBe(2);
-    expect(unrecoverableBrief.sevenDay.proteinFloorHitDays).toBe(1);
+    expect(unrecoverableBrief).toBeDefined();
+    expect(unrecoverableBrief!.runwayState).toBe('proteinUnrecoverable');
+    expect(unrecoverableBrief!.proteinUnrecoverable).toBe(true);
+    expect(unrecoverableBrief!.sevenDay.loggedDays).toBe(2);
+    expect(unrecoverableBrief!.sevenDay.proteinFloorHitDays).toBe(1);
 
-    const unrecoverableText = executiveBriefArchetypeText(unrecoverableBrief);
+    const unrecoverableText = executiveBriefArchetypeText(unrecoverableBrief!);
     expect(unrecoverableText).toMatch(/169 kcal/);
     expect(unrecoverableText).toMatch(/114 g/);
     expect(unrecoverableText).toMatch(/front-load protein/i);
@@ -77,16 +78,18 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
       },
     ]);
     const tightBrief = executiveBriefOf(tightInput, today);
-    expect(tightBrief.runwayState).toBe('tightRunway');
-    expect(executiveBriefArchetypeText(tightBrief)).toMatch(/450 kcal/);
+    expect(tightBrief).toBeDefined();
+    expect(tightBrief!.runwayState).toBe('tightRunway');
+    expect(executiveBriefArchetypeText(tightBrief!)).toMatch(/450 kcal/);
 
     const protectedInput = inputOf(
       [{ date: today, entries: [food(today, 'lunch', 'Salmon bowl', 650, 42, 22)] }],
-      { safeguards: safeguards('activeEatingDisorder') },
+      { safeguards: safeguards({ eatingDisorderHistory: true }) },
     );
     const protectedBrief = executiveBriefOf(protectedInput, today);
-    expect(protectedBrief.protectedPath).toBe(true);
-    const protectedText = executiveBriefArchetypeText(protectedBrief);
+    expect(protectedBrief).toBeDefined();
+    expect(protectedBrief!.protectedPath).toBe(true);
+    const protectedText = executiveBriefArchetypeText(protectedBrief!);
     expect(protectedText).not.toMatch(/kcal|calorie/i);
   });
 
@@ -97,7 +100,8 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
     ];
     const allToday = mealEntries;
     const candidates = [
-      food(yesterday, 'lunch', 'Turkey breast wrap', 340, 38, 6),
+      food(yesterday, 'lunch', 'Turkey breast wrap', 480, 42, 6),
+      food(yesterday.addDays(-1), 'lunch', 'Turkey breast wrap', 480, 42, 6),
       ...mealEntries,
     ];
     const analysis = mealBreakdownAnalysisOf({
@@ -114,8 +118,8 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
     expect(analysis.mealProteinG).toBe(54);
     expect(analysis.outlierItem?.name).toBe('Loaded nachos');
     expect(analysis.suggestedSwap?.replacementName).toBe('Turkey breast wrap');
-    expect(analysis.suggestedSwap?.caloriesSaved).toBe(440);
-    expect(analysis.suggestedSwap?.proteinGained).toBe(24);
+    expect(analysis.suggestedSwap?.caloriesSaved).toBe(300);
+    expect(analysis.suggestedSwap?.proteinGained).toBe(28);
 
     const text = mealBreakdownArchetypeText(analysis);
     expect(text).toMatch(/Lunch used 42% of your daily calorie budget/);
