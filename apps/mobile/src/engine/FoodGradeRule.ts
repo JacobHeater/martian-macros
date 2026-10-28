@@ -97,6 +97,20 @@ export const FoodGradeRule = {
   sugarsWaiverKcalPerGram: { from: 1.5, to: 2 },
   /** Saturated fat in g per 100 kcal, against (max 6), when stated. */
   saturatedFatGPer100Kcal: [1.5, 2.5, 3.5, 4.5, 5.5, 6.5],
+  /**
+   * The cap (MM-660, the owner): a fried, battered or breaded food, by the
+   * words of its name (`friedByName`), and a sweet and fatty food by its
+   * numbers, grade no better than C-, the top of whose band is this score.
+   * The numbers: at `minKcalPer100` or more per 100 g or 100 mL, at least
+   * `fatShare` of its calories from fat and `sugarsGPer100` of sugars, with
+   * fewer than `maxPointsFor` points for it from protein, fiber and the
+   * vitamins and minerals, so a nut butter, a cheese or a fibrous granola is
+   * never caught: the signature of a sauced or sweet dish that is mostly
+   * fat and sugar, which no word in a nutrient table names. On the generic
+   * pack of 2026-10-27 the words move 333 foods and the numbers 24
+   * (`docs/food-grade-cap-moves.md`).
+   */
+  cap: { score: -2, sweetAndFatty: { minKcalPer100: 200, fatShare: 0.4, sugarsGPer100: 10, maxPointsFor: 3 } },
   /** A food with fewer calories than this per 100 g has nothing to grade per calorie. */
   minKcalPer100g: 10,
   /** A food with more alcohol than this per 100 g is not graded. */
