@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { FoodGradeLetter } from '../../src/domain/food/grade/FoodGradeLetter';
+import { friedByName } from '../../src/domain/food/grade/friedByName';
 import { Micronutrient } from '../../src/domain/food/micros/Micronutrient';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { referenceAmount } from '../../src/domain/food/micros/referenceAmount';
@@ -290,6 +291,38 @@ describe('gradeOfNutrition', () => {
     expect(gradeOfNutrition({ ...lentils, alcoholG: 4 })).toEqual({ kind: 'ungradable', reason: 'Alcoholic drinks aren’t graded.' });
     expect(gradeOfNutrition({ ...lentils, alcoholG: undefined }).kind).toBe('graded');
     expect(gradeOfNutrition({ ...lentils, alcoholG: 1.2 }).kind).toBe('graded');
+  });
+});
+
+describe('the cap (MM-660)', () => {
+  // The pack's own numbers per 100 g (FNDDS, 2026-10-27).
+  const generalTso: GradeNutrition = { kcal: 295, proteinG: 12.9, fatG: 16.4, carbsG: 24, fiberG: 0.9, sodiumMg: 435, sugarsG: 11.6, saturatedFatG: 2.76, alcoholG: undefined, micros: { potassium: 201, calcium: 12, iron: 1.16, magnesium: 18, zinc: 1.3, vitaminA: 11, vitaminC: 1.6, vitaminD: 0.2, vitaminB12: 0.22, folate: 15 } };
+  const friedBreast: GradeNutrition = { kcal: 243, proteinG: 24.6, fatG: 14, carbsG: 7.8, fiberG: 0.3, sodiumMg: 500, sugarsG: 0.3, saturatedFatG: 3.6, alcoholG: undefined, micros: {} };
+  const peanutButter: GradeNutrition = { kcal: 588, proteinG: 25, fatG: 50, carbsG: 20, fiberG: 6, sodiumMg: 429, sugarsG: 10.5, saturatedFatG: 10, alcoholG: undefined, micros: { potassium: 649, magnesium: 168, zinc: 2.9, folate: 87 } };
+
+  it('reads fried, battered and breaded from a name, and not a stir-fry, a pan-fry, an egg or a coating not eaten', () => {
+    for (const name of ['Chicken breast, fried, coated, skin / coating eaten', 'Doughnut, cake type, plain', 'Potato chips, plain', 'French fries, from fast food', 'Soybean curd, deep fried', 'Onion rings, breaded', 'Mozzarella sticks, breaded, baked, or fried'])
+      expect(friedByName(name), name).toBe(true);
+    for (const name of ['Vegetables, stir-fried', 'Veal, pan-fried, not breaded', 'Beef, cooked, fast fried', 'Refried beans', 'Egg, whole, fried', 'Egg white omelet, scrambled, or fried', 'Roll, not fried', 'Chicken breast, fried, coated, skin / coating not eaten', 'Chicken breast, grilled', 'General Tso chicken'])
+      expect(friedByName(name), name).toBe(false);
+  });
+
+  it('holds a fried food to C- whatever its score, and says why', () => {
+    const free = gradeOfNutrition(friedBreast, { name: 'Chicken breast, grilled' });
+    expect(free).toMatchObject({ kind: 'graded', letter: 'B-' });
+    expect(free).not.toHaveProperty('cap');
+    expect(gradeOfNutrition(friedBreast, { name: 'Chicken breast, fried, coated, skin / coating eaten' })).toMatchObject({ kind: 'graded', letter: 'C-', score: -2, cap: 'fried' });
+    // Already below the cap: the letter stays, the reason is still given.
+    expect(gradeOfNutrition({ ...lentils, kcal: 434, proteinG: 5, fatG: 25, sodiumMg: 400, sugarsG: 23, saturatedFatG: 11, fiberG: 1.6 }, { name: 'Doughnut, cake type, plain' })).toMatchObject({ cap: 'fried' });
+  });
+
+  it('holds a sweet and fatty food with little for it to C-, and never a nut butter', () => {
+    expect(gradeOfNutrition(generalTso)).toMatchObject({ kind: 'graded', letter: 'C' });
+    expect(gradeOfNutrition(generalTso, { name: 'General Tso chicken' })).toMatchObject({ kind: 'graded', letter: 'C-', score: -2, cap: 'sweetAndFatty' });
+    expect(gradeOfNutrition(peanutButter, { name: 'Peanut butter, smooth style, with salt' })).not.toHaveProperty('cap');
+    // Without fat or sugars stated, the numbers cannot cap a food.
+    expect(gradeOfNutrition({ ...generalTso, fatG: undefined }, { name: 'General Tso chicken' })).not.toHaveProperty('cap');
+    expect(gradeOfNutrition({ ...generalTso, sugarsG: undefined }, { name: 'General Tso chicken' })).not.toHaveProperty('cap');
   });
 });
 

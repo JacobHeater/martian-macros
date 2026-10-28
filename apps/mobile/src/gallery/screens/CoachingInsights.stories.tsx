@@ -292,6 +292,42 @@ export const FoodGradeMeaning = screenStory({
   },
 });
 
+/** MM-660: a fried food's popover: held to C- by its name, before what was not counted. */
+export const FoodGradeCappedFried = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Fried, battered or breaded, by its name, so no better than C-/,
+  scenario: demoWith({ then: extraFoods }),
+  preview: {
+    ...foodPreview,
+    entryGrades: new Map<string, FoodGradeValue>([
+      ...(foodPreview.entryGrades ?? new Map<string, FoodGradeValue>()),
+      ['Garlic bread', { kind: 'graded', letter: 'C-', score: -2, notCounted: ['micronutrients'], statedMicronutrients: 0, cap: 'fried' }],
+    ]),
+  },
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed('Grade C minus for Garlic bread')(canvas));
+  },
+});
+
+/** MM-660: a sweet and fatty dish's popover: held to C- by its numbers. */
+export const FoodGradeCappedSweetAndFatty = screenStory({
+  covers: ['FoodScreen'],
+  shows: /Mostly fat and sugar, with little that counts for it, so no better than C-/,
+  scenario: demoWith({ then: extraFoods }),
+  preview: {
+    ...foodPreview,
+    entryGrades: new Map<string, FoodGradeValue>([
+      ...(foodPreview.entryGrades ?? new Map<string, FoodGradeValue>()),
+      ['Pasta with cream sauce', { kind: 'graded', letter: 'C-', score: -2, notCounted: [], statedMicronutrients: 10, cap: 'sweetAndFatty' }],
+    ]),
+  },
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    await userEvent.click(await revealed('Grade C minus for Pasta with cream sauce')(canvas));
+  },
+});
+
 /** MM-382: a graded food whose source left sugars, saturated fat and most vitamins and minerals unstated: the popover at its longest. */
 export const FoodGradeNotCounted = screenStory({
   covers: ['FoodScreen'],

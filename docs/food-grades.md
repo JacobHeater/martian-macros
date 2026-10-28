@@ -69,6 +69,34 @@ state sodium, since a missing value is never zero (MM-310). A fiber that is not
 stated is counted as none and the grade says so (MM-656, the owner): fiber can
 only count for a food, so the letter is at worst a step too low.
 
+## The cap (MM-660, the owner, 2026-10-27)
+
+A nutrient table cannot see a fryer: breaded fried chicken breast and a
+grilled one are the same numbers, and per calorie a battered, sauced dish
+scores like an average food (General Tso chicken, a C). Two caps hold such a
+food to C- whatever its score, and the popover says which:
+
+- **Fried**, by the words of its name (`friedByName`): fried, battered,
+  breaded, a doughnut, fries, chips and the like; never a stir-fry, a pan-fry
+  or a fast fry of lean meat, refried beans, an egg, a food said not to be
+  fried, or one whose coating was not eaten. The source's own words, so
+  almonds and a salmon fillet, as fat-rich as fried chicken, are never
+  called fried; a name the words miss grades as it would without the cap.
+- **Sweet and fatty**, by its numbers (`FoodGradeRule.cap.sweetAndFatty`):
+  at 200 kcal or more per 100 g or 100 mL, 40% or more of its calories from
+  fat and 10 g or more of sugars, with fewer than 3 points for it from
+  protein, fiber and the vitamins and minerals. The signature of a sauced or
+  sweet dish that is mostly fat and sugar, which no word names; the points
+  for it keep a nut butter, a cheese or a fibrous granola out.
+
+Both are rules with a handful of constants, not a list of foods. On the
+generic pack of 2026-10-27 the words move 333 foods and the numbers 24;
+every one is listed in [food-grade-cap-moves.md](food-grade-cap-moves.md).
+Other published systems do not see the fryer either: Nutri-Score 2023 gives
+breaded fried chicken breast a B and General Tso chicken a D, the D coming
+from reading salt and sugar per 100 g, which also puts cheddar and peanut
+butter at E.
+
 ## Inputs
 
 | Food | Per 100 g from |
