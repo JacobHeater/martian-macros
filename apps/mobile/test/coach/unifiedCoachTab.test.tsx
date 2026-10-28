@@ -49,7 +49,7 @@ it('shows four destinations in the bottom bar and unifies Executive summary, Wei
 
   // Telemetry sections at the bottom are collapsible.
   const metabolism = screen.getByRole('heading', { name: 'Your metabolism' }).closest('.mm-section') as HTMLElement;
-  const metabolismButton = within(metabolism).getByRole('button', { name: /^Your metabolism/ });
+  const metabolismButton = within(metabolism).getByRole('button', { name: 'Your metabolism' });
   expect(metabolismButton).toHaveAttribute('aria-expanded', 'true');
   await userEvent.click(metabolismButton);
   expect(metabolismButton).toHaveAttribute('aria-expanded', 'false');

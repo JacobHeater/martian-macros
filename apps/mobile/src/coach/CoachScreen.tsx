@@ -75,6 +75,7 @@ import { UnderEatingNotice } from './UnderEatingNotice';
 import { WhatToExpectScreen } from './WhatToExpectScreen';
 import { WhatYourDataSaysSection } from './WhatYourDataSaysSection';
 import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
+import { usePaceInWords } from './usePaceInWords';
 import { usePaceSheet } from './usePaceSheet';
 import { useCheckInNow } from './useCheckInNow';
 import './coach.css';
@@ -119,6 +120,7 @@ export function CoachScreen() {
   const { services, state } = useApp();
   // How much of the person's weight is shown (MM-118).
   const weightDisplay = useCell(state.weightDisplay);
+  const paceInWords = usePaceInWords();
   const navigator = useNavigator();
   const overlays = useOverlays();
   const openPaceSheet = usePaceSheet();
@@ -144,10 +146,14 @@ export function CoachScreen() {
   if (setup === undefined) return null;
   if (!weights.ready && !Loadable.hasFailed(weights)) return <ScreenLoading />;
   if (snapshot === undefined) {
-    if (weights.ready && weights.value.length > 0 && sources.some((source) => Loadable.hasFailed(source))) {
-      return <ReadFailedNotice title="Could not read what your coach works from" onRetry={() => state.retryCoach()} />;
-    }
-    return <ProgressScreen />;
+    return (
+      <>
+        {weights.ready && weights.value.length > 0 && sources.some((source) => Loadable.hasFailed(source)) ? (
+          <ReadFailedNotice title="Could not read what your coach works from" onRetry={() => state.retryCoach()} />
+        ) : null}
+        <ProgressScreen />
+      </>
+    );
   }
   const fmt = new Fmt(setup.unitSystem, { weightDisplay });
 
@@ -403,7 +409,7 @@ export function CoachScreen() {
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />
       <ReportsCard />
-      <MmSection framed icon="bolt" title="Your metabolism" collapsible remember="coach.metabolism">
+      <MmSection framed icon="bolt" title="Your metabolism" collapsible remember="coach.metabolism-section">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
         {gaps.includes('history') ? <DataGapNote gap="history" /> : null}
       </MmSection>
@@ -420,6 +426,9 @@ export function CoachScreen() {
         </MmDisclosure>
       </MmSection>
       <MmSection framed icon="body" title="Body" collapsible remember="coach.body">
+        {fmt.weightHidden && paceInWords !== undefined ? (
+          <StatRow label="Your trend" value={paceInWords} detail="Against your plan’s pace" />
+        ) : null}
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
         <StatRow

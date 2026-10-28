@@ -88,7 +88,7 @@ describe('on the Coach tab', () => {
     await userEvent.click(await screen.findByRole('button', { name: /^What to expect/ }));
     expect(await screen.findByRole('heading', { name: 'What to expect' })).toBeInTheDocument();
     expect(screen.getByText(/^Your plan aims for about/)).toBeInTheDocument();
-    expect(screen.getByText(/around your period/)).toBeInTheDocument();
+    expect(screen.getAllByText(/around your period/).length).toBeGreaterThan(0);
     expect(screen.getByText(whatToExpectClosing)).toBeInTheDocument();
   });
 });
