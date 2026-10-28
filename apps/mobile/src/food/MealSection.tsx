@@ -105,6 +105,11 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
   const preview = useInsightPreview();
   // Each entry's grade and the meal's (MM-370), unless a design story hands in its own.
   const gradeOf = (entry: FoodEntry) => preview.entryGrades?.get(entry.name) ?? gradeOfFoodEntry(entry, { hand });
+  /** A long press on a row: one tap under the finger, then choosing with that row ticked (MM-661). */
+  const chooseByHold = (key: string) => {
+    services.haptics.tap();
+    onStartSelection?.(key);
+  };
   const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');
 
   /** The slot's ⋯ menu: its macro split (MM-597), or a time, meal, day or copy for all its foods (MM-630, MM-633). */
@@ -249,6 +254,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
               day={day}
               grade={rowGrade}
               onSelect={onStartSelection === undefined ? undefined : () => onStartSelection(`meal:${row.key}`)}
+              onLongPress={onStartSelection === undefined ? undefined : () => chooseByHold(`meal:${row.key}`)}
               autoFocus={`meal:${row.key}` === focusKey}
             />
           );
@@ -265,6 +271,8 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
                   describedBy={foodEntryLinesId(entry)}
                   autoFocus={`food:${entry.id}` === focusKey}
                   onPress={() => void showAddFoodSheet(overlays, day, { entry })}
+                  // A long press starts choosing with this food ticked, felt as one tap (MM-661, the owner).
+                  onLongPress={onStartSelection === undefined ? undefined : () => chooseByHold(`food:${entry.id}`)}
                 >
                   <FoodEntryTile entry={entry} />
                 </MmPressable>
