@@ -47,7 +47,7 @@ export function CoachSettingsSection() {
 
   const chooseAiProvider = () =>
     void overlays
-      .options<CoachAiProvider>({
+      .options({
         title: 'AI coaching phrasing',
         options: CoachAiProvider.values.map((value) => ({ value, label: coachAiProviderLabel(value) })),
         selected: aiConfig.provider,
@@ -112,11 +112,11 @@ export function CoachSettingsSection() {
                   <MmTextField
                     label="Coaching API key"
                     value={keyDraft}
-                    placeholder="Paste your API key"
+                    hint="Paste your API key"
                     onChange={setKeyDraft}
                   />
                 </div>
-                <MmButton label="Save key" variant="secondary" onPress={saveApiKey} />
+                <MmButton label="Save key" kind="secondary" onPress={saveApiKey} />
               </div>
             }
           />

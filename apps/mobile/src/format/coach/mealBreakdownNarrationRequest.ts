@@ -21,7 +21,7 @@ export function mealBreakdownNarrationRequest(analysis: MealBreakdownAnalysis): 
   const allowedNumbers: number[] = [
     analysis.mealKcal,
     analysis.mealProteinG,
-    analysis.mealCarbG,
+    analysis.mealCarbsG,
     analysis.mealFatG,
     kcalSharePct,
     proteinSharePct,
@@ -38,9 +38,13 @@ export function mealBreakdownNarrationRequest(analysis: MealBreakdownAnalysis): 
     );
   }
   if (analysis.suggestedSwap !== undefined) {
+    if (analysis.suggestedSwap.replacementKcal !== undefined) {
+      allowedNumbers.push(analysis.suggestedSwap.replacementKcal);
+    }
+    if (analysis.suggestedSwap.replacementProteinG !== undefined) {
+      allowedNumbers.push(analysis.suggestedSwap.replacementProteinG);
+    }
     allowedNumbers.push(
-      analysis.suggestedSwap.replacementKcal,
-      analysis.suggestedSwap.replacementProteinG,
       analysis.suggestedSwap.caloriesSaved,
       analysis.suggestedSwap.proteinGained,
     );
