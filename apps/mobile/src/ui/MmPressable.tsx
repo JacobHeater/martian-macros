@@ -33,7 +33,7 @@ interface MmPressableProps {
  * a screen makes a region pressable without a raw button (MM-246).
  */
 export function MmPressable({ label, expanded, controls, describedBy, onPress, children, autoFocus = false, onLongPress }: MmPressableProps) {
-  const hold = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number }>();
+  const hold = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | undefined>(undefined);
   const held = useRef(false);
   const letGo = () => {
     if (hold.current !== undefined) clearTimeout(hold.current.timer);
