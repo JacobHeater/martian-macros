@@ -53,7 +53,10 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   framing and the 3 kcal/g start of the energy-density scale let a fried, sauced dish sit mid-table on its
   protein. Resolved as MM-660 (the owner, "go"): a fried food by its name, or a sweet and fatty one by its
   numbers with little for it, is held to C-; the moves on the generic pack are listed in
-  `docs/food-grade-cap-moves.md` for the owner to review. Open: reading ingredients lists (a pack column). **Lesson, the owner's (2026-10-27):** a fix
+  `docs/food-grade-cap-moves.md` for the owner to review; ingredients lists closed by the owner (they would not
+  improve the grade: the dishes that fooled it have none, and packaged fried food says so in its name). MM-661
+  (the owner): a long press on a food starts choosing with it ticked and one haptic tap (`@capacitor/haptics`,
+  the app's first haptic); MM-634's choice against the long press reversed. Not verified on a phone by Claude. **Lesson, the owner's (2026-10-27):** a fix
   proven only on a hand-built entry passed CI and failed on the phone; `test/food/drinkGradeOnThePhone.test.tsx`
   is the shape every such fix needs: the real screens, the real database, a reopen and an edit.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per

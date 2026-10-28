@@ -24,6 +24,7 @@ import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { SqlOnlineFoodCache } from '../foodCatalog/online/SqlOnlineFoodCache';
 import { OpenFoodFactsSource } from '../foodOnline/OpenFoodFactsSource';
 import { UsdaFoodDataCentralSource } from '../foodOnline/UsdaFoodDataCentralSource';
+import { CapacitorHaptics } from '../platform/CapacitorHaptics';
 import { CapacitorJsonHttp } from '../platform/CapacitorJsonHttp';
 import { constant } from '../lang/constant';
 import { mmHealth } from '../platform/mmHealth';
@@ -172,6 +173,8 @@ export async function openAppServices(): Promise<AppServices> {
     barcodeScanner: camera,
     labelReader: camera,
     restSignal: new VibratingRestSignal(),
+    // One tap when a long press starts choosing (MM-661): the phone's engine, or the browser's vibration.
+    haptics: new CapacitorHaptics(),
     // A link the person presses opens in the phone's browser (MM-454); in a browser, in a new tab.
     externalLinks: native ? new NativeExternalLinks(mmBackup) : new WindowExternalLinks(),
     // The phone's clipboard through the shell, since Android's WebView cannot read it (MM-590); in a browser, the page's.

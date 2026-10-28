@@ -14,6 +14,7 @@ import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoo
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
 import { InMemoryClipboard } from '../fixtures/InMemoryClipboard';
+import { InMemoryHaptics } from '../fixtures/InMemoryHaptics';
 import { InMemoryMealShare } from '../fixtures/InMemoryMealShare';
 import { InMemoryPhotoLibrary } from '../fixtures/InMemoryPhotoLibrary';
 import { InMemoryExternalLinks } from '../fixtures/InMemoryExternalLinks';
@@ -46,6 +47,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     labelReader: camera,
     // Never the device's vibration.
     restSignal: { restOver: () => undefined },
+    haptics: new InMemoryHaptics(),
     // Never the device's browser: a link pressed is only kept (MM-454).
     externalLinks: new InMemoryExternalLinks(),
     // Never the device's clipboard: what is copied is only kept (MM-586).
