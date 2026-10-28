@@ -50,10 +50,10 @@ export function foodMovesOf(input: MealMovesInput, entry: FoodEntry): readonly M
   const cut = limits.underEating ? undefined : cutPortionOf({ entry, food, meal: mealAfter, noLowering: limits.noLowering });
   const proteinToGoG = input.dailyProteinTargetG - input.dayEntries.reduce((s, e) => s + e.proteinG, 0);
   const order = (m: MealMove) => (m.kind === 'swapSameGroup' ? 0 : m.kind === 'addProtein' ? 1 : 2);
+  const found = (list: readonly (MealMove | undefined)[]): MealMove[] => list.filter((m): m is MealMove => m !== undefined);
   if (proteinToGoG > 0) {
-    const moves = [swap, add, cut].filter((m): m is MealMove => m !== undefined);
     const density = (m: MealMove) => (m.kind === 'nextMeal' ? 0 : m.mealAfter.proteinDensity);
-    return moves.sort((a, b) => density(b) - density(a) || order(a) - order(b));
+    return found([swap, add, cut]).sort((a, b) => density(b) - density(a) || order(a) - order(b));
   }
-  return [swap, cut].filter((m): m is MealMove => m !== undefined);
+  return found([swap, cut]);
 }
