@@ -6,6 +6,7 @@ import { adviceFoodOf } from './food/adviceFoodOf';
 import { countsAsFood } from './food/countsAsFood';
 import type { FoodAnalysisInput } from './food/FoodAnalysisInput';
 import { foodGroupOf } from './food/foodGroupOf';
+import { foodKeyOf } from './food/foodKeyOf';
 import { foodLimitsOf } from './food/foodLimitsOf';
 import { FoodSignalRule } from './food/FoodSignalRule';
 import { mealBreakdownOf } from './food/mealBreakdownOf';
@@ -83,10 +84,10 @@ export function executiveBriefOf(
       const adviceFood = adviceFoodOf(worstEntry.name, [worstEntry]);
       const swap = swapFor({
         food: { ...adviceFood, carbsG: worstEntry.carbsG },
-        group: foodGroupOf([worstEntry], input.catalog),
+        group: foodGroupOf(foodKeyOf(worstEntry), [worstEntry], input.catalog),
         meal: worstEntry.meal,
         goal: record.mode,
-        history: history56,
+        history: [...history56, worstEntry],
         catalog: input.catalog,
         safeguards: input.safeguards,
         cautions: input.safeguards.cautions,
@@ -150,6 +151,23 @@ export function executiveBriefOf(
     }
   }
 
+  const proteinUnrecoverable = runwayState === 'proteinUnrecoverable';
+  const briefHash = [
+    today.toString(),
+    limits.proteinOnly ? 'protected' : 'full',
+    runwayState,
+    Math.round(kcalTarget),
+    Math.round(kcalLogged),
+    Math.round(proteinTargetG),
+    Math.round(proteinLoggedG),
+    primaryDriver?.foodName ?? '',
+    primaryDriver?.replacement?.name ?? '',
+    loggedDays,
+    calorieAdherenceDays,
+    proteinFloorHitDays,
+    options.weighIns7d ?? 0,
+  ].join(':');
+
   return {
     date: today,
     protectedPath: limits.proteinOnly,
@@ -162,6 +180,8 @@ export function executiveBriefOf(
     proteinLoggedG,
     proteinRemainingG,
     requiredProteinDensity,
+    proteinUnrecoverable,
+    briefHash,
     ...(primaryDriver === undefined ? {} : { primaryDriver }),
     sevenDay: {
       loggedDays,
