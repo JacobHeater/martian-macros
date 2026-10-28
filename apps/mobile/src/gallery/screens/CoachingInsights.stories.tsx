@@ -12,6 +12,7 @@ import { WorkoutSet } from '../../domain/training/WorkoutSet';
 import { FoodGradeRule } from '../../engine/FoodGradeRule';
 import { WaterEntry } from '../../domain/water/WaterEntry';
 import { DemoSeed } from '../../fixtures/DemoSeed';
+import { writingCoach } from './writingCoach';
 import { FoodGradeLetter } from '../../domain/food/grade/FoodGradeLetter';
 import type { FoodGradeValue } from '../../domain/food/grade/FoodGradeValue';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
@@ -164,6 +165,15 @@ const biscuits: StoryScenario = async (repos, today) => {
     }),
   );
 };
+
+/** MM-687: a BYOK coach set up and phrasing the day's lines: the wait stands under the food where its line will. */
+export const FoodLinesWriting = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'The coach is writing…',
+  scenario: demoWith({ then: biscuits }),
+  device: writingCoach,
+  open: yesterdaysFood,
+});
 
 /** MM-393: two rules hold on one food, and each says its own line under it. */
 export const FoodTwoInsightsOnOneEntry = screenStory({
