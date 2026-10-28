@@ -35,14 +35,15 @@ import { FoodGrade } from './FoodGrade';
 import { LoggedMealRow } from './meal/LoggedMealRow';
 import { mealIcon } from './mealIcon';
 import { showAddFoodSheet } from './showAddFoodSheet';
+import { showMealBreakdownSheet } from './showMealBreakdownSheet';
 import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { showMealSplitSheet } from './showMealSplitSheet';
 import { SolidProteinMarker } from './SolidProteinMarker';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
-/** What a slot's ⋯ menu does (MM-597, MM-630). */
-type SlotAction = 'split' | 'time' | 'meal' | 'day' | 'copy' | 'save';
+/** What a slot's ⋯ menu does (MM-597, MM-630, MM-666). */
+type SlotAction = 'breakdown' | 'split' | 'time' | 'meal' | 'day' | 'copy' | 'save';
 
 interface MealSectionProps {
   meal: Meal;
@@ -115,6 +116,10 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
 
   /** The slot's ⋯ menu: its macro split (MM-597), or a time, meal, day or copy for all its foods (MM-630, MM-633). */
   const slotAction = async (action: SlotAction) => {
+    if (action === 'breakdown') {
+      void showMealBreakdownSheet(overlays, day, meal, entries);
+      return;
+    }
     if (action === 'split') {
       void showMealSplitSheet(overlays, day, meal, entries);
       return;
@@ -217,6 +222,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
               icon="more"
               label={`Options for ${label.toLowerCase()}`}
               items={[
+                { value: 'breakdown', label: 'Coach breakdown' },
                 { value: 'split', label: 'Macro split' },
                 { value: 'time', label: 'Change time' },
                 { value: 'meal', label: 'Move to another meal' },
