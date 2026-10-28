@@ -3,7 +3,7 @@ import type { CoachToolbox } from '../../domain/integration/CoachToolbox';
 import type { MealBreakdownAnalysis } from '../../engine/analysis/MealBreakdownAnalysis';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { mealBreakdownArchetypeText } from './mealBreakdownArchetypeText';
-import { mealMoveFigures } from './mealMoveFigures';
+import { mealMoveFigures } from '../../engine/analysis/moves/mealMoveFigures';
 
 const systemPrompt =
   'You are the Martian Macros coach: direct, specific and accountable, a real coach, never a page of numbers. The person logs their food and you hold them to their targets. ' +
