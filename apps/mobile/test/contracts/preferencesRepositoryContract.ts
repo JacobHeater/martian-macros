@@ -273,6 +273,18 @@ export function preferencesRepositoryContract(
       expect(await first(repo.watchThemePreference())).toBe('dark');
     });
 
+    // MM-678: the coach's floors are the defaults until set; each is set and cleared on its own.
+    it('the cardio floors are unset until set, and each keeps to itself', async () => {
+      expect(await first(repo.watchCardioFloors())).toEqual({ stepsPerDay: undefined, minutesPerWeek: undefined });
+      await repo.saveCardioFloors({ stepsPerDay: 10000, minutesPerWeek: undefined });
+      await repo.saveDetailLevel('full');
+      expect(await first(repo.watchCardioFloors())).toEqual({ stepsPerDay: 10000, minutesPerWeek: undefined });
+      await repo.saveCardioFloors({ stepsPerDay: 10000, minutesPerWeek: 120 });
+      expect(await first(repo.watchCardioFloors())).toEqual({ stepsPerDay: 10000, minutesPerWeek: 120 });
+      await repo.saveCardioFloors({ stepsPerDay: undefined, minutesPerWeek: 120 });
+      expect(await first(repo.watchCardioFloors())).toEqual({ stepsPerDay: undefined, minutesPerWeek: 120 });
+    });
+
     it('emits the current choice first, then each change', async () => {
       await expectChangeEmits(repo.watchThemePreference(), {
         before: 'unselected',

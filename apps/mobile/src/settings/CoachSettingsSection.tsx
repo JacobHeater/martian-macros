@@ -13,6 +13,11 @@ import { Notice } from '../ui/Notice';
 import { useOverlays } from '../ui/useOverlays';
 import { useCell } from '../app/useCell';
 import { CarbFatBalance } from '../domain/CarbFatBalance';
+import { CardioFloors } from '../domain/training/CardioFloors';
+import { CardioRule } from '../engine/CardioRule';
+import { Fmt } from '../format/Fmt';
+import { FormatError } from '../lang/FormatError';
+import { NumberEntry } from '../ui/NumberEntry';
 import { CoachAiConfig } from '../domain/integration/CoachAiConfig';
 import type { CoachNarrationOutcome } from '../domain/integration/CoachNarrationOutcome';
 import { CoachAiProvider } from '../domain/integration/CoachAiProvider';
@@ -32,8 +37,9 @@ import { WeekShapeScreen } from './WeekShapeScreen';
  * insights' switches, as Pause opens its screen from Today's setup; optional
  * BYOK provider and API key configuration for coaching narration; and the
  * switches for exact targets (MM-123) and easing into maintenance (MM-130),
- * both off by default; and the rows that open the balance of carbs and fat
- * (MM-122) and the week's shape (MM-124).
+ * both off by default; the rows that open the balance of carbs and fat
+ * (MM-122) and the week's shape (MM-124); and the floors the coach holds
+ * cardio to (MM-678), the coach's defaults until the person types their own.
  */
 export function CoachSettingsSection() {
   // Folds in place, closed until opened (MM-398).
@@ -43,6 +49,7 @@ export function CoachSettingsSection() {
   const { services, state } = useApp();
   const exact = useLoaded(state.exactTargets) ?? false;
   const ease = useLoaded(state.easeIntoMaintenance) ?? false;
+  const floors = useLoaded(state.cardioFloors) ?? CardioFloors.none;
   const aiConfig = useLoaded(state.coachAiConfig) ?? CoachAiConfig.off;
   const [keyDraft, setKeyDraft] = useState(aiConfig.apiKey);
   // "Test AI coach" (MM-671): the model's words on today's brief, or why there are none.
@@ -183,6 +190,54 @@ export function CoachSettingsSection() {
           }
           opens
           onPress={() => void navigator.push(() => <WeekShapeScreen />)}
+        />
+        <MmListRow
+          leadingIcon="walk"
+          title="Steps a day floor"
+          subtitle={
+            floors.stepsPerDay === undefined
+              ? `The coach's default is ${Fmt.whole(CardioRule.stepsPerDay)} a day on fat loss and recomp. Type your own to change it.`
+              : 'Yours. The coach holds you to it on fat loss and recomp.'
+          }
+          entry={
+            <NumberEntry
+              title="Steps a day floor"
+              unit="steps"
+              initial={String(floors.stepsPerDay ?? CardioRule.stepsPerDay)}
+              hint="A whole number from 1,000 to 30,000."
+              refusal="That floor is out of range."
+              saves="steps floor"
+              saveKind="secondary"
+              onSave={async (steps) => {
+                if (!CardioFloors.stepsAllowed(steps)) throw new FormatError('Out of range');
+                await services.preferences.saveCardioFloors({ ...floors, stepsPerDay: steps });
+              }}
+            />
+          }
+        />
+        <MmListRow
+          leadingIcon="timer"
+          title="Cardio minutes a week floor"
+          subtitle={
+            floors.minutesPerWeek === undefined
+              ? `The coach's default is ${CardioRule.minutesPerWeek} minutes a week, every session on the watch that is not strength. Type your own to change it.`
+              : 'Yours. Every session on the watch that is not strength counts.'
+          }
+          entry={
+            <NumberEntry
+              title="Cardio minutes a week floor"
+              unit="min"
+              initial={String(floors.minutesPerWeek ?? CardioRule.minutesPerWeek)}
+              hint="A whole number from 0 to 1,000."
+              refusal="That floor is out of range."
+              saves="cardio floor"
+              saveKind="secondary"
+              onSave={async (minutes) => {
+                if (!CardioFloors.minutesAllowed(minutes)) throw new FormatError('Out of range');
+                await services.preferences.saveCardioFloors({ ...floors, minutesPerWeek: minutes });
+              }}
+            />
+          }
         />
         <MmSwitchRow
           leadingIcon="tune"

@@ -15,7 +15,7 @@ import { MuscleVolumeRow } from '../../src/ui/MuscleVolumeRow';
 import { failsFirst } from '../support/failsFirst';
 import { overriding } from '../support/overriding';
 import { renderApp } from '../support/renderApp';
-import { layer, openTrain } from '../support/train';
+import { openTrain } from '../support/train';
 
 /** Hard sets by muscle group, this week beside last. Carried over from weekly_volume_test.dart. */
 const today = CalendarDate.of(2026, 10, 11);
@@ -48,18 +48,18 @@ async function fresh(): Promise<InMemoryRepositories> {
 async function openVolume(repos: InMemoryRepositories, change?: (services: AppServices) => AppServices): Promise<void> {
   renderApp(repos, today, change === undefined ? {} : { change });
   await openTrain();
+  // The fold opens in place (MM-680): its rows are on Train, no screen.
   await userEvent.click(screen.getByRole('button', { name: 'Weekly training volume' }));
-  await layer().findByRole('heading', { name: 'Weekly training volume' });
+  await screen.findByRole('img', { name: /^Chest: / }).catch(() => undefined);
 }
 
-const row = (group: string) => layer().getByRole('img', { name: new RegExp(`^${group}: `) }).closest('.mm-volume-row');
+const row = (group: string) => screen.getByRole('img', { name: new RegExp(`^${group}: `) }).closest('.mm-volume-row');
 
 it('all groups, exact half sets, zero and reactive edit and delete', async () => {
   const repos = await fresh();
   const id = await repos.workouts.saveWorkout(workout({ count: 3 }));
   await repos.workouts.saveWorkout(workout({ age: 7, count: 4 }));
   await openVolume(repos);
-  await layer().findByRole('heading', { name: 'Hard sets by muscle group' });
   expect(row('Chest')).toHaveTextContent('3 hard sets');
   expect(row('Chest')).toHaveTextContent('Previous: 4 · change: -1');
 
@@ -77,14 +77,14 @@ it('MM-195: the volume can be reached during a workout', async () => {
   await openTrain();
   expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Weekly training volume' }));
-  expect(await layer().findByRole('heading', { name: 'Last seven days' })).toBeInTheDocument();
+  expect(await screen.findByRole('img', { name: /^Chest: / })).toBeInTheDocument();
 });
 
 it('sets of an exercise that is not known are said to be left out', async () => {
   const repos = await fresh();
   await repos.workouts.saveWorkout(workout({ id: 'custom-deleted' }));
   await openVolume(repos);
-  expect(await layer().findByText(/4 current and 0 previous hard sets omitted/)).toBeInTheDocument();
+  expect(await screen.findByText(/4 current and 0 previous hard sets omitted/)).toBeInTheDocument();
 });
 
 it('the reference band and a volume above the range are drawn to scale', () => {
@@ -105,7 +105,6 @@ it('a change to an exercise of the user’s own moves its volume at once', async
   );
   await repos.workouts.saveWorkout(workout({ id, count: 3 }));
   await openVolume(repos);
-  await layer().findByRole('heading', { name: 'Hard sets by muscle group' });
   expect(row('Chest')).toHaveTextContent('3 hard sets');
   expect(row('Triceps')).toHaveTextContent('1.5 hard sets');
 
@@ -114,7 +113,7 @@ it('a change to an exercise of the user’s own moves its volume at once', async
   );
   await expect.poll(() => row('Chest')?.textContent ?? '').toContain('0 hard sets');
   await repos.customExercises.deleteCustomExercise(id);
-  expect(await layer().findByText(/3 current and 0 previous hard sets omitted/)).toBeInTheDocument();
+  expect(await screen.findByText(/3 current and 0 previous hard sets omitted/)).toBeInTheDocument();
 });
 
 for (const custom of [false, true]) {
@@ -130,12 +129,14 @@ for (const custom of [false, true]) {
           }
         : { ...services, workouts: overriding(services.workouts, { watchWorkouts: workouts.watch }) },
     );
-    expect(layer().queryByRole('heading', { name: 'Hard sets by muscle group' })).not.toBeInTheDocument();
+    // The notice in the fold (MM-680), with Try again; no row until the read comes back.
+    expect(await screen.findByText('Could not read training history')).toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: /^Chest: / })).not.toBeInTheDocument();
     const read = custom ? exercises : workouts;
     const before = read.attempts();
     read.recover();
-    await userEvent.click(await layer().findByRole('button', { name: 'Retry volume' }));
-    expect(await layer().findByRole('heading', { name: 'Last seven days' })).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+    expect(await screen.findByRole('img', { name: /^Chest: / })).toBeInTheDocument();
     expect(read.attempts()).toBeGreaterThan(before);
   });
 }

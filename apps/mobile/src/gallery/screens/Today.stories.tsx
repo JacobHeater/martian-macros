@@ -4,6 +4,8 @@ import { DemoSeed } from '../../fixtures/DemoSeed';
 import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
+import { cardioWearable } from './cardioWearable';
+import { CrashOnDraw } from './crashOnDraw';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { fiberLowScenario } from './fiberLowScenario';
@@ -38,6 +40,24 @@ export const Dashboard = screenStory({ covers: ['DashboardScreen'], shows: 'Hist
 
 /** MM-91: the Dashboard on a 360 px phone: the hero, its macro rows and the strip inside the width. */
 export const DashboardSmallPhone = screenStory({ covers: ['DashboardScreen'], shows: 'History', viewport: 'smallPhone' });
+
+/** MM-679: a screen that throws while drawing is said in words, in the app's notice, never a blank screen. */
+export const CrashWhileDrawing = screenStory({
+  covers: [],
+  shows: 'Something went wrong while drawing this',
+  open: ({ navigator }) => void navigator.push(() => <CrashOnDraw />),
+});
+
+/** MM-677 (the owner): today's steps and the week's cardio from the wearable against their floors, a row that opens Train. */
+export const DashboardCardio = screenStory({ covers: ['DashboardScreen'], shows: /steps today · .* of cardio this week/, device: cardioWearable() });
+
+/** MM-677: the same row at phone width, with the floors under it. */
+export const DashboardCardioSmallPhone = screenStory({
+  covers: ['DashboardScreen'],
+  shows: /steps today · .* of cardio this week/,
+  viewport: 'smallPhone',
+  device: cardioWearable({ stepsPerDay: 12350 }),
+});
 
 /** MM-91: the Dashboard at 200% text: every row wraps, nothing clips, the title and Settings share the width. */
 export const DashboardLargeText = screenStory({ covers: ['DashboardScreen'], shows: 'History', textScale: 2 });

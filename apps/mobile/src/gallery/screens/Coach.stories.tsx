@@ -46,6 +46,8 @@ import { writingCoach } from './writingCoach';
 import { valueOf } from './valueOf';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
 import { analysisBalancedScenario } from './analysisBalancedScenario';
+import { cardioUnderFloorScenario } from './cardioUnderFloorScenario';
+import { cardioWearable } from './cardioWearable';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
 import { analysisSeasonScenario } from './analysisSeasonScenario';
 import { analysisTodayTradeScenario } from './analysisTodayTradeScenario';
@@ -1208,6 +1210,15 @@ export const CoachAnalysisMoreBothKinds = screenStory({
   },
 });
 
+/** MM-678: a week under both cardio floors on a cut: the coach's cardio and steps fixes, with their orders, in the drafted lines. */
+export const CoachAnalysisCardioUnderFloor = screenStory({
+  covers: ['CoachScreen'],
+  shows: /of cardio this week$/,
+  scenario: cardioUnderFloorScenario,
+  open: onCoach,
+  walk: pressOnCoach('7d'),
+});
+
 /** MM-610 (F13): the hidden fold opened: each hidden finding's title with the day it shows again. */
 export const CoachAnalysisHiddenOpened = screenStory({
   covers: ['CoachScreen'],
@@ -1282,6 +1293,14 @@ export const CoachAnalysisNothingToday = screenStory({
 export const CoachExecutiveSummary = screenStory({
   covers: ['CoachScreen'],
   shows: 'Executive summary',
+  open: onCoach,
+});
+
+/** MM-681: the Executive summary holding the person to lifting, cardio and steps: a watch worn, the week under both floors. */
+export const CoachExecutiveSummaryTraining = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Lifting this week',
+  device: cardioWearable(),
   open: onCoach,
 });
 

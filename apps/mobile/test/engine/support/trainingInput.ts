@@ -38,6 +38,9 @@ export function trainingInput(
     waterGoal: undefined,
     wholeDays: [],
     safeguards: { eatingDisorderHistory: false, underEating: false },
+    cardio: [],
+    steps: [],
+    cardioFloors: { stepsPerDay: undefined, minutesPerWeek: undefined },
     ...rest,
   };
 }

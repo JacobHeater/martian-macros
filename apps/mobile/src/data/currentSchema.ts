@@ -164,6 +164,8 @@ CREATE TABLE "user_preferences" (
   "weigh_in_window_end_minute" INTEGER NULL CHECK ("weigh_in_window_end_minute" IS NULL OR "weigh_in_window_end_minute" BETWEEN 1 AND 1440),
   "weight_display" TEXT NULL CHECK ("weight_display" IS NULL OR "weight_display" IN ('everything', 'trendOnly', 'hidden')),
   "weight_display_offered" INTEGER NOT NULL DEFAULT 0 CHECK ("weight_display_offered" IN (0, 1)),
+  "cardio_steps_floor" INTEGER NULL CHECK ("cardio_steps_floor" IS NULL OR "cardio_steps_floor" BETWEEN 1000 AND 30000),
+  "cardio_minutes_floor" INTEGER NULL CHECK ("cardio_minutes_floor" IS NULL OR "cardio_minutes_floor" BETWEEN 0 AND 1000),
   PRIMARY KEY ("id")
 );
 CREATE TABLE "weight_events" (
@@ -492,4 +494,16 @@ CREATE TABLE "saved_meal_foods" (
   "evidence_citation" TEXT NULL
 );
 CREATE INDEX "saved_meal_foods_meal" ON "saved_meal_foods" ("saved_meal_id");
+CREATE TABLE "cardio_sessions" (
+  "platform_id" TEXT NOT NULL PRIMARY KEY,
+  "source_name" TEXT NOT NULL,
+  "activity" TEXT NOT NULL CHECK ("activity" IN ('walking', 'running', 'hiking', 'cycling', 'elliptical', 'rowing', 'stairClimbing', 'swimming', 'intervals', 'other')),
+  "started_at_ms" INTEGER NOT NULL,
+  "ended_at_ms" INTEGER NOT NULL CHECK ("ended_at_ms" > "started_at_ms"),
+  "date_epoch_day" INTEGER NOT NULL
+);
+CREATE TABLE "daily_steps" (
+  "epoch_day" INTEGER NOT NULL PRIMARY KEY,
+  "steps" INTEGER NOT NULL CHECK ("steps" > 0)
+);
 `;

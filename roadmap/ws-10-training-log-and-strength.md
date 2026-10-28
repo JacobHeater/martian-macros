@@ -93,6 +93,10 @@ training-lapse rules owned by WS-05.
    MM-214, MM-215 and MM-222 built 2026-10-21; MM-447 (the paused bar and
    the workout's times) built 2026-10-21 with the recommended defaults.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-193, MM-194; step 3: MM-192; step 4: MM-195; step 7: MM-196.
+10. **Cardio from the wearable (MM-677).** The owner, 2026-10-28, after a Q&A: every non-strength session and the
+   platform's daily steps kept in the app (schema 31), a Cardio section on Train and a row on the Dashboard against the
+   coach's floors, the week's dots half on a cardio-only day. The app times and types nothing. Built 2026-10-28 in the
+   main checkout; the coach's side is WS-09's MM-678.
 
 ## Done enough to unblock others
 MM-77 is done: one engine function returns a smoothed e1RM trend per lift
@@ -116,6 +120,7 @@ creates is new.
   chosen exercise).
 - Placed 2026-10-13 (MM-245), from the React conversion onward: MM-193 (Demo workouts repeated for each nutrition day, done); MM-194 (Deleting a custom exercise hides preserved strength sessions, done); MM-192 (Invalid strength evidence bypasses the retry state, done); MM-195 (Weekly volume navigation disappears during a workout, done); MM-196 (Typed set times can overlap another set in the workout, done); MM-214 (A set's reps field can show a value the set does not have, done); MM-215 (Removing a set happens at once and cannot be undone, done); MM-222 (A logged set looks logged, and the next action is in reach, done); MM-447 (A paused workout, and a workout's times, say what they do; placed 2026-10-21, done).
 - Added 2026-10-24 (step 9): MM-613 (an imported set without repetitions breaks weekly volume).
+- Added 2026-10-28 (the owner; step 10): MM-677 (cardio from the wearable: sessions and steps on Train and the Dashboard); MM-680 (the owner, from the phone: Weekly training volume and Cardio fold in place on Train, no sub-screens, and Cardio is drawn as figures, bars and a chart).
 
 ## Notes for whoever builds it
 - **The owner's direction (MM-189): workouts line up with what the phone's health systems offer, with a fallback where they do

@@ -1,3 +1,4 @@
+import type { CardioActivity } from './CardioActivity';
 import type { PlatformWorkoutSegment } from './PlatformWorkoutSegment';
 
 /**
@@ -19,6 +20,14 @@ export interface PlatformWorkout {
    * types). Any other kind is imported with its span and no exercises.
    */
   readonly strength: boolean;
+
+  /**
+   * What the platform called it when it is not strength (MM-677): every
+   * non-strength session is cardio, by one of `CardioActivity`'s names.
+   * Undefined for a strength session, and from an older plugin that says
+   * no activity.
+   */
+  readonly cardio?: CardioActivity | undefined;
   readonly start: Date;
   readonly end: Date;
 

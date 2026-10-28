@@ -13,6 +13,7 @@ import { MmFoldsContext } from '../ui/MmFoldsContext';
 import { MmOverlays } from '../ui/MmOverlays';
 import { AppContext } from './AppContext';
 import { AppRoot } from './AppRoot';
+import { CrashBoundary } from './CrashBoundary';
 import { NavigatorHost } from './NavigatorHost';
 import { useCell } from './useCell';
 import { usePrefersDark } from './usePrefersDark';
@@ -92,16 +93,19 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
     return () => document.removeEventListener('visibilitychange', resumed);
   }, [state]);
 
+  // A crash while drawing any of this is said in words, with the theme on (MM-679), never a blank screen.
   const content = (
-    <MmOverlays>
-      <DownloadStatusHost>
-        <NavigatorHost>
-          <HardwareBack />
-          <AppRoot />
-          {children}
-        </NavigatorHost>
-      </DownloadStatusHost>
-    </MmOverlays>
+    <CrashBoundary>
+      <MmOverlays>
+        <DownloadStatusHost>
+          <NavigatorHost>
+            <HardwareBack />
+            <AppRoot />
+            {children}
+          </NavigatorHost>
+        </DownloadStatusHost>
+      </MmOverlays>
+    </CrashBoundary>
   );
   return (
     <AppContext.Provider value={scope}>

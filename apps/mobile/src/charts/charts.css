@@ -418,3 +418,43 @@
 .mm-section-body > .chart-plot {
   width: calc(100% + 24px + var(--space-12));
 }
+
+/* ---- Cardio on Train (MM-680): the two figures side by side, the steps by day as bars on the floor's line ---- */
+.chart-cardio-figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12) var(--space-24);
+  margin: var(--space-8) 0 var(--space-12);
+}
+.chart-cardio-figure {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+.chart-steps-chart {
+  margin: var(--space-8) 0 var(--space-12);
+}
+.chart-steps {
+  fill: color-mix(in srgb, var(--ion) 40%, transparent);
+}
+.chart-steps.chart-steps-today {
+  fill: var(--ion);
+}
+.chart-steps-missing {
+  fill: none;
+  stroke: var(--outline);
+  stroke-width: 1;
+  stroke-dasharray: 2 2;
+}
+.chart-steps-missing.chart-steps-today {
+  stroke: var(--ion);
+}
+.chart-steps-letter.chart-steps-today {
+  fill: var(--text);
+  font-weight: 600;
+}
+/* The steps floor, a line across the bars (MM-678). */
+.chart-steps-floor {
+  stroke: var(--text2);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}

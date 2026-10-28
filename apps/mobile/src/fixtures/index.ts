@@ -20,6 +20,8 @@ export * from './InMemoryExternalLinks';
 export * from './InMemoryFoodCatalog';
 export * from './InMemoryFoodRepository';
 export * from './InMemoryGoalBodyFatRepository';
+export * from './InMemoryCardioSessionRepository';
+export * from './InMemoryDailyStepsRepository';
 export * from './InMemoryHealthWorkouts';
 export * from './InMemoryHealthWriting';
 export * from './InMemoryInlineInsightLogRepository';

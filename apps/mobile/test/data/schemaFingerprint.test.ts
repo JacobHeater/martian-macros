@@ -57,6 +57,8 @@ const fingerprints: Readonly<Record<number, string>> = {
   29: '402fbe7fa3a7cf8bacc4bceb69377128ede96caa65104d51c6518d528fec98bb',
   // MM-645: the meals saved to log again, and their foods.
   30: '3cf5fd4cd7892c5665147e930513a8c399beeaea482223ddd2d99a56e0c9fb72',
+  // MM-677, MM-678: the wearable's cardio sessions, the platform's daily steps, and the coach's cardio floors.
+  31: 'eff24c40fafcf3184b816ada1b2e189da7ba1b28ff56c5ba82871813e6677a5b',
 };
 
 it('the schema is the one recorded for its version', () => {

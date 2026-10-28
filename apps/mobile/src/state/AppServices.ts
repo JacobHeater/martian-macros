@@ -35,6 +35,8 @@ import type { WaterRepository } from '../domain/repositories/WaterRepository';
 import type { WeightEventRepository } from '../domain/repositories/WeightEventRepository';
 import type { WeightRepository } from '../domain/repositories/WeightRepository';
 import type { WorkoutRepository } from '../domain/repositories/WorkoutRepository';
+import type { CardioSessionRepository } from '../domain/repositories/CardioSessionRepository';
+import type { DailyStepsRepository } from '../domain/repositories/DailyStepsRepository';
 import type { InlineInsightLogRepository } from '../engine/InlineInsightLogRepository';
 import type { InsightSnoozeRepository } from '../engine/InsightSnoozeRepository';
 import type { InsightLogRepository } from '../engine/InsightLogRepository';
@@ -117,6 +119,9 @@ export interface AppServices {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
+  /** The wearable's cardio sessions and the platform's daily steps, as kept in the app (MM-677). */
+  readonly cardioSessions: CardioSessionRepository;
+  readonly dailySteps: DailyStepsRepository;
   readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;

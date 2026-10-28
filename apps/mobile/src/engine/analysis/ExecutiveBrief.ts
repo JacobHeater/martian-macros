@@ -1,13 +1,15 @@
 import type { CalendarDate } from '../../domain/CalendarDate';
 import type { Meal } from '../../domain/Meal';
+import type { TrainingBrief } from './TrainingBrief';
 
 /**
  * The unified deterministic coaching pre-calculation for the Coach screen's
  * Executive Summary card (MM-663).
  *
- * Focuses strictly on energy balance, the anabolic protein floor, and
- * consistency, enforcing the hard mathematical invariant:
- * `proteinRemainingG * 4 <= kcalRemaining`.
+ * Energy balance, the anabolic protein floor and consistency, enforcing the
+ * hard mathematical invariant `proteinRemainingG * 4 <= kcalRemaining`; and,
+ * since MM-681, what the person is held to in training, cardio and steps
+ * (`training`), absent only under the safeguards that forbid it.
  */
 export interface ExecutiveBrief {
   readonly date: CalendarDate;
@@ -64,4 +66,6 @@ export interface ExecutiveBrief {
     readonly averageProteinG: number;
     readonly weighIns: number;
   };
+  /** Lifting, cardio and steps this week against what the person is held to (MM-681); absent under the safeguards. */
+  readonly training?: TrainingBrief | undefined;
 }

@@ -1,4 +1,4 @@
-import { type StallAssessment, StallRule } from '../engine';
+import { CardioRule, type StallAssessment, StallRule } from '../engine';
 import { StateError } from '../lang/StateError';
 import { toStringAsFixed } from '../lang/toStringAsFixed';
 import { Fmt } from './Fmt';
@@ -11,6 +11,8 @@ import { shortSleepText } from './shortSleepText';
  * offers options, never instructions. The chance that the log understates
  * what was eaten is raised once, only when the estimate is very low. Sleep
  * that averaged short comes first, before any line about the log (MM-252).
+ * A stall put down to moving less (MM-678) states both averages of steps
+ * and orders them back, before anything about the estimate.
  */
 export function stallText(a: StallAssessment, fmt: Fmt): readonly [body: string, options: readonly string[]] {
   const [body, options] = diagnosisText(a, fmt);
@@ -71,6 +73,19 @@ function diagnosisText(a: StallAssessment, fmt: Fmt): readonly [body: string, op
         a.gaining
           ? ['Keep the target', 'Move to a slower gain']
           : ['Keep the target', 'Move to a gentler pace that matches what you are eating'],
+      ];
+    }
+    case 'activity': {
+      const now = a.stepsNowPerDay;
+      const before = a.stepsBeforePerDay;
+      if (now === undefined || before === undefined) {
+        throw new StateError('A stall put down to moving less has both averages of steps.');
+      }
+      return [
+        `Your steps fell: about ${Fmt.whole(now)} a day over the last ${a.windowDays} days against about ` +
+          `${Fmt.whole(before)} a day in the ${CardioRule.stepsBeforeWeeks} weeks before. Less moving is the likeliest ` +
+          `reason the scale held. Get the steps back to ${Fmt.whole(before)} before anything else changes.`,
+        [],
       ];
     }
     case 'estimate': {

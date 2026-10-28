@@ -33,6 +33,8 @@ export interface CoachAdvice {
    * - `slowDown`: lose at `rateFraction` of body weight a week instead.
    * - `sleep`: sleep at least `minutes` a night.
    * - `keepLifting`: keep the loads; cut sets before weight.
+   * - `cardio`: `minutes` more of cardio on the watch this week (MM-678).
+   * - `steps`: up to `steps` a day, `stepsShort` more each day (MM-678).
    */
   readonly kind:
     | 'skip'
@@ -47,7 +49,9 @@ export interface CoachAdvice {
     | 'addSets'
     | 'slowDown'
     | 'sleep'
-    | 'keepLifting';
+    | 'keepLifting'
+    | 'cardio'
+    | 'steps';
   /** The food the order is about, at the portion eaten (a time). */
   readonly food?:
     | {
@@ -127,4 +131,8 @@ export interface CoachAdvice {
   readonly amountMl?: number | undefined;
   /** An add or water on these days only: training days or rest days. */
   readonly days?: 'training' | 'rest' | undefined;
+  /** `steps`: the floor, steps a day (MM-678). */
+  readonly steps?: number | undefined;
+  /** `steps`: how many more a day, on average, reach it. */
+  readonly stepsShort?: number | undefined;
 }

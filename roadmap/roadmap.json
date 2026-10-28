@@ -1615,7 +1615,8 @@
      "MM-242",
      "MM-453",
      "MM-601",
-     "MM-603"
+     "MM-603",
+     "MM-679"
     ]
    },
    "sequence": [
@@ -1928,6 +1929,13 @@
      "title": "A text field of several lines for longer text, grown with what is typed (the owner, 2026-10-24, MM-603)",
      "tickets": [
       "MM-603"
+     ]
+    },
+    {
+     "step": 24,
+     "title": "A crash while drawing is said in words, never a blank screen (the owner, 2026-10-28, MM-679): one boundary inside the app with the theme and one around it",
+     "tickets": [
+      "MM-679"
      ]
     }
    ],
@@ -3152,7 +3160,9 @@
     "remaining": [
      "MM-145",
      "MM-617",
-     "MM-618"
+     "MM-618",
+     "MM-678",
+     "MM-681"
     ]
    },
    "sequence": [
@@ -3315,7 +3325,9 @@
       "MM-666",
       "MM-667",
       "MM-670",
-      "MM-617"
+      "MM-617",
+      "MM-678",
+      "MM-681"
      ]
     },
     {
@@ -3422,7 +3434,9 @@
      "MM-613"
     ],
     "remaining": [
-     "MM-74"
+     "MM-74",
+     "MM-677",
+     "MM-680"
     ]
    },
    "sequence": [
@@ -3506,6 +3520,14 @@
      "title": "An imported set without repetitions is skipped by weekly volume, the volume jump and strength trends instead of breaking them (MM-613)",
      "tickets": [
       "MM-613"
+     ]
+    },
+    {
+     "step": 10,
+     "title": "Cardio from the wearable (the owner, 2026-10-28): every non-strength session and the platform's daily steps kept in the app (schema 31), a Cardio section on Train and a row on the Dashboard against the coach's floors, the week's dots half on a cardio-only day; the volume and the cardio as folds in place, the cardio drawn (MM-680)",
+     "tickets": [
+      "MM-677",
+      "MM-680"
      ]
     }
    ],
@@ -4901,6 +4923,18 @@
     "MM-613"
    ],
    "reason": "MM-609's training signals read weekly volume and strength trends, which an imported set without repetitions breaks until MM-613."
+  },
+  {
+   "from": "WS-10",
+   "to": "WS-09",
+   "type": "hard-blocker",
+   "scope": [
+    16
+   ],
+   "satisfiedBy": [
+    "MM-677"
+   ],
+   "reason": "MM-678's cardio and steps signals, floors and stall explanation read the sessions and steps MM-677 keeps."
   }
  ],
  "parallelGroups": [
