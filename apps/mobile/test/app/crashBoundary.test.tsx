@@ -37,7 +37,7 @@ afterEach(() => {
 const drawWith = (child: ReactNode) => render(<App services={servicesOf(repos, new FixedClock(today))}>{child}</App>);
 
 it('a screen that throws while drawing is said in words, the error kept off the screen', async () => {
-  drawWith(<CrashOnDraw name="always" />);
+  drawWith(<CrashOnDraw />);
   const alert = await screen.findByRole('alert');
   expect(alert).toHaveTextContent('Something went wrong while drawing this');
   expect(alert).toHaveTextContent('Nothing you logged has been changed.');
@@ -48,8 +48,11 @@ it('a screen that throws while drawing is said in words, the error kept off the 
 });
 
 it('Try again draws again, and a crash that does not recur leaves the app drawn', async () => {
-  drawWith(<CrashOnDraw name="retry" once />);
-  await userEvent.click(await screen.findByRole('button', { name: 'Try again' }));
+  let crashing = true;
+  drawWith(<CrashOnDraw throws={() => crashing} />);
+  const again = await screen.findByRole('button', { name: 'Try again' });
+  crashing = false;
+  await userEvent.click(again);
   expect(await screen.findByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 });
