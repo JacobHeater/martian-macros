@@ -1,6 +1,6 @@
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, expect, it } from 'vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { InMemoryHaptics } from '../../src/fixtures/InMemoryHaptics';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
@@ -38,6 +38,8 @@ const open = async () => {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const at = { clientX: 100, clientY: 100, pointerId: 1 };
 
+afterEach(() => vi.restoreAllMocks());
+
 it('a long press starts choosing with that food ticked, and taps once', async () => {
   const row = await open();
   fireEvent.pointerDown(row, at);
@@ -49,6 +51,21 @@ it('a long press starts choosing with that food ticked, and taps once', async ()
   expect(screen.getByRole('checkbox', { name: /^Banana/ })).not.toBeChecked();
   expect(screen.queryByRole('dialog', { name: 'Edit food' })).toBeNull();
   expect(haptics.taps).toBe(1);
+  // Nothing is said (MM-662, the owner): the boxes and the bar say it.
+  expect(screen.queryByText(/Choosing: tick/)).toBeNull();
+});
+
+it('MM-662: the box choosing started from takes focus without scrolling to itself, so the held row stays under the finger', async () => {
+  const focus = vi.spyOn(HTMLElement.prototype, 'focus');
+  const row = await open();
+  fireEvent.pointerDown(row, at);
+  await wait(650);
+  fireEvent.pointerUp(row, at);
+  const box = await screen.findByRole('checkbox', { name: /^Oats · 300 kcal/ });
+  expect(box).toHaveFocus();
+  const focused = focus.mock.calls.filter((_, i) => focus.mock.instances[i] === box);
+  expect(focused.length).toBeGreaterThan(0);
+  for (const call of focused) expect(call[0]).toEqual({ preventScroll: true });
 });
 
 it('a short press opens the food, with no tap', async () => {
