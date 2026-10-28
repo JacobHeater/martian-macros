@@ -16,6 +16,8 @@ import type { CoachFinding } from '../engine/analysis/CoachFinding';
 import type { CoachSpanEvaluation } from '../engine/analysis/CoachSpanEvaluation';
 import { coachTrendSteps } from '../engine/analysis/coachTrendSteps';
 import type { DashboardInsight } from '../engine/analysis/DashboardInsight';
+import type { ExecutiveBrief } from '../engine/analysis/ExecutiveBrief';
+import { executiveBriefOf } from '../engine/analysis/executiveBriefOf';
 import { foldTrainingProtein } from '../engine/analysis/foldTrainingProtein';
 import { analyseFoodDay } from '../engine/analysis/food/analyseFoodDay';
 import { analyseFoodSpan } from '../engine/analysis/food/analyseFoodSpan';
@@ -149,6 +151,12 @@ export class CoachAnalysis {
   /** What the Dashboard's insight card shows (MM-610), or undefined: nothing, or still being read. */
   readonly dashboard: Cell<DashboardInsight | undefined>;
 
+  /** Deterministic pre-calculated executive summary brief for today and the last 7 days (MM-663). */
+  readonly executiveBrief: Cell<ExecutiveBrief | undefined>;
+
+  /** The food analysis input with the trade catalog resolved, for on-demand meal breakdowns (MM-666). */
+  readonly foodInput: Cell<FoodAnalysisInput | undefined>;
+
   private readonly inputs: CoachAnalysisInputs;
   private readonly entries: StreamCell<FoodEntry[]>;
   private readonly intakeDays: StreamCell<IntakeDay[]>;
@@ -222,6 +230,17 @@ export class CoachAnalysis {
     });
 
     this.read = new DerivedCell(() => this.readCells());
+    this.foodInput = new DerivedCell<FoodAnalysisInput | undefined>(() => {
+      const read = this.read.value;
+      if (read === undefined) return undefined;
+      return { ...read.food, catalog: Loadable.valueOf(this.tradeCatalog.value) };
+    });
+    this.executiveBrief = new DerivedCell(() => {
+      const read = this.read.value;
+      const food = this.foodInput.value;
+      if (read === undefined || food === undefined) return undefined;
+      return executiveBriefOf(food, read.today);
+    });
     this.view = new DerivedCell(() => this.work());
     this.spans = new DerivedCell<readonly AnalysisSpan[]>(() => this.view.value?.spans ?? [1]);
     this.canonical = new DerivedCell(() => this.readCanonical());

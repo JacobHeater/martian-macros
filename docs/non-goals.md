@@ -213,6 +213,15 @@ should read this list as closely as any feature.
   cannot be reviewed in advance.
 - **Detail:** MM-141
 - **Reopen if:** Generated text can be bounded to reviewed content.
+- **Amended by the product owner (2026-10-27, MM-664, MM-665):** the coaching
+  numbers, targets, swaps and runway invariants remain 100% deterministic, and
+  the app ships with offline whole-situation paragraph archetypes. A person who
+  wants natural-language phrasing may optionally enter their own API key
+  (Gemini, OpenAI or Anthropic) in Settings; the model phrases only the
+  deterministic brief it is given, its answer is checked against the brief's
+  numbers, banned words and safety invariants (`verifyCoachNarration`), and any
+  failed check or offline state falls back immediately to the deterministic
+  archetype.
 
 ### No engagement notifications
 

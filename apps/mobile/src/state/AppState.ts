@@ -1,6 +1,7 @@
 import type { WaterGoal } from '../domain/water/WaterGoal';
 import { suggestedWaterGoalMl } from '../domain/water/suggestedWaterGoalMl';
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { CoachAiConfig } from '../domain/integration/CoachAiConfig';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { ArgumentError } from '../lang/ArgumentError';
 import type { InsightSwitches } from '../domain/InsightSwitches';
@@ -208,6 +209,8 @@ export class AppState {
   readonly termsAcceptance: StreamCell<TermsAcceptance | undefined>;
   /** When the last backup was made on this phone, if ever (MM-63). */
   readonly lastBackupOn: StreamCell<CalendarDate | undefined>;
+  /** Optional BYOK coaching provider and API key (MM-665). */
+  readonly coachAiConfig: StreamCell<CoachAiConfig>;
 
   /** A look being tried on the theme chooser before it is kept (MM-184). */
   readonly themePreview = new ValueCell<ThemePreference | undefined>(undefined);
@@ -611,6 +614,7 @@ export class AppState {
     this.themePreference = stream(() => s.preferences.watchThemePreference());
     this.termsAcceptance = stream(() => s.preferences.watchTermsAcceptance());
     this.lastBackupOn = stream(() => s.preferences.watchLastBackupOn());
+    this.coachAiConfig = stream(() => s.coachAi.watchConfig());
     this.foodCatalog = stream(() => {
       // Read here so that an install or a removal makes this ask again.
       void this.packChanges.value;

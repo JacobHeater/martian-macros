@@ -23,6 +23,9 @@ const named: Readonly<Record<string, string>> = {
   'world.openfoodfacts.org': 'Open Food Facts',
   'api.nal.usda.gov': 'USDA FoodData Central',
   'github.com': 'GitHub',
+  'generativelanguage.googleapis.com': 'Gemini',
+  'api.openai.com': 'OpenAI',
+  'api.anthropic.com': 'Anthropic',
   // The public page (MM-247), which the phone's browser fetches when "On the web" is pressed, not the app (MM-454).
   'jacobheater.github.io': 'GitHub Pages',
 };

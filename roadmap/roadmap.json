@@ -3125,6 +3125,8 @@
      "MM-606",
      "MM-604",
      "MM-620",
+     "MM-664",
+     "MM-665",
      "MM-621",
      "MM-622"
     ],
@@ -3298,7 +3300,9 @@
      "step": 17,
      "title": "Spike: a small on-device model phrases the coach, permissive licenses only (the owner, 2026-10-24, MM-618)",
      "tickets": [
-      "MM-618"
+      "MM-618",
+      "MM-664",
+      "MM-665"
      ]
     },
     {

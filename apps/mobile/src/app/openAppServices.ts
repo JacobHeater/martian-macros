@@ -26,6 +26,9 @@ import { OpenFoodFactsSource } from '../foodOnline/OpenFoodFactsSource';
 import { UsdaFoodDataCentralSource } from '../foodOnline/UsdaFoodDataCentralSource';
 import { CapacitorHaptics } from '../platform/CapacitorHaptics';
 import { CapacitorJsonHttp } from '../platform/CapacitorJsonHttp';
+import { LocalStorageCoachAiStore } from '../platform/LocalStorageCoachAiStore';
+import { InMemoryCoachAiStore } from '../fixtures/InMemoryCoachAiStore';
+import { HttpCoachNarrator } from '../format/coach/HttpCoachNarrator';
 import { constant } from '../lang/constant';
 import { mmHealth } from '../platform/mmHealth';
 import { mmReminders } from '../platform/mmReminders';
@@ -94,6 +97,8 @@ export async function openAppServices(): Promise<AppServices> {
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
   const onlineHttp = new CapacitorJsonHttp();
+  const coachAi = native ? new LocalStorageCoachAiStore() : new InMemoryCoachAiStore();
+  const coachNarrator = new HttpCoachNarrator({ store: coachAi, http: onlineHttp });
   const onlineFoods = new SqlOnlineFoodCache(sql);
   const platform = runningOn();
   // What is logged is written to the health platform only for the kinds turned on in Settings (MM-70, MM-314,
@@ -183,6 +188,8 @@ export async function openAppServices(): Promise<AppServices> {
     // the camera only, and the browser's share where it can share files.
     photoLibrary: native ? new NativePhotoLibrary(mmBackup) : new NoPhotoLibrary(),
     mealShare: native ? new NativeMealShare(mmBackup) : new NavigatorMealShare(),
+    coachAi,
+    coachNarrator,
     reminderScheduler: native
       ? new NativeReminderScheduler({ api: mmReminders, prompt: reminderPrompt })
       : new NoNotifications(),
