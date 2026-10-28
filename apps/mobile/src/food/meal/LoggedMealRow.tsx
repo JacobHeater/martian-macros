@@ -8,6 +8,7 @@ import { useApp } from '../../app/useApp';
 import { useLoaded } from '../../app/useLoaded';
 import { MmIcon } from '../../ui/MmIcon';
 import { MmMenuButton } from '../../ui/MmMenuButton';
+import type { MmAnchor } from '../../ui/MmAnchor';
 import { MmPressable } from '../../ui/MmPressable';
 import { MmSwipeToRemove } from '../../ui/MmSwipeToRemove';
 import { useOverlays } from '../../ui/useOverlays';
@@ -23,8 +24,8 @@ interface LoggedMealRowProps {
   grade: FoodGradeValue | undefined;
   /** Starts choosing foods to change together, with this meal chosen (MM-634). */
   onSelect?: (() => void) | undefined;
-  /** A long press on the row (MM-661): choosing with this meal ticked. */
-  onLongPress?: (() => void) | undefined;
+  /** A long press on the row (MM-661): choosing with this meal ticked, given the row's edges (MM-662). */
+  onLongPress?: ((anchor: MmAnchor) => void) | undefined;
   /** Takes focus when drawn: choosing has just ended on this meal (MM-634). */
   autoFocus?: boolean | undefined;
 }

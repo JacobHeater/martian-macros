@@ -56,7 +56,9 @@ plan's status table in `docs/food-logging-plan.md` says what is built and what i
   `docs/food-grade-cap-moves.md` for the owner to review; ingredients lists closed by the owner (they would not
   improve the grade: the dishes that fooled it have none, and packaged fried food says so in its name). MM-661
   (the owner): a long press on a food starts choosing with it ticked and one haptic tap (`@capacitor/haptics`,
-  the app's first haptic); MM-634's choice against the long press reversed. Not verified on a phone by Claude. **Lesson, the owner's (2026-10-27):** a fix
+  the app's first haptic); MM-634's choice against the long press reversed. MM-662 (the owner, from the phone):
+  the held row stays where the finger is once the boxes are drawn, and the "Choosing: tick…" snack is gone. The
+  scroll correction needs layout the test harness has none of: the owner's phone is the check. **Lesson, the owner's (2026-10-27):** a fix
   proven only on a hand-built entry passed CI and failed on the phone; `test/food/drinkGradeOnThePhone.test.tsx`
   is the shape every such fix needs: the real screens, the real database, a reopen and an edit.
 - **Liquids' volume** (the plan's C2, second half): built 2026-10-27 as MM-650 (pack format 5: a food per
