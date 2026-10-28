@@ -19,10 +19,11 @@ interface MmPressableProps {
   /** Takes focus when it first draws: where focus goes back to after something it stood for was replaced (MM-634). */
   autoFocus?: boolean | undefined;
   /**
-   * What a long press does (MM-661): the finger held still for half a second. The press that follows the hold
-   * is not also a press. A finger that drifts, as a swipe begins, is not holding.
+   * What a long press does (MM-661): the finger held still for half a second, given the content's edges as
+   * `onPress` is. The press that follows the hold is not also a press. A finger that drifts, as a swipe
+   * begins, is not holding.
    */
-  onLongPress?: (() => void) | undefined;
+  onLongPress?: ((anchor: MmAnchor) => void) | undefined;
   children: ReactNode;
 }
 
@@ -55,10 +56,11 @@ export function MmPressable({ label, expanded, controls, describedBy, onPress, c
           : (event) => {
               letGo();
               held.current = false;
+              const pressed = event.currentTarget;
               const timer = setTimeout(() => {
                 hold.current = undefined;
                 held.current = true;
-                onLongPress();
+                onLongPress(pressed.getBoundingClientRect());
               }, holdMs);
               hold.current = { timer, x: event.clientX, y: event.clientY };
             }

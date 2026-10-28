@@ -51,9 +51,9 @@ async function change(count: string, action: string): Promise<void> {
 it('MM-634: two foods of dinner and a snack get one time; the rest are untouched', async () => {
   await startFrom('Salmon');
   expect(screen.getByRole('checkbox', { name: 'Salmon · 400 kcal' })).toBeChecked();
-  // The box choosing started from holds the focus, and how to choose is said (the UX guard's UX-1).
+  // The box choosing started from holds the focus (the UX guard's UX-1); nothing is said: the boxes and the bar say it (MM-662, the owner).
   expect(screen.getByRole('checkbox', { name: 'Salmon · 400 kcal' })).toHaveFocus();
-  expect(screen.getByText('Choosing: tick the foods to change together')).toBeInTheDocument();
+  expect(screen.queryByText(/Choosing: tick/)).toBeNull();
   await userEvent.click(screen.getByRole('checkbox', { name: 'Apple · 95 kcal' }));
   // Shown in the bar, and said as it changes (MM-640).
   expect(screen.getAllByText('2 foods chosen').some((element) => element.getAttribute('role') === 'status')).toBe(true);

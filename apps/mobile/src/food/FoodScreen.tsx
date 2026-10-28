@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import type { FoodEntry } from '../domain/FoodEntry';
 import { intakeDayFrom } from '../domain/intakeDayFrom';
@@ -25,6 +25,8 @@ import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { FoodDayMarkRow } from './FoodDayMarkRow';
 import { changeTogether } from './changeTogether';
 import { MealSection } from './MealSection';
+import { keepRowInPlace } from './keepRowInPlace';
+import type { MmAnchor } from '../ui/MmAnchor';
 import { SelectionBar } from './SelectionBar';
 import type { TogetherAction } from './TogetherAction';
 import { useShownDay } from './useShownDay';
@@ -66,13 +68,23 @@ export function FoodScreen() {
     if (focusKey !== undefined) setFocusKey(undefined);
   }, [focusKey]);
   const startedFrom = useRef<string | undefined>(undefined);
-  /** Starts choosing with `key` chosen, and says how (MM-634). */
-  const startChoosing = (key: string) => {
+  /** Where the row a hold started from stood, so it stays there once every row is a box (MM-662). */
+  const heldAt = useRef<number | undefined>(undefined);
+  /** Starts choosing with `key` chosen (MM-634); from a hold, with the held row kept where it is (MM-662). Nothing is said: the boxes and the bar say it. */
+  const startChoosing = (key: string, anchor?: MmAnchor) => {
     startedFrom.current = key;
+    heldAt.current = anchor?.top;
     setFocusKey(key);
     setSelected(new Set([key]));
-    overlays.snack('Choosing: tick the foods to change together');
   };
+  useLayoutEffect(() => {
+    const top = heldAt.current;
+    if (selected === undefined || top === undefined) return;
+    heldAt.current = undefined;
+    // The box choosing started from has the focus (its row's layout effect ran first); the row is its label.
+    const row = document.activeElement?.closest('.mm-check-row');
+    if (row !== null && row !== undefined) keepRowInPlace(row, top);
+  }, [selected]);
   /** Stops choosing, focus back on the row it started from. */
   const stopChoosing = () => {
     setFocusKey(startedFrom.current);

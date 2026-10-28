@@ -21,6 +21,7 @@ import { useLoaded } from '../app/useLoaded';
 import { MmIconButton } from '../ui/MmIconButton';
 import { MmCheckRow } from '../ui/MmCheckRow';
 import { MmMenuButton } from '../ui/MmMenuButton';
+import type { MmAnchor } from '../ui/MmAnchor';
 import { MmPressable } from '../ui/MmPressable';
 import { MmSection } from '../ui/MmSection';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
@@ -53,7 +54,7 @@ interface MealSectionProps {
    */
   selection?: { readonly selected: ReadonlySet<string>; readonly toggle: (key: string) => void } | undefined;
   /** Starts choosing foods to change together, with the one keyed chosen (MM-634). */
-  onStartSelection?: ((key: string) => void) | undefined;
+  onStartSelection?: ((key: string, anchor?: MmAnchor) => void) | undefined;
   /**
    * The row, by key, that takes focus when drawn (MM-634): the one choosing
    * started from, as a box when choosing starts and as a row when it ends.
@@ -105,10 +106,10 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
   const preview = useInsightPreview();
   // Each entry's grade and the meal's (MM-370), unless a design story hands in its own.
   const gradeOf = (entry: FoodEntry) => preview.entryGrades?.get(entry.name) ?? gradeOfFoodEntry(entry, { hand });
-  /** A long press on a row: one tap under the finger, then choosing with that row ticked (MM-661). */
-  const chooseByHold = (key: string) => {
+  /** A long press on a row: one tap under the finger, then choosing with that row ticked where it is (MM-661, MM-662). */
+  const chooseByHold = (key: string, anchor: MmAnchor) => {
     services.haptics.tap();
-    onStartSelection?.(key);
+    onStartSelection?.(key, anchor);
   };
   const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');
 
@@ -254,7 +255,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
               day={day}
               grade={rowGrade}
               onSelect={onStartSelection === undefined ? undefined : () => onStartSelection(`meal:${row.key}`)}
-              onLongPress={onStartSelection === undefined ? undefined : () => chooseByHold(`meal:${row.key}`)}
+              onLongPress={onStartSelection === undefined ? undefined : (anchor) => chooseByHold(`meal:${row.key}`, anchor)}
               autoFocus={`meal:${row.key}` === focusKey}
             />
           );
@@ -272,7 +273,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
                   autoFocus={`food:${entry.id}` === focusKey}
                   onPress={() => void showAddFoodSheet(overlays, day, { entry })}
                   // A long press starts choosing with this food ticked, felt as one tap (MM-661, the owner).
-                  onLongPress={onStartSelection === undefined ? undefined : () => chooseByHold(`food:${entry.id}`)}
+                  onLongPress={onStartSelection === undefined ? undefined : (anchor) => chooseByHold(`food:${entry.id}`, anchor)}
                 >
                   <FoodEntryTile entry={entry} />
                 </MmPressable>

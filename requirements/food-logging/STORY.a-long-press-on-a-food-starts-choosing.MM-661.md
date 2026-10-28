@@ -53,3 +53,4 @@ Scenario: A drift is not a hold
 - `ui/MmPressable.tsx` (`onLongPress`), `domain/integration/Haptics.ts`, `fixtures/InMemoryHaptics.ts`,
   `platform/CapacitorHaptics.ts`, `MealSection`, `LoggedMealRow`; `test/food/longPressChooses.test.tsx` holds for
   real time. The hold and the tap are not verified on a phone by Claude.
+- MM-662 (the owner, from the phone): the held row stays where the finger is once the boxes are drawn, and nothing is said.
