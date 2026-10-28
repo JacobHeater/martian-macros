@@ -30,6 +30,17 @@ shows the built-in words and keeps them (MM-686); the inline lines phrased in on
 `in-progress` and in `remaining`: **owed is the owner's phone read of the coach's words on a real breakfast** (never call coach
 work done before that), and then `done` and `built`. Three CI rounds (a type predicate; `state` may not import `format`, one
 declaration per file, a gap from the `--space-N` scale in px; a test's old words).
+**The owner's first phone read (same day, PR #363, green in one round): two plain defects, fixed without asking.** MM-689: the
+Executive summary opened "I'll work from the JSON you supplied; the protein gap is marked as unable to fit": the prompts said
+"the supplied JSON" and the check had no rule against the model talking about its input. The prompts now say "the figures" and
+tell the model to speak as the coach who looked at the day; `whyCoachNarrationRejected` refuses words about figures, instructions
+or tools. MM-688: the same brief ordered "adding a beaver beside" the biscuit: `leanProteinOf` took the most protein inside 300
+kcal from the catalog's protein groups, and `CatalogTradeCatalog.load` lists a group's first 500 foods as the pack stores them
+(the owner's meat group runs "Armadillo" to "Beef, heart"; chicken breast is past a thousand cuts). Now `everydayProteins`, an
+ordered list (chicken breast first), `everydayProteinRankOf` striking breaded, fried, raw, dried and game forms, and the adapter
+searching each everyday protein by name across its whole group. Lesson: a pick "by the most X" over a catalog of thousands names
+the strangest food in it; check the real pack (`.food_cache/packs/generic.pack`, SQLite, values x100) before trusting a rule.
+Still owed: the owner's phone read of all of it (MM-682 to MM-689 stay `in-progress`).
 
 **Cardio from the wearable, the owner's push of 2026-10-28 (Session 47, Claude; MM-677, MM-678).** Settled in a four-round Q&A
 with the owner before any code (the owner's standing rule now: a big feature starts with the Q&A): platform only, every
