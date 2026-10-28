@@ -26,14 +26,23 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
     brief.sevenDay.loggedDays,
     brief.sevenDay.calorieAdherenceDays,
     brief.sevenDay.proteinFloorHitDays,
-    brief.sevenDay.avgKcalDeltaFromTarget,
-    brief.sevenDay.avgProteinG,
-    brief.sevenDay.weighInsLast7d,
+    brief.sevenDay.averageKcal,
+    brief.sevenDay.averageProteinG,
+    brief.sevenDay.weighIns,
   ];
   if (brief.primaryDriver !== undefined) {
     allowedNumbers.push(brief.primaryDriver.kcal, brief.primaryDriver.proteinG);
     if (brief.primaryDriver.replacement !== undefined) {
-      allowedNumbers.push(brief.primaryDriver.replacement.kcal, brief.primaryDriver.replacement.proteinG);
+      if (brief.primaryDriver.replacement.kcal !== undefined) {
+        allowedNumbers.push(brief.primaryDriver.replacement.kcal);
+      }
+      if (brief.primaryDriver.replacement.proteinG !== undefined) {
+        allowedNumbers.push(brief.primaryDriver.replacement.proteinG);
+      }
+      allowedNumbers.push(
+        brief.primaryDriver.replacement.caloriesSaved,
+        brief.primaryDriver.replacement.proteinGained,
+      );
     }
   }
   const payload = {

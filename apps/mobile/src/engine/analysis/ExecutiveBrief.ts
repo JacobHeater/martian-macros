@@ -30,6 +30,10 @@ export interface ExecutiveBrief {
   readonly proteinRemainingG: number;
   /** Required protein share of remaining calories (`(proteinRemainingG * 4) / kcalRemaining`), or 0 when none remain. */
   readonly requiredProteinDensity: number;
+  /** True when `runwayState === 'proteinUnrecoverable'`. */
+  readonly proteinUnrecoverable: boolean;
+  /** Stable cache hash of the pre-calculated brief inputs and state. */
+  readonly briefHash: string;
   /** The single primary meal or item driving calorie displacement today, when applicable. */
   readonly primaryDriver?:
     | {
