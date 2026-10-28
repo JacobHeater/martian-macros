@@ -39,13 +39,12 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
-import { WeighInRow } from '../dashboard/WeighInRow';
 import { CalorieHero } from '../food/CalorieHero';
 import { PauseBanner } from '../pause/PauseBanner';
+import { ProgressScreen } from '../progress/ProgressScreen';
 import { ChoiceCard } from '../ui/ChoiceCard';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
-import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
 import { MmSection } from '../ui/MmSection';
 import { Notice } from '../ui/Notice';
@@ -55,15 +54,13 @@ import { StatRow } from '../ui/StatRow';
 import { useOverlays } from '../ui/useOverlays';
 import { AdherenceCard } from './AdherenceCard';
 import { DataGapNote } from './DataGapNote';
+import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { GoalBodyFatSheet } from './GoalBodyFatSheet';
 import { HeadsUpSection } from './HeadsUpSection';
 import { dataGapsOf } from './dataGapsOf';
 import { LastChangeCard } from './LastChangeCard';
 import { LeanGainCard } from './LeanGainCard';
 import { MaintenanceCard } from './MaintenanceCard';
-import { RecentInsightsSection } from './RecentInsightsSection';
-import { useInsightPreview } from './useInsightPreview';
-import { useRecentInsights } from './useRecentInsights';
 import { MetabolismSummary } from './MetabolismSummary';
 import { OneThingRow } from './OneThingRow';
 import { PhaseRows } from './PhaseRows';
@@ -78,7 +75,6 @@ import { UnderEatingNotice } from './UnderEatingNotice';
 import { WhatToExpectScreen } from './WhatToExpectScreen';
 import { WhatYourDataSaysSection } from './WhatYourDataSaysSection';
 import { useLeanGainPaceSheet } from './useLeanGainPaceSheet';
-import { usePaceInWords } from './usePaceInWords';
 import { usePaceSheet } from './usePaceSheet';
 import { useCheckInNow } from './useCheckInNow';
 import './coach.css';
@@ -123,7 +119,6 @@ export function CoachScreen() {
   const { services, state } = useApp();
   // How much of the person's weight is shown (MM-118).
   const weightDisplay = useCell(state.weightDisplay);
-  const paceInWords = usePaceInWords();
   const navigator = useNavigator();
   const overlays = useOverlays();
   const openPaceSheet = usePaceSheet();
@@ -145,34 +140,14 @@ export function CoachScreen() {
   const connection = useLoaded(state.healthConnection);
   // What the coach works from; any of it unread leaves the coach with nothing to say (MM-340).
   const sources = [weights, useCell(state.weightEvents), useCell(state.intakeDays), useCell(state.targetsHistory), useCell(state.pauses)];
-  // What the coach said inline (MM-363), or a design story's own list.
-  const logged = useRecentInsights();
-  const recent = useInsightPreview().recent ?? logged;
 
   if (setup === undefined) return null;
+  if (!weights.ready && !Loadable.hasFailed(weights)) return <ScreenLoading />;
   if (snapshot === undefined) {
-    if (sources.some((source) => Loadable.hasFailed(source))) {
+    if (weights.ready && weights.value.length > 0 && sources.some((source) => Loadable.hasFailed(source))) {
       return <ReadFailedNotice title="Could not read what your coach works from" onRetry={() => state.retryCoach()} />;
     }
-    if (Loadable.valueOf(weights)?.length !== 0) return <ScreenLoading />;
-    // Nothing to coach from yet: the weigh-in it asks for, in the row the Dashboard asks with (MM-340).
-    const fmt = new Fmt(setup.unitSystem, { weightDisplay });
-    return (
-      <MmListGroup>
-        <WeighInRow
-          fmt={fmt}
-          lastTrendKg={undefined}
-          note="The coach starts from your first weigh-in."
-          onSaveWeight={async (kg) => {
-            await services.weights.saveWeight(today, kg);
-            overlays.snack(fmt.readingsShown ? `Saved ${fmt.weight(kg)} for today` : 'Saved', {
-              label: 'Open Progress',
-              onAction: () => state.homeTab.put('progress'),
-            });
-          }}
-        />
-      </MmListGroup>
-    );
+    return <ProgressScreen />;
   }
   const fmt = new Fmt(setup.unitSystem, { weightDisplay });
 
@@ -254,7 +229,6 @@ export function CoachScreen() {
   // Rounded as every screen shows them, unless the person asked for exact ones (MM-123).
   const shownTargets = current === undefined ? undefined : displayTargets(current.targets, { exact: exactTargets });
   const confidence = confidenceLabel(snapshot.confidence.level);
-  const trendSigma = snapshot.trend[snapshot.trend.length - 1]?.levelSigmaKg;
   const bodyFatLine = bodyFatNote(snapshot.bodyFatBasis, { eatingDisorderHistory: setup.screening.eatingDisorderHistory });
   // On a weight-loss medication (MM-113, MM-510): the fast pace is for the prescriber, and training keeps muscle.
   const paceNote = current === undefined ? undefined : weightLossMedicationPaceNote(setup.screening, current.targets.flags);
@@ -360,6 +334,8 @@ export function CoachScreen() {
         />
       </MmSection>
       <OneThingRow />
+      <ExecutiveSummaryCard />
+      <ProgressScreen />
       {/* What the coach reads in the log (MM-610): under the one thing to do, above the targets; the safeguards stay above. */}
       <WhatYourDataSaysSection />
       {current === undefined ? null : (
@@ -417,7 +393,6 @@ export function CoachScreen() {
       )}
       <LastChangeCard history={history} today={today} holdNote={holdNote(setup, snapshot, today)} />
       <MaintenanceCard />
-      {recent === undefined ? null : <RecentInsightsSection insights={recent} />}
       <StallCard />
       <RecompReviewCard />
       <LeanGainCard
@@ -428,11 +403,11 @@ export function CoachScreen() {
       {/* The one-thing row above is the way into a due check-in (MM-391). */}
       <RecoveryCard answeredAbove />
       <ReportsCard />
-      <MmSection framed icon="bolt" title="Your metabolism">
+      <MmSection framed icon="bolt" title="Your metabolism" collapsible remember="coach.metabolism">
         <MetabolismSummary snapshot={snapshot} calibrating={setup.onboardedOn.daysUntil(today) < calibrationDays} />
         {gaps.includes('history') ? <DataGapNote gap="history" /> : null}
       </MmSection>
-      <MmSection framed icon="coach" title={`Coach confidence · ${confidence}`}>
+      <MmSection framed icon="coach" title={`Coach confidence · ${confidence}`} collapsible remember="coach.confidence">
         {snapshot.confidence.level === 'learning' ? (
           <p className="app-text">Targets are held while the coach learns.</p>
         ) : null}
@@ -444,22 +419,7 @@ export function CoachScreen() {
           <StatRow label="Stability" value={confidenceLabel(snapshot.confidence.stability)} />
         </MmDisclosure>
       </MmSection>
-      <MmSection framed icon="body" title="Body">
-        {/* An estimate is shown with its uncertainty, in words rather than "±" (MM-108): the trend's band, as the trend
-            chart draws it (two sigma). With the weight hidden, the pace in words in place of the figure (MM-118). */}
-        {fmt.weightHidden ? (
-          paceInWords === undefined ? null : <StatRow label="Your trend" value={paceInWords} detail="Against your plan’s pace" />
-        ) : (
-          <StatRow
-            label="Trend weight"
-            value={fmt.weight(snapshot.trendWeightKg)}
-            detail={
-              trendSigma === undefined
-                ? undefined
-                : `Likely between ${fmt.weight(snapshot.trendWeightKg - 2 * trendSigma)} and ${fmt.weight(snapshot.trendWeightKg + 2 * trendSigma)}`
-            }
-          />
-        )}
+      <MmSection framed icon="body" title="Body" collapsible remember="coach.body">
         {gaps.includes('weight') ? <DataGapNote gap="weight" /> : null}
         <StatRow label="Body fat" value={bodyFatRangeText(snapshot.bodyFat, snapshot.bodyFatBasis)} detail={bodyFatLine} />
         <StatRow

@@ -66,7 +66,7 @@ it('the app opens on the dashboard with its destinations', async () => {
   await seed({ history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
   const bar = await screen.findByRole('navigation', { name: 'Destinations' });
-  for (const label of ['Dashboard', 'Food', 'Progress', 'Coach']) expect(bar).toHaveTextContent(label);
+  for (const label of ['Dashboard', 'Food', 'Train', 'Coach']) expect(bar).toHaveTextContent(label);
   expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
 });
 
@@ -227,7 +227,7 @@ it('opens Progress from the waist confirmation', async () => {
   renderApp(repos, today);
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '36{Enter}');
   await userEvent.click(await screen.findByRole('button', { name: 'Open Progress' }));
-  expect(await screen.findByRole('button', { name: 'Progress', current: 'page' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Coach', current: 'page' })).toBeInTheDocument();
 });
 
 it('refuses a waist that cannot be one, and records nothing', async () => {

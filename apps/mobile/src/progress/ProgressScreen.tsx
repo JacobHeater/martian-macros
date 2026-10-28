@@ -14,7 +14,6 @@ import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmDisclosure } from '../ui/MmDisclosure';
-import { MmHeroSurface } from '../ui/MmHeroSurface';
 import { MmSurface } from '../ui/MmSurface';
 import { MmSegmented } from '../ui/MmSegmented';
 import { MmSpinner } from '../ui/MmSpinner';
@@ -98,13 +97,14 @@ export function ProgressScreen() {
 
   return (
     <>
-      <MmHeroSurface>
+      <MmSurface>
         <h2 className="progress-hero-title">Today’s weigh-in</h2>
         {/* Unless every reading is shown, today's is not put back in the field: what was typed is seen, and nothing after (MM-118). */}
         <NumberEntry
           key={fmt.readingsShown ? `weight-${todays?.weightKg}-${setup.unitSystem}` : `weight-${todays === undefined ? 'none' : todays.weightKg}`}
           title="Today’s weigh-in"
           unit={fmt.weightUnit}
+          saveKind="secondary"
           initial={todays === undefined || !fmt.readingsShown ? undefined : toStringAsFixed(fmt.weightFromKg(todays.weightKg), 1)}
           hint={
             !fmt.readingsShown && todays !== undefined
@@ -138,8 +138,11 @@ export function ProgressScreen() {
             // Weighed, and the trend still being worked out (MM-343).
             <MmSpinner />
           ) : last === undefined ? (
-            // Nothing to draw: the chart's frame says what starts it (MM-578).
-            <ChartPlaceholder tall text="No trend yet. Your first weigh-in starts it." />
+            // Nothing to draw: the chart's frame says what starts it (MM-578), and that the coach starts from the first weigh-in (MM-340).
+            <>
+              <p className="app-caption">The coach starts from your first weigh-in.</p>
+              <ChartPlaceholder tall text="No trend yet. Your first weigh-in starts it." />
+            </>
           ) : fmt.weightHidden ? (
             // No figure and no chart with the weight hidden: the pace in words against the plan's (MM-118).
             <>
@@ -200,7 +203,7 @@ export function ProgressScreen() {
             </>
           )}
         </div>
-      </MmHeroSurface>
+      </MmSurface>
       <WeightEventsCard />
       <PeriodDaysCard />
       <SleepNightCard />
