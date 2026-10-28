@@ -265,6 +265,9 @@ export function coachAdviceText(
               : `your usual ${foodInSentence(a.addFood)} (${Fmt.grams(fit.proteinG)} protein, ${Fmt.kcal(fit.kcal)})`;
         if (a.amountG !== undefined && a.amountG >= 0.5) {
           const amount = Fmt.grams(a.amountG);
+          if (a.amountKcal !== undefined && a.amountG * 4 > a.amountKcal) {
+            return say('orderProteinUnrecoverable');
+          }
           return named === undefined ? say('orderProteinAmount', { amount }) : say('orderProteinAmountFood', { amount, food: named });
         }
         if (named !== undefined) return say('orderProteinFood', { food: named });

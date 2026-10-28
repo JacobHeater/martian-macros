@@ -80,6 +80,11 @@ export const coachPhrasings = {
   ],
   orderProteinAmountFood: ['Get {amount} more protein: {food} fits.', '{amount} of protein to go: {food} fits.'],
   orderProteinAmount: ['Get {amount} more protein in today.', '{amount} of protein to go today.', 'Find {amount} more protein before the day ends.'],
+  orderProteinUnrecoverable: [
+    "The math doesn't work tonight. Hold your calorie cap, take the loss on protein today, and front-load protein in the morning.",
+    'You cannot hit that protein inside those calories. Protect your calorie cap tonight and front-load protein at your next breakfast.',
+    'The calorie budget cannot cover that protein tonight. Protect the calorie cap today and front-load protein first thing in the morning.',
+  ],
   orderProteinFood: ['Add {food}: you already log it, and it carries protein.', 'More {food}. You already log it.'],
   orderProteinAtMeal: ['Put a protein food in {meal}.', 'Give {meal} a protein food.'],
   orderProteinDays: ["Hit the minimum on {days} too: it's the same every day.", '{days} need the same minimum. Hit it.'],
