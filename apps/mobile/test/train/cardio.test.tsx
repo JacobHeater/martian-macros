@@ -58,7 +58,7 @@ const wearing =
   (platform: InMemoryHealthWorkouts, source?: FakeHealthSource) =>
   (services: AppServices): AppServices => ({ ...services, healthWorkouts: platform, ...(source === undefined ? {} : { healthSource: source }) });
 
-const cardioHeader = () => screen.findByRole('button', { name: 'Cardio' });
+const cardioHeader = () => screen.findByRole('button', { name: /^Cardio/ });
 /** The Cardio fold, header and body. */
 const cardioFold = async () => (await cardioHeader()).closest('.mm-section') as HTMLElement;
 const storedSessions = () => first(repos.cardioSessions.watchCardioSessions());
@@ -86,7 +86,7 @@ it('a walk on the watch and the steps show on Train, are kept, and the fold draw
   expect(within(fold).getByText('of cardio · floor 2 h 30 min · 0 min last week')).toBeInTheDocument();
   expect(within(fold).getByRole('img', { name: 'Steps by day, last seven days: 7 of 7 counted, from 8,400 to 8,400. Floor 8,000 a day.' })).toBeInTheDocument();
   expect(within(fold).getByRole('img', { name: 'Walking: 42 min this week; 0 min last week. Floor 2 h 30 min a week.' })).toBeInTheDocument();
-  await userEvent.click(within(fold).getByRole('button', { name: 'Sessions this week' }));
+  await userEvent.click(within(fold).getByRole('button', { name: /^Sessions this week/ }));
   expect(within(fold).getByText('Walking · 42 min')).toBeInTheDocument();
   expect(within(fold).getByText('Yesterday · 7:05 AM · from Watch')).toBeInTheDocument();
   expect(screen.queryByRole('heading', { level: 1, name: 'Cardio' })).not.toBeInTheDocument();

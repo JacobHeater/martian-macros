@@ -5,7 +5,7 @@ import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
 import { cardioWearable } from './cardioWearable';
-import { CrashOnDraw } from './crashOnDraw';
+import { CrashOnDraw } from './CrashOnDraw';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
 import { fiberLowScenario } from './fiberLowScenario';

@@ -150,7 +150,7 @@ export const WeeklyVolume = screenStory({
   covers: ['TrainScreen'],
   shows: 'Weekly training volume',
   open: onTrain,
-  walk: pressNamed('Weekly training volume'),
+  walk: pressNamed(/^Weekly training volume/),
 });
 
 /** MM-680: the week's volume before any workout. */
@@ -159,7 +159,7 @@ export const WeeklyVolumeEmpty = screenStory({
   shows: 'No hard sets in the last seven days.',
   scenario: firstDayScenario,
   open: onTrain,
-  walk: pressNamed('Weekly training volume'),
+  walk: pressNamed(/^Weekly training volume/),
 });
 
 /** MM-680: the workouts could not be read for the week's volume: the notice in the fold, with Try again. */
@@ -168,7 +168,7 @@ export const WeeklyVolumeFailed = screenStory({
   shows: 'Could not read training history.',
   stores: failingRead('workouts', 'watchWorkouts'),
   open: onTrain,
-  walk: pressNamed('Weekly training volume'),
+  walk: pressNamed(/^Weekly training volume/),
 });
 
 /** MM-677, MM-680: a fortnight of a watch's sessions and the phone's steps, drawn: the figures, the steps by day, the minutes by activity. */
@@ -177,7 +177,7 @@ export const Cardio = screenStory({
   shows: /steps a day · .* of cardio this week/,
   device: cardioWearable(),
   open: onTrain,
-  walk: pressNamed('Cardio'),
+  walk: pressNamed(/^Cardio/),
 });
 
 /** MM-680: the sessions one tap down inside the Cardio fold. */
@@ -187,8 +187,8 @@ export const CardioSessions = screenStory({
   device: cardioWearable(),
   open: onTrain,
   walk: async (canvas) => {
-    await pressNamed('Cardio')(canvas);
-    await pressNamed('Sessions this week')(canvas);
+    await pressNamed(/^Cardio/)(canvas);
+    await pressNamed(/^Sessions this week/)(canvas);
   },
 });
 
@@ -199,7 +199,7 @@ export const CardioSmallPhone = screenStory({
   viewport: 'smallPhone',
   device: cardioWearable({ long: true, floorsSet: true }),
   open: onTrain,
-  walk: pressNamed('Cardio'),
+  walk: pressNamed(/^Cardio/),
 });
 
 /** MM-677: no wearable yet: the fold says what would bring sessions and steps, and draws the empty week. */
@@ -208,7 +208,7 @@ export const CardioEmpty = screenStory({
   shows: /Comes from a watch or phone through/,
   scenario: firstDayScenario,
   open: onTrain,
-  walk: pressNamed('Cardio'),
+  walk: pressNamed(/^Cardio/),
 });
 
 /** MM-677: the sessions could not be read: the notice in the fold, with Try again. */
@@ -217,7 +217,7 @@ export const CardioFailed = screenStory({
   shows: 'Could not read your sessions and steps.',
   stores: failingRead('cardioSessions', 'watchCardioSessions'),
   open: onTrain,
-  walk: pressNamed('Cardio'),
+  walk: pressNamed(/^Cardio/),
 });
 
 /** MM-677: the Cardio fold while the sessions are still being read. */
@@ -423,7 +423,7 @@ export const WeeklyVolumeUnmapped = screenStory({
   shows: /^Missing exercise mappings/,
   scenario: oldLiftsScenario,
   open: onTrain,
-  walk: pressNamed('Weekly training volume'),
+  walk: pressNamed(/^Weekly training volume/),
 });
 
 /** MM-321: a workout's start time pressed opens the clock to set it, to the second (MM-191). */

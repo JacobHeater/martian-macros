@@ -53,6 +53,9 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'weigh_in_window_end_minute',
     'weight_display',
     'weight_display_offered',
+    // Version 31 (MM-678): the floors the coach holds cardio to.
+    'cardio_steps_floor',
+    'cardio_minutes_floor',
   ],
   // Version 6 (MM-359): a clinician's limit on what the person drinks. Version 11 (MM-128, MM-130): the pace change day, the maintenance anchor and correction.
   // Version 13 (MM-251): a diagnosed sleep disorder. Version 17 (MM-480): the lean-gain pace chosen.

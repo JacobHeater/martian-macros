@@ -9,7 +9,7 @@ import { termsOfUse } from '../../src/terms/termsOfUse';
 import { FixedClock } from '../../src/fixtures/FixedClock';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
-import { CrashOnDraw } from '../../src/gallery/screens/crashOnDraw';
+import { CrashOnDraw } from '../../src/gallery/screens/CrashOnDraw';
 import { servicesOf } from '../support/servicesOf';
 
 /**

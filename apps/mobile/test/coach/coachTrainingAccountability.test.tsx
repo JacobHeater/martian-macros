@@ -79,7 +79,7 @@ it('without a watch on a cut the summary says nothing is being counted; on maint
   renderApp(repos, today);
   await openCoach();
   card = await summary();
-  await expect.poll(() => card.textContent).toContain('sessions you set this week');
+  await expect.poll(() => card.textContent).toContain('No lifting logged yet. 3 sessions a week is what you set; log the first one.');
   expect(card.textContent).not.toContain('watch');
   expect(within(card).queryByText('Cardio and steps')).not.toBeInTheDocument();
 });

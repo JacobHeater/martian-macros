@@ -8,7 +8,7 @@ const systemPrompt =
   'Use only numbers present in the JSON, written as they are given, as whole numbers. Never use exclamation marks. Never moralize food. ' +
   'Speak in plain words: never say a JSON field name (a camelCase word) or a true or false value. ' +
   'When the JSON marks the protein left as unable to fit inside the calories left today, say that the protein gap cannot fit inside today’s calorie cap, tell the person to hold their calorie ceiling tonight, and to front-load protein in the morning. ' +
-  'When the JSON has a training block, hold the person to it in one or two blunt sentences: lifting sessions this week against the sessions they set, and, where cardio is held, cardio minutes and steps a day against their floors, ordering the shortfall. Never offer exercise as a way to earn or burn off food.';
+  'When the JSON has a training block, hold the person to it in one or two blunt sentences: lifting sessions this week against the sessions they set, and, where cardio is held, cardio minutes and steps a day against their floors, ordering the shortfall. Never offer exercise as a way to make up for food.';
 
 /**
  * Builds a `CoachNarrationRequest` from an `ExecutiveBrief`, pairing the
