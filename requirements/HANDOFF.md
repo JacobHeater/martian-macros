@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-28, by Claude, Session 47.
+Last updated: 2026-10-28, by Claude, Session 48.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -16,6 +16,20 @@ each, merged when green (`gh pr merge --merge`; no branch
 protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
+
+**AI meal analysis with tools, the owner's push of 2026-10-28 (Session 48, Claude; MM-682 to MM-687, PR #361 merged green).**
+Settled in a four-round interactive Q&A (the owner's standing rule, and the Q&A is interactive: AskUserQuestion rounds, never a
+list of questions in prose) before any ticket; the answers and the owner's approved coach lines A, B, C and the inline line are in
+MM-682. Built: `mealMovesOf` (one move per meal ranked by the day's gap: cut the portion, add a protein food, a same-group swap,
+the next meal's order; the catalog first then the person's own foods; MM-683's bug: a swap is within the food's group or none),
+the approved lines as the built-in words on the sheet's "Your move" row, under the foods and in the Executive brief (MM-684);
+`CoachToolbox` and the tool loop in `HttpCoachNarrator` for Gemini, OpenAI and Anthropic, `AppCoachToolbox` answering
+meal_and_day, moves, my_foods_at_meal, search_catalog, price_move, today_meals, week and training from the state, privacy and
+terms amended (MM-685); the sheet, the Executive summary and Settings' test ask with tools and "Answer now" after three seconds
+shows the built-in words and keeps them (MM-686); the inline lines phrased in one request a day (MM-687). Tickets stay
+`in-progress` and in `remaining`: **owed is the owner's phone read of the coach's words on a real breakfast** (never call coach
+work done before that), and then `done` and `built`. Three CI rounds (a type predicate; `state` may not import `format`, one
+declaration per file, a gap from the `--space-N` scale in px; a test's old words).
 
 **Cardio from the wearable, the owner's push of 2026-10-28 (Session 47, Claude; MM-677, MM-678).** Settled in a four-round Q&A
 with the owner before any code (the owner's standing rule now: a big feature starts with the Q&A): platform only, every
@@ -34,7 +48,7 @@ the Executive brief carries a `TrainingBrief` (`trainingBriefOf`), said by `trai
 model with its figures allowed; the Executive summary shows the three rows; 1d's findings include the week's training,
 cardio and steps accountability.
 
-**Open PRs at the end of Session 46:** none (#355, #356, #357 and #358 all merged green; only this handoff PR is opened and merged). A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 48:** none (#360 and #361 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
 
 **Coaching architecture & UI overhaul, the owner's push of 2026-10-27 to 2026-10-28** (MM-663 to MM-667, PRs #355 to #358). Built and merged:
 - **MM-663** (PR #355): deterministic pre-calculated `ExecutiveBrief` (`executiveBriefOf`) and `MealBreakdownAnalysis` (`mealBreakdownAnalysisOf`), whole-situation paragraph archetypes for offline / no-key coaching (`executiveBriefArchetypeText`, `mealBreakdownArchetypeText`), and the hard mathematical invariant `proteinRemainingG * 4 <= kcalRemaining` enforced across intraday coaching (`analyseFoodDay`, `dayAdviceOf`, `foodFindingText`, `executiveBriefOf`, `mealBreakdownAnalysisOf`, `verifyCoachNarration`). When protein cannot fit inside remaining calories, advice pivots to pure protein sources for the remaining calorie budget and marks protein as unrecoverable today without pushing the user over their calorie budget.
@@ -271,6 +285,14 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 48: 2026-10-28, Claude (AI meal analysis with tools: the Q&A, then MM-682 to MM-687 in one PR)
+
+- **The owner's words:** "i think it's time to lean into the ai driven meal analysis when the ai coach is enabled and provide tools into the application either through mcp or other tools within the application runtime to make proper suggestions and analysis. let's be honest, swapping a biscuit for a chicken breast is kind of a poor suggestion, but i'm also open to revamping and reworking this determinstically with another approach that isn't agent driven and is also available to deterministic users." Then, on a first reply that listed six questions in prose: "i said interactive q and a sessions only" (recorded: every Q&A question goes through the interactive question tool, a round at a time).
+- **The Q&A's answers** are in MM-682 under Decisions, with the approved lines. Among them: both tracks, deterministic first; same-group swaps only; the catalog first, then the person's foods; one best move; the model may pick a different move as long as every number came from a tool; no limit on the wait, "Answer now" after 3 s; the cheap models stay; one inline pass a day; not MCP (no server for a provider to reach), each provider's own function calling.
+- **Merged:** #361 (MM-682 to MM-687; the worktree-per-PR shipping the owner chose in the Q&A). Not seen on a phone yet: the owner's read of the coach's words is owed before the tickets close.
+- **Lessons:** `state/` may not import `format/`, so a figures mapper the state needs lives in `engine/` (`mealMoveFigures`); the one-declaration rule counts an exported interface beside a class (`AppCoachToolboxReads` has its own file); the spacing scale is `--space-N` in px (`--space-12`), and a `gap` with a fallback literal fails the stylesheet test; a food can carry two insights (mostly fat and light on protein), so a one-pass test counts items, not foods.
+- **Not run:** nothing was run locally; CI validated the merge.
+
 ## Session 47: 2026-10-28, Claude (cardio from the wearable: the Q&A, then the build of MM-677 and MM-678 in the main checkout)
 
 - **The owner's words:** "Next big swing here on a feature is steady state cardio. I don't want the app to track steady state cardio, but we'll track this in two forms: steps, and cardio workout sessions within the user's wearable. I love strength training here and it must stay, but part of training on any fatloss or recomp program must be steady state cardio. now ask me questions." Then: "q&a sessions only. record that for the record then get started." (a rule, not a scope answer: the Q&A comes first; a first misreading of it as "sessions only" was stopped by the owner and undone).
@@ -284,27 +306,4 @@ MM-242, a draft by non-lawyers that blocks release.
 - **The owner's words:** "I have NO concerns lifting the zero AI policy, and I'm ready to do so. We've got to get Coaching sounding human, and I like your plan to trim costs. So, I want determinstic engine with precalc, and we'll keep the human sounding determinsm track for offline modes, or users who don't want to supply keys, and then run BYOK with users who bring keys."
 - **Merged:** #355 (MM-663: `executiveBriefOf`, `mealBreakdownAnalysisOf`, offline paragraph archetypes, and the hard `proteinRemainingG * 4 <= kcalRemaining` invariant across intraday coaching and narration validation), #356 (MM-664, MM-665: lifted zero-AI runtime policy in `docs/non-goals.md`, MM-144, privacy policy, and terms of use; added `CoachNarrator` and `CoachAiStore` with `Google Gemini`, `OpenAI`, and `Anthropic` BYOK in `Settings > Coach`), #357 (MM-666: on-demand `"Coach breakdown"` sheet from meal overflow menu and higher-protein `swapFor` suggestions on `mostlyFat` / `lightOnProtein` inline insights), #358 (MM-667: consolidated 4-tab navigation `Dashboard`, `Food`, `Train`, `Coach`, `ExecutiveSummaryCard` at top of `CoachScreen`, embedded `ProgressScreen`, collapsible bottom telemetry sections, retired `RecentInsightsSection`), and this handoff PR.
 - **Lessons:** `apps/mobile/scripts/check-unseen.mjs` uses `/<[A-Z][A-Za-z]*[\s/>]/` to spot JSX in unexecuted callbacks, which also matches TypeScript type arguments like `overlays.options<CoachAiProvider>(...)`; omit the explicit generic parameter so the type is inferred from `choices`. `CoachScreen`'s collapsible `<MmSection title="Your metabolism">` needs `remember="coach.metabolism-section"` so its fold state does not collide with `MetabolismSummary`'s inner `<MmDisclosure remember="coach.metabolism">`.
-- **Not run:** nothing was run locally; CI validated every merge.
-
-## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 18 PRs)
-
-- **The owner's words:** asked for an evidence-backed food-logging improvement plan (multi-food logging, alternate
-  units and volume, bulk editing especially of time); added that recent foods and database search are weak
-  next to MyFitnessPal and MyNetDiary; that deleting a meal row by row is "a pathetic user experience"; then "go
-  forth". Answered D-1 to D-4 as recommended (saved together; loose foods; match first; a day move keeps the time),
-  and allowed one worktree per PR for this build only.
-- **Merged:** #319 (the plan, `docs/food-logging-plan.md`, and MM-623 to MM-626 as tickets with skipped tests),
-  #320 (MM-623 to MM-626 fixed), #321 (MM-627), #322 (MM-628 to MM-630, MM-632), #323 (MM-631), #324 (MM-633), #325
-  (MM-634), #327 (MM-635), #328 (MM-636), #330 (MM-637), #331 (MM-638), #332 (MM-639), #333 (MM-640), #334
-  (MM-641), #335 (MM-642 to MM-644), #336 (MM-645, schema 30), #338 (MM-646 to MM-649, the plan's tail: the owner
-  said "finish the plan", so F-19 and F-20 took the plan's own recommendations, recorded in the tickets as choices
-  made without asking), and #326, #329, #337 and this PR (the handoff). The owner
-  also answered: Saved logs when pressed, build volume, save meals, fold the amount step, calories first, Cancel. A six-role panel shaped the plan; the designer and UX guard reviewed MM-631 and MM-634 before they
-  shipped, and every blocking finding was fixed in the same PR.
-- **Lessons:** a fallback that helps a person reading results can mislead a lookup that takes the first hit (the
-  any-word search matched "broccoli cooked" to broccoli raw; now only the results list asks for it). Number
-  constants deserve a test of their ratios (the cup was a digit short). `exactOptionalPropertyTypes` refuses
-  `{ change: undefined }`, and `useRef<T>()` needs its argument here. A merge's own fetch can race a follow-up
-  fetch on the ref lock: fetch again. The unseen check flagged FoodScreen's loading markup once (#334) though
-  FoodLoading draws it; a re-run passed: a coverage flake to watch, not a missing story.
 - **Not run:** nothing was run locally; CI validated every merge.
