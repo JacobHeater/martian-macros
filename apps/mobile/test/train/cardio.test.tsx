@@ -82,7 +82,8 @@ it('a walk on the watch and the steps show on Train, are kept, and the fold draw
   await userEvent.click(await cardioHeader());
   expect(within(fold).getByText('8,400')).toBeInTheDocument();
   expect(within(fold).getByText('steps a day · floor 8,000 · none counted last week')).toBeInTheDocument();
-  expect(within(fold).getByText('42 min')).toBeInTheDocument();
+  // The figure, apart from the activity bar that says the same minutes.
+  expect(fold.querySelector('.chart-cardio-figures')?.textContent).toContain('42 min');
   expect(within(fold).getByText('of cardio · floor 2 h 30 min · 0 min last week')).toBeInTheDocument();
   expect(within(fold).getByRole('img', { name: 'Steps by day, last seven days: 7 of 7 counted, from 8,400 to 8,400. Floor 8,000 a day.' })).toBeInTheDocument();
   expect(within(fold).getByRole('img', { name: 'Walking: 42 min this week; 0 min last week. Floor 2 h 30 min a week.' })).toBeInTheDocument();
