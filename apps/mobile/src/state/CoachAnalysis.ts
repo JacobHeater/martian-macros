@@ -230,7 +230,7 @@ export class CoachAnalysis {
     });
 
     this.read = new DerivedCell(() => this.readCells());
-    this.foodInput = new DerivedCell(() => {
+    this.foodInput = new DerivedCell<FoodAnalysisInput | undefined>(() => {
       const read = this.read.value;
       if (read === undefined) return undefined;
       return { ...read.food, catalog: Loadable.valueOf(this.tradeCatalog.value) };

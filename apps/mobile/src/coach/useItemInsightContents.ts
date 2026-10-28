@@ -1,6 +1,10 @@
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
+import { adviceFoodOf } from '../engine/analysis/food/adviceFoodOf';
+import { foodGroupOf } from '../engine/analysis/food/foodGroupOf';
+import { foodKeyOf } from '../engine/analysis/food/foodKeyOf';
+import { recordOnOf } from '../engine/analysis/food/recordOnOf';
 import { swapFor } from '../engine/analysis/swap/swapFor';
 import type { ItemAnchor } from '../engine/ItemAnchor';
 import { ItemAnchor as Anchor } from '../engine/ItemAnchor';
@@ -43,16 +47,24 @@ export function useItemInsightContents(anchor: ItemAnchor, item: string): readon
     ) {
       const entry = foodInput.entries.find((e) => `${e.id}` === anchor.id);
       if (entry !== undefined) {
+        const record = recordOnOf(foodInput.history)(entry.date);
+        const adviceFood = adviceFoodOf(entry.name, [entry]);
         const swap = swapFor({
-          kind: insight.kind === 'mostlyFat' ? 'fat' : 'protein',
-          x: entry,
-          candidates: foodInput.entries,
+          food: { ...adviceFood, carbsG: entry.carbsG },
+          group: foodGroupOf(foodKeyOf(entry), [entry], foodInput.catalog),
+          meal: entry.meal,
+          goal: record?.mode ?? 'fatLoss',
+          history: foodInput.entries,
           catalog: foodInput.catalog,
-          snoozed: foodInput.snoozed,
+          safeguards: foodInput.safeguards,
+          cautions: foodInput.safeguards.cautions,
         });
         if (swap !== undefined) {
           const firstSentence = line.split('. ')[0] ?? line;
-          const swapDetail = `${swap.name} (${whole(swap.proteinG)} g protein, ${whole(swap.kcal)} kcal)`;
+          const swapDetail =
+            swap.proteinG !== undefined && swap.kcal !== undefined
+              ? `${swap.name} (${whole(swap.proteinG)} g protein, ${whole(swap.kcal)} kcal)`
+              : swap.name;
           line = `${firstSentence}. Swap for ${swapDetail} next time.`;
           evidence = [
             ...evidence,

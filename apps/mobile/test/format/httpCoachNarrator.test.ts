@@ -16,7 +16,7 @@ describe('HttpCoachNarrator (MM-665)', () => {
         { date: today, entries: [food(today, 'lunch', 'Cheese pizza', 2231, 56, 98)] },
       ]),
       today,
-    );
+    )!;
 
   it('returns the deterministic archetype with zero network requests when BYOK is off or has no key', async () => {
     const store = new InMemoryCoachAiStore();
