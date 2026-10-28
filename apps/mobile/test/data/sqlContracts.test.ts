@@ -5,6 +5,8 @@ import { customExerciseRepositoryContract } from '../contracts/customExerciseRep
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
 import { savedMealRepositoryContract } from '../contracts/savedMealRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
+import { cardioSessionRepositoryContract } from '../contracts/cardioSessionRepositoryContract';
+import { dailyStepsRepositoryContract } from '../contracts/dailyStepsRepositoryContract';
 import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
@@ -67,6 +69,8 @@ customFoodRepositoryContract('SQLite', async () => (await open()).customFoods);
 savedMealRepositoryContract('SQLite', async () => (await open()).savedMeals);
 dayMarkRepositoryContract('SQLite', async () => (await open()).dayMarks);
 dayKindRepositoryContract('SQLite', async () => (await open()).dayKinds);
+cardioSessionRepositoryContract('SQLite', async () => (await open()).cardioSessions);
+dailyStepsRepositoryContract('SQLite', async () => (await open()).dailySteps);
 targetsHistoryRepositoryContract('SQLite', async () => (await open()).targets);
 targetShapeRepositoryContract('SQLite', async () => (await open()).targetShapes);
 goalBodyFatRepositoryContract('SQLite', async () => (await open()).goalBodyFat);

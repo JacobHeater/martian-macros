@@ -20,6 +20,9 @@ const R = CoachAdviceRule;
  * - **X1, protein by training day:** protein to the minimum on the days it
  *   falls short.
  * - **X3, water on training days:** the goal on training days.
+ * - **C1, cardio under the floor:** the shortfall on the watch this week.
+ * - **C2, steps under the floor:** up to the floor, the shortfall a day.
+ *   Neither under `restricted`, as T1: the fix is then not said (MM-678).
  */
 export function trainingAdviceOf(finding: CoachFinding, restricted: boolean): CoachAdvice[] {
   if (finding.kind !== 'fix') return [];
@@ -51,6 +54,10 @@ export function trainingAdviceOf(finding: CoachFinding, restricted: boolean): Co
       const goalMl = x('goalMl');
       return [{ kind: 'drinkWater', days: 'training', ...(goalMl === undefined ? {} : { amountMl: goalMl }) }];
     }
+    case 'cardioMinutes':
+      return restricted ? [] : [{ kind: 'cardio', minutes: Math.max(1, Math.round(x('more') ?? 1)) }];
+    case 'stepsPerDay':
+      return restricted ? [] : [{ kind: 'steps', steps: Math.round(x('floor') ?? 0), stepsShort: Math.max(1, Math.round(x('short') ?? 1)) }];
     default:
       return [];
   }

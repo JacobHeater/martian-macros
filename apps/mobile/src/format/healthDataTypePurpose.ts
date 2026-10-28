@@ -7,7 +7,7 @@ const purposes: Readonly<Record<HealthDataType, string>> = {
   height: 'To suggest a correction if it differs from your profile.',
   workout: 'When you trained, and for how long.',
   menstruation: 'To allow for water weight around your period.',
-  steps: 'For context only. Never used to work out your calories.',
+  steps: 'Steps a day against the floor the coach holds you to. Never used to work out your calories.',
   sleep: 'Hours asleep each night, so the coach can tell when sleep runs short.',
 };
 

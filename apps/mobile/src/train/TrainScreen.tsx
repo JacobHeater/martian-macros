@@ -1,7 +1,6 @@
 import type { Workout } from '../domain/training/Workout';
 import { Fmt } from '../format/Fmt';
 import { workoutSummaryText } from '../format/workoutSummaryText';
-import { Loadable } from '../state/Loadable';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
@@ -11,44 +10,34 @@ import { MmIcon } from '../ui/MmIcon';
 import { MmListRow } from '../ui/MmListRow';
 import { MmRhythmStrip } from '../ui/MmRhythmStrip';
 import { MmSection } from '../ui/MmSection';
+import { CardioFold } from './CardioFold';
 import { trainedDays } from './trainedDays';
 import { useWorkoutController } from './useWorkoutController';
-import { WeeklyVolumeScreen } from './WeeklyVolumeScreen';
+import { WeeklyVolumeFold } from './WeeklyVolumeFold';
 import { workoutGroups } from './workoutGroups';
 import { WorkoutScreen } from './WorkoutScreen';
 import './train.css';
 
-const sets = (value: number) => (Number.isInteger(value) ? String(value + 0) : value.toFixed(1));
-const capital = (word: string) => `${word.charAt(0).toUpperCase()}${word.substring(1)}`;
-
 
 /**
  * The Train destination (MM-75), in tiers (MM-258): one primary action,
- * the rhythm of the last seven days, the week's volume as a section that
- * opens its screen, and finished workouts grouped by week and month with
- * a mark on a record day.
+ * the rhythm of the last seven days, the week's volume and the week's cardio
+ * from the wearable as folds in place (MM-677, MM-680, the owner), and
+ * finished workouts grouped by week and month with a mark on a record day.
  */
 export function TrainScreen() {
   const { state } = useApp();
   const navigator = useNavigator();
   const controller = useWorkoutController();
   const workouts = useLoaded(state.workouts) ?? [];
+  const cardio = useCell(state.cardioWeek);
   const today = useCell(state.today);
   const records = useCell(state.personalRecords);
-  const volume = useCell(state.weeklyVolume);
   const inProgress = workouts.find((workout) => workout.inProgress);
   const finished = workouts.filter((workout) => !workout.inProgress);
 
   const open = (workoutId: number) => void navigator.push(() => <WorkoutScreen workoutId={workoutId} />);
   const start = async (from?: Workout) => open(await controller.start({ from }));
-
-  const groups = volume.ready ? [...volume.value.groups].sort((a, b) => b.currentSets - a.currentSets) : [];
-  const trainedGroups = groups.filter((group) => group.currentSets > 0);
-  let volumeSummary: string;
-  if (Loadable.hasFailed(volume)) volumeSummary = 'Could not read training history.';
-  else if (!volume.ready) volumeSummary = 'Reading your sets…';
-  else if (trainedGroups.length === 0) volumeSummary = 'No hard sets in the last seven days.';
-  else volumeSummary = trainedGroups.slice(0, 4).map((group) => `${capital(group.group)} ${sets(group.currentSets)}`).join(' · ');
 
   const row = (workout: Workout) => {
     const count = records.get(workout.id)?.length ?? 0;
@@ -93,15 +82,10 @@ export function TrainScreen() {
         </>
       )}
       <div className="food-rhythm">
-        <MmRhythmStrip name="Last seven days of training" days={trainedDays(workouts, today)} />
+        <MmRhythmStrip name="Last seven days of training" days={trainedDays(workouts, today, cardio.ready ? cardio.value.sessions : [])} />
       </div>
-      <MmSection
-        icon="speed"
-        title="Weekly training volume"
-        summary={volumeSummary}
-        onPress={() => void navigator.push(() => <WeeklyVolumeScreen />)}
-        opens="Opens weekly volume"
-      />
+      <WeeklyVolumeFold />
+      <CardioFold />
       {workoutGroups(finished, today).map((group, index) => (
         <MmSection
           key={group.title}

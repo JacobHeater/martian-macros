@@ -1,5 +1,6 @@
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { HealthWorkoutWriter } from '../domain/integration/HealthWorkoutWriter';
+import { CardioActivity } from '../domain/training/CardioActivity';
 import type { PlatformWorkout } from '../domain/training/PlatformWorkout';
 import type { PlatformWorkoutSegment } from '../domain/training/PlatformWorkoutSegment';
 import type { WorkoutForPlatform } from '../domain/training/WorkoutForPlatform';
@@ -32,6 +33,8 @@ function platformWorkout(raw: MmHealthWorkout): PlatformWorkout | undefined {
     platformId: raw.id,
     clientId: raw.clientId === '' ? undefined : raw.clientId,
     strength: raw.strength,
+    // A non-strength session's activity (MM-677); a strength session has none, and an older plugin says none.
+    cardio: raw.strength ? undefined : CardioActivity.named(raw.activity),
     start: new Date(raw.startMs),
     end: new Date(raw.endMs),
     segments,

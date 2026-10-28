@@ -3,10 +3,12 @@ import type { Exercise } from '../../domain/training/Exercise';
 import { buildStrengthTrends } from '../buildStrengthTrends';
 import { hasHardSet } from '../hasHardSet';
 import type { TrendSpan } from '../trends/TrendSpan';
+import { cardioFindings } from './cardioFindings';
 import type { CoachFinding } from './CoachFinding';
 import { proteinByTrainingDayFindings } from './proteinByTrainingDayFindings';
 import { rirUnrecordedFindings } from './rirUnrecordedFindings';
 import { setsPerMuscleFindings } from './setsPerMuscleFindings';
+import { stepsFindings } from './stepsFindings';
 import { strengthOnFatLossFindings } from './strengthOnFatLossFindings';
 import { strengthRisingFindings } from './strengthRisingFindings';
 import { strengthStalledFindings } from './strengthStalledFindings';
@@ -21,7 +23,8 @@ import { waterOnTrainingDaysFindings } from './waterOnTrainingDaysFindings';
 /**
  * What the coach reads in training, water and sleep over a span ending on
  * `asOf`, which is yesterday (MM-609): T1, T2, T3, T5, T6, T7, T8, T9, X1
- * and X3, unranked (MM-605's ranking and MM-610's sections place them).
+ * and X3, and the wearable's cardio and steps against their floors, C1 and
+ * C2 (MM-678), unranked (MM-605's ranking and MM-610's sections place them).
  *
  * - A session is a finished workout with at least one hard set.
  * - Training reads weeks: rest days are real zeros, not missing days.
@@ -31,7 +34,8 @@ import { waterOnTrainingDaysFindings } from './waterOnTrainingDaysFindings';
  *   `usualTrainingWeekdays`, `shortSleep`), read, not repeated.
  * - A signal needing more days than the span is not run here;
  *   `unjudgedTrainingAreas` names its area instead.
- * - A training-stopped notice (T1) suppresses T2 to T9.
+ * - A training-stopped notice (T1) suppresses T2 to T9, not C1 and C2: the
+ *   cardio floor stands whether or not the lifting stopped.
  * - Every fix ends in an order (MM-617, `trainingAdviceOf`); a fix left
  *   with none is not said.
  *
@@ -53,7 +57,12 @@ export function analyseTrainingSpan(input: TrainingAnalysisInput, span: TrendSpa
     restricted: input.safeguards.eatingDisorderHistory || input.safeguards.underEating,
   };
   const stopped = trainingStoppedFindings(context);
-  const besideTraining = [...proteinByTrainingDayFindings(context), ...waterOnTrainingDaysFindings(context)];
+  const besideTraining = [
+    ...proteinByTrainingDayFindings(context),
+    ...waterOnTrainingDaysFindings(context),
+    ...cardioFindings(context),
+    ...stepsFindings(context),
+  ];
   if (stopped.some((f) => f.kind === 'fix')) return ordered([...stopped, ...besideTraining], context.restricted);
   return ordered([
     ...stopped,

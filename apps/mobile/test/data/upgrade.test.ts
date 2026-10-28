@@ -9,6 +9,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { FoodEntry } from '../../src/domain/FoodEntry';
+import { CardioSession } from '../../src/domain/training/CardioSession';
 import { Workout } from '../../src/domain/training/Workout';
 import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { SleepNight } from '../../src/domain/SleepNight';
@@ -146,8 +147,18 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * after the food log's `created_at` and the custom foods' `cooked_weight_grams`),
  * the goals and the water log (MM-305).
  */
+/** The schema as version 30 left it: no cardio session, no day of steps, and no cardio floor (MM-677, MM-678). */
+const versionThirty = currentSchema
+  .replace(/CREATE TABLE "cardio_sessions" \([\s\S]*?\n\);\n/, '')
+  .replace(/CREATE TABLE "daily_steps" \([\s\S]*?\n\);\n/, '')
+  .replace(
+    '  "cardio_steps_floor" INTEGER NULL CHECK ("cardio_steps_floor" IS NULL OR "cardio_steps_floor" BETWEEN 1000 AND 30000),\n' +
+      '  "cardio_minutes_floor" INTEGER NULL CHECK ("cardio_minutes_floor" IS NULL OR "cardio_minutes_floor" BETWEEN 0 AND 1000),\n',
+    '',
+  );
+
 /** The schema as version 29 left it: no meal saved to log again (MM-645). */
-const versionTwentyNine = currentSchema
+const versionTwentyNine = versionThirty
   .replace(/CREATE TABLE "saved_meals" \([\s\S]*?\n\);\n/, '')
   .replace(/CREATE TABLE "saved_meal_foods" \([\s\S]*?\n\);\n/, '')
   .replace(/CREATE INDEX "saved_meal_foods_meal" [^\n]*\n/, '');
@@ -1073,3 +1084,38 @@ it('a version 29 database comes up to date with no saved meal, and keeps what is
   expect(saved?.foods.map((f) => [f.name, f.kcal])).toEqual([['Oats', 300]]);
 });
 
+// MM-677, MM-678: a version 30 database comes up to date with no cardio session, no day of steps and the coach's own
+// floors; what the next read brings, and what the person sets, is kept after.
+it('a version 30 database comes up to date with no cardio and the default floors, and keeps what comes after', async () => {
+  expect(versionThirty).not.toContain('cardio');
+  expect(versionThirty).not.toContain('daily_steps');
+  expect(versionThirty).toContain('saved_meal_foods');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 30, schema: versionThirty });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'user_preferences')).toEqual(expect.arrayContaining(['cardio_steps_floor', 'cardio_minutes_floor']));
+  expect(await first(repos.cardioSessions.watchCardioSessions())).toEqual([]);
+  expect(await first(repos.dailySteps.watchDailySteps())).toEqual([]);
+  expect(await first(repos.preferences.watchCardioFloors())).toEqual({ stepsPerDay: undefined, minutesPerWeek: undefined });
+  const seven = new Date(2026, 9, 5, 7, 5);
+  await repos.cardioSessions.saveCardioSessions([
+    new CardioSession({ platformId: 'hk-walk', sourceName: 'Watch', activity: 'walking', start: seven, end: new Date(seven.getTime() + 42 * 60000) }),
+  ]);
+  await repos.dailySteps.saveDailySteps([{ date: day, steps: 8400 }]);
+  await repos.preferences.saveCardioFloors({ stepsPerDay: 10000, minutesPerWeek: undefined });
+  expect((await first(repos.cardioSessions.watchCardioSessions())).map((s) => [s.activity, s.minutes])).toEqual([['walking', 42]]);
+  expect(await first(repos.dailySteps.watchDailySteps())).toEqual([{ date: day, steps: 8400 }]);
+  expect((await first(repos.preferences.watchCardioFloors())).stepsPerDay).toBe(10000);
+  await expect(repos.dailySteps.saveDailySteps([{ date: day.addDays(1), steps: 0 }])).resolves.toBeUndefined();
+  await expect(sql.execute("INSERT INTO cardio_sessions (platform_id, source_name, activity, started_at_ms, ended_at_ms, date_epoch_day) VALUES ('x', 'Watch', 'jogging', 1, 2, 1)"), 'an activity the app does not name').rejects.toThrow();
+});

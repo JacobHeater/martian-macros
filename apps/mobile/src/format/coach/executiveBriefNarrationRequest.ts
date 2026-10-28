@@ -7,7 +7,8 @@ const systemPrompt =
   'You are the Martian Macros nutrition coach. Write 2 to 3 concise, direct sentences summarizing the user position from the supplied JSON only. ' +
   'Use only numbers present in the JSON, written as they are given, as whole numbers. Never use exclamation marks. Never moralize food. ' +
   'Speak in plain words: never say a JSON field name (a camelCase word) or a true or false value. ' +
-  'When the JSON marks the protein left as unable to fit inside the calories left today, say that the protein gap cannot fit inside today’s calorie cap, tell the person to hold their calorie ceiling tonight, and to front-load protein in the morning.';
+  'When the JSON marks the protein left as unable to fit inside the calories left today, say that the protein gap cannot fit inside today’s calorie cap, tell the person to hold their calorie ceiling tonight, and to front-load protein in the morning. ' +
+  'When the JSON has a training block, hold the person to it in one or two blunt sentences: lifting sessions this week against the sessions they set, and, where cardio is held, cardio minutes and steps a day against their floors, ordering the shortfall. Never offer exercise as a way to make up for food.';
 
 /**
  * Builds a `CoachNarrationRequest` from an `ExecutiveBrief`, pairing the
@@ -51,6 +52,25 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
                   proteinGained: whole(driver.replacement.proteinGained),
                 },
         };
+  const t = brief.training;
+  const training =
+    t === undefined
+      ? undefined
+      : {
+          goal: t.goal,
+          cardioHeld: t.cardioHeld,
+          liftingSessionsThisWeek: t.sessionsThisWeek,
+          liftingSessionsSet: t.sessionsTarget,
+          liftingSessionsToGo: Math.max(0, t.sessionsTarget - t.sessionsThisWeek),
+          daysSinceLastLift: t.daysSinceSession,
+          watchConnected: t.wearableInUse,
+          cardioMinutesThisWeek: t.cardioMinutes,
+          cardioMinutesFloor: t.cardioFloorMinutes,
+          cardioMinutesMore: Math.max(0, t.cardioFloorMinutes - t.cardioMinutes),
+          stepsPerDay: t.stepsPerDay,
+          stepsFloor: t.stepsFloor,
+          stepsMorePerDay: t.stepsPerDay === undefined ? undefined : Math.max(0, t.stepsFloor - t.stepsPerDay),
+        };
   const payload = {
     runwayState: brief.runwayState,
     protectedPath: brief.protectedPath,
@@ -64,6 +84,7 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
     requiredProteinDensityPercent: densityPct,
     sevenDay,
     primaryDriver,
+    training,
   };
   const allowedNumbers: number[] = [
     payload.kcalLogged,
@@ -89,6 +110,21 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief): CoachNarr
       if (replacement.proteinG !== undefined) allowedNumbers.push(replacement.proteinG);
       allowedNumbers.push(replacement.caloriesSaved, replacement.proteinGained);
     }
+  }
+  if (training !== undefined) {
+    // Minutes may come back as hours and minutes ("1 h 36 min"): both parts are allowed too.
+    const minutes = [training.cardioMinutesThisWeek, training.cardioMinutesFloor, training.cardioMinutesMore];
+    allowedNumbers.push(
+      training.liftingSessionsThisWeek,
+      training.liftingSessionsSet,
+      training.liftingSessionsToGo,
+      ...minutes,
+      ...minutes.flatMap((m) => [Math.floor(m / 60), m % 60]),
+      training.stepsFloor,
+    );
+    if (training.daysSinceLastLift !== undefined) allowedNumbers.push(training.daysSinceLastLift);
+    if (training.stepsPerDay !== undefined) allowedNumbers.push(training.stepsPerDay);
+    if (training.stepsMorePerDay !== undefined) allowedNumbers.push(training.stepsMorePerDay);
   }
   return {
     cacheKey: `exec:${brief.briefHash}`,

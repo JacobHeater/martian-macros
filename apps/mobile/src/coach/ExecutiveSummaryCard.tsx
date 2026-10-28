@@ -3,6 +3,7 @@ import { useCell } from '../app/useCell';
 import { executiveBriefNarrationRequest } from '../format/coach/executiveBriefNarrationRequest';
 import { coachAnalysisWords } from '../format/coachAnalysisWords';
 import { Fmt } from '../format/Fmt';
+import { minutesText } from '../format/minutesText';
 import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmSection } from '../ui/MmSection';
 import { StatRow } from '../ui/StatRow';
@@ -12,8 +13,10 @@ import { useCoachNarration } from '../app/useCoachNarration';
  * The top-level executive summary on the unified Coach screen (MM-667):
  * narrates the 7-day accountability brief via Track 1 (deterministic archetype)
  * or Track 2 (BYOK LLM narrator) alongside the 7-day calorie adherence,
- * protein floor hits, and today's remaining runway. The wait on the model is
- * shown as such; the archetype is only the fallback (MM-673).
+ * protein floor hits, and today's remaining runway; and, since MM-681, the
+ * week's lifting, cardio and steps against what the person is held to. The
+ * wait on the model is shown as such; the archetype is only the fallback
+ * (MM-673).
  */
 export function ExecutiveSummaryCard() {
   const { state } = useApp();
@@ -22,6 +25,7 @@ export function ExecutiveSummaryCard() {
   const narration = useCoachNarration(brief === undefined ? undefined : executiveBriefNarrationRequest(brief));
 
   if (brief === undefined) return null;
+  const training = brief.training;
 
   const adherenceValue = brief.protectedPath
     ? `${brief.sevenDay.loggedDays} / 7 days logged`
@@ -54,6 +58,31 @@ export function ExecutiveSummaryCard() {
       <StatRow label="7-day calorie adherence" value={adherenceValue} />
       <StatRow label="7-day protein floor" value={proteinValue} />
       <StatRow label="Today’s runway" value={runwayValue} detail={runwayDetail} />
+      {training === undefined ? null : (
+        <StatRow
+          label="Lifting this week"
+          value={`${training.sessionsThisWeek} / ${training.sessionsTarget} sessions`}
+          detail={
+            training.daysSinceSession === undefined
+              ? 'No session logged yet'
+              : training.daysSinceSession === 0
+                ? 'Last session today'
+                : `Last session ${training.daysSinceSession} ${training.daysSinceSession === 1 ? 'day' : 'days'} ago`
+          }
+        />
+      )}
+      {training === undefined || !training.cardioHeld ? null : training.wearableInUse ? (
+        <>
+          <StatRow label="Cardio this week" value={minutesText(training.cardioMinutes)} detail={`Floor ${minutesText(training.cardioFloorMinutes)} a week`} />
+          <StatRow
+            label="Steps a day"
+            value={training.stepsPerDay === undefined ? 'None counted' : `About ${Fmt.whole(training.stepsPerDay)}`}
+            detail={`Floor ${Fmt.whole(training.stepsFloor)} a day · ${training.stepsDays} of 7 days counted`}
+          />
+        </>
+      ) : (
+        <StatRow label="Cardio and steps" value="No watch connected" detail="Not counted until one is connected in Settings › Health" />
+      )}
     </MmSection>
   );
 }

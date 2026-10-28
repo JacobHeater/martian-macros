@@ -4,8 +4,11 @@ import type { UserSetup } from '../domain/UserSetup';
 import type { WaistObservation } from '../domain/WaistObservation';
 import type { WeightEvent } from '../domain/WeightEvent';
 import type { WeightObservation } from '../domain/WeightObservation';
+import type { StepsDay } from '../domain/training/StepsDay';
 import type { Workout } from '../domain/training/Workout';
 import { clamp } from '../lang/clamp';
+import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
+import { CardioRule } from './CardioRule';
 import type { CoachSnapshot } from './CoachSnapshot';
 import { effectiveWeightEvents } from './effectiveWeightEvents';
 import { SafetyBounds } from './SafetyBounds';
@@ -29,8 +32,9 @@ import type { WeightTrendPoint } from './WeightTrendPoint';
  * trend moved less than a third of the intended pace, and the shortfall is
  * larger than the slope's own uncertainty. The diagnosis is the first that
  * applies of: thin data, masked by water (the waist down, a passing event,
- * or training started in the last days), intake off target, and the
- * estimate being wrong. Sleep that averaged short is recorded beside the
+ * or training started in the last days), intake off target, moving less
+ * (steps a day down against the weeks before, MM-678), and the estimate
+ * being wrong. Sleep that averaged short is recorded beside the
  * diagnosis (MM-252), whichever it is, as a cause the person can act on.
  * Intake is judged as the adherence summary judges it, a shaped week against
  * its plan (MM-124, `plannedShare`). Nothing here changes a target.
@@ -48,6 +52,7 @@ export function assessStall({
   hasCycleData = false,
   sleepAverage,
   plannedShare,
+  steps = [],
 }: {
   setup: UserSetup;
   snapshot: CoachSnapshot;
@@ -64,6 +69,8 @@ export function assessStall({
   sleepAverage?: SleepAverage | undefined;
   /** The share of the flat figure planned for each day (MM-124); every day flat without it. */
   plannedShare?: ((date: CalendarDate) => number) | undefined;
+  /** The platform's daily steps (MM-677), for the activity diagnosis; none without a wearable. */
+  steps?: readonly StepsDay[];
 }): StallAssessment {
   const window =
     setup.profile.sex === 'female' && !hasCycleData ? StallRule.windowDaysWithoutCycleData : StallRule.windowDays;
@@ -145,6 +152,17 @@ export function assessStall({
   const trainingStart = trainingStartOn(workouts, { asOf: today, gapDays: StallRule.trainingRestartGapDays });
   const maskedByTraining = trainingStart !== undefined && trainingStart.daysUntil(today) <= StallRule.maskingEventDays;
 
+  // Steps a day over the window against the weeks before it (MM-678), each needing enough days to compare.
+  const stepsAverage = (first: CalendarDate, last: CalendarDate): number | undefined => {
+    const days = steps.filter((day) => !day.date.isBefore(first) && !day.date.isAfter(last));
+    if (days.length < CardioRule.stepsDropMinDays) return undefined;
+    return roundHalfAwayFromZero(days.reduce((sum, day) => sum + day.steps, 0) / days.length);
+  };
+  const stepsNow = stepsAverage(from.addDays(1), through);
+  const stepsBefore = stepsAverage(from.addDays(1 - 7 * CardioRule.stepsBeforeWeeks), from);
+  const movingLess =
+    !gaining && stepsNow !== undefined && stepsBefore !== undefined && stepsNow <= stepsBefore * (1 - CardioRule.stepsDropShare);
+
   let diagnosis: StallDiagnosis;
   if (summary.completeDays < StallRule.minimumFoodDays || summary.weighIns < StallRule.minimumWeighIns) {
     diagnosis = 'data';
@@ -152,6 +170,8 @@ export function assessStall({
     diagnosis = 'masked';
   } else if (summary.standing === (gaining ? 'below' : 'above')) {
     diagnosis = 'intake';
+  } else if (movingLess) {
+    diagnosis = 'activity';
   } else {
     diagnosis = 'estimate';
   }
@@ -189,5 +209,7 @@ export function assessStall({
       diagnosis === 'estimate' && !gaining && snapshot.tdee.kcal < StallRule.lowEstimateRestingMultiple * snapshot.bmrKcal,
     shortSleepAverageMinutes: shortSleep(sleepAverage) ? sleepAverage?.averageMinutes : undefined,
     shortSleepNights: shortSleep(sleepAverage) ? sleepAverage?.nights : undefined,
+    stepsNowPerDay: stepsNow,
+    stepsBeforePerDay: stepsBefore,
   });
 }

@@ -1,6 +1,6 @@
 import type { WaterGoal } from '../domain/water/WaterGoal';
 import { suggestedWaterGoalMl } from '../domain/water/suggestedWaterGoalMl';
-import type { CalendarDate } from '../domain/CalendarDate';
+import { CalendarDate } from '../domain/CalendarDate';
 import type { CoachAiConfig } from '../domain/integration/CoachAiConfig';
 import { CoachingPolicy } from '../domain/CoachingPolicy';
 import { ArgumentError } from '../lang/ArgumentError';
@@ -31,6 +31,9 @@ import type { ThemePreference } from '../domain/ThemePreference';
 import { builtInExercises } from '../domain/training/builtInExercises';
 import type { Exercise } from '../domain/training/Exercise';
 import type { ExerciseProgression } from '../domain/training/ExerciseProgression';
+import type { CardioFloors } from '../domain/training/CardioFloors';
+import type { CardioSession } from '../domain/training/CardioSession';
+import type { StepsDay } from '../domain/training/StepsDay';
 import type { Workout } from '../domain/training/Workout';
 import type { TargetShape } from '../domain/TargetShape';
 import type { BodyFatObservation } from '../domain/BodyFatObservation';
@@ -67,7 +70,10 @@ import { TargetInputs } from '../engine/TargetInputs';
 import { TargetShapeLimits } from '../engine/TargetShapeLimits';
 import { buildMonthlyReport } from '../engine/buildMonthlyReport';
 import { buildStrengthTrends } from '../engine/buildStrengthTrends';
+import { buildCardioWeek } from '../engine/buildCardioWeek';
 import { buildWeeklyVolume } from '../engine/buildWeeklyVolume';
+import { cardioSessionImports } from '../engine/cardioSessionImports';
+import type { CardioWeek } from '../engine/CardioWeek';
 import type { CoachSnapshot } from '../engine/CoachSnapshot';
 import type { DailyTargets } from '../engine/DailyTargets';
 import { findInsights } from '../engine/findInsights';
@@ -178,6 +184,8 @@ const of = <T>(cell: Cell<Loadable<T>>) => Loadable.valueOf(cell.value);
 
 /** How far back each read of the platform looks for workouts to import (MM-490). */
 const workoutImportDays = 30;
+/** How far back each read of the platform looks for daily steps (MM-677): the stall rule's window and the four weeks before it (MM-678). */
+const stepsImportDays = 56;
 const dayMs = 24 * 60 * 60 * 1000;
 
 /**
@@ -595,6 +603,14 @@ export class AppState {
   /** Hard sets for each muscle group, this week and last. Failed when a logged set cannot be worked out. */
   readonly weeklyVolume: Cell<Loadable<WeeklyVolume>>;
 
+  /** The wearable's cardio sessions and the platform's daily steps, as kept (MM-677), and the coach's floors (MM-678). */
+  readonly cardioSessions: Cell<Loadable<CardioSession[]>>;
+  readonly dailySteps: Cell<Loadable<StepsDay[]>>;
+  readonly cardioFloors: Cell<Loadable<CardioFloors>>;
+
+  /** Cardio over the last seven days beside the seven before, against the floors (MM-677). */
+  readonly cardioWeek: Cell<Loadable<CardioWeek>>;
+
   /** How many days of history the Dashboard shows. */
   readonly dashboardRange = new ValueCell(30);
 
@@ -680,6 +696,9 @@ export class AppState {
     });
     this.weightEvents = stream(() => s.weightEvents.watchWeightEvents());
     this.workouts = stream(() => s.workouts.watchWorkouts());
+    this.cardioSessions = stream(() => s.cardioSessions.watchCardioSessions());
+    this.dailySteps = stream(() => s.dailySteps.watchDailySteps());
+    this.cardioFloors = stream(() => s.preferences.watchCardioFloors());
     this.customExercises = stream(() => s.customExercises.watchCustomExercises());
     this.exercises = derived<readonly Exercise[]>(() => [...builtInExercises, ...(of(this.customExercises) ?? [])]);
     this.exercisesById = derived<ReadonlyMap<string, Exercise>>(() => new Map(this.exercises.value.map((e) => [e.id, e])));
@@ -869,6 +888,8 @@ export class AppState {
         history,
         intake,
         weights,
+        // The platform's steps, for a stall put down to moving less (MM-678); unread, none.
+        steps: of(this.dailySteps) ?? [],
         waist,
         weightEvents,
         workouts,
@@ -1435,6 +1456,16 @@ export class AppState {
       }
     });
 
+    this.cardioWeek = derived<Loadable<CardioWeek>>(() => {
+      const sources: Loadable<unknown>[] = [this.cardioSessions.value, this.dailySteps.value, this.cardioFloors.value];
+      for (const source of sources) if (!source.ready && 'error' in source) return Loadable.failed(source.error);
+      const sessions = of(this.cardioSessions);
+      const steps = of(this.dailySteps);
+      const floors = of(this.cardioFloors);
+      if (sessions === undefined || steps === undefined || floors === undefined) return Loadable.loading;
+      return Loadable.of(buildCardioWeek({ sessions, steps, floors, today: this.today.value }));
+    });
+
     this.checkIn = this.makeCheckIn();
     this.coachAnalysis = this.makeCoachAnalysis();
   }
@@ -1517,6 +1548,7 @@ export class AppState {
     }
     if (changed) this.healthImported();
     await this.importWorkouts();
+    await this.importSteps();
     await this.backfillHealth();
     this.refreshHealthConnection();
     return true;
@@ -1541,6 +1573,31 @@ export class AppState {
         library: this.exercises.value,
       });
       for (const workout of changes) await workouts.saveWorkout(workout);
+      // The non-strength sessions of the same read are the cardio kept (MM-677).
+      const { cardioSessions } = this.services;
+      await cardioSessions.saveCardioSessions(
+        cardioSessionImports({ platform: read, kept: await currentValueOf(cardioSessions.watchCardioSessions()) }),
+      );
+    } catch {
+      // Not read this time; the next read tries again.
+    }
+  }
+
+  /**
+   * Keeps the platform's daily step totals of the last `stepsImportDays`
+   * days (MM-677), as MM-442 reads them: the platform's own total for each
+   * day, a row a day. A platform that cannot be read changes nothing.
+   */
+  private async importSteps(): Promise<void> {
+    const { healthSource, dailySteps, clock } = this.services;
+    try {
+      const now = clock.now();
+      const from = new Date(now.getFullYear(), now.getMonth(), now.getDate() - stepsImportDays);
+      // Up to, not including, tomorrow: today's total so far is read too (MM-442 reads whole local days).
+      const to = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const days = await healthSource.dailySteps({ from, to });
+      if (days.length === 0) return;
+      await dailySteps.saveDailySteps(days.map((day) => ({ date: CalendarDate.fromDate(day.day), steps: Math.round(day.steps) })));
     } catch {
       // Not read this time; the next read tries again.
     }
@@ -1590,6 +1647,13 @@ export class AppState {
   /** Reads again what the weekly volume is worked out from, after a read went wrong. */
   retryWeeklyVolume(): void {
     for (const cell of [this.workouts, this.customExercises]) {
+      if (cell instanceof StreamCell) cell.retry();
+    }
+  }
+
+  /** Reads again what the week's cardio is worked out from, after a read went wrong (MM-677). */
+  retryCardioWeek(): void {
+    for (const cell of [this.cardioSessions, this.dailySteps, this.cardioFloors]) {
       if (cell instanceof StreamCell) cell.retry();
     }
   }
@@ -1735,6 +1799,10 @@ export class AppState {
           sleep: of(this.sleepNights) ?? [],
           waterGoal: this.waterGoal.value,
           safeguards,
+          // The wearable's cardio and the platform's steps (MM-678); unread, none, as a record that could not be read.
+          cardio: of(this.cardioSessions) ?? [],
+          steps: of(this.dailySteps) ?? [],
+          cardioFloors: of(this.cardioFloors) ?? { stepsPerDay: undefined, minutesPerWeek: undefined },
         };
       },
       wholeDays: () => {

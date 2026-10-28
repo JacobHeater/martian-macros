@@ -8,6 +8,7 @@ import type { MacroPicture } from '../domain/MacroPicture';
 import { NutritionGoals } from '../domain/NutritionGoals';
 import type { PreferencesRepository } from '../domain/repositories/PreferencesRepository';
 import type { TermsAcceptance } from '../domain/TermsAcceptance';
+import { CardioFloors } from '../domain/training/CardioFloors';
 import type { WeightDisplay } from '../domain/WeightDisplay';
 import type { ThemePreference } from '../domain/ThemePreference';
 import { WeighInWindow } from '../healthIngest/WeighInWindow';
@@ -39,6 +40,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
   private readonly weighInWindow = new ObservableValue(WeighInWindow.usual);
   private readonly weightDisplay = new ObservableValue<WeightDisplay | undefined>(undefined);
   private readonly weightDisplayOffered = new ObservableValue(false);
+  private readonly cardioFloors = new ObservableValue<CardioFloors>(CardioFloors.none);
 
   watchThemePreference(): Watched<ThemePreference> {
     return this.theme.watch();
@@ -207,6 +209,14 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
     this.weightDisplayOffered.value = true;
   }
 
+  watchCardioFloors(): Watched<CardioFloors> {
+    return this.cardioFloors.watch();
+  }
+
+  async saveCardioFloors(floors: CardioFloors): Promise<void> {
+    this.cardioFloors.value = { stepsPerDay: floors.stepsPerDay, minutesPerWeek: floors.minutesPerWeek };
+  }
+
   watchWeighInWindow(): Watched<WeighInWindow> {
     return this.weighInWindow.watch();
   }
@@ -222,6 +232,7 @@ export class InMemoryPreferencesRepository implements PreferencesRepository, Wei
     this.weighInWindow.value = WeighInWindow.usual;
     this.weightDisplay.value = undefined;
     this.weightDisplayOffered.value = false;
+    this.cardioFloors.value = CardioFloors.none;
     this.exactTargets.value = false;
     this.onlineLookup.value = 'ask';
     this.labelNoteDismissed.value = undefined;

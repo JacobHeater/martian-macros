@@ -3,6 +3,8 @@ import { customExerciseRepositoryContract } from '../contracts/customExerciseRep
 import { customFoodRepositoryContract } from '../contracts/customFoodRepositoryContract';
 import { savedMealRepositoryContract } from '../contracts/savedMealRepositoryContract';
 import { dataEraserContract } from '../contracts/dataEraserContract';
+import { cardioSessionRepositoryContract } from '../contracts/cardioSessionRepositoryContract';
+import { dailyStepsRepositoryContract } from '../contracts/dailyStepsRepositoryContract';
 import { dayKindRepositoryContract } from '../contracts/dayKindRepositoryContract';
 import { dayMarkRepositoryContract } from '../contracts/dayMarkRepositoryContract';
 import { exerciseProgressionRepositoryContract } from '../contracts/exerciseProgressionRepositoryContract';
@@ -55,6 +57,8 @@ customFoodRepositoryContract('In-memory', () => new InMemoryRepositories().custo
 savedMealRepositoryContract('In-memory', () => new InMemoryRepositories().savedMeals);
 dayMarkRepositoryContract('In-memory', () => new InMemoryRepositories().dayMarks);
 dayKindRepositoryContract('In-memory', () => new InMemoryRepositories().dayKinds);
+cardioSessionRepositoryContract('In-memory', () => new InMemoryRepositories().cardioSessions);
+dailyStepsRepositoryContract('In-memory', () => new InMemoryRepositories().dailySteps);
 targetsHistoryRepositoryContract('In-memory', () => new InMemoryRepositories().targets);
 targetShapeRepositoryContract('In-memory', () => new InMemoryRepositories().targetShapes);
 insightLogRepositoryContract('In-memory', () => new InMemoryRepositories().insightLog);

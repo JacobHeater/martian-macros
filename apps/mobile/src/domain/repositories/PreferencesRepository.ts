@@ -1,3 +1,5 @@
+import type { CardioFloorsReader } from './CardioFloorsReader';
+import type { CardioFloorsWriter } from './CardioFloorsWriter';
 import type { CookingFatReader } from './CookingFatReader';
 import type { CookingFatWriter } from './CookingFatWriter';
 import type { DetailLevelReader } from './DetailLevelReader';
@@ -79,4 +81,6 @@ export interface PreferencesRepository
     PrimaryScaleReader,
     PrimaryScaleWriter,
     WeightDisplayReader,
-    WeightDisplayWriter {}
+    WeightDisplayWriter,
+    CardioFloorsReader,
+    CardioFloorsWriter {}

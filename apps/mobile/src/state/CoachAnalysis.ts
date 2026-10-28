@@ -11,6 +11,7 @@ import type { AnalysisArea } from '../engine/analysis/AnalysisArea';
 import type { AnalysisSpan } from '../engine/analysis/AnalysisSpan';
 import { arrangeCoachFindings } from '../engine/analysis/arrangeCoachFindings';
 import { analyseTrainingSpan } from '../engine/analysis/analyseTrainingSpan';
+import { trainingBriefOf } from '../engine/analysis/trainingBriefOf';
 import { canonicalTrendSpan } from '../engine/analysis/canonicalTrendSpan';
 import type { CoachFinding } from '../engine/analysis/CoachFinding';
 import type { CoachSpanEvaluation } from '../engine/analysis/CoachSpanEvaluation';
@@ -239,7 +240,9 @@ export class CoachAnalysis {
       const read = this.read.value;
       const food = this.foodInput.value;
       if (read === undefined || food === undefined) return undefined;
-      return executiveBriefOf(food, read.today);
+      // What the person is held to in training, cardio and steps (MM-681), once the training read is in.
+      const training = read.training === undefined ? undefined : trainingBriefOf(read.training, read.today);
+      return executiveBriefOf(food, read.today, { training });
     });
     this.view = new DerivedCell(() => this.work());
     this.spans = new DerivedCell<readonly AnalysisSpan[]>(() => this.view.value?.spans ?? [1]);
@@ -483,6 +486,23 @@ export class CoachAnalysis {
       const followUps = safely(() => coachFollowUpsOf({ food: foodInput, given: Loadable.valueOf(given) ?? [], today }));
       findings = withCoachFollowUps(day, followUps, today);
       if (entries.some((e) => e.date === today)) checked.push('food');
+      // The week's accountability on the day too (MM-681): training stopped or dropped, cardio and steps against their
+      // floors, read over the seven days through today, so the coach is never mute on training where the tab opens.
+      const trainingInput = read.training;
+      if (trainingInput !== undefined) {
+        const accountable = new Set(['trainingStopped', 'trainingDropped', 'cardioMinutes', 'stepsPerDay']);
+        const held = safely(() => analyseTrainingSpan(trainingInput, 7, today)).filter((f) => accountable.has(f.signal));
+        findings = [...findings, ...held];
+        const weekFrom = today.addDays(-6);
+        const inWeek = (date: CalendarDate) => !date.isBefore(weekFrom) && !date.isAfter(today);
+        if (
+          trainingInput.workouts.some((w) => !w.inProgress && inWeek(w.date) && hasHardSet(w)) ||
+          trainingInput.cardio.some((s) => inWeek(s.date)) ||
+          trainingInput.steps.some((d) => inWeek(d.date))
+        ) {
+          checked.push('training');
+        }
+      }
     } else {
       // 7d ends today (MM-621); the longer spans end yesterday, as MM-605's detectors read whole days.
       to = span === 7 ? today : today.addDays(-1);
@@ -499,7 +519,14 @@ export class CoachAnalysis {
       if (trainingInput !== undefined && water !== undefined) {
         findings = [...findings, ...safely(() => analyseTrainingSpan(trainingInput, span, to))];
         unjudged = unjudgedTrainingAreas(trainingInput, span, to);
-        if (trainingInput.workouts.some((w) => !w.inProgress && within(w.date) && hasHardSet(w))) checked.push('training');
+        // Training was read when a session was lifted, or the wearable gave cardio or steps, in the span (MM-678).
+        if (
+          trainingInput.workouts.some((w) => !w.inProgress && within(w.date) && hasHardSet(w)) ||
+          trainingInput.cardio.some((s) => within(s.date)) ||
+          trainingInput.steps.some((d) => within(d.date))
+        ) {
+          checked.push('training');
+        }
         if (water.some((e) => within(e.date))) checked.push('water');
       }
       // The state machine's word on each key as of yesterday (MM-605): the canonical span's log, read for every span.
