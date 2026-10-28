@@ -77,7 +77,8 @@ export function dayAdviceOf(finding: CoachFinding, c: DayAdviceContext, named: R
     kind: 'add',
     nutrient: 'protein',
     ...(c.proteinLeftG > 0 ? { amountG: c.proteinLeftG } : {}),
-    ...(fit === undefined || c.kcalLeft <= 0 ? {} : { addFood: fit.name }),
+    ...(c.kcalLeft >= 0 ? { amountKcal: c.kcalLeft } : {}),
+    ...(fit === undefined || c.kcalLeft <= 0 || c.proteinLeftG * 4 > c.kcalLeft ? {} : { addFood: fit.name }),
   };
 
   switch (finding.kind === 'fix' ? finding.signal : finding.kind) {
@@ -170,7 +171,7 @@ export function dayAdviceOf(finding: CoachFinding, c: DayAdviceContext, named: R
         };
         return allowedOrders(c.limits, [limit], c.proteinLeftG > 0 ? [{ kind: 'add', nutrient: 'protein', amountG: c.proteinLeftG }] : []);
       }
-      return c.proteinLeftG > 0 ? allowedOrders(c.limits, [{ ...proteinAdd, ...(c.kcalLeft > 0 ? { amountKcal: c.kcalLeft } : {}) }]) : [];
+      return c.proteinLeftG > 0 ? allowedOrders(c.limits, [{ ...proteinAdd, ...(c.kcalLeft >= 0 ? { amountKcal: c.kcalLeft } : {}) }]) : [];
     case 'close':
       return allowedOrders(c.limits, [{ kind: 'backToPlan', limitKcal: c.targetKcal }]);
     default:

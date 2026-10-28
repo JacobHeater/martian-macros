@@ -18,7 +18,7 @@ const R = FoodSignalRule;
  * mostly of alcohol.
  */
 export function foodsThatFit(history: readonly FoodEntry[], proteinLeftG: number, kcalLeft: number): CoachFood[] {
-  if (!(proteinLeftG > 0) || !(kcalLeft > 0)) return [];
+  if (!(proteinLeftG > 0) || !(kcalLeft > 0) || proteinLeftG * 4 > kcalLeft) return [];
   // Each time a food or a meal was eaten: its calories and protein, and how much of it can be read.
   const times = new Map<string, { name: string; days: Set<number>; at: Map<string, { kcal: number; proteinG: number; countable: number }> }>();
   for (const e of history) {

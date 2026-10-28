@@ -164,6 +164,8 @@ export function analyseFoodDay(
               proteinTargetG: targets.proteinG,
               kcalLeft,
               proteinLeftG,
+              proteinUnrecoverable:
+                !limits.proteinOnly && !limits.noMoreProtein && kcalLeft >= 0 && proteinLeftG > 0 && proteinLeftG * 4 > kcalLeft ? 1 : 0,
               proteinOnly: limits.proteinOnly ? 1 : 0,
               proteinShown: limits.noMoreProtein ? 0 : 1,
               marked: dayKind === 'refeed' ? 1 : dayKind === 'dayOff' ? 2 : 0,
