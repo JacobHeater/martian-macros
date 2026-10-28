@@ -82,7 +82,7 @@ it('typing a value for today overrules the import, which is kept', async () => {
   await expect.poll(() => weighIn().value).toBe('81.4');
   await userEvent.clear(weighIn());
   await userEvent.type(weighIn(), '80.9');
-  const hero = screen.getByRole('heading', { name: 'Today’s weigh-in' }).closest('.mm-hero') as HTMLElement;
+  const hero = screen.getByRole('heading', { name: 'Today’s weigh-in' }).closest('.mm-surface') as HTMLElement;
   await userEvent.click(within(hero).getByRole('button', { name: 'Save' }));
   await expect.poll(async () => (await first(repos.weights.watchWeights())).length).toBe(1);
   await expect.poll(() => weighIn().value).toBe('80.9');

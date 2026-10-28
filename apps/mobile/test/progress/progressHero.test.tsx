@@ -26,7 +26,7 @@ async function openProgress(): Promise<InMemoryRepositories> {
 
 it('the hero has one figure, the trend weight, and the changes as one line beneath it', async () => {
   await openProgress();
-  const hero = document.querySelector('.mm-hero') as HTMLElement;
+  const hero = screen.getByRole('heading', { name: 'Weight trend' }).closest('.mm-surface') as HTMLElement;
   const figures = hero.querySelectorAll('.chart-stat-figure, .food-hero-figure, .app-figure');
   expect(figures).toHaveLength(1);
   expect(figures[0]?.textContent).toMatch(/^Trend weight \d+\.\d lb$/);

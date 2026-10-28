@@ -65,7 +65,7 @@ it('Trend only: the chart is a line and band with no dots, and no raw reading ap
   expect(await screen.findByText(/^Trend [\d.]+ kg$/)).toBeInTheDocument();
   expect(document.body.textContent).not.toContain(`${todaysReading}`);
   await openTab('Progress');
-  await screen.findByText(/last 7 days/);
+  await screen.findAllByText(/last 7 days/);
   expect(document.querySelector('.chart-trend')).not.toBeNull();
   expect(dots()).toBe(0);
   expect(document.body.textContent).not.toContain(`${todaysReading}`);
@@ -78,7 +78,7 @@ it('Switching back: with Everything the full history of readings is shown', asyn
   renderApp(repos, today);
   expect(await screen.findByText(new RegExp(`^Today ${todaysReading} kg`))).toBeInTheDocument();
   await openTab('Progress');
-  await screen.findByText(/last 7 days/);
+  await screen.findAllByText(/last 7 days/);
   expect(dots()).toBeGreaterThan(20);
 });
 
@@ -89,7 +89,7 @@ it('Hidden: no screen shows a weight in any unit, and the dashboard says the pac
   expect(document.body.textContent).not.toMatch(weightFigure);
   for (const tab of ['Progress', 'Coach']) {
     await openTab(tab);
-    await screen.findByText(tab === 'Progress' ? /Against your plan’s pace/ : 'Your metabolism');
+    await screen.findAllByText(tab === 'Progress' ? /Against your plan’s pace/ : 'Your metabolism');
     expect(document.body.textContent, tab).not.toMatch(weightFigure);
   }
   expect(document.querySelector('.chart-trend')).toBeNull();

@@ -81,7 +81,7 @@ it('MM-340: Coach with no weigh-in offers a way to log one', async () => {
   renderApp(empty, today);
   await openTab('Coach');
   await screen.findByText('The coach starts from your first weigh-in.');
-  expect(screen.getByRole('button', { name: /weigh/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: 'Today’s weigh-in' })).toBeInTheDocument();
 });
 
 it('MM-340: weighed in, and a record the coach needs unread: Coach says so, never a spinner for good', async () => {
