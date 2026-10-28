@@ -32,6 +32,7 @@ const libraries: Record<string, readonly string[]> = {
   'libsodium-wrappers-sumo': ['backup/SodiumBackupCipher.ts'],
   '@capacitor/core': ['platform/', 'sql/native/', 'foodCatalog/download/native/'],
   '@capacitor/app': ['platform/'],
+  '@capacitor/haptics': ['platform/'],
   '@mui/icons-material/': ['ui/'],
   '@storybook/react-vite': ['gallery/'],
   'storybook/test': ['gallery/'],

@@ -18,7 +18,9 @@ From the owner (2026-10-26, D-4): a food moved to another day keeps its time eat
 
 Choices made without asking (say if any is wrong):
 - **"Select"** in a food's ⋯ menu, or a logged meal's, starts choosing with that one ticked. Choosing does
-  not start on a long press: that is easy to miss and collides with swiping a food away.
+  not start on a long press: that is easy to miss and collides with swiping a food away. (Reversed by MM-661,
+  the owner, 2026-10-27: a long press starts choosing too, with one tap under the finger; a drifting finger is
+  not holding, so swiping stands.)
 - **While choosing**, each row of the day is a box to tick (the design system's check row, MM-266), with
   the food's name and calories. A logged meal is one box and stands for all its foods (MM-587). Choosing
   only some foods of a meal is not offered. The meals' own actions (add, copy, menu) step aside, and

@@ -23,6 +23,8 @@ interface LoggedMealRowProps {
   grade: FoodGradeValue | undefined;
   /** Starts choosing foods to change together, with this meal chosen (MM-634). */
   onSelect?: (() => void) | undefined;
+  /** A long press on the row (MM-661): choosing with this meal ticked. */
+  onLongPress?: (() => void) | undefined;
   /** Takes focus when drawn: choosing has just ended on this meal (MM-634). */
   autoFocus?: boolean | undefined;
 }
@@ -36,7 +38,7 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
  * opens to its foods; swiped away or deleted, the whole meal goes, with
  * Undo.
  */
-export function LoggedMealRow({ loggedMeal, day, grade, onSelect, autoFocus }: LoggedMealRowProps) {
+export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, autoFocus }: LoggedMealRowProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
   const level = useLoaded(state.detailLevel) ?? 'standard';
@@ -52,7 +54,7 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, autoFocus }: L
     <MmSwipeToRemove onRemove={remove}>
       <div className="food-meal-entry">
         <div className="food-entry-open">
-          <MmPressable label={`View ${loggedMeal.name}`} describedBy={linesId} onPress={view} autoFocus={autoFocus}>
+          <MmPressable label={`View ${loggedMeal.name}`} describedBy={linesId} onPress={view} autoFocus={autoFocus} onLongPress={onLongPress}>
             <span className="food-entry">
               <span className="food-entry-method" role="img" aria-label="Meal">
                 <MmIcon name="food" size={20} />
