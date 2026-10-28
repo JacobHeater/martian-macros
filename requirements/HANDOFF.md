@@ -8,16 +8,22 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-27, by Claude, Session 45.
+Last updated: 2026-10-28, by Gemini, Session 46.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
-each, merged by Claude when green (`gh pr merge --merge`; no branch
+each, merged when green (`gh pr merge --merge`; no branch
 protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
 
-**Open PRs at the end of Session 45:** none expected (MM-652 and MM-653 merge when green). A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 46:** none (#355, #356, #357 and #358 all merged green; only this handoff PR is opened and merged). A new session still checks `gh pr list` first.
+
+**Coaching architecture & UI overhaul, the owner's push of 2026-10-27 to 2026-10-28** (MM-663 to MM-667, PRs #355 to #358). Built and merged:
+- **MM-663** (PR #355): deterministic pre-calculated `ExecutiveBrief` (`executiveBriefOf`) and `MealBreakdownAnalysis` (`mealBreakdownAnalysisOf`), whole-situation paragraph archetypes for offline / no-key coaching (`executiveBriefArchetypeText`, `mealBreakdownArchetypeText`), and the hard mathematical invariant `proteinRemainingG * 4 <= kcalRemaining` enforced across intraday coaching (`analyseFoodDay`, `dayAdviceOf`, `foodFindingText`, `executiveBriefOf`, `mealBreakdownAnalysisOf`, `verifyCoachNarration`). When protein cannot fit inside remaining calories, advice pivots to pure protein sources for the remaining calorie budget and marks protein as unrecoverable today without pushing the user over their calorie budget.
+- **MM-664 & MM-665** (PR #356): lifted the zero-AI runtime policy (`docs/non-goals.md`, MM-144, `privacyPolicy.ts`, `termsOfUse.ts`) and added optional BYOK LLM coaching narration (`CoachNarrator` with `HttpCoachNarrator` and `InMemoryCoachNarrator`; `CoachAiStore` with `LocalStorageCoachAiStore` and `InMemoryCoachAiStore`) supporting `Google Gemini`, `OpenAI`, and `Anthropic` in `Settings > Coach` (`CoachSettingsSection.tsx`), guarded by `verifyCoachNarration` with automatic fallback to the deterministic archetype paragraph.
+- **MM-666** (PR #357): on-demand `"Coach breakdown"` sheet (`MealBreakdownSheet.tsx`, `showMealBreakdownSheet.tsx`) in every non-empty meal's overflow (`⋯`) menu (`MealSection.tsx`), plus concrete higher-protein swaps (`swapFor`) wired into inline `mostlyFat` and `lightOnProtein` food insights (`useItemInsightContents.ts`).
+- **MM-667** (PR #358): consolidated the 5-tab navigation bar into 4 tabs (`Dashboard`, `Food`, `Train`, `Coach` in `destinations.ts`), added `ExecutiveSummaryCard.tsx` at the top of `CoachScreen.tsx`, embedded `ProgressScreen` into `CoachScreen.tsx`, made the bottom telemetry sections (`Your metabolism`, `Coach confidence`, `Body`) collapsible, and retired `RecentInsightsSection.tsx` and `useRecentInsights.ts`.
 
 **Food logging, the owner's push of 2026-10-26** (`docs/food-logging-plan.md`, WS-08 steps 18 to 23). Built and
 merged: MM-623 to MM-626 (reuse keeps every nutrient; saves said and pressed once; meal writes all or nothing
@@ -248,6 +254,13 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 46: 2026-10-28, Gemini (coaching architecture, BYOK narration, meal breakdowns & unified Coach tab; 4 PRs)
+
+- **The owner's words:** "I have NO concerns lifting the zero AI policy, and I'm ready to do so. We've got to get Coaching sounding human, and I like your plan to trim costs. So, I want determinstic engine with precalc, and we'll keep the human sounding determinsm track for offline modes, or users who don't want to supply keys, and then run BYOK with users who bring keys."
+- **Merged:** #355 (MM-663: `executiveBriefOf`, `mealBreakdownAnalysisOf`, offline paragraph archetypes, and the hard `proteinRemainingG * 4 <= kcalRemaining` invariant across intraday coaching and narration validation), #356 (MM-664, MM-665: lifted zero-AI runtime policy in `docs/non-goals.md`, MM-144, privacy policy, and terms of use; added `CoachNarrator` and `CoachAiStore` with `Google Gemini`, `OpenAI`, and `Anthropic` BYOK in `Settings > Coach`), #357 (MM-666: on-demand `"Coach breakdown"` sheet from meal overflow menu and higher-protein `swapFor` suggestions on `mostlyFat` / `lightOnProtein` inline insights), #358 (MM-667: consolidated 4-tab navigation `Dashboard`, `Food`, `Train`, `Coach`, `ExecutiveSummaryCard` at top of `CoachScreen`, embedded `ProgressScreen`, collapsible bottom telemetry sections, retired `RecentInsightsSection`), and this handoff PR.
+- **Lessons:** `apps/mobile/scripts/check-unseen.mjs` uses `/<[A-Z][A-Za-z]*[\s/>]/` to spot JSX in unexecuted callbacks, which also matches TypeScript type arguments like `overlays.options<CoachAiProvider>(...)`; omit the explicit generic parameter so the type is inferred from `choices`. `CoachScreen`'s collapsible `<MmSection title="Your metabolism">` needs `remember="coach.metabolism-section"` so its fold state does not collide with `MetabolismSummary`'s inner `<MmDisclosure remember="coach.metabolism">`.
+- **Not run:** nothing was run locally; CI validated every merge.
+
 ## Session 43: 2026-10-26, Claude (food logging: a plan, then its build; 18 PRs)
 
 - **The owner's words:** asked for an evidence-backed food-logging improvement plan (multi-food logging, alternate
@@ -297,31 +310,3 @@ MM-242, a draft by non-lawyers that blocks release.
   branch; nothing was lost). Pushing straight to main is refused by auto mode: merge through PRs.
 - **Not run:** nothing was run locally; CI validated every merge. Main's CI is green at 86744579.
 
-## Session 41: 2026-10-21, Claude (the push through M3 and M4: builders in parallel, 30 PRs merged)
-
-- **The owner's words this session:** "I want all milestones done in rapid fire. No more excuses, and no more
-  delays." The owner allowed `gh pr merge` and lifted the subagent cap for this push. On #211: "I reject #211 icons."
-- **Merged:** #195 (backup by share sheet only), #196 (MM-438), #197 (MM-439), #198 (MM-440), #200 (MM-92, MM-33:
-  the longest logging run and personal records in the monthly report), #201 (MM-71: the primary scale, schema v15;
-  MM-443, a `StreamCell` that ignored a change made while it woke), #202 (MM-248: exact alarms), #204 (MM-214,
-  MM-215, MM-222: the Train hierarchy), #206 (MM-391, MM-392), #207 (MM-125: the protein marker on the reference
-  weight), #209 (MM-126, MM-127: standard drinks, the fiber insight), #212 (MM-386, MM-387, MM-471: the catalog
-  closes what it replaces, downloads streamed to a file natively), #215 (MM-189: the rules for platform workouts).
-- **Also merged:** #205 (MM-45), #208 (MM-116, MM-117), #210 (MM-46), #213 (MM-329), #214 (MM-129: lean-gain
-  guardrails), #216 (MM-191), #217 (MM-34: the body-fat range), #219 (MM-73: a year of history), #222 (MM-113,
-  unwired), #225 (MM-72: sync on open and on return), #224 (MM-36: phase planning on the body-fat range; a gain ends
-  where MM-129 says, at the upper end of the range), #226 (MM-495; MM-432 closed), #221 (MM-122,
-  MM-124, MM-486: the balance and week shape, stored at schema v16; unchosen stays as issued), #227 (MM-489, MM-70,
-  MM-314, MM-522: food, water and workouts written to Health Connect and Apple Health, each behind its own switch). The owner merged #203 (MM-95, MM-247) and #218 (MM-454).
-- **Closed:** #211 (MM-109's planet icon) and #220 (MM-432), by the owner. MM-368 was declined as medical advice.
-- **New tickets:** MM-441, MM-442 (WS-11), MM-443 (done), MM-447 (Train decisions), MM-450 (body fat in the report),
-  MM-453 (the terms predate the backup), MM-454, MM-456, MM-471 (done), MM-474 (dev and demo icon markers, moot
-  while the owner's art stays), MM-480, MM-486, MM-489, MM-490, MM-495 (done), MM-498 (skipped test), MM-501,
-  MM-502, MM-507, MM-510, MM-513, MM-514, MM-515, MM-516, MM-522.
-- **Lessons:** a ticket placed in a step must also be in that milestone's `requires` list, or `mm check` fails (twice
-  today). Scripted edits failed silently three times (a reminder toggle, a swallowed comment, an emptied ticket):
-  re-read every scripted edit. The shared "Built" and "In progress" lines in the workstream files conflict on almost
-  every merge; record status in `roadmap.json` and touch only a step's own lines. Two green PRs can still break `main`
-  together (#221 and #227 crossed on the eraser contract; #228 fixed it): check `main`'s run after a burst of merges. `gh` lives in `~/.local/bin`, and
-  `/usr/bin/git` (not `/usr/local/bin`'s 2.10) pushes with `-c credential.helper='!gh auth git-credential'`.
-- **Not run:** nothing was run locally; CI validated every merge.
