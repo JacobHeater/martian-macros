@@ -73,7 +73,7 @@ tradeCatalogContract('Over the food catalog', async (seeds) => {
   );
 });
 
-it('lists only the groups of the foods logged, and a food with no serving at 100 g', async () => {
+it('lists the groups of the foods logged and the protein groups (MM-684), and a food with no serving at 100 g', async () => {
   const cereal = packEntryOf({
     packId: tradeCatalogPackId,
     foodId: 1,
@@ -93,7 +93,8 @@ it('lists only the groups of the foods logged, and a food with no serving at 100
   expect(trades.groupOf({ packId: tradeCatalogPackId, foodId: 1 })).toBe('breakfastCereals');
   // Not logged from the catalog, so its group was never looked up.
   expect(trades.groupOf({ packId: tradeCatalogPackId, foodId: 3 })).toBeUndefined();
-  expect(trades.candidatesIn('fish', { minKcal: 0, maxKcal: undefined })).toEqual([]);
+  // Fish is a protein group: read whether or not the person logged from it, for a lean protein food to add (MM-684).
+  expect(trades.candidatesIn('fish', { minKcal: 0, maxKcal: undefined }).map((f) => f.name)).toEqual(['Tuna']);
   const listed = trades.candidatesIn('breakfastCereals', { minKcal: 0, maxKcal: undefined });
   expect(listed.map((f) => [f.name, f.grams]).sort()).toEqual([
     ['Bran flakes', 100],

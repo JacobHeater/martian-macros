@@ -72,6 +72,15 @@ describe('the policy matches the app', () => {
     }
   });
 
+  // MM-685: with a key the model may ask the app for more, and what the app answers goes to the provider too.
+  it('says what the coach’s tools send with a key: the meal’s foods, the foods at that meal, the week, and database lookups', () => {
+    for (const text of [android, ios]) {
+      expect(text).toContain('The model may ask the app for more while it writes');
+      expect(text).toContain('the meal’s foods with their calories and macros, the foods you have logged at that meal, your week’s totals and training, and what it looks up in the food database');
+      expect(text).toContain('Those answers go to the provider too.');
+    }
+  });
+
   it('names the Google reader on Android, as Google describes it, and says it is not given the records', () => {
     expect(android).toMatch(/ML Kit/);
     expect(android).toContain('It is not given your records.');

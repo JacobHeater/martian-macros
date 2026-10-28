@@ -1304,6 +1304,18 @@ export const CoachExecutiveSummaryTraining = screenStory({
   open: onCoach,
 });
 
+/** MM-686: the model writing past three seconds: "Answer now" under the summary's wait, the built-in words at a press. */
+export const CoachWritingAnswerNow = screenStory({
+  covers: ['CoachScreen'],
+  shows: 'Answer now',
+  device: writingCoach,
+  viewport: 'smallPhone',
+  open: onCoach,
+  walk: async (canvas) => {
+    await within(canvas).findByRole('button', { name: 'Answer now' }, { timeout: 5000 });
+  },
+});
+
 /** MM-673: a BYOK coach set up and writing: the wait stands where the summary's words and each finding's will. */
 export const CoachWriting = screenStory({
   covers: ['CoachScreen'],

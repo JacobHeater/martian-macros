@@ -6,6 +6,7 @@ import type { SwapNameIndex } from '../engine/analysis/swap/SwapNameIndex';
 import { swapNameIndexOf } from '../engine/analysis/swap/swapNameIndexOf';
 import type { TradeCatalogFood } from '../engine/analysis/TradeCatalogFood';
 import type { TradeTarget } from '../engine/analysis/TradeTarget';
+import { proteinGroups } from '../engine/analysis/moves/proteinGroups';
 import { gradeMicrosFrom } from '../engine/gradeMicrosFrom';
 import { gradeOfNutrition } from '../engine/gradeOfNutrition';
 import type { CatalogFood } from '../foodCatalog/CatalogFood';
@@ -53,7 +54,9 @@ export class CatalogTradeCatalog implements TradeCatalog {
       if (group !== undefined) groups.set(key, group);
     }
     const foods = new Map<FoodGroup, TradeCatalogFood[]>();
-    for (const group of new Set(groups.values())) {
+    // The protein groups are read whether or not the person logged from them: a lean protein food to add or to
+    // carry the next meal comes from the catalog first (MM-684).
+    for (const group of new Set([...groups.values(), ...proteinGroups])) {
       const listed: TradeCatalogFood[] = [];
       for (const hit of await catalog.search('', { group, limit: perGroup })) {
         if (hit.food.group !== group || !(hit.food.kcal > 0)) continue;

@@ -93,7 +93,7 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
     expect(protectedText).not.toMatch(/kcal|calorie/i);
   });
 
-  it('computes MealBreakdownAnalysis with tactical impact, outlier item, and deterministic swap', () => {
+  it('computes MealBreakdownAnalysis with tactical impact, the outlier and the move (MM-684)', () => {
     const mealEntries = [
       food(today, 'lunch', 'Grilled chicken', 220, 40, 5),
       food(today, 'lunch', 'Loaded nachos', 780, 14, 48),
@@ -117,14 +117,15 @@ describe('protein runway invariant and deterministic pre-calc (MM-663)', () => {
     expect(analysis.mealKcal).toBe(1000);
     expect(analysis.mealProteinG).toBe(54);
     expect(analysis.outlierItem?.name).toBe('Loaded nachos');
-    expect(analysis.suggestedSwap?.replacementName).toBe('Turkey breast wrap');
-    expect(analysis.suggestedSwap?.caloriesSaved).toBe(300);
-    expect(analysis.suggestedSwap?.proteinGained).toBe(28);
+    // The wrap is not of the nachos' group (no group is known for either), so it is no swap (MM-683); nor is it lean
+    // enough to add. The nachos are cut, and the day's protein is still to go.
+    expect(analysis.moves.best?.kind).toBe('cutPortion');
 
     const text = mealBreakdownArchetypeText(analysis);
-    expect(text).toMatch(/Lunch used 42% of your daily calorie budget/);
-    expect(text).toMatch(/loaded nachos/i);
-    expect(text).toMatch(/Turkey breast wrap/);
+    expect(text).toBe(
+      'Lunch was 1,000 kcal for 54 g of protein. The loaded nachos are the drag: 780 kcal for 14 g. ' +
+        'Half of it next time keeps 390 kcal for protein. You have 1,400 kcal left for 116 g today. Dinner carries it.',
+    );
   });
 
   it('verifies candidate narrations against numbers, voice rules, protected path, and protein invariant', () => {

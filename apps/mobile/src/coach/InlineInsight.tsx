@@ -5,6 +5,8 @@ import { useLoaded } from '../app/useLoaded';
 import { useNavigator } from '../app/useNavigator';
 import { InsightSnooze } from '../engine/InsightSnooze';
 import { CoachAreaScreen } from '../settings/CoachAreaScreen';
+import { coachAnalysisWords } from '../format/coachAnalysisWords';
+import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmButton } from '../ui/MmButton';
 import { MmDisclosure } from '../ui/MmDisclosure';
 import { MmIcon } from '../ui/MmIcon';
@@ -70,6 +72,15 @@ export function InlineInsight({ insight, layout = 'entry', initiallyExpanded = f
       onAction: () => void services.insightSnoozes.removeInsightSnooze(snooze.kind, snooze.subject),
     });
   };
+
+  // The day's lines are being phrased by the person's own model (MM-687): the wait stands where the line will.
+  if (insight.waiting === true) {
+    return (
+      <div ref={host} className={`coach-inline-insight coach-inline-insight-${layout}`}>
+        <MmBusyLine label={coachAnalysisWords.writing} />
+      </div>
+    );
+  }
 
   return (
     <div ref={host} className={`coach-inline-insight coach-inline-insight-${layout}`}>
