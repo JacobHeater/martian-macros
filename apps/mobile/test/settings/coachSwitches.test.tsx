@@ -47,3 +47,28 @@ it('ease into maintenance is off until switched on, and claims nothing about met
   await userEvent.click(ease);
   await expect.poll(async () => first(repos.preferences.watchEaseIntoMaintenance())).toBe(true);
 });
+
+// MM-678: the floors the coach holds cardio to, the coach's defaults until typed, each saved on its own.
+it('the cardio floors show the defaults until set, and a typed floor is kept', async () => {
+  await openCoach();
+  const steps = await screen.findByRole('textbox', { name: 'Steps a day floor' });
+  expect(steps).toHaveValue('8000');
+  expect(screen.getByText(/The coach's default is 8,000 a day/)).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: 'Cardio minutes a week floor' })).toHaveValue('150');
+  await userEvent.clear(steps);
+  await userEvent.type(steps, '10000');
+  await userEvent.click(screen.getByRole('button', { name: 'Save steps floor' }));
+  await expect.poll(async () => (await first(repos.preferences.watchCardioFloors())).stepsPerDay).toBe(10000);
+  expect((await first(repos.preferences.watchCardioFloors())).minutesPerWeek).toBeUndefined();
+  expect(await screen.findByText(/Yours\. The coach holds you to it/)).toBeInTheDocument();
+});
+
+it('a floor out of range is refused and nothing is saved', async () => {
+  await openCoach();
+  const minutes = await screen.findByRole('textbox', { name: 'Cardio minutes a week floor' });
+  await userEvent.clear(minutes);
+  await userEvent.type(minutes, '5000');
+  await userEvent.click(screen.getByRole('button', { name: 'Save cardio floor' }));
+  expect(await screen.findByText('That floor is out of range.')).toBeInTheDocument();
+  expect((await first(repos.preferences.watchCardioFloors())).minutesPerWeek).toBeUndefined();
+});

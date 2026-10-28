@@ -25,6 +25,8 @@ const stall = (
     change,
     atFloor = false,
     low = false,
+    stepsNow,
+    stepsBefore,
   }: {
     gaining?: boolean;
     intake?: number;
@@ -33,6 +35,8 @@ const stall = (
     change?: number;
     atFloor?: boolean;
     low?: boolean;
+    stepsNow?: number;
+    stepsBefore?: number;
   } = {},
 ) =>
   new StallAssessment({
@@ -49,6 +53,8 @@ const stall = (
     expectedChangeKcal: change,
     atFloor,
     estimateLow: low,
+    stepsNowPerDay: stepsNow,
+    stepsBeforePerDay: stepsBefore,
   });
 
 const every = [
@@ -57,6 +63,7 @@ const every = [
   stall('masked', { event: true }),
   stall('intake', { intake: 2350 }),
   stall('intake', { intake: 1850, gaining: true }),
+  stall('activity', { stepsNow: 5200, stepsBefore: 8100 }),
   stall('estimate', { change: -100 }),
   stall('estimate'),
   stall('estimate', { atFloor: true }),
@@ -84,6 +91,15 @@ it('intake states both figures and offers options', () => {
   expect(body).toContain('At 2,350 the app would expect roughly the pace');
   expect(options).toHaveLength(2);
   expect(options[0]).toBe('Keep the target');
+});
+
+// MM-678: moving less is said with both averages and the steps ordered back, before anything about the estimate.
+it('moving less states both averages of steps and orders them back', () => {
+  const [body, options] = stallText(stall('activity', { stepsNow: 5200, stepsBefore: 8100 }), fmt);
+  expect(body).toContain('about 5,200 a day over the last 21 days against about 8,100 a day in the 4 weeks before');
+  expect(body).toContain('Get the steps back to 8,100');
+  expect(body).not.toContain('estimated');
+  expect(options).toEqual([]);
 });
 
 it('the estimate diagnosis gives the size of the coming change', () => {

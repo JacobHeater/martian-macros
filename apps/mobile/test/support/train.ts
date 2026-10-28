@@ -41,7 +41,8 @@ export function finishedWorkout(
 /** Opens the Train destination of an app already drawn. */
 export async function openTrain(): Promise<void> {
   await openTab('Train');
-  await screen.findByRole('button', { name: 'Weekly training volume' });
+  // The fold's header (MM-680) is named by its title and its summary line.
+  await screen.findByRole('button', { name: /^Weekly training volume/ });
 }
 
 /** Starts a workout from the Train screen and waits for it to open. */

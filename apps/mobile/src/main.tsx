@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
+import { CrashBoundary } from './app/CrashBoundary';
 import { openAppServices } from './app/openAppServices';
 import { seedDemo } from './app/seedDemo';
 import { CapacitorSystemBars } from './platform/CapacitorSystemBars';
@@ -19,9 +20,12 @@ openAppServices()
     // time, and says so on every screen (MM-177). Only the demo identity
     // may: the build refuses the flag on any other (MM-8), and so does this.
     const demo = await seedDemo({ services, asked: __MM_DEMO_SEED__ && __MM_IDENTITY__ === 'demo', native: runningNatively() });
+    // A crash in the app's own root is said too (MM-679), unthemed rather than blank; the app's own boundary keeps the theme.
     root.render(
       <StrictMode>
-        <App services={services} systemBars={systemBars} demo={demo} />
+        <CrashBoundary>
+          <App services={services} systemBars={systemBars} demo={demo} />
+        </CrashBoundary>
       </StrictMode>,
     );
   })

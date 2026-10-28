@@ -22,6 +22,8 @@ interface StallAssessmentInit {
   estimateLow?: boolean;
   shortSleepAverageMinutes?: number | undefined;
   shortSleepNights?: number | undefined;
+  stepsNowPerDay?: number | undefined;
+  stepsBeforePerDay?: number | undefined;
 }
 
 /**
@@ -77,6 +79,14 @@ export class StallAssessment {
   readonly shortSleepAverageMinutes: number | undefined;
   readonly shortSleepNights: number;
 
+  /**
+   * Steps a day over the window and over the weeks before it (MM-678),
+   * when both had enough days to compare; the activity diagnosis rests on
+   * them. Undefined when they could not be compared.
+   */
+  readonly stepsNowPerDay: number | undefined;
+  readonly stepsBeforePerDay: number | undefined;
+
   constructor(init: StallAssessmentInit) {
     this.status = init.status;
     this.windowDays = init.windowDays;
@@ -97,6 +107,8 @@ export class StallAssessment {
     this.estimateLow = init.estimateLow ?? false;
     this.shortSleepAverageMinutes = init.shortSleepAverageMinutes;
     this.shortSleepNights = init.shortSleepNights ?? 0;
+    this.stepsNowPerDay = init.stepsNowPerDay;
+    this.stepsBeforePerDay = init.stepsBeforePerDay;
   }
 
   static notAssessed(reason: StallNotAssessedReason, { windowDays }: { windowDays: number }): StallAssessment {

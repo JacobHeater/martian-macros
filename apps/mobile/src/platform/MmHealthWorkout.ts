@@ -20,4 +20,10 @@ export interface MmHealthWorkout {
    * plugin, where the client id alone tells.
    */
   readonly ours?: boolean;
+  /**
+   * What the platform called a non-strength session (MM-677), by one of
+   * `CardioActivity`'s names; "" for a strength session. Absent from an
+   * older plugin, which says no activity.
+   */
+  readonly activity?: string;
 }

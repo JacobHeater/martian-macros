@@ -9,9 +9,10 @@ import { WorkoutController } from '../../state/WorkoutController';
 import { CustomExerciseScreen } from '../../train/CustomExerciseScreen';
 import { ExercisePickerScreen } from '../../train/ExercisePickerScreen';
 import { ProgressionSettingsScreen } from '../../train/ProgressionSettingsScreen';
-import { WeeklyVolumeScreen } from '../../train/WeeklyVolumeScreen';
 import { WorkoutScreen } from '../../train/WorkoutScreen';
 import { WorkoutTimesScreen } from '../../train/WorkoutTimesScreen';
+import { cardioWearable } from './cardioWearable';
+import { waitingRead } from './waitingRead';
 import { failingRead } from './failingRead';
 import { firstDayScenario } from './firstDayScenario';
 import { oldLiftsScenario } from './oldLiftsScenario';
@@ -87,12 +88,6 @@ export const Suggestions = screenStory({
   open: ({ navigator }) => void navigator.push(() => <ProgressionSettingsScreen exerciseId="back-squat" />),
 });
 
-export const WeeklyVolume = screenStory({
-  covers: ['WeeklyVolumeScreen'],
-  shows: 'Weekly training volume',
-  open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
-});
-
 // ---- MM-321: the Train screen's states no story drew ----
 
 const onTrain = ({ state }: StoryStage) => state.homeTab.put('train');
@@ -148,28 +143,89 @@ export const TrainWorkoutInProgress = screenStory({
   walk: pressNamed('Continue'),
 });
 
-/** MM-321: the week's volume opens from Train. */
-export const TrainOpensWeeklyVolume = screenStory({
-  covers: ['TrainScreen', 'WeeklyVolumeScreen'],
+// ---- MM-680 (the owner): the week's volume and the week's cardio as folds in place, in each state ----
+
+/** MM-78, MM-680: the week's hard sets by muscle group, unfolded on Train. */
+export const WeeklyVolume = screenStory({
+  covers: ['TrainScreen'],
   shows: 'Weekly training volume',
   open: onTrain,
   walk: pressNamed(/^Weekly training volume/),
 });
 
-/** MM-321: the week's volume before any workout. */
+/** MM-680: the week's volume before any workout. */
 export const WeeklyVolumeEmpty = screenStory({
-  covers: ['WeeklyVolumeScreen'],
-  shows: 'Weekly training volume',
+  covers: ['TrainScreen'],
+  shows: 'No hard sets in the last seven days.',
   scenario: firstDayScenario,
-  open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
+  open: onTrain,
+  walk: pressNamed(/^Weekly training volume/),
 });
 
-/** MM-321: the workouts could not be read for the week's volume. */
+/** MM-680: the workouts could not be read for the week's volume: the notice in the fold, with Try again. */
 export const WeeklyVolumeFailed = screenStory({
-  covers: ['WeeklyVolumeScreen'],
-  shows: 'Weekly training volume',
+  covers: ['TrainScreen'],
+  shows: 'Could not read training history.',
   stores: failingRead('workouts', 'watchWorkouts'),
-  open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
+  open: onTrain,
+  walk: pressNamed(/^Weekly training volume/),
+});
+
+/** MM-677, MM-680: a fortnight of a watch's sessions and the phone's steps, drawn: the figures, the steps by day, the minutes by activity. */
+export const Cardio = screenStory({
+  covers: ['TrainScreen'],
+  shows: /steps a day · .* of cardio this week/,
+  device: cardioWearable(),
+  open: onTrain,
+  walk: pressNamed(/^Cardio/),
+});
+
+/** MM-680: the sessions one tap down inside the Cardio fold. */
+export const CardioSessions = screenStory({
+  covers: ['TrainScreen'],
+  shows: /steps a day · .* of cardio this week/,
+  device: cardioWearable(),
+  open: onTrain,
+  walk: async (canvas) => {
+    await pressNamed(/^Cardio/)(canvas);
+    await pressNamed(/^Sessions this week/)(canvas);
+  },
+});
+
+/** MM-680: the Cardio fold with the person's own floors (MM-678) and the week's longest session a stair climb over an hour, at phone width. */
+export const CardioSmallPhone = screenStory({
+  covers: ['TrainScreen'],
+  shows: /steps a day · .* of cardio this week/,
+  viewport: 'smallPhone',
+  device: cardioWearable({ long: true, floorsSet: true }),
+  open: onTrain,
+  walk: pressNamed(/^Cardio/),
+});
+
+/** MM-677: no wearable yet: the fold says what would bring sessions and steps, and draws the empty week. */
+export const CardioEmpty = screenStory({
+  covers: ['TrainScreen'],
+  shows: /Comes from a watch or phone through/,
+  scenario: firstDayScenario,
+  open: onTrain,
+  walk: pressNamed(/^Cardio/),
+});
+
+/** MM-677: the sessions could not be read: the notice in the fold, with Try again. */
+export const CardioFailed = screenStory({
+  covers: ['TrainScreen'],
+  shows: 'Could not read your sessions and steps.',
+  stores: failingRead('cardioSessions', 'watchCardioSessions'),
+  open: onTrain,
+  walk: pressNamed(/^Cardio/),
+});
+
+/** MM-677: the Cardio fold while the sessions are still being read. */
+export const CardioLoading = screenStory({
+  covers: ['TrainScreen'],
+  shows: 'Reading your watch…',
+  stores: waitingRead('cardioSessions', 'watchCardioSessions'),
+  open: onTrain,
 });
 
 /** MM-321: a new workout with nothing in it yet, and Add exercise opening the picker. */
@@ -361,12 +417,13 @@ export const FinishedWorkoutPaused = screenStory({
   },
 });
 
-/** MM-321: sets of an exercise since deleted: the volume says what it could not map. */
+/** MM-321, MM-680: sets of an exercise since deleted: the volume fold says what it could not map. */
 export const WeeklyVolumeUnmapped = screenStory({
-  covers: ['WeeklyVolumeScreen'],
+  covers: ['TrainScreen'],
   shows: /^Missing exercise mappings/,
   scenario: oldLiftsScenario,
-  open: ({ navigator }) => void navigator.push(() => <WeeklyVolumeScreen />),
+  open: onTrain,
+  walk: pressNamed(/^Weekly training volume/),
 });
 
 /** MM-321: a workout's start time pressed opens the clock to set it, to the second (MM-191). */

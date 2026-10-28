@@ -19,6 +19,10 @@ const values = [
   'proteinByTrainingDay',
   /** X3: water logged on training days against the goal and rest days. */
   'waterOnTrainingDays',
+  /** C1: the week's cardio minutes from the wearable against the floor (MM-678). */
+  'cardioMinutes',
+  /** C2: the week's steps a day from the platform against the floor (MM-678). */
+  'stepsPerDay',
 ] as const;
 
 /** The catalog signals of training, water and sleep (MM-609): a `CoachFinding`'s `signal`. */

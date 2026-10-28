@@ -2,6 +2,9 @@ import type { CalendarDate } from '../../domain/CalendarDate';
 import type { IntakeDay } from '../../domain/IntakeDay';
 import type { Pause } from '../../domain/Pause';
 import type { SleepNight } from '../../domain/SleepNight';
+import type { CardioFloors } from '../../domain/training/CardioFloors';
+import type { CardioSession } from '../../domain/training/CardioSession';
+import type { StepsDay } from '../../domain/training/StepsDay';
 import type { Exercise } from '../../domain/training/Exercise';
 import type { ExerciseProgression } from '../../domain/training/ExerciseProgression';
 import type { Workout } from '../../domain/training/Workout';
@@ -40,4 +43,10 @@ export interface TrainingAnalysisInput {
   readonly wholeDays: readonly IntakeDay[];
   /** An eating-disorder history or the under-eating finding holds: no "train more", no held line, no water line. */
   readonly safeguards: Pick<InsightSafeguards, 'eatingDisorderHistory' | 'underEating'>;
+  /** The wearable's cardio sessions (MM-677), for C1; at least the 4 weeks before `asOf`. */
+  readonly cardio: readonly CardioSession[];
+  /** The platform's daily steps (MM-677), for C2; at least the 4 weeks before `asOf`. */
+  readonly steps: readonly StepsDay[];
+  /** The floors the person set (MM-678); the coach's defaults for either unset. */
+  readonly cardioFloors: CardioFloors;
 }

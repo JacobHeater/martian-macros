@@ -801,6 +801,24 @@ export const SettingsOpensPrivacyPolicy = screenStory({
   walk: pressAnywhere(/^Privacy policy/),
 });
 
+/** MM-678: Settings > Coach with the floors the coach holds cardio to, the defaults until the person types their own. */
+export const CoachCardioFloors = screenStory({
+  covers: ['SettingsScreen'],
+  shows: 'Steps a day floor',
+  open: settingsAt('coach'),
+});
+
+/** MM-678: the floors set by the person, said as theirs. */
+export const CoachCardioFloorsSet = screenStory({
+  covers: ['SettingsScreen'],
+  shows: /Yours\. The coach holds you to it/,
+  device: async (services) => {
+    await services.preferences.saveCardioFloors({ stepsPerDay: 10000, minutesPerWeek: 120 });
+    return services;
+  },
+  open: settingsAt('coach'),
+});
+
 /** MM-122: Settings > Coach > Carbs and fat balance, opened from its row. */
 export const SettingsOpensCarbFatBalance = screenStory({
   covers: ['SettingsScreen', 'CarbFatBalanceScreen'],

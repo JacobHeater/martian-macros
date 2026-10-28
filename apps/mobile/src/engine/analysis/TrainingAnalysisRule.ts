@@ -23,6 +23,8 @@ export const TrainingAnalysisRule = {
     rirUnrecorded: 14,
     proteinByTrainingDay: 14,
     waterOnTrainingDays: 14,
+    /** C1 and C2's holding up: at or over the floor in each of the last 4 weeks (MM-678). */
+    cardioHoldingUp: 28,
   },
 
   /** T1's holding up: a session in each of this many weeks. */

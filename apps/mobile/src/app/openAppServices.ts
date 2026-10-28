@@ -147,6 +147,9 @@ export async function openAppServices(): Promise<AppServices> {
       ids: healthWriting,
     }),
     customExercises: repositories.customExercises,
+    // The wearable's cardio sessions and the platform's daily steps, as kept (MM-677).
+    cardioSessions: repositories.cardioSessions,
+    dailySteps: repositories.dailySteps,
     healthSamples: repositories.healthSamples,
     exerciseProgressions: repositories.exerciseProgressions,
     // Erasing or restoring starts entry ids again: a new write namespace keeps new writes from replacing old ones (MM-522).

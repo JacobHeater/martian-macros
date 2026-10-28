@@ -547,6 +547,28 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
     /// MM-188's strength types: a workout of one of these is imported as strength.
     private static let strengthTypes: Set<HKWorkoutActivityType> = [.traditionalStrengthTraining, .functionalStrengthTraining, .coreTraining]
 
+    /// What the app calls a non-strength session (MM-677), by the names of its `CardioActivity`; any other type is "other".
+    private static let cardioActivities: [HKWorkoutActivityType: String] = [
+        .walking: "walking",
+        .running: "running",
+        .hiking: "hiking",
+        .cycling: "cycling",
+        .handCycling: "cycling",
+        .elliptical: "elliptical",
+        .rowing: "rowing",
+        .stairClimbing: "stairClimbing",
+        .stairs: "stairClimbing",
+        .stepTraining: "stairClimbing",
+        .swimming: "swimming",
+        .highIntensityIntervalTraining: "intervals",
+    ]
+
+    /// A session's activity as the app names it (MM-677): "" for strength, else its cardio name, "other" for any type not listed.
+    private static func activity(of type: HKWorkoutActivityType) -> String {
+        if strengthTypes.contains(type) { return "" }
+        return cardioActivities[type] ?? "other"
+    }
+
     /// Workouts (MM-489), this app's own among them, marked `ours` by their source: the adapter skips them. HealthKit has no segments.
     @objc func readWorkouts(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
@@ -560,6 +582,8 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
                     "id": workout.uuid.uuidString,
                     "clientId": workout.metadata?[HKMetadataKeySyncIdentifier] as? String ?? "",
                     "strength": Self.strengthTypes.contains(workout.workoutActivityType),
+                    // Every non-strength session is cardio, by name (MM-677).
+                    "activity": Self.activity(of: workout.workoutActivityType),
                     "startMs": self.ms(workout.startDate),
                     "endMs": self.ms(workout.endDate),
                     "sourceId": workout.sourceRevision.source.bundleIdentifier,

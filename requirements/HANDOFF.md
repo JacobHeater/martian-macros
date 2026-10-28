@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-28, by Gemini, Session 46.
+Last updated: 2026-10-28, by Claude, Session 47.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -16,6 +16,23 @@ each, merged when green (`gh pr merge --merge`; no branch
 protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
+
+**Cardio from the wearable, the owner's push of 2026-10-28 (Session 47, Claude; MM-677, MM-678).** Settled in a four-round Q&A
+with the owner before any code (the owner's standing rule now: a big feature starts with the Q&A): platform only, every
+non-strength session counts, floors of 8,000 steps a day and 150 min a week changeable in Settings › Coach, fat loss and
+recomp only, one "Cardio" section on Train and a row on the Dashboard, both shells, both counted, orders plus a stall
+explanation at a 20% steps drop, the coach's lines built as drafts for the owner to read on the phone. Built in the main
+checkout, uncommitted, **not yet on a branch or through CI** (the owner decides how it ships): schema 31
+(`cardio_sessions`, `daily_steps`, two floor columns), `cardioSessionImports` and `importSteps` in `AppState`,
+`buildCardioWeek`, the Cardio fold on Train (MM-680), the Dashboard row, `cardioFindings` and `stepsFindings` (C1, C2), the `activity` stall
+diagnosis, both native plugins sending a session's `activity`. The non-goal is narrowed to "no burn it off". **MM-679** (the owner, from the phone: the first live run blanked the
+app with no words, a service wired to the wrong object): `CrashBoundary` inside `App` with the theme and around it
+in `main.tsx`, the crash said in `ReadFailedNotice`'s shape with Try again; `test/app/crashBoundary.test.tsx`. **MM-680** (the owner, from the phone: "collapsibles not nav to sub views", "Cardio must
+have infographics"): `WeeklyVolumeFold` and `CardioFold` on Train in place of the two screens, the cardio drawn by
+`CardioWeekFigures`, `StepsByDayChart` and `CardioActivityBars`. **MM-681** (the owner: "coach is completely mute on training"):
+the Executive brief carries a `TrainingBrief` (`trainingBriefOf`), said by `trainingBriefText` after the food and given to the
+model with its figures allowed; the Executive summary shows the three rows; 1d's findings include the week's training,
+cardio and steps accountability.
 
 **Open PRs at the end of Session 46:** none (#355, #356, #357 and #358 all merged green; only this handoff PR is opened and merged). A new session still checks `gh pr list` first.
 
@@ -254,6 +271,14 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 47: 2026-10-28, Claude (cardio from the wearable: the Q&A, then the build of MM-677 and MM-678 in the main checkout)
+
+- **The owner's words:** "Next big swing here on a feature is steady state cardio. I don't want the app to track steady state cardio, but we'll track this in two forms: steps, and cardio workout sessions within the user's wearable. I love strength training here and it must stay, but part of training on any fatloss or recomp program must be steady state cardio. now ask me questions." Then: "q&a sessions only. record that for the record then get started." (a rule, not a scope answer: the Q&A comes first; a first misreading of it as "sessions only" was stopped by the owner and undone).
+- **The Q&A's answers** are in MM-677 and MM-678 under "By the product owner". Among them: every non-strength session counts, so the word is "cardio", never "steady state".
+- **Built, in place on main, uncommitted:** the two tickets, the roadmap (WS-10 step 10, WS-09 step 16, an edge), `docs/non-goals.md`, `docs/evidence.md` rows, and the code and tests listed above. No test was run locally (the owner's rule); the first CI run is owed, and the owner's phones (both shells) are the check that a watch's session arrives with its activity and steps arrive by day.
+- **Lessons:** a Python `replace(..., 1)` on a repeated anchor (`customExercises:`) landed two services inside `MirroredWorkoutLog`'s options instead of on `AppServices`; the phone blanked and nothing said why (MM-679 now does). Check every inserted line's placement, not just that the edit applied. `format/` may not import `state/`: a screen helper that reads the health connection takes the two sets it needs as a structural type. `cardioDisclosureText` is that helper.
+- **Not run:** nothing was run locally.
+
 ## Session 46: 2026-10-28, Gemini (coaching architecture, BYOK narration, meal breakdowns & unified Coach tab; 4 PRs)
 
 - **The owner's words:** "I have NO concerns lifting the zero AI policy, and I'm ready to do so. We've got to get Coaching sounding human, and I like your plan to trim costs. So, I want determinstic engine with precalc, and we'll keep the human sounding determinsm track for offline modes, or users who don't want to supply keys, and then run BYOK with users who bring keys."
@@ -283,30 +308,3 @@ MM-242, a draft by non-lawyers that blocks release.
   fetch on the ref lock: fetch again. The unseen check flagged FoodScreen's loading markup once (#334) though
   FoodLoading draws it; a re-run passed: a coverage flake to watch, not a missing story.
 - **Not run:** nothing was run locally; CI validated every merge.
-
-## Session 42: 2026-10-22, Claude (M0 to M4 finished: five builder lanes, a panel review of everything, ~50 PRs)
-
-- **The owner's words:** "M3 and M4 are both nearly done. Get them finished ASAP"; "Have the subagents now do their
-  reviews"; "I want any ticket that's not done in M0-M4 done tonight and reviewed with the panel. The status must be
-  done." On the failing Pages deploys the owner chose to pause the workflow (#288).
-- **Built and merged:** five lanes in parallel (schema, coaching, health sync, iOS, food/training), then seven panel
-  roles (designer, UX, safety, privacy, measurement, integrations, React) over all of it, then fix PRs for every
-  blocking and should-fix finding, then the last eight M0-M4 tickets (MM-108, 176, 179, 183, 51, 57, 323, 523) with
-  a second panel pass (product, QA, UX, integrations) and its fixes. Schema is at v24 (MM-441 19, MM-456 20, MM-507
-  21, MM-490 22, MM-156 23, MM-118 24).
-- **Decisions taken as defaults, each recorded in its ticket ("say if any is wrong"):** goal body fat shown only in
-  fat loss and recomp; the soft-floor warning announced, not confirmed; a photo self-timer and the front camera on the
-  first set; a smart scale may only make safety stricter (bias 4.5 points, correlation 0.4); only strength workouts
-  imported; Navy tape for men only (no natural-waist site); MM-108's localization files not built (a note, not a
-  criterion; translation would be its own ticket); "No estimate yet" says what fills it.
-- **Bugs found by the panel and CI, fixed:** planned lower days on a shaped week dropped as partial (the estimator
-  and every adherence reader now read a day against its plan, MM-124); a consumer scale narrowing the body-fat range
-  and loosening safety (MM-502); photos savable by long press on iOS, no lock before a photo backup, no Android
-  device-transfer exclusion (MM-157); two Resume buttons while paused (MM-447).
-- **Lessons:** GitHub skips PR CI while a PR conflicts, and a stale branch keeps failing on fixes already on main:
-  merge main into every open branch after a burst of merges. A cancelled run is not a failure: rerun it. The
-  architecture test's import scanner reads `from '…'` inside strings. Coach states ranges in words, never "±", and
-  two "Probably between" on one screen break a test. Never share a worktree between agents (one reset another's
-  branch; nothing was lost). Pushing straight to main is refused by auto mode: merge through PRs.
-- **Not run:** nothing was run locally; CI validated every merge. Main's CI is green at 86744579.
-

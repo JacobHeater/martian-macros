@@ -1,4 +1,6 @@
+import type { CardioSessionRepository } from '../domain/repositories/CardioSessionRepository';
 import type { CustomExerciseRepository } from '../domain/repositories/CustomExerciseRepository';
+import type { DailyStepsRepository } from '../domain/repositories/DailyStepsRepository';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { SavedMealRepository } from '../domain/repositories/SavedMealRepository';
 import type { DataEraser } from '../domain/repositories/DataEraser';
@@ -37,7 +39,9 @@ import type { HealthBackfillMarks } from '../healthIngest/HealthBackfillMarks';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
 import { AppDatabase } from './AppDatabase';
+import { SqlCardioSessionRepository } from './SqlCardioSessionRepository';
 import { SqlCustomExerciseRepository } from './SqlCustomExerciseRepository';
+import { SqlDailyStepsRepository } from './SqlDailyStepsRepository';
 import { SqlCustomFoodRepository } from './SqlCustomFoodRepository';
 import { SqlSavedMealRepository } from './SqlSavedMealRepository';
 import { SqlDataEraser } from './SqlDataEraser';
@@ -117,6 +121,9 @@ export class SqlRepositories {
   readonly recovery: RecoveryCheckInRepository;
   readonly workouts: WorkoutRepository;
   readonly customExercises: CustomExerciseRepository;
+  /** The wearable's cardio sessions and the platform's daily steps (MM-677). */
+  readonly cardioSessions: CardioSessionRepository;
+  readonly dailySteps: DailyStepsRepository;
   readonly healthSamples: HealthSampleStore & HealthBackfillMarks;
   readonly exerciseProgressions: ExerciseProgressionRepository;
   readonly eraser: DataEraser;
@@ -155,6 +162,8 @@ export class SqlRepositories {
     this.recovery = new SqlRecoveryCheckInRepository(db);
     this.workouts = new SqlWorkoutRepository(db);
     this.customExercises = new SqlCustomExerciseRepository(db);
+    this.cardioSessions = new SqlCardioSessionRepository(db);
+    this.dailySteps = new SqlDailyStepsRepository(db);
     this.healthSamples = new SqlHealthSampleStore(db);
     this.exerciseProgressions = new SqlExerciseProgressionRepository(db);
     this.eraser = new SqlDataEraser(db);
