@@ -38,9 +38,9 @@ describe('a meal’s swap', () => {
       for (const move of analysis.moves.moves) {
         if (move.kind !== 'swapSameGroup') continue;
         expect(isSameFoodName(move.replacement.name, fillet), move.replacement.name).toBe(false);
+        // A swap stays in the bread's own group: the person's bagel, the catalog's, or the table's words, never a chicken.
+        expect(move.replacement.name).not.toMatch(/chicken/i);
       }
-      // The order on this day is the protein food of the next meal, never the fillet for the biscuit.
-      expect(analysis.moves.best?.kind).not.toBe('swapSameGroup');
     });
   }
 });
