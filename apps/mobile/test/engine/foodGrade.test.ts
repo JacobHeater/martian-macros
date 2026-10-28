@@ -297,8 +297,9 @@ describe('gradeOfNutrition', () => {
 describe('the cap (MM-660)', () => {
   // The pack's own numbers per 100 g (FNDDS, 2026-10-27).
   const generalTso: GradeNutrition = { kcal: 295, proteinG: 12.9, fatG: 16.4, carbsG: 24, fiberG: 0.9, sodiumMg: 435, sugarsG: 11.6, saturatedFatG: 2.76, alcoholG: undefined, micros: { potassium: 201, calcium: 12, iron: 1.16, magnesium: 18, zinc: 1.3, vitaminA: 11, vitaminC: 1.6, vitaminD: 0.2, vitaminB12: 0.22, folate: 15 } };
-  const friedBreast: GradeNutrition = { kcal: 243, proteinG: 24.6, fatG: 14, carbsG: 7.8, fiberG: 0.3, sodiumMg: 500, sugarsG: 0.3, saturatedFatG: 3.6, alcoholG: undefined, micros: {} };
-  const peanutButter: GradeNutrition = { kcal: 588, proteinG: 25, fatG: 50, carbsG: 20, fiberG: 6, sodiumMg: 429, sugarsG: 10.5, saturatedFatG: 10, alcoholG: undefined, micros: { potassium: 649, magnesium: 168, zinc: 2.9, folate: 87 } };
+  // FNDDS "Chicken breast, fried, coated, skin / coating eaten, from raw" and USDA Foundation "Peanut butter, smooth style, with salt", as the pack has them.
+  const friedBreast: GradeNutrition = { kcal: 243, proteinG: 21.46, fatG: 14.11, carbsG: 6.01, fiberG: 0.2, sodiumMg: 299, sugarsG: 0.1, saturatedFatG: 2.77, alcoholG: undefined, micros: { potassium: 245, calcium: 13, iron: 0.88, magnesium: 21, zinc: 0.77, vitaminA: 15, vitaminC: 0, vitaminD: 0.1, vitaminB12: 0.15, folate: 24 } };
+  const peanutButter: GradeNutrition = { kcal: 597, proteinG: 22.5, fatG: 51.1, carbsG: 22.3, fiberG: 4.8, sodiumMg: 429, sugarsG: 10.5, saturatedFatG: 10.1, alcoholG: undefined, micros: { potassium: 564, calcium: 49, iron: 1.73, magnesium: 169, zinc: 2.54 } };
 
   it('reads fried, battered and breaded from a name, and not a stir-fry, a pan-fry, an egg or a coating not eaten', () => {
     for (const name of ['Chicken breast, fried, coated, skin / coating eaten', 'Doughnut, cake type, plain', 'Potato chips, plain', 'French fries, from fast food', 'Soybean curd, deep fried', 'Onion rings, breaded', 'Mozzarella sticks, breaded, baked, or fried'])
@@ -317,7 +318,9 @@ describe('the cap (MM-660)', () => {
   });
 
   it('holds a sweet and fatty food with little for it to C-, and never a nut butter', () => {
-    expect(gradeOfNutrition(generalTso)).toMatchObject({ kind: 'graded', letter: 'C' });
+    // A C by its score; the numbers cap it with or without a name.
+    expect(gradeOfNutrition({ ...generalTso, fatG: undefined })).toMatchObject({ kind: 'graded', letter: 'C' });
+    expect(gradeOfNutrition(generalTso)).toMatchObject({ kind: 'graded', letter: 'C-', score: -2, cap: 'sweetAndFatty' });
     expect(gradeOfNutrition(generalTso, { name: 'General Tso chicken' })).toMatchObject({ kind: 'graded', letter: 'C-', score: -2, cap: 'sweetAndFatty' });
     expect(gradeOfNutrition(peanutButter, { name: 'Peanut butter, smooth style, with salt' })).not.toHaveProperty('cap');
     // Without fat or sugars stated, the numbers cannot cap a food.

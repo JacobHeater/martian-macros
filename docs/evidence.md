@@ -188,14 +188,19 @@ micronutrients and measurement roles and held to a calibration set of
 reference foods; every figure below is a judgement. A food is graded when it
 states calories, the macros, fiber and sodium; sugars, saturated fat and the
 vitamins and minerals count when stated, and the grade's popover says when
-they were not. A step is about the resolution of the inputs: a label may be
+they were not; a fiber that is not stated is counted as none, which can only
+hold the letter down. A fried, battered or breaded food, by the words of its
+name, or a food that is mostly fat and sugar with little that counts for it,
+grades no better than C-, and the popover says so: a nutrient table cannot
+see a fryer, and per calorie a battered, sauced dish can look like a grilled
+one. A step is about the resolution of the inputs: a label may be
 20% off and comply, so neighbouring letters are not a ranking to act on. The
 grade does not reflect a clinician's restrictions. A meal's or a day's grade
 counts its foods by their calories. No grade for an alcoholic drink, a food
-with almost no calories, an estimate, a recipe, or a food whose grams are not
-known.
+with almost no calories, an estimate, a recipe, or a food whose grams or
+millilitres are not known.
 
-Rows: foodGrade, FoodGradeRule.againstFloorKcal, FoodGradeRule.proteinGPer100Kcal, FoodGradeRule.fiberGPer100Kcal, FoodGradeRule.micronutrientsPercentPer100Kcal, FoodGradeRule.micronutrientCapPercent, FoodGradeRule.micronutrientBreadthPercent, FoodGradeRule.micronutrientsCapWithSugars, FoodGradeRule.micronutrientsMinStated, FoodGradeRule.dailyValues, FoodGradeRule.kcalPerGram, FoodGradeRule.sodiumMgPer100Kcal, FoodGradeRule.sugarsGPer100Kcal, FoodGradeRule.sugarsWaiverProteinG, FoodGradeRule.sugarsWaiverFiberG, FoodGradeRule.sugarsWaiverKcalPerGram, FoodGradeRule.saturatedFatGPer100Kcal, FoodGradeRule.minKcalPer100g, FoodGradeRule.alcoholLimitG, FoodGradeRule.rollupCoverage, FoodGradeRule.letterSteps, foodGrade.requiredNutrients, foodGrade.refinementsWhenStated
+Rows: foodGrade, FoodGradeRule.cap, FoodGradeRule.againstFloorKcal, FoodGradeRule.proteinGPer100Kcal, FoodGradeRule.fiberGPer100Kcal, FoodGradeRule.micronutrientsPercentPer100Kcal, FoodGradeRule.micronutrientCapPercent, FoodGradeRule.micronutrientBreadthPercent, FoodGradeRule.micronutrientsCapWithSugars, FoodGradeRule.micronutrientsMinStated, FoodGradeRule.dailyValues, FoodGradeRule.kcalPerGram, FoodGradeRule.sodiumMgPer100Kcal, FoodGradeRule.sugarsGPer100Kcal, FoodGradeRule.sugarsWaiverProteinG, FoodGradeRule.sugarsWaiverFiberG, FoodGradeRule.sugarsWaiverKcalPerGram, FoodGradeRule.saturatedFatGPer100Kcal, FoodGradeRule.minKcalPer100g, FoodGradeRule.alcoholLimitG, FoodGradeRule.rollupCoverage, FoodGradeRule.letterSteps, foodGrade.requiredNutrients, foodGrade.refinementsWhenStated
 
 ### How far can a food's numbers be trusted?
 
@@ -497,6 +502,7 @@ Rows: TrendRule.sigmaScale, TrendRule.coverageMinimum, TrendRule.levelAgainstTar
 | `FoodGradeRule.sugarsWaiverFiberG` | A ramp from 0.5 to 1 g per 100 kcal | engine FoodGradeRule.ts | How far fiber waives sugars | The stand-in for the intrinsic sugars of whole fruit (NU-2, ME-4): grapes and watermelon are waived, juice is not | judgement | None | No |
 | `FoodGradeRule.sugarsWaiverKcalPerGram` | Whole under 1.5 kcal/g, fading out by 2 | engine FoodGradeRule.ts | Which foods the waiver applies to | NU-2: fresh fruit, vegetables and plain dairy are under 1 kcal/g; a sweetened cereal with added fiber, dried fruit, honey and chocolate are not, and keep their sugars points | judgement | None | No |
 | `FoodGradeRule.saturatedFatGPer100Kcal` | 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 g (max 6) | engine FoodGradeRule.ts | The saturated-fat points | Product judgement anchored on the 20 g Daily Value over 2,000 kcal (1 g per 100 kcal); direction supported by Hooper 2020 (Cochrane CD011737: combined cardiovascular events RR 0.83), not the thresholds | moderate | Adults in trials of reduced saturated fat | No |
+| `FoodGradeRule.cap` | C- (score −2) for a food fried, battered or breaded by its name, or at 200 kcal or more per 100 g with 40% or more of its calories from fat, 10 g or more of sugars and fewer than 3 points for it | engine FoodGradeRule.ts, domain friedByName.ts | When a food's letter is held to C- whatever its score (MM-660) | Product judgement, the owner's (2026-10-27): a nutrient table cannot see a fryer; the words are the source's own, the numbers the one signature without words; measured on the generic pack of 2026-10-27 (333 and 24 foods moved, `docs/food-grade-cap-moves.md`); nuts, nut butters and cheese are never caught | judgement | None | No |
 | `FoodGradeRule.minKcalPer100g` | 10 kcal per 100 g | engine FoodGradeRule.ts | When a food has nothing to grade per calorie | Product judgement: broth, coffee and diet drinks fall under it; every vegetable stays above it (NU-12) | judgement | None | No |
 | `FoodGradeRule.alcoholLimitG` | 1.2 g per 100 g | engine FoodGradeRule.ts | When a drink is not graded | Product judgement, kept from MM-369: 1.2% by volume read by weight | judgement | None | No |
 | `FoodGradeRule.rollupCoverage` | 70% of calories | engine FoodGradeRule.ts | When a meal or a day has a grade | MM-370's choice, matching MM-126's fiber rule | judgement | None | No |
