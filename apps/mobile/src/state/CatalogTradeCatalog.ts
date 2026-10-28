@@ -6,6 +6,8 @@ import type { SwapNameIndex } from '../engine/analysis/swap/SwapNameIndex';
 import { swapNameIndexOf } from '../engine/analysis/swap/swapNameIndexOf';
 import type { TradeCatalogFood } from '../engine/analysis/TradeCatalogFood';
 import type { TradeTarget } from '../engine/analysis/TradeTarget';
+import { everydayProteinRankOf } from '../engine/analysis/moves/everydayProteinRankOf';
+import { everydayProteins } from '../engine/analysis/moves/everydayProteins';
 import { proteinGroups } from '../engine/analysis/moves/proteinGroups';
 import { gradeMicrosFrom } from '../engine/gradeMicrosFrom';
 import { gradeOfNutrition } from '../engine/gradeOfNutrition';
@@ -24,7 +26,10 @@ const originKey = (origin: Pick<FoodOrigin, 'packId' | 'foodId'>) => `${origin.p
  * those groups, each at its default serving (the first the pack lists, or
  * 100 g). A group lists at most `perGroup` foods, in the order the packs
  * store them. Each group's name index for the swap (MM-617) is built there
- * too, over the same foods, so a swap never reads the catalog.
+ * too, over the same foods, so a swap never reads the catalog. The
+ * everyday proteins (MM-688) are searched by name on top, each at most
+ * `perEveryday` foods, so chicken breast is listed however deep in its
+ * group the pack stores it.
  */
 export class CatalogTradeCatalog implements TradeCatalog {
   private readonly groups: ReadonlyMap<string, FoodGroup>;
@@ -40,7 +45,7 @@ export class CatalogTradeCatalog implements TradeCatalog {
   static async load(
     catalog: CatalogSearch & CatalogFoodLookup & CatalogServingLookup,
     entries: readonly FoodEntry[],
-    { perGroup = 500 }: { perGroup?: number } = {},
+    { perGroup = 500, perEveryday = 40 }: { perGroup?: number; perEveryday?: number } = {},
   ): Promise<CatalogTradeCatalog> {
     const groups = new Map<string, FoodGroup>();
     const looked = new Set<string>();
@@ -54,17 +59,31 @@ export class CatalogTradeCatalog implements TradeCatalog {
       if (group !== undefined) groups.set(key, group);
     }
     const foods = new Map<FoodGroup, TradeCatalogFood[]>();
-    // The protein groups are read whether or not the person logged from them: a lean protein food to add or to
-    // carry the next meal comes from the catalog first (MM-684).
-    for (const group of new Set([...groups.values(), ...proteinGroups])) {
-      const listed: TradeCatalogFood[] = [];
-      for (const hit of await catalog.search('', { group, limit: perGroup })) {
-        if (hit.food.group !== group || !(hit.food.kcal > 0)) continue;
+    const listedIds = new Map<FoodGroup, Set<string>>();
+    const list = async (group: FoodGroup, hits: readonly { readonly food: CatalogFood }[], keep: (food: CatalogFood) => boolean) => {
+      const listed = foods.get(group) ?? [];
+      const ids = listedIds.get(group) ?? new Set<string>();
+      for (const hit of hits) {
+        const id = `${hit.food.packId}:${hit.food.id}`;
+        if (hit.food.group !== group || !(hit.food.kcal > 0) || ids.has(id) || !keep(hit.food)) continue;
         const amount = tradeAmountOf(hit.food, (await catalog.servingsOf(hit.food))[0]);
         if (amount === undefined) continue;
+        ids.add(id);
         listed.push(tradeFoodOf(hit.food, group, amount));
       }
       foods.set(group, listed);
+      listedIds.set(group, ids);
+    };
+    // The protein groups are read whether or not the person logged from them: a lean protein food to add or to
+    // carry the next meal comes from the catalog first (MM-684).
+    for (const group of new Set([...groups.values(), ...proteinGroups])) {
+      await list(group, await catalog.search('', { group, limit: perGroup }), () => true);
+    }
+    // The everyday proteins by name (MM-688): a group lists its first `perGroup` foods as the pack stores them, and
+    // chicken breast stands past a thousand beef cuts and game; the owner's brief of 2026-10-28 named a beaver.
+    for (const protein of everydayProteins) {
+      const hits = await catalog.search(protein.query, { group: protein.group, limit: perEveryday });
+      await list(protein.group, hits, (food) => everydayProteinRankOf({ name: food.name, group: protein.group }) !== undefined);
     }
     return new CatalogTradeCatalog(groups, foods);
   }
