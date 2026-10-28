@@ -1,5 +1,7 @@
 import type { Clock } from '../domain/integration/Clock';
 import type { Clipboard } from '../domain/integration/Clipboard';
+import type { CoachAiStore } from '../domain/integration/CoachAiStore';
+import type { CoachNarrator } from '../domain/integration/CoachNarrator';
 import type { Haptics } from '../domain/integration/Haptics';
 import type { ExternalLinks } from '../domain/integration/ExternalLinks';
 import type { Platform } from '../domain/integration/Platform';
@@ -224,4 +226,10 @@ export interface AppServices {
 
   /** The phone's share sheet, handing a meal's photos and prompt to the person's assistant together (MM-599). */
   readonly mealShare: MealShare;
+
+  /** The person's optional BYOK provider and API key, kept on this device outside SQLite backups (MM-665). */
+  readonly coachAi: CoachAiStore;
+
+  /** Phrases deterministic coaching briefs with the person's BYOK model or the built-in archetype fallback (MM-665). */
+  readonly coachNarrator: CoachNarrator;
 }
