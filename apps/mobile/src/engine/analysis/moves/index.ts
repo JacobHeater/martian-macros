@@ -5,6 +5,7 @@ export * from './foodMovesOf';
 export * from './leanProteinOf';
 export * from './MealAfter';
 export * from './mealAfterOf';
+export * from './mealMoveFigures';
 export * from './MealMove';
 export * from './MealMoves';
 export * from './MealMovesInput';

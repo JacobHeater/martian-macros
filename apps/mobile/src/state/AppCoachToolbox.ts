@@ -4,17 +4,15 @@ import { FoodGroup } from '../domain/food/FoodGroup';
 import type { CoachTool } from '../domain/integration/CoachTool';
 import type { CoachToolAnswer } from '../domain/integration/CoachToolAnswer';
 import type { CoachToolbox } from '../domain/integration/CoachToolbox';
+import type { AppCoachToolboxReads } from './AppCoachToolboxReads';
 import { Meal } from '../domain/Meal';
-import type { ExecutiveBrief } from '../engine/analysis/ExecutiveBrief';
 import type { FoodAnalysisInput } from '../engine/analysis/food/FoodAnalysisInput';
 import { foodKeyOf } from '../engine/analysis/food/foodKeyOf';
 import { foodLimitsOf } from '../engine/analysis/food/foodLimitsOf';
 import { recordOnOf } from '../engine/analysis/food/recordOnOf';
 import { mealMovesOf } from '../engine/analysis/moves/mealMovesOf';
 import { FoodSignalRule } from '../engine/analysis/food/FoodSignalRule';
-import type { CatalogSearch } from '../foodCatalog/CatalogSearch';
-import type { CatalogServingLookup } from '../foodCatalog/CatalogServingLookup';
-import { mealMoveFigures } from '../format/coach/mealMoveFigures';
+import { mealMoveFigures } from '../engine/analysis/moves/mealMoveFigures';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -34,13 +32,6 @@ const answer = (result: unknown): CoachToolAnswer => ({ result, numbers: numbers
 
 /** A logged food as the model reads it. */
 const foodOf = (e: FoodEntry) => ({ name: e.name.trim(), meal: e.meal, kcal: whole(e.kcal), proteinG: whole(e.proteinG), carbsG: whole(e.carbsG), fatG: whole(e.fatG) });
-
-/** What the toolbox reads of the app, each at the moment a tool is called. */
-export interface AppCoachToolboxReads {
-  readonly foodInput: () => FoodAnalysisInput | undefined;
-  readonly brief: () => ExecutiveBrief | undefined;
-  readonly catalog: () => (CatalogSearch & CatalogServingLookup) | undefined;
-}
 
 const searchCatalog: CoachTool = {
   name: 'search_catalog',

@@ -44,7 +44,7 @@ beforeEach(async () => {
   await repos.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today }));
   await repos.weights.saveWeight(today, 82);
   await repos.food.addFood(new FoodEntry({ id: 1, date: today, meal: 'lunch', name: 'Creamy Alfredo pasta', kcal: 640, proteinG: 12, carbsG: 68, fatG: 36, source: 'weighed' }));
-  await repos.food.addFood(new FoodEntry({ id: 2, date: today, meal: 'dinner', name: 'Loaded nachos', kcal: 780, proteinG: 14, carbsG: 73, fatG: 48, source: 'weighed' }));
+  await repos.food.addFood(new FoodEntry({ id: 2, date: today, meal: 'dinner', name: 'Loaded nachos', kcal: 780, proteinG: 14, carbsG: 91, fatG: 40, source: 'weighed' }));
 });
 
 const withModel = (narrator: CoachNarrator) =>

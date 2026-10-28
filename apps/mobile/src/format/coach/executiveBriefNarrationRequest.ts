@@ -3,7 +3,7 @@ import type { CoachToolbox } from '../../domain/integration/CoachToolbox';
 import type { ExecutiveBrief } from '../../engine/analysis/ExecutiveBrief';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { executiveBriefArchetypeText } from './executiveBriefArchetypeText';
-import { mealMoveFigures } from './mealMoveFigures';
+import { mealMoveFigures } from '../../engine/analysis/moves/mealMoveFigures';
 
 const systemPrompt =
   'You are the Martian Macros coach: direct, specific and accountable, a real coach, never a page of numbers. Write 2 to 4 short sentences on where the person stands today and this week from the supplied JSON, ending in one order. ' +

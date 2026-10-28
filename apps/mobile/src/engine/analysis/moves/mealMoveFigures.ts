@@ -1,5 +1,5 @@
-import type { MealMove } from '../../engine/analysis/moves/MealMove';
-import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
+import { roundHalfAwayFromZero } from '../../../lang/roundHalfAwayFromZero';
+import type { MealMove } from './MealMove';
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
 

@@ -67,7 +67,7 @@ it('says under a logged food what the coach noticed, with the numbers behind it'
   expect(await screen.findByText(/^Mostly fat: \d+ kcal, 76% from fat\./)).toBeInTheDocument();
   expect(screen.getByText(/^Light on protein: 640 kcal for 14 g\./)).toBeInTheDocument();
   expect(screen.getByText(/^Logged as 4 servings \(350 kcal\); one serving is 30 g/)).toBeInTheDocument();
-  await userEvent.click(screen.getByRole('button', { name: /^Coach: 14 g of protein/ }));
+  await userEvent.click(screen.getByRole('button', { name: /^Coach: Light on protein: 640 kcal for 14 g/ }));
   expect(screen.getByText('Your protein minimum')).toBeInTheDocument();
   expect(screen.getByText('140 g a day')).toBeInTheDocument();
 });
@@ -91,7 +91,7 @@ it('with kidney disease, no protein line: the minimum is a ceiling there', async
   renderApp(repos, today);
   await openTab('Food');
   expect(await screen.findByText(/^Mostly fat:/)).toBeInTheDocument();
-  expect(screen.queryByText(/^14 g of protein/)).toBeNull();
+  expect(screen.queryByText(/^Light on protein: 640 kcal for 14 g/)).toBeNull();
 });
 
 it('an estimated entry gets no line', async () => {
@@ -164,6 +164,6 @@ it('snoozing the second of two lines puts the focus on the first', async () => {
   await userEvent.click(screen.getByRole('button', { name: /^Snooze… Light on protein for Biscuits/ }));
   const dialog = await screen.findByRole('dialog', { name: /^Snooze “Light on protein” for Biscuits/ });
   await userEvent.click(within(dialog).getByRole('option', { name: /^For a week/ }));
-  await expect.poll(() => screen.queryByRole('button', { name: /^Coach: 12 g of protein/ })).toBeNull();
+  await expect.poll(() => screen.queryByRole('button', { name: /^Coach: Light on protein: 780 kcal for 12 g/ })).toBeNull();
   expect(document.activeElement).toBe(screen.getByRole('button', { name: /^Coach: Logged as 3 servings/ }));
 });
