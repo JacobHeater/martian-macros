@@ -8,7 +8,23 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-29, by Claude, Session 49.
+Last updated: 2026-10-29, by Claude, Session 50.
+
+**The owner's phone, 2026-10-29 (Session 50, Claude; MM-694 in PR #369, merged green).** The app, resident through a long
+sleep, showed "Could not open your data. Nothing you logged has been changed. Close the app and open it again." on unlock.
+Read off the phone over USB: the database sound (schema 31, integrity ok, written at 13:59), the same build opening to the
+Dashboard when started again unlocked (`./mm screenshot --phone`). From the code: the shell starts the web app again whenever
+iOS drops the web view's process (Capacitor's `webViewWebContentProcessDidTerminate` resets the bridge and reloads), and that
+start opened the progress-photo database, `.completeUnlessOpen` on iOS (MM-157), unopenable while the phone is locked; `main.tsx`
+took the whole app down with it, error to the console only, no retry. That the owner's start was one made behind the lock
+screen is inferred, not observed (the phone kept no jetsam record). Built: `LazyProgressPhotoRepository` (the photo database
+opened on first use, a failed opening forgotten so the next call tries again), `startApp` with `OpeningFailed` (the app's
+`ReadFailedNotice`, "Could not open your data", Try again), `main.tsx` only wiring; tests `test/data/lazyProgressPhotos.test.ts`,
+`test/app/photosOpenedLazily.test.ts`, `test/app/startApp.test.tsx`, story `OpeningFailedAtStart`. MM-694 stays `in-progress`
+and in WS-07's `remaining` list: `mm req` refuses a `built` ticket whose status is not `done`. **Owed: the owner's rebuild
+(`mm run --ios --phone`) and the app opening after a long sleep with it resident.** The native plugin still keeps the handles a
+dropped web view opened; not changed.
+
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -84,7 +100,7 @@ Lesson: when the phone disagrees with the code, pull the phone's own data before
 Every snack now has the Dismiss icon button, with an action or without, and no longer takes focus itself (a tap on a plain
 snack focused it, and a focused snack is held by MM-601, so it never went). `MmOverlays.tsx`, `test/ui/snack.test.tsx`.
 
-**Open PRs at the end of Session 49:** none (#366 and #367 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 50:** none (#369 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
 
 **Coaching architecture & UI overhaul, the owner's push of 2026-10-27 to 2026-10-28** (MM-663 to MM-667, PRs #355 to #358). Built and merged:
 - **MM-663** (PR #355): deterministic pre-calculated `ExecutiveBrief` (`executiveBriefOf`) and `MealBreakdownAnalysis` (`mealBreakdownAnalysisOf`), whole-situation paragraph archetypes for offline / no-key coaching (`executiveBriefArchetypeText`, `mealBreakdownArchetypeText`), and the hard mathematical invariant `proteinRemainingG * 4 <= kcalRemaining` enforced across intraday coaching (`analyseFoodDay`, `dayAdviceOf`, `foodFindingText`, `executiveBriefOf`, `mealBreakdownAnalysisOf`, `verifyCoachNarration`). When protein cannot fit inside remaining calories, advice pivots to pure protein sources for the remaining calorie budget and marks protein as unrecoverable today without pushing the user over their calorie budget.
@@ -321,6 +337,14 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 50: 2026-10-29, Claude (the owner's phone: "Could not open your data" after a long sleep, MM-694)
+
+- **The owner's words:** a screenshot of the plain-text screen, "what is this?"; then, correcting a first reading that blamed the screenshot tool launching the app cold on a locked phone: "the usecase was that i was using the app on my phone as normal, unplugged and away from the computer. my phone had been asleep for quite some time and i guess the app was still loaded in memory. when i unlocked the phone that's what i saw."
+- **Read off the phone first:** the database over `xcrun devicectl device copy from --domain-type appDataContainer` (sound, schema 31); the same build run through `./mm screenshot --phone` while unlocked (the Dashboard); the crash-log domain `systemCrashLogs` (no jetsam or crash record of the app that day). Only then the code: Capacitor's reload on a dropped web content process, the photo database's `.completeUnlessOpen`, `main.tsx` taking the app down.
+- **Merged:** #369 (MM-694), three CI rounds, the first two on `mm req`: a ticket must be in `roadmap.json` (a workstream's `sourceRequirements` and a step), and a ticket listed under `built` must be `done`; one that waits on the owner's phone goes under `remaining`, as MM-693 does. Built on a branch from `origin/main` in the main checkout, which was fast-forwarded to the merge after.
+- **Lessons:** when the phone disagrees with the code, pull the phone's own data and run the real path before reasoning (MM-690's lesson held again); the first reading was wrong because it assumed how the screenshot was taken, and the owner's account of the use case overturned it. A start of the web app happens more often than a launch: anything a start needs must be openable at any time, locked phone included. `main.tsx` stays in the unseen register: its entry is named by the line that holds the markup, so a restructure renames it.
+- **Not run:** nothing was run locally; CI validated the merge. Not seen on a phone: the fix is owed the owner's rebuild.
+
 ## Session 49: 2026-10-28 to 29, Claude (two phone call-outs: the completeness chip in the hero, MM-692; the brief's shape, MM-693)
 
 - **The owner's words:** on the Food header's checkmark: "I don't like its placement. there's a lot of horizontal real estate in the top right corner of the graph where we can place a background colored chip for complete/partial/not marked at the top right." On the Executive summary: "weve got to hone in the system prompt for this so we don't get ramblin rose over here." Then "branch and pr" for this handoff.
@@ -336,11 +360,3 @@ MM-242, a draft by non-lawyers that blocks release.
 - **Merged:** #361 (MM-682 to MM-687; the worktree-per-PR shipping the owner chose in the Q&A). Not seen on a phone yet: the owner's read of the coach's words is owed before the tickets close.
 - **Lessons:** `state/` may not import `format/`, so a figures mapper the state needs lives in `engine/` (`mealMoveFigures`); the one-declaration rule counts an exported interface beside a class (`AppCoachToolboxReads` has its own file); the spacing scale is `--space-N` in px (`--space-12`), and a `gap` with a fallback literal fails the stylesheet test; a food can carry two insights (mostly fat and light on protein), so a one-pass test counts items, not foods.
 - **Not run:** nothing was run locally; CI validated the merge.
-
-## Session 47: 2026-10-28, Claude (cardio from the wearable: the Q&A, then the build of MM-677 and MM-678 in the main checkout)
-
-- **The owner's words:** "Next big swing here on a feature is steady state cardio. I don't want the app to track steady state cardio, but we'll track this in two forms: steps, and cardio workout sessions within the user's wearable. I love strength training here and it must stay, but part of training on any fatloss or recomp program must be steady state cardio. now ask me questions." Then: "q&a sessions only. record that for the record then get started." (a rule, not a scope answer: the Q&A comes first; a first misreading of it as "sessions only" was stopped by the owner and undone).
-- **The Q&A's answers** are in MM-677 and MM-678 under "By the product owner". Among them: every non-strength session counts, so the word is "cardio", never "steady state".
-- **Shipped in PR #360, merged green 2026-10-28:** the tickets, the roadmap (WS-10 step 10, WS-09 step 16, an edge), `docs/non-goals.md`, `docs/evidence.md` rows, and the code and tests listed above. The owner's first walk on the watch then did not arrive: MM-690 (the iOS plugin's own memory of what Apple Health was asked for, drifted from HealthKit's record; fixed in the main checkout, the owner's rebuild and press of Exercise sessions owed), see "Where things stand".
-- **Lessons:** a Python `replace(..., 1)` on a repeated anchor (`customExercises:`) landed two services inside `MirroredWorkoutLog`'s options instead of on `AppServices`; the phone blanked and nothing said why (MM-679 now does). Check every inserted line's placement, not just that the edit applied. `format/` may not import `state/`: a screen helper that reads the health connection takes the two sets it needs as a structural type. `cardioDisclosureText` is that helper.
-- **Not run:** nothing was run locally.
