@@ -13,7 +13,7 @@ import type { Overlays } from './Overlays';
 import { OverlaysContext } from './OverlaysContext';
 import './ui.css';
 
-/** Every snack goes after ten seconds, one with an Undo too, unless it is focused or pointed at (the owner, MM-601). */
+/** Every snack goes after ten seconds, one with an Undo too, unless it is focused or pointed at (the owner, MM-601); every one has Dismiss (the owner, MM-691). */
 const snackMs = 10_000;
 
 interface Snack {
@@ -241,7 +241,6 @@ export function MmOverlays({ children }: { children: ReactNode }) {
             ref={snackBox}
             className="mm-snack"
             key={snack.id}
-            tabIndex={snack.action === undefined ? 0 : -1}
             onFocusCapture={() => setHeld(true)}
             onBlurCapture={() => setHeld(false)}
             onPointerEnter={() => setHeld(true)}
@@ -249,18 +248,17 @@ export function MmOverlays({ children }: { children: ReactNode }) {
           >
             <span className="mm-snack-message">{snack.message}</span>
             {snack.action === undefined ? null : (
-              <>
-                <MmButton
-                  label={snack.action.label}
-                  kind="text"
-                  onPress={() => {
-                    setSnack(undefined);
-                    snack.action?.onAction();
-                  }}
-                />
-                <MmIconButton icon="close" label="Dismiss" onPress={() => setSnack(undefined)} />
-              </>
+              <MmButton
+                label={snack.action.label}
+                kind="text"
+                onPress={() => {
+                  setSnack(undefined);
+                  snack.action?.onAction();
+                }}
+              />
             )}
+            {/* Every snack is dismissed by its own button (the owner, MM-691): the timer alone is not a way out. */}
+            <MmIconButton icon="close" label="Dismiss" onPress={() => setSnack(undefined)} />
           </div>
         )}
       </div>

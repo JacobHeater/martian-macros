@@ -1667,7 +1667,7 @@
 }
 
 /*
- * A snack (MM-272, MM-601): every one goes after ten seconds, one with an Undo too.
+ * A snack (MM-272, MM-601, MM-691): every one goes after ten seconds, one with an Undo too, and every one has Dismiss.
  * It stands above the navigation bar while one is shown (MM-302), else above the safe area.
  */
 .mm-snack-host {

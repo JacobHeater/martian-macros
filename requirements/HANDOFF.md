@@ -46,8 +46,8 @@ Still owed: the owner's phone read of all of it (MM-682 to MM-689 stay `in-progr
 with the owner before any code (the owner's standing rule now: a big feature starts with the Q&A): platform only, every
 non-strength session counts, floors of 8,000 steps a day and 150 min a week changeable in Settings › Coach, fat loss and
 recomp only, one "Cardio" section on Train and a row on the Dashboard, both shells, both counted, orders plus a stall
-explanation at a 20% steps drop, the coach's lines built as drafts for the owner to read on the phone. Built in the main
-checkout, uncommitted, **not yet on a branch or through CI** (the owner decides how it ships): schema 31
+explanation at a 20% steps drop, the coach's lines built as drafts for the owner to read on the phone. Shipped in PR #360,
+merged green 2026-10-28 after two fix rounds, the main checkout fast-forwarded to it: schema 31
 (`cardio_sessions`, `daily_steps`, two floor columns), `cardioSessionImports` and `importSteps` in `AppState`,
 `buildCardioWeek`, the Cardio fold on Train (MM-680), the Dashboard row, `cardioFindings` and `stepsFindings` (C1, C2), the `activity` stall
 diagnosis, both native plugins sending a session's `activity`. The non-goal is narrowed to "no burn it off". **MM-679** (the owner, from the phone: the first live run blanked the
@@ -58,6 +58,17 @@ have infographics"): `WeeklyVolumeFold` and `CardioFold` on Train in place of th
 the Executive brief carries a `TrainingBrief` (`trainingBriefOf`), said by `trainingBriefText` after the food and given to the
 model with its figures allowed; the Executive summary shows the three rows; 1d's findings include the week's training,
 cardio and steps accountability.
+**MM-690, same day, from the owner's first walk on the watch: "martian macros isn't picking it up."** Read off the phone itself
+(the database copied over USB with `xcrun devicectl device copy from --domain-type appDataContainer`, the Health app's sharing
+page): steps fresh, no workout read since 2026-10-09, and Health's "Allow to Read" list without Workouts. The Swift plugin
+answered `permitted` from its own `UserDefaults` list of kinds asked for, which held "workout" while HealthKit's record did not,
+so Settings never asked again and HealthKit answered every workout query with nothing. Now `askedToRead` asks
+`getRequestStatusForAuthorization` per kind; the list is gone; `test/ios/healthAskedFromHealthKit.test.ts` reads the source.
+Built in the main checkout for the owner's rebuild; **owed: the owner presses Exercise sessions, allows Workouts, sees the walk.**
+Lesson: when the phone disagrees with the code, pull the phone's own data before reasoning further.
+**MM-691, same evening:** the owner, on the "Read from Apple Health" snack: "it needs a dismiss button right now."
+Every snack now has the Dismiss icon button, with an action or without, and no longer takes focus itself (a tap on a plain
+snack focused it, and a focused snack is held by MM-601, so it never went). `MmOverlays.tsx`, `test/ui/snack.test.tsx`.
 
 **Open PRs at the end of Session 48:** none (#360 and #361 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
 
@@ -308,7 +319,7 @@ MM-242, a draft by non-lawyers that blocks release.
 
 - **The owner's words:** "Next big swing here on a feature is steady state cardio. I don't want the app to track steady state cardio, but we'll track this in two forms: steps, and cardio workout sessions within the user's wearable. I love strength training here and it must stay, but part of training on any fatloss or recomp program must be steady state cardio. now ask me questions." Then: "q&a sessions only. record that for the record then get started." (a rule, not a scope answer: the Q&A comes first; a first misreading of it as "sessions only" was stopped by the owner and undone).
 - **The Q&A's answers** are in MM-677 and MM-678 under "By the product owner". Among them: every non-strength session counts, so the word is "cardio", never "steady state".
-- **Built, in place on main, uncommitted:** the two tickets, the roadmap (WS-10 step 10, WS-09 step 16, an edge), `docs/non-goals.md`, `docs/evidence.md` rows, and the code and tests listed above. No test was run locally (the owner's rule); the first CI run is owed, and the owner's phones (both shells) are the check that a watch's session arrives with its activity and steps arrive by day.
+- **Shipped in PR #360, merged green 2026-10-28:** the tickets, the roadmap (WS-10 step 10, WS-09 step 16, an edge), `docs/non-goals.md`, `docs/evidence.md` rows, and the code and tests listed above. The owner's first walk on the watch then did not arrive: MM-690 (the iOS plugin's own memory of what Apple Health was asked for, drifted from HealthKit's record; fixed in the main checkout, the owner's rebuild and press of Exercise sessions owed), see "Where things stand".
 - **Lessons:** a Python `replace(..., 1)` on a repeated anchor (`customExercises:`) landed two services inside `MirroredWorkoutLog`'s options instead of on `AppServices`; the phone blanked and nothing said why (MM-679 now does). Check every inserted line's placement, not just that the edit applied. `format/` may not import `state/`: a screen helper that reads the health connection takes the two sets it needs as a structural type. `cardioDisclosureText` is that helper.
 - **Not run:** nothing was run locally.
 
