@@ -5,6 +5,7 @@ import { typicalSetup } from '../../fixtures/typicalSetup';
 import { userEvent, within } from 'storybook/test';
 import { analysisFatWeekScenario } from './analysisFatWeekScenario';
 import { cardioWearable } from './cardioWearable';
+import { OpeningFailed } from '../../app/OpeningFailed';
 import { CrashOnDraw } from './CrashOnDraw';
 import { demoWith } from './demoWith';
 import { failingRead } from './failingRead';
@@ -46,6 +47,13 @@ export const CrashWhileDrawing = screenStory({
   covers: [],
   shows: 'Something went wrong while drawing this',
   open: ({ navigator }) => void navigator.push(() => <CrashOnDraw />),
+});
+
+/** MM-694: the data could not be opened when the app started: a failed read in the app's words, with Try again, before any theme. */
+export const OpeningFailedAtStart = screenStory({
+  covers: [],
+  shows: /^Could not open your data/,
+  open: ({ navigator }) => void navigator.push(() => <OpeningFailed onRetry={() => Promise.resolve()} />),
 });
 
 /** MM-677 (the owner): today's steps and the week's cardio from the wearable against their floors, a row that opens Train. */
