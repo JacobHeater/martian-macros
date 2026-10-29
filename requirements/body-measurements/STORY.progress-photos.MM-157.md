@@ -210,7 +210,8 @@ Built 2026-10-21. Not run locally; CI validates.
 - iOS: the photo database opens after the phone has been locked and unlocked again with the app in the background
   (`.completeUnlessOpen`), and the app launches normally when the phone is locked (the photo database is opened at
   start; if a launch in the background while locked fails to open it, the protection must move to opening the photo
-  database lazily).
+  database lazily). Seen 2026-10-29 on the owner's phone (MM-694): the shell's restart of the app failed at the
+  photo database and took the app down; it is opened on first use now, never at start.
 - The photo database survives an app update and is gone after Erase all data; a backup with Back up photos on
   restores the photos on another phone.
 - The Android and iOS builds compile the plugin additions (written without a local build).

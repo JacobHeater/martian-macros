@@ -1,5 +1,6 @@
 import { SqlRepositories } from '../data/SqlRepositories';
 import { EraserWithPhotos } from '../data/EraserWithPhotos';
+import { LazyProgressPhotoRepository } from '../data/LazyProgressPhotoRepository';
 import { SqlProgressPhotoRepository } from '../data/SqlProgressPhotoRepository';
 import { MediaDevicesPhotoCamera } from '../platform/MediaDevicesPhotoCamera';
 import { NativeDeviceLock } from '../platform/NativeDeviceLock';
@@ -87,9 +88,13 @@ export async function openAppServices(): Promise<AppServices> {
   // A backup is the phone's copy of that database, encrypted before it leaves (MM-63); a restore opens a copy brought back.
   const repositories = await SqlRepositories.open(sql, native ? { openSnapshot: openNativeSnapshot({ api: mmBackup, db: mmDb }) } : {});
   // The progress photos are a database file of their own (MM-157), so the user's database, and its snapshot for a
-  // backup, never holds one; a browser keeps them in memory.
-  const progressPhotos = await SqlProgressPhotoRepository.open(
-    native ? await NativeSqlDatabase.open({ name: `${databaseName}-photos` }, mmDb) : await WasmSqlDatabase.open(),
+  // backup, never holds one; a browser keeps them in memory. It is opened on first use, never here (MM-694): on iOS
+  // it cannot be opened while the phone is locked, and the shell starts the app again whenever iOS drops the web
+  // view's process, locked or not.
+  const progressPhotos = new LazyProgressPhotoRepository(async () =>
+    SqlProgressPhotoRepository.open(
+      native ? await NativeSqlDatabase.open({ name: `${databaseName}-photos` }, mmDb) : await WasmSqlDatabase.open(),
+    ),
   );
   const backup = sql instanceof WasmSqlDatabase ? new WasmBackupPlatform(sql) : new NativeBackupPlatform({ api: mmBackup, databaseName });
   const packStore = native

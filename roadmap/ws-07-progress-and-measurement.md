@@ -111,6 +111,9 @@ WS-09 steps 3 and 6 (stall diagnosis, recomp review and signal) and step 8
    side-by-side comparison, the device lock and a private screen, and photo
    backup only when switched on. Phone checks owed. MM-560 (2026-10-22): a
    camera that does not open says why, not always "allow it in settings".
+   MM-694 (2026-10-29, the owner's phone): the photo database opens on first
+   use, never at start, so a start behind the lock screen no longer takes the
+   app down; a start whose data cannot be opened says so with Try again.
 
 ## Done enough to unblock others
 MM-155 is done: every caller that asks whether waist changed over a period
@@ -128,7 +131,8 @@ storage rules above.
 - Built: MM-16, MM-17 (weigh-in, trend chart); MM-21 (waist, built but
   unverified); MM-34 (body-fat range from the waist).
 - Remaining: MM-155, MM-136, MM-20, MM-142.
-- Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed), MM-502 (smart-scale
+- Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed; MM-694, 2026-10-29: its database opened
+  on first use, never at start), MM-502 (smart-scale
   readings in the body-fat range, each scale's own bias), MM-156 (more measurement sites; the waist moved
   into one store by site), MM-578 (a graphic in every Progress section), MM-501 (the Navy tape method in the body-fat range),
   MM-118 (the weight display: Everything, Trend only or Hidden).
