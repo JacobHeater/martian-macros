@@ -62,6 +62,8 @@ interface CalorieHeroProps {
   onPress?: (() => void) | undefined;
   /** What the way into the detail is called. */
   pressLabel?: string | undefined;
+  /** A chip of the day's state at the head's top right (MM-692): on Food, the day's completeness. */
+  mark?: ReactNode;
 }
 
 /**
@@ -83,6 +85,9 @@ interface CalorieHeroProps {
  * On a weight-loss medication (MM-113, MM-510) protein is the headline, its
  * bar above the arc, and calories are a level to reach: what is logged so
  * far and the aim, until the day is over it, when the usual words return.
+ *
+ * The head's right side holds `mark`, a chip of the day's state, at its top
+ * (MM-692), and what is left or over at its foot (MM-571).
  */
 export function CalorieHero({
   lines,
@@ -97,6 +102,7 @@ export function CalorieHero({
   onStatusPress,
   onPress,
   pressLabel,
+  mark,
 }: CalorieHeroProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
@@ -225,10 +231,15 @@ export function CalorieHero({
         <span className="food-hero-figure">{figure}</span>
         <span className="food-hero-caption">{caption}</span>
       </span>
-      {delta === undefined ? null : (
-        <span className="food-hero-delta">
-          <span className="food-hero-delta-figure">{delta.figure}</span>
-          <span className="food-hero-caption">{delta.caption}</span>
+      {mark === undefined && delta === undefined ? null : (
+        <span className="food-hero-side">
+          {mark === undefined ? null : <span className="food-hero-mark">{mark}</span>}
+          {delta === undefined ? null : (
+            <span className="food-hero-delta">
+              <span className="food-hero-delta-figure">{delta.figure}</span>
+              <span className="food-hero-caption">{delta.caption}</span>
+            </span>
+          )}
         </span>
       )}
     </span>
