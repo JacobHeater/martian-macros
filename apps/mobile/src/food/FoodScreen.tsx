@@ -21,6 +21,7 @@ import { LabelAccuracyNote } from './LabelAccuracyNote';
 import { copyEntries } from './copyEntries';
 import { entriesCopiedTo } from './entriesCopiedTo';
 import { FiberLine } from './FiberLine';
+import { FoodCompletenessChip } from './FoodCompletenessChip';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { FoodDayMarkRow } from './FoodDayMarkRow';
@@ -166,6 +167,8 @@ export function FoodScreen() {
         microsOffered
         targets={paused ? guide : targets}
         paused={paused}
+        // The day's completeness at the hero's top right (MM-692) for any day up to today; the row after the meals changes it.
+        mark={day.isAfter(today) ? undefined : <FoodCompletenessChip day={day} />}
         lines={
           // The day's fiber and alcohol belong where the day's energy is, inside the hero (MM-336).
           <>

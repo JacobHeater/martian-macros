@@ -845,6 +845,25 @@
   min-height: 32px;
   cursor: default;
 }
+.mm-chip-mark {
+  display: grid;
+}
+/* A status chip with a fill, by meaning (MM-692): its colour tinted into the surface, its word in the colour. */
+.mm-chip-neutral {
+  border-color: var(--outline);
+  background: var(--raised);
+  color: var(--text2);
+}
+.mm-chip-positive {
+  border-color: color-mix(in srgb, var(--positive) 40%, transparent);
+  background: color-mix(in srgb, var(--positive) 18%, var(--surface));
+  color: var(--positive);
+}
+.mm-chip-caution {
+  border-color: color-mix(in srgb, var(--caution) 40%, transparent);
+  background: color-mix(in srgb, var(--caution) 18%, var(--surface));
+  color: var(--caution);
+}
 
 .mm-segmented {
   /* Every segment as wide as the widest, so a two-way switch is never lopsided (MM-290, PD-9). */
