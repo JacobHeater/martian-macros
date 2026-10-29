@@ -10,8 +10,9 @@ import HealthKit
  * both. What this app wrote is never read back as a reading.
  *
  * HealthKit never tells an app that reading a kind was refused, so
- * "permitted" here is the set of kinds asked for, kept in the app's own
- * preferences. An anchored query's anchor is the change token.
+ * "permitted" here is the set of kinds HealthKit has been asked to read,
+ * from its own record of the requests (MM-690): a memory of the app's own
+ * drifted from it. An anchored query's anchor is the change token.
  *
  * It writes only what the person turned on in Settings (MM-70, MM-314,
  * MM-513, MM-489): food, water, typed weight and finished workouts, each
@@ -55,7 +56,6 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "profile", returnType: CAPPluginReturnPromise),
     ]
 
-    private static let askedKey = "mm_health_asked"
     private static let notHere = "Apple Health is not on this device."
 
     /// What the app calls each kind of reading, and what HealthKit calls it.
@@ -88,9 +88,18 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private let store = HKHealthStore()
 
-    private var asked: Set<String> {
-        get { Set(UserDefaults.standard.stringArray(forKey: Self.askedKey) ?? []) }
-        set { UserDefaults.standard.set(Array(newValue).sorted(), forKey: Self.askedKey) }
+    /**
+     * Which of `names`, in their order, HealthKit has been asked to read (MM-690), by its own record of the requests:
+     * a kind a request is no longer needed for was asked. It says nothing of what the person chose; a kind refused reads as
+     * nothing held. One kind at a time, each answer carried into the next, so nothing is shared with the handlers.
+     */
+    private func askedToRead(_ names: ArraySlice<String>, _ have: [String], _ answer: @escaping ([String]) -> Void) {
+        guard let name = names.first else { return answer(have) }
+        let rest = names.dropFirst()
+        guard let type = Self.type(named: name) else { return askedToRead(rest, have, answer) }
+        store.getRequestStatusForAuthorization(toShare: [], read: [type]) { status, _ in
+            self.askedToRead(rest, status == .unnecessary ? have + [name] : have, answer)
+        }
     }
 
     private func typeNames(_ call: CAPPluginCall) -> [String] {
@@ -103,8 +112,7 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func permitted(_ call: CAPPluginCall) {
         guard HKHealthStore.isHealthDataAvailable() else { return call.reject(Self.notHere) }
-        let have = asked
-        call.resolve(["types": typeNames(call).filter { have.contains($0) && Self.type(named: $0) != nil }])
+        askedToRead(typeNames(call)[...], []) { have in call.resolve(["types": have]) }
     }
 
     @objc func requestPermission(_ call: CAPPluginCall) {
@@ -114,10 +122,8 @@ public class MmHealthPlugin: CAPPlugin, CAPBridgedPlugin {
         if wanted.isEmpty { return call.resolve(["types": []]) }
         store.requestAuthorization(toShare: nil, read: wanted) { _, error in
             if let error = error { return call.reject(error.localizedDescription) }
-            // The sheet was shown; what the person chose on it is not told to the app.
-            self.asked = self.asked.union(names)
-            let have = self.asked
-            call.resolve(["types": Self.types.map(\.name).filter { have.contains($0) }])
+            // The sheet was shown; what the person chose on it is not told to the app. What has been asked for is.
+            self.askedToRead(Self.types.map(\.name)[...], []) { have in call.resolve(["types": have]) }
         }
     }
 
