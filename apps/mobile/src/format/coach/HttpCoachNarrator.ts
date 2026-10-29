@@ -266,6 +266,8 @@ export class HttpCoachNarrator implements CoachNarrator {
       protectedPath: request.protectedPath,
       proteinUnrecoverable: request.proteinUnrecoverable,
       allowedNumbers,
+      maxSentences: request.maxSentences,
+      maxWords: request.maxWords,
     });
     if (reason !== undefined) return { kind: 'rejected', text: candidate, reason };
     this.cache.set(fullKey, candidate);

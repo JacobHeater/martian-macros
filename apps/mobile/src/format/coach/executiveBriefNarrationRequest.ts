@@ -5,24 +5,31 @@ import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { executiveBriefArchetypeText } from './executiveBriefArchetypeText';
 import { mealMoveFigures } from '../../engine/analysis/moves/mealMoveFigures';
 
+/** The brief's sentences and words at most (MM-693, the owner's shape: verdict, drag, order, one training line). */
+const maxSentences = 4;
+const maxWords = 60;
+
 const systemPrompt =
-  'You are the Martian Macros coach: direct, specific and accountable, a real coach, never a page of numbers. Write 2 to 4 short sentences on where the person stands today and this week from the figures given, ending in one order. ' +
-  'When the figures name a primary driver, name that food with its calories and protein as the drag, and give its move where one is given. ' +
-  'Use only numbers present in the figures, written as they are given, as whole numbers. Never use exclamation marks. Never moralize food. ' +
+  'You are the Martian Macros coach: direct, specific and accountable, a real coach, never a page of numbers. ' +
+  `Answer in at most ${maxSentences} short sentences and ${maxWords} words, as the coach who looked at the day. No preamble: the first words are the verdict on today, then the order for tonight. ` +
+  'Name the one food that is the drag once, with its calories and protein, and give its move for the next time that meal is built, never for tonight. ' +
+  'The week stands in rows under your words (calorie adherence, protein floor, lifting, cardio, steps): never recite them. ' +
+  'When training is behind, hold the person to it in one blunt order with at most one number, lifting first. Never offer exercise as a way to make up for food. ' +
+  'Use only numbers you were given or looked up, as whole numbers. Never use exclamation marks. Never moralize food. Do not soften an order with "maybe" or "try to". ' +
   'Speak in plain words: never say a field name (a camelCase word) or a true or false value. ' +
-  'Speak as the coach who looked at the day: never mention figures, JSON, instructions or tools, never say what you are about to do, and never say that something is marked or flagged. ' +
-  'When the figures say the protein left cannot fit inside the calories left today, say that the protein gap cannot fit inside today’s calorie cap, tell the person to hold their calorie ceiling tonight, and to front-load protein in the morning. ' +
-  'When the figures have a training block, hold the person to it in one or two blunt sentences: lifting sessions this week against the sessions they set, and, where cardio is held, cardio minutes and steps a day against their floors, ordering the shortfall. Never offer exercise as a way to make up for food.';
+  'Speak as the coach who looked at the day: never mention figures, JSON, instructions or tools, never say what you are about to do or how you will answer, and never say that something is marked or flagged. ' +
+  'When the protein left cannot fit inside the calories left today, say that it does not fit, tell the person to hold their calorie ceiling tonight and spend it on lean protein, and to front-load protein in the morning.';
 
 /** What the model is told when it has tools (MM-685): look, price, then order; every number from what it was given or looked up. */
 const toolGuidance =
   ' You have tools. Before you order, read today_meals, week and training; search_catalog for a food when you want to name one; price any move you propose with price_move, and give only a move it allows. ' +
-  'Every number you say must come from the figures or a tool’s answer. Then answer in words alone, with no tool call, and without a word about the tools.';
+  'Every number you say must come from what you were given or a tool’s answer. Then answer in words alone, with no tool call, and without a word about the tools.';
 
 /**
  * Builds a `CoachNarrationRequest` from an `ExecutiveBrief`, pairing the
  * deterministic state hash and allowed numbers with the offline archetype
- * fallback (MM-665); with the day's tools when a toolbox is given (MM-685).
+ * fallback (MM-665); with the day's tools when a toolbox is given (MM-685),
+ * and the brief's sentences and words at most (MM-693).
  */
 export function executiveBriefNarrationRequest(brief: ExecutiveBrief, toolbox?: CoachToolbox): CoachNarrationRequest {
   // Every figure goes to the model whole: given 2176.903968363784 kcal it wrote it back, digit for digit (the
@@ -129,6 +136,8 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief, toolbox?: 
     protectedPath: brief.protectedPath,
     proteinUnrecoverable: brief.proteinUnrecoverable,
     allowedNumbers,
+    maxSentences,
+    maxWords,
     ...(toolbox === undefined ? {} : { toolbox }),
   };
 }

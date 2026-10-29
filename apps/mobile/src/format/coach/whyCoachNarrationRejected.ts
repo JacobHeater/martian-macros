@@ -29,7 +29,17 @@ const metaTalk: readonly RegExp[] = [
   /\b(is|are|was|were)\s+(marked|flagged)\s+as\b/i,
   /\b(the|a|my|your)\s+(tools?|function|tool\s+calls?|instructions?|prompt|system\s+prompt)\b/i,
   /\b(tool|function)\s+(call|calls|answer|result|results|output)s?\b/i,
+  // The owner's brief of 2026-10-28 (MM-693): "The figures are already in front of me, so I can answer directly
+  // without calling tools." A coach has no figures and no tools to speak of.
+  /\b(figures|tools?)\b/i,
+  /\bin\s+front\s+of\s+me\b/i,
+  /\b(answer|respond|reply)\s+(directly|straight)\b/i,
+  /\bwithout\s+(calling|using|needing|running)\b/i,
+  /\bI\s+(can|could|will|would|am\s+able\s+to)\s+(answer|respond|reply|see|read|tell\s+you)\b/i,
 ];
+
+/** Sentence ends: a full stop, question or exclamation mark before a space or the end, never a decimal point. */
+const sentenceEnd = /[.?!]["”’)]*(?=\s|$)/g;
 
 /**
  * Why a candidate coaching narration (such as one returned by a BYOK LLM
@@ -37,9 +47,10 @@ const metaTalk: readonly RegExp[] = [
  * must be non-empty, bounded in length, free of banned words, respect the
  * protected eating-disorder safeguard, not contradict the mathematical
  * invariant when protein is unrecoverable, and cite only the figures it was
- * given (MM-663), and speak of the day, never of its figures, its
- * instructions or its tools (MM-689). The reason is shown by Settings' test
- * of the voice (MM-671).
+ * given (MM-663), speak of the day, never of its figures, its
+ * instructions or its tools (MM-689), and keep to the surface's sentences
+ * and words (MM-693). The reason is shown by Settings' test of the voice
+ * (MM-671).
  */
 export function whyCoachNarrationRejected(
   text: string,
@@ -47,6 +58,9 @@ export function whyCoachNarrationRejected(
     readonly protectedPath: boolean;
     readonly proteinUnrecoverable: boolean;
     readonly allowedNumbers?: readonly number[] | undefined;
+    /** The most sentences and words allowed (MM-693); the brief's are 4 and 60. */
+    readonly maxSentences?: number | undefined;
+    readonly maxWords?: number | undefined;
   },
 ): string | undefined {
   const trimmed = text.trim();
@@ -56,6 +70,9 @@ export function whyCoachNarrationRejected(
   for (const pattern of metaTalk) {
     if (pattern.test(trimmed)) return 'It spoke of its figures or tools instead of the day';
   }
+  // Over the surface's length (MM-693): the owner's brief ran to six sentences and 170 words under the 900 characters.
+  if (context.maxWords !== undefined && trimmed.split(/\s+/).length > context.maxWords) return 'It rambled';
+  if (context.maxSentences !== undefined && Math.max(1, (trimmed.match(sentenceEnd) ?? []).length) > context.maxSentences) return 'It rambled';
   // A JSON field read aloud ("Because proteinUnrecoverable is true", the owner's breakdown, MM-674).
   const fieldName = /\b[a-z]+[A-Z][A-Za-z]*\b/.exec(trimmed)?.[0];
   if (fieldName !== undefined) return `It read out a field name (${fieldName})`;

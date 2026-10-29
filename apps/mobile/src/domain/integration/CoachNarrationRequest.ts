@@ -21,4 +21,8 @@ export interface CoachNarrationRequest {
   readonly allowedNumbers: readonly number[];
   /** The tools the model may call before it answers (MM-685); none, and it answers from the prompt alone. */
   readonly toolbox?: CoachToolbox | undefined;
+  /** The most sentences the answer may run to (MM-693); more, and it is refused for rambling. None, and only the character bound holds. */
+  readonly maxSentences?: number | undefined;
+  /** The most words the answer may run to (MM-693); more, and it is refused for rambling. */
+  readonly maxWords?: number | undefined;
 }
