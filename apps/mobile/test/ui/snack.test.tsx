@@ -7,7 +7,8 @@ import { useOverlays } from '../../src/ui/useOverlays';
 /**
  * MM-601 (the owner, 2026-10-24): every snack goes after ten seconds, one
  * with an Undo too, unless it is being read or pointed at. Before then, the
- * action, a dismissal or the back button takes it (MM-272).
+ * action, a dismissal or the back button takes it (MM-272). Every snack,
+ * with an action or without, has its own Dismiss (the owner, MM-691).
  */
 let overlays: Overlays | undefined;
 
@@ -53,21 +54,26 @@ describe('a snack', () => {
     expect(screen.queryByText('Oats removed.')).not.toBeInTheDocument();
   });
 
-  it('with nothing to press goes after ten seconds', async () => {
+  it('with nothing to press goes after ten seconds, and at once by its Dismiss', async () => {
     act(() => overlays?.snack('Saved.'));
     await pass(9_900);
     expect(screen.getByText('Saved.')).toBeInTheDocument();
     await pass(200);
     expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
+
+    act(() => overlays?.snack('Saved.'));
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+    expect(screen.queryByText('Saved.'), 'gone by its Dismiss').not.toBeInTheDocument();
   });
 
   it('does not go while it is focused or pointed at', async () => {
     act(() => overlays?.snack('Saved.'));
-    const snack = screen.getByText('Saved.').parentElement as HTMLElement;
-    act(() => snack.focus());
+    // Its Dismiss is the focus stop in it; a snack no longer takes focus itself (MM-691).
+    const dismiss = screen.getByRole('button', { name: 'Dismiss' });
+    act(() => dismiss.focus());
     await pass(20_000);
     expect(screen.getByText('Saved.')).toBeInTheDocument();
-    act(() => snack.blur());
+    act(() => dismiss.blur());
     await pass(10_100);
     expect(screen.queryByText('Saved.')).not.toBeInTheDocument();
   });

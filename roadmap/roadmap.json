@@ -711,7 +711,8 @@
       "MM-73",
       "MM-498",
       "MM-551",
-      "MM-188"
+      "MM-188",
+      "MM-690"
      ]
     },
     {
@@ -1616,7 +1617,8 @@
      "MM-453",
      "MM-601",
      "MM-603",
-     "MM-679"
+     "MM-679",
+     "MM-691"
     ]
    },
    "sequence": [
@@ -1919,9 +1921,10 @@
     },
     {
      "step": 22,
-     "title": "Every snack goes by itself after ten seconds, Undo too (the owner, 2026-10-24, MM-601, replacing MM-272's waiting snack)",
+     "title": "Every snack goes by itself after ten seconds, Undo too (the owner, 2026-10-24, MM-601, replacing MM-272's waiting snack); every one has Dismiss (MM-691)",
      "tickets": [
-      "MM-601"
+      "MM-601",
+      "MM-691"
      ]
     },
     {
@@ -3616,7 +3619,8 @@
      "MM-523"
     ],
     "remaining": [
-     "MM-66"
+     "MM-66",
+     "MM-690"
     ]
    },
    "sequence": [
@@ -3650,7 +3654,8 @@
      "tickets": [
       "MM-73",
       "MM-498",
-      "MM-551"
+      "MM-551",
+      "MM-690"
      ],
      "milestone": "M3"
     },
