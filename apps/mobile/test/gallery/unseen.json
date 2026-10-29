@@ -1,7 +1,7 @@
 [
   {
-    "place": "src/main.tsx: .then(async (services) => {",
-    "reason": "The entry point, run by the phone and the dev server when the app starts; Storybook draws App itself over in-memory stores, so no story runs it (MM-321, reviewed 2026-10-16)."
+    "place": "src/main.tsx: draw: async (services) => {",
+    "reason": "The entry point, run by the phone and the dev server when the app starts; Storybook draws App itself over in-memory stores, so no story runs it (MM-321, reviewed 2026-10-16; the start moved into startApp, MM-694, and this is what it draws)."
   },
   {
     "place": "src/settings/SettingsScreen.tsx: if (setup === undefined) return <Screen title=\"Settings\">{null}</Screen>;",
