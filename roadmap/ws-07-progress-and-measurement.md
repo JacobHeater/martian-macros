@@ -130,9 +130,9 @@ storage rules above.
 ## Requirement sources
 - Built: MM-16, MM-17 (weigh-in, trend chart); MM-21 (waist, built but
   unverified); MM-34 (body-fat range from the waist).
-- Remaining: MM-155, MM-136, MM-20, MM-142.
-- Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed; MM-694, 2026-10-29: its database opened
-  on first use, never at start), MM-502 (smart-scale
+- Remaining: MM-155, MM-136, MM-20, MM-142; MM-694 (built 2026-10-29, the photo database opened on first use, in
+  progress until the owner's phone confirms it).
+- Built 2026-10-21: MM-157 (progress photos, kept on the phone; phone checks owed), MM-502 (smart-scale
   readings in the body-fat range, each scale's own bias), MM-156 (more measurement sites; the waist moved
   into one store by site), MM-578 (a graphic in every Progress section), MM-501 (the Navy tape method in the body-fat range),
   MM-118 (the weight display: Everything, Trend only or Hidden).
