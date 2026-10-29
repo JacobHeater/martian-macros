@@ -966,10 +966,11 @@ export const DayPartial = screenStory({
   },
 });
 
-/** MM-692: the longest label, "Not marked", beside the day's figure and over what is left, on a 360 px phone. */
+/** MM-692: the longest label, "Not marked", beside the day's figure and over what is left, on a 360 px phone (the demo marks every day, so today is unmarked here). */
 export const DayNotMarkedSmallPhone = screenStory({
   covers: ['FoodScreen'],
   shows: 'Not marked',
+  scenario: demoWith({ then: async (repos, today) => repos.dayMarks.setCompleteness(today, 'unmarked') }),
   open: ({ state }) => state.homeTab.put('food'),
   viewport: 'smallPhone',
 });
