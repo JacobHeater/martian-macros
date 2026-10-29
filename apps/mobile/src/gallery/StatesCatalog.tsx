@@ -101,7 +101,10 @@ export function StatesCatalog() {
         <State name="Selected"><MmChoiceChip label="Chest" selected onSelect={nothing} /></State>
         <State name="Pressed" pressed><MmChoiceChip label="Chest" selected={false} onSelect={nothing} /></State>
         <State name="Action"><MmActionChip label="Oats, 80 g" onPress={nothing} /></State>
-        <State name="Status"><MmStatusChip label="Partial" /></State>
+        <State name="Status"><MmStatusChip label="Refeed" /></State>
+        <State name="Neutral"><MmStatusChip label="Not marked" icon="dayUnmarked" tone="neutral" /></State>
+        <State name="Positive"><MmStatusChip label="Complete" icon="dayComplete" tone="positive" /></State>
+        <State name="Caution"><MmStatusChip label="Partial" icon="dayPartial" tone="caution" /></State>
       </div>
       <div className="gallery-state-row">
         <State name="Card" wide><ChoiceCard label="Fat loss" detail="Lose fat at a steady pace." selected={false} onPress={nothing} /></State>

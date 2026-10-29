@@ -200,6 +200,8 @@ workstream's.
   for every food; done), MM-659 (the edit sheet shows the entry's grade; done), MM-660 (a fried or sweet-and-fatty food grades no
   better than C-; done), MM-661 (a long press on a food starts choosing, with a haptic tap; done), MM-662 (the held row stays put and
   nothing is said; done).
+- Added 2026-10-28 (step 32, the owner from the phone): MM-692 (the day's completeness is a chip with a fill at the
+  hero's top right, Complete, Partial or Not marked, not a wordless mark in the header; done).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
