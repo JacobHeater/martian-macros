@@ -8,7 +8,7 @@ session.
 
 ## Where things stand
 
-Last updated: 2026-10-28, by Claude, Session 48.
+Last updated: 2026-10-29, by Claude, Session 49.
 
 **How work is done now (owner, 2026-10-20 and 21; root `AGENTS.md`, "Usage").** No
 local tests, checks or builds: CI validates. Small parallel branches, one PR
@@ -16,6 +16,20 @@ each, merged when green (`gh pr merge --merge`; no branch
 protection, so `--auto` is refused). For the push through M3 and M4 the owner
 lifted the five-minute subagent cap (2026-10-21): builder agents, one ticket
 per worktree and PR. This handoff is updated once per session, in its own PR.
+
+**The owner's phone call-outs of 2026-10-28 (Session 49, Claude; MM-692 in PR #366, MM-693 in PR #367, both merged green).**
+MM-692: the Food header's wordless completeness checkmark is gone; the day's completeness is a chip with a fill at the top right of
+the Food hero's head (`FoodCompletenessChip`: Complete positive, Partial caution, Not marked neutral, with MM-255's mark), above
+what is left or over, for any day up to today; `MmStatusChip` took a `tone` and an `icon`, `CalorieHero` a `mark`; the Refeed or
+Day off chip stays in the header. MM-693: the Executive brief rambled ("The figures are already in front of me, so I can answer
+directly without calling tools", 170 words, the rows under it recited). The owner chose, in one interactive question with three
+drafts of that day, **verdict, drag, order, one training line, at most 4 sentences and 60 words** (the draft is in MM-693). The
+limits travel with `CoachNarrationRequest` (`maxSentences`, `maxWords`) and `whyCoachNarrationRejected` refuses past them with
+"It rambled"; "figures" and "tools" as words, "in front of me", "answer directly", "without calling" and "I can answer" are
+refused as meta-talk; the sheet's approved line A is longer and is not bound. The built-in words are unchanged. **Owed: the
+owner's phone read of both** (the chip at 360 px with "Not marked" over the delta; the next brief the model writes); MM-693 stays
+`in-progress` until then. Lesson: the demo seed marks every day complete or partial, so a story that needs an unmarked day sets
+it so.
 
 **AI meal analysis with tools, the owner's push of 2026-10-28 (Session 48, Claude; MM-682 to MM-687, PR #361 merged green).**
 Settled in a four-round interactive Q&A (the owner's standing rule, and the Q&A is interactive: AskUserQuestion rounds, never a
@@ -70,7 +84,7 @@ Lesson: when the phone disagrees with the code, pull the phone's own data before
 Every snack now has the Dismiss icon button, with an action or without, and no longer takes focus itself (a tap on a plain
 snack focused it, and a focused snack is held by MM-601, so it never went). `MmOverlays.tsx`, `test/ui/snack.test.tsx`.
 
-**Open PRs at the end of Session 48:** none (#360 and #361 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
+**Open PRs at the end of Session 49:** none (#366 and #367 merged green; this handoff PR is opened and merged after). A new session still checks `gh pr list` first.
 
 **Coaching architecture & UI overhaul, the owner's push of 2026-10-27 to 2026-10-28** (MM-663 to MM-667, PRs #355 to #358). Built and merged:
 - **MM-663** (PR #355): deterministic pre-calculated `ExecutiveBrief` (`executiveBriefOf`) and `MealBreakdownAnalysis` (`mealBreakdownAnalysisOf`), whole-situation paragraph archetypes for offline / no-key coaching (`executiveBriefArchetypeText`, `mealBreakdownArchetypeText`), and the hard mathematical invariant `proteinRemainingG * 4 <= kcalRemaining` enforced across intraday coaching (`analyseFoodDay`, `dayAdviceOf`, `foodFindingText`, `executiveBriefOf`, `mealBreakdownAnalysisOf`, `verifyCoachNarration`). When protein cannot fit inside remaining calories, advice pivots to pure protein sources for the remaining calorie budget and marks protein as unrecoverable today without pushing the user over their calorie budget.
@@ -307,6 +321,14 @@ not yet in the panel protocol: an "emerging" grade on one trial is not a
 grade; search before grading any evidence below "moderate"). Terms of use:
 MM-242, a draft by non-lawyers that blocks release.
 
+## Session 49: 2026-10-28 to 29, Claude (two phone call-outs: the completeness chip in the hero, MM-692; the brief's shape, MM-693)
+
+- **The owner's words:** on the Food header's checkmark: "I don't like its placement. there's a lot of horizontal real estate in the top right corner of the graph where we can place a background colored chip for complete/partial/not marked at the top right." On the Executive summary: "weve got to hone in the system prompt for this so we don't get ramblin rose over here." Then "branch and pr" for this handoff.
+- **Merged:** #366 (MM-692, two CI rounds: the Stories job was red because the demo seed marks every day, so the 360 px "Not marked" story found "Complete"; the story now unmarks today) and #367 (MM-693, green in one round). Both shipped through a scratchpad worktree from `origin/main`, the main checkout fast-forwarded after its copies were checked byte for byte against the merge. Asked before the first branch (the owner chose the worktree PR); MM-693 under the AI meal analysis epic's standing OK.
+- **Settled with the owner:** the brief's shape, one interactive question with three drafts of the owner's own day; the chosen draft is the approved line in MM-693.
+- **Lessons:** zsh does not word-split an unquoted variable, so a file list for `cp` and `git add` is an array; `git merge --ff-only` refuses over files that are modified even when they equal the incoming tree, so restore them from `origin/main` first (they do not change on disk) and drop untracked copies of new files once `cmp` shows them identical; `git diff` cannot compare an untracked file, `git show origin/main:path | cmp - path` can. A model echoes the words its prompt uses for its input ("the figures"), so a prompt names the day, never the input, and the check refuses the input's words outright.
+- **Not run:** nothing was run locally; CI validated both merges. Not seen on a phone: both call-outs are owed the owner's read.
+
 ## Session 48: 2026-10-28, Claude (AI meal analysis with tools: the Q&A, then MM-682 to MM-687 in one PR)
 
 - **The owner's words:** "i think it's time to lean into the ai driven meal analysis when the ai coach is enabled and provide tools into the application either through mcp or other tools within the application runtime to make proper suggestions and analysis. let's be honest, swapping a biscuit for a chicken breast is kind of a poor suggestion, but i'm also open to revamping and reworking this determinstically with another approach that isn't agent driven and is also available to deterministic users." Then, on a first reply that listed six questions in prose: "i said interactive q and a sessions only" (recorded: every Q&A question goes through the interactive question tool, a round at a time).
@@ -322,10 +344,3 @@ MM-242, a draft by non-lawyers that blocks release.
 - **Shipped in PR #360, merged green 2026-10-28:** the tickets, the roadmap (WS-10 step 10, WS-09 step 16, an edge), `docs/non-goals.md`, `docs/evidence.md` rows, and the code and tests listed above. The owner's first walk on the watch then did not arrive: MM-690 (the iOS plugin's own memory of what Apple Health was asked for, drifted from HealthKit's record; fixed in the main checkout, the owner's rebuild and press of Exercise sessions owed), see "Where things stand".
 - **Lessons:** a Python `replace(..., 1)` on a repeated anchor (`customExercises:`) landed two services inside `MirroredWorkoutLog`'s options instead of on `AppServices`; the phone blanked and nothing said why (MM-679 now does). Check every inserted line's placement, not just that the edit applied. `format/` may not import `state/`: a screen helper that reads the health connection takes the two sets it needs as a structural type. `cardioDisclosureText` is that helper.
 - **Not run:** nothing was run locally.
-
-## Session 46: 2026-10-28, Gemini (coaching architecture, BYOK narration, meal breakdowns & unified Coach tab; 4 PRs)
-
-- **The owner's words:** "I have NO concerns lifting the zero AI policy, and I'm ready to do so. We've got to get Coaching sounding human, and I like your plan to trim costs. So, I want determinstic engine with precalc, and we'll keep the human sounding determinsm track for offline modes, or users who don't want to supply keys, and then run BYOK with users who bring keys."
-- **Merged:** #355 (MM-663: `executiveBriefOf`, `mealBreakdownAnalysisOf`, offline paragraph archetypes, and the hard `proteinRemainingG * 4 <= kcalRemaining` invariant across intraday coaching and narration validation), #356 (MM-664, MM-665: lifted zero-AI runtime policy in `docs/non-goals.md`, MM-144, privacy policy, and terms of use; added `CoachNarrator` and `CoachAiStore` with `Google Gemini`, `OpenAI`, and `Anthropic` BYOK in `Settings > Coach`), #357 (MM-666: on-demand `"Coach breakdown"` sheet from meal overflow menu and higher-protein `swapFor` suggestions on `mostlyFat` / `lightOnProtein` inline insights), #358 (MM-667: consolidated 4-tab navigation `Dashboard`, `Food`, `Train`, `Coach`, `ExecutiveSummaryCard` at top of `CoachScreen`, embedded `ProgressScreen`, collapsible bottom telemetry sections, retired `RecentInsightsSection`), and this handoff PR.
-- **Lessons:** `apps/mobile/scripts/check-unseen.mjs` uses `/<[A-Z][A-Za-z]*[\s/>]/` to spot JSX in unexecuted callbacks, which also matches TypeScript type arguments like `overlays.options<CoachAiProvider>(...)`; omit the explicit generic parameter so the type is inferred from `choices`. `CoachScreen`'s collapsible `<MmSection title="Your metabolism">` needs `remember="coach.metabolism-section"` so its fold state does not collide with `MetabolismSummary`'s inner `<MmDisclosure remember="coach.metabolism">`.
-- **Not run:** nothing was run locally; CI validated every merge.
