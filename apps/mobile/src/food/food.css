@@ -1,15 +1,30 @@
 /* The hero's head (MM-571): what was eaten, and what is left or over beside it. */
 .food-hero-head {
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   justify-content: space-between;
   gap: var(--space-12);
   margin-bottom: var(--space-12);
 }
 .food-hero-eaten,
+.food-hero-side,
 .food-hero-delta {
   display: flex;
   flex-direction: column;
+}
+.food-hero-eaten {
+  justify-content: flex-end;
+}
+/* The right side (MM-692): the day's chip at the top corner, what is left or over at the foot, each alone when the other is absent. */
+.food-hero-side {
+  flex: none;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+.food-hero-mark {
+  display: grid;
+  margin-bottom: auto;
 }
 .food-hero-delta {
   align-items: flex-end;
@@ -205,10 +220,6 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-4);
-}
-.food-day-mark {
-  display: grid;
-  color: var(--text2);
 }
 .food-easy-to-miss-confirm {
   margin-top: var(--space-16);

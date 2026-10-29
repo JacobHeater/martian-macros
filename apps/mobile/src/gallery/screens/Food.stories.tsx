@@ -947,6 +947,34 @@ export const DayCompleteness = screenStory({
   },
 });
 
+/** MM-692: today marked complete: the positive chip at the hero's top right, above what is left. */
+export const DayComplete = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Complete',
+  scenario: demoWith({ then: async (repos, today) => repos.dayMarks.setCompleteness(today, 'complete') }),
+  open: ({ state }) => state.homeTab.put('food'),
+});
+
+/** MM-692: yesterday marked partial: the caution chip at the hero's top right. */
+export const DayPartial = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Partial',
+  scenario: demoWith({ then: async (repos, today) => repos.dayMarks.setCompleteness(today.addDays(-1), 'partial') }),
+  open: ({ state, today }) => {
+    state.homeTab.put('food');
+    state.selectedDay.put(today.addDays(-1));
+  },
+});
+
+/** MM-692: the longest label, "Not marked", beside the day's figure and over what is left, on a 360 px phone (the demo marks every day, so today is unmarked here). */
+export const DayNotMarkedSmallPhone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Not marked',
+  scenario: demoWith({ then: async (repos, today) => repos.dayMarks.setCompleteness(today, 'unmarked') }),
+  open: ({ state }) => state.homeTab.put('food'),
+  viewport: 'smallPhone',
+});
+
 /** MM-611: today marked a Refeed: the neutral chip in the day's header, and the row after the meals saying so (MM-655). */
 export const DayMarkedRefeed = screenStory({
   covers: ['FoodScreen'],

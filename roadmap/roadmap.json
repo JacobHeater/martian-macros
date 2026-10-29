@@ -2661,6 +2661,7 @@
      "MM-653",
      "MM-654",
      "MM-655",
+     "MM-692",
      "MM-656",
      "MM-657",
      "MM-658",
@@ -3036,6 +3037,13 @@
       "MM-660",
       "MM-661",
       "MM-662"
+     ]
+    },
+    {
+     "step": 32,
+     "title": "From the phone (the owner, 2026-10-28): the day's completeness is a chip with a fill at the hero's top right, not a mark in the header (MM-692)",
+     "tickets": [
+      "MM-692"
      ]
     }
    ],
