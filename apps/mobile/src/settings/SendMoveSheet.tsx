@@ -59,7 +59,9 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
       try {
         const snapshot = await services.backup.snapshot();
         const photos = await services.progressPhotos.exportArchive();
-        await services.moveSender.send(code, { snapshot, photos }, (done, total) => {
+        // The coach's provider and key go with a move, never with a backup (MM-701).
+        const coachAi = await services.coachAi.loadConfig();
+        await services.moveSender.send(code, { snapshot, photos, coachAi }, (done, total) => {
           if (live) setStage({ kind: 'sending', done, total });
         });
         if (live) setStage({ kind: 'sent' });
