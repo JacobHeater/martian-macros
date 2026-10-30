@@ -16,6 +16,7 @@ import { Fmt } from '../format/Fmt';
 import { mealLabel } from '../format/mealLabel';
 import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
+import { useNavigator } from '../app/useNavigator';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -34,7 +35,7 @@ import { foodEntryLinesId } from './foodEntryLinesId';
 import { FoodGrade } from './FoodGrade';
 import { LoggedMealRow } from './meal/LoggedMealRow';
 import { mealIcon } from './mealIcon';
-import { showAddFoodSheet } from './showAddFoodSheet';
+import { addFoodFrom } from './addFoodFrom';
 import { showMealBreakdownSheet } from './showMealBreakdownSheet';
 import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { showMealSplitSheet } from './showMealSplitSheet';
@@ -75,6 +76,7 @@ interface MealSectionProps {
 export function MealSection({ meal, day, entries, selection, onStartSelection, focusKey }: MealSectionProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
+  const navigator = useNavigator();
   const today = useCell(state.today);
   const total = entries.reduce((sum, e) => sum + e.kcal, 0);
   const protein = entries.reduce((sum, e) => sum + e.proteinG, 0);
@@ -215,7 +217,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
             icon="plus"
             kind="add"
             label={`Add food to ${label.toLowerCase()}`}
-            onPress={() => void showAddFoodSheet(overlays, day, { meal })}
+            onPress={() => void addFoodFrom({ overlays, navigator }, day, { meal })}
           />
           {entries.length === 0 ? null : (
             <MmMenuButton<SlotAction>
@@ -277,7 +279,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
                   label={`Edit ${entry.name}`}
                   describedBy={foodEntryLinesId(entry)}
                   autoFocus={`food:${entry.id}` === focusKey}
-                  onPress={() => void showAddFoodSheet(overlays, day, { entry })}
+                  onPress={() => void addFoodFrom({ overlays, navigator }, day, { entry })}
                   // A long press starts choosing with this food ticked, felt as one tap (MM-661, the owner).
                   onLongPress={onStartSelection === undefined ? undefined : (anchor) => chooseByHold(`food:${entry.id}`, anchor)}
                 >

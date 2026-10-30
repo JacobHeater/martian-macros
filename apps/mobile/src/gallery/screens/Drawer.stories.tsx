@@ -59,6 +59,16 @@ export const DrawerOpensSettings = screenStory({
   },
 });
 
+/** The Library from the drawer (MM-706): pushed over the destination, with Back. */
+export const DrawerOpensLibrary = screenStory({
+  covers: ['LibraryScreen'],
+  shows: 'Usual foods',
+  walk: async (canvas) => {
+    const drawer = await openMenu(canvas);
+    await userEvent.click(within(drawer).getByRole('button', { name: 'Library' }));
+  },
+});
+
 /** MM-91: the drawer on a 360 px phone at twice the text size: the lettering and every row inside its width. */
 export const DrawerOpenSmallPhone = screenStory({
   covers: ['DashboardScreen'],

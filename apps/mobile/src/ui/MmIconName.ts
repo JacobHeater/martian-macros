@@ -83,4 +83,6 @@ export type MmIconName =
   | 'movePhone'
   | 'qrCode'
   // The drawer's menu button (MM-704).
-  | 'menu';
+  | 'menu'
+  // The Library: everything the person made (MM-706).
+  | 'library';

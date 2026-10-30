@@ -53,3 +53,14 @@ Scenario: A label still saves and logs
 ## Notes
 - Tests: `test/food/customFoods.test.tsx` updated (management cases move to `test/library/library.test.tsx`),
   `test/food/savedStep.test.tsx` for the scenarios above.
+
+## Progress
+Built 2026-10-30 (PR B of MM-703, with MM-706): `MyFoodsStep` lists the saved meals and foods to log them, with no
+menus and no New food or New recipe; "Manage in Library" (a text button before Back) closes the sheet and pushes the
+Library; nothing saved says "Nothing saved yet. Make a food in the Library."; a label read from an unknown barcode
+(MM-44) and "Fix this food" (MM-153) still open the food form inside the sheet and come back to be logged. Tests in
+`test/food/savedStep.test.tsx`; the management cases of `test/food/customFoods.test.tsx` moved to
+`test/library/library.test.tsx`. Stories: `AddFoodSaved` and `AddFoodSavedOwn` (Food.stories.tsx) draw the picker.
+
+Not run locally; CI validates.
+

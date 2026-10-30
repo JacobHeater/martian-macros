@@ -5,6 +5,7 @@ import type { FoodRangeReader } from './FoodRangeReader';
 import type { LastLoggedReader } from './LastLoggedReader';
 import type { LoggedFoodSearch } from './LoggedFoodSearch';
 import type { RecentFoodReader } from './RecentFoodReader';
+import type { SavedFoodUsageReader } from './SavedFoodUsageReader';
 
 /** Reads and writes the food log. */
-export interface FoodRepository extends FoodDayReader, FoodRangeReader, RecentFoodReader, LastLoggedReader, LoggedFoodSearch, FoodEntryWriter, FoodEntryBatchWriter {}
+export interface FoodRepository extends FoodDayReader, FoodRangeReader, RecentFoodReader, LastLoggedReader, SavedFoodUsageReader, LoggedFoodSearch, FoodEntryWriter, FoodEntryBatchWriter {}
