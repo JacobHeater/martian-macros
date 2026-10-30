@@ -113,3 +113,31 @@ Scenario: Unreadable
 - Tests: `test/food/makeFoodWithAi.test.tsx` (every scenario above), `test/format/foodPrompt.test.ts` (the prompt's own
   example reads back clean through MM-709).
 - Not run locally; CI validates. Owed on the phone: the share sheet with photos, the paste, the barcode scan from here.
+
+## Progress
+Built 2026-10-30 (PR C of MM-703, worktree `mm-wt/ai-food`), not run locally; CI validates.
+- `MakeFoodWithAiScreen` (`apps/mobile/src/food/ai/`), a pushed `Screen` titled "With my AI", in the three parts of
+  `AnalyzeMealStep`: **About the food** (name, the Homemade switch that hides the brand, brand or restaurant, one serving
+  and its grams, a Barcode row with Scan and Remove, anything else, up to six photos, Send to my assistant or Copy
+  prompt, the paste controls), **Review the foods** (`FoodDraftRow` with `FoodDraftForm` under it, "You have X already"
+  with Update it and Keep both, a "Save X" check on each row, the problems notice with Copy fixes for AI and the paste
+  controls, Save N foods, Start again), and the camera (`MealPhotoCamera`). The share, the clipboard, the copy and send
+  status pattern and the clearing of what was shared are the meal flow's.
+- The barcode scanned goes on the one food of the answer, on none with several (said in the review); a same-name
+  saved food is updated by default, keeping its id and its logged entries; Save writes every ticked food through
+  `customFoodOfDraft` and says "Saved N foods" (or "Saved X") in a snack, then hands the saved foods to `onDone`.
+- Stories: `MakeFoodWithAi.stories.tsx` (MakeFoodAsk, MakeFoodAskHomemade, MakeFoodPromptCopied, MakeFoodCopyRefused,
+  MakeFoodWithPhotos, MakeFoodSent, MakeFoodShareFailed, MakeFoodCannotShare, MakeFoodSixPhotos, MakeFoodCamera,
+  MakeFoodCameraRefused, MakeFoodBarcode, MakeFoodScanRefused, MakeFoodUnreadable, MakeFoodClipboardRefused,
+  MakeFoodReview, MakeFoodReviewHomemade, MakeFoodChangeFood, MakeFoodChangeRefused, MakeFoodReviewSameName,
+  MakeFoodReviewProblems, MakeFoodReviewBarcodeUnplaced, MakeFoodSaveFailed, MakeFoodReviewSmallPhone at 360 px).
+- Tests: `test/food/makeFoodWithAi.test.tsx` (every scenario above), `test/format/foodPrompt.test.ts`;
+  `test/support/renderApp.tsx` gained `open`, so a test reaches a screen with no way in yet.
+
+**Left to a sibling PR:** the way in. The Library's New food chooser (MM-706) is built in its own PR and is not on this
+branch; whichever PR lands later wires "With my AI" to `MakeFoodWithAiScreen` (`navigator.push((close) =>
+<MakeFoodWithAiScreen onDone={(saved) => close(saved)} />)`) and opens the Foods fold on what came back. The stories
+and the tests open the screen directly. Nothing is stubbed.
+
+**Owed on the phone:** the share sheet with photos, the paste from a real assistant's answer, the barcode scan from
+here, and the owner's read of the review at phone width.

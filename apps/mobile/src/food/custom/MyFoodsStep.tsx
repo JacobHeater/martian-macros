@@ -10,6 +10,7 @@ import { MmMenuButton } from '../../ui/MmMenuButton';
 import { useOverlays } from '../../ui/useOverlays';
 import { CustomFoodForm } from './CustomFoodForm';
 import { RecipeForm } from './RecipeForm';
+import { SavedFoodTrustMark } from './SavedFoodTrustMark';
 import '../food.css';
 
 interface MyFoodsStepProps {
@@ -114,9 +115,14 @@ export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal 
         <MmListRow
           key={food.id}
           title={food.name}
-          subtitle={
-            `${food.kind === 'recipe' ? 'Recipe' : 'Food'} · ${food.servingDescription} · ` +
-            Fmt.kcal(food.perServing.kcal)
+          detail={
+            <span className="food-entry-text">
+              <span className="food-entry-line">
+                {`${food.kind === 'recipe' ? 'Recipe' : 'Food'} · ${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`}
+              </span>
+              {/* Where its numbers came from (MM-710). */}
+              <SavedFoodTrustMark food={food} />
+            </span>
           }
           // Pressing a saved food logs it; its editing and deleting are in its menu (MM-635).
           opens

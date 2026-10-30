@@ -201,7 +201,11 @@ CREATE TABLE "custom_foods" (
   "sugars_g" REAL NULL,
   "saturated_fat_g" REAL NULL,
   "cholesterol_mg" REAL NULL,
-  "sugar_alcohols_g" REAL NULL
+  "sugar_alcohols_g" REAL NULL,
+  "food_group" TEXT NULL,
+  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN ('cited', 'matched', 'estimated', 'yours', 'label')),
+  "evidence_citation" TEXT NULL,
+  "ingredients" TEXT NULL
 );
 CREATE TABLE "recipe_ingredients" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

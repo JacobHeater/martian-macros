@@ -7,9 +7,11 @@ const values = [
   'estimated',
   /** Changed or added by the person. */
   'yours',
+  /** Read from the product's Nutrition Facts panel on the phone (MM-44); only a saved food carries it (MM-710). */
+  'label',
 ] as const;
 
-/** Where an item of an analysed meal got its numbers (MM-586). */
+/** Where an item of an analysed meal (MM-586) or a saved food (MM-710) got its numbers. */
 export type FoodEvidenceKind = (typeof values)[number];
 
 export const FoodEvidenceKind = { values } as const;

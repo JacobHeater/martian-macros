@@ -88,7 +88,8 @@ const addedSince: Readonly<Record<string, readonly string[]>> = {
     'evidence_citation',
   ],
   // Version 4 (MM-309): fiber, sodium and the micronutrients of a food of one's own.
-  custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g'],
+  // Version 32 (MM-710): a saved food's group, where its numbers came from, and what went into it.
+  custom_foods: ['fiber_g', ...Micronutrient.values.map((n) => Micronutrient.column(n)), 'sugar_alcohols_g', 'food_group', 'evidence_kind', 'evidence_citation', 'ingredients'],
   // Version 20 (MM-456): the pack food a recipe's ingredient was found as.
   recipe_ingredients: ['source_pack_id', 'source_food_id'],
   // Version 22 (MM-490): the platform id and source of a workout imported from the health platform.

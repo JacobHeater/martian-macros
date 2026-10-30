@@ -58,6 +58,7 @@ import { Notice } from '../ui/Notice';
 import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
+import { SavedFoodTrustMark } from './custom/SavedFoodTrustMark';
 import { defaultMeal } from './defaultMeal';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
@@ -1322,9 +1323,12 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
                         <MmListRow
                           key={`custom-${food.id}`}
                           title={food.name}
-                          subtitle={
-                            `${food.kind === 'recipe' ? 'Your recipe' : 'Your food'} · ` +
-                            `${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`
+                          detail={
+                            <span className="food-entry-text">
+                              <span className="food-entry-line">{`${food.servingDescription} · ${Fmt.kcal(food.perServing.kcal)}`}</span>
+                              {/* Your food or recipe, and where its numbers came from (MM-710). */}
+                              <SavedFoodTrustMark food={food} />
+                            </span>
                           }
                           opens
                           onPress={() => pickCustom(food)}

@@ -524,4 +524,17 @@ CREATE INDEX "saved_meal_foods_meal" ON "saved_meal_foods" ("saved_meal_id")
       );
     },
   ],
+  // 31 to 32 (MM-710): a saved food's group, where its numbers came from, and what went into it when homemade. Nothing
+  // is backfilled: a food saved before has no group and no evidence.
+  [
+    31,
+    async (db) => {
+      await db.execute('ALTER TABLE custom_foods ADD COLUMN food_group TEXT NULL');
+      await db.execute(
+        "ALTER TABLE custom_foods ADD COLUMN evidence_kind TEXT NULL CHECK (evidence_kind IS NULL OR evidence_kind IN ('cited', 'matched', 'estimated', 'yours', 'label'))",
+      );
+      await db.execute('ALTER TABLE custom_foods ADD COLUMN evidence_citation TEXT NULL');
+      await db.execute('ALTER TABLE custom_foods ADD COLUMN ingredients TEXT NULL');
+    },
+  ],
 ]);

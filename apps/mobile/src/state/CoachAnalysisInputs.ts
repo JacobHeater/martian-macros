@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { IntakeDay } from '../domain/IntakeDay';
 import type { Pause } from '../domain/Pause';
 import type { FoodRangeReader } from '../domain/repositories/FoodRangeReader';
@@ -35,6 +36,8 @@ export interface CoachAnalysisInputs {
   readonly nowMinute: () => number;
   /** The installed catalog, for a trade's catalog food (MM-607); undefined until it is read. */
   readonly catalog: () => (CatalogSearch & CatalogFoodLookup & CatalogServingLookup) | undefined;
+  /** The person's saved foods, for the group a saved food was given (MM-710); undefined until they are read. */
+  readonly savedFoods: () => readonly CustomFood[] | undefined;
   /** The food analysis's input but its days (entries and intake) and the catalog. */
   readonly foodInput: () => Omit<FoodAnalysisInput, 'entries' | 'intake' | 'catalog'> | undefined;
   /** The training analysis's input but the water and the whole days. */

@@ -69,3 +69,24 @@ Scenario: The coach may offer it
   contract, `test/food/customFoods.test.tsx` (the chooser, the mark, About this food), `test/engine/mealMoves.test.ts`
   (the swap).
 - Never edit step 31 or earlier (MM-325).
+
+## Progress
+Built 2026-10-30 (PR C of MM-703, which takes schema 32), not run locally; CI validates.
+- Schema 32: `custom_foods` gains `food_group`, `evidence_kind` (checked against the five kinds), `evidence_citation`
+  and `ingredients` (a JSON list of name and grams); the step adds the four columns and backfills nothing.
+  `CustomFood` gains `group`, `evidence` and `madeOf` (named so because `ingredients` is a recipe's lines); the SQL and
+  in-memory repositories carry them, with a contract case; `FoodEvidenceKind` gains `label`.
+- The typed form chooses "Food group (optional)" (an `MmDropdown` with None); a new typed food is "yours", one read from
+  the label "label", a corrected copy (MM-153) "yours"; an edited food keeps its evidence.
+- `SavedFoodTrustMark` on the Saved step's rows and the add-food sheet's Yours results; `customCatalogFood` carries the
+  group and turns the evidence into the amount step's tier (an estimate is "Check this"); "About this food" says the
+  evidence and "Made of: …".
+- The coach: `CatalogTradeCatalog.load` takes the saved foods and answers `groupOf` for a `custom` origin by the saved
+  food's group; `InMemoryTradeCatalog` takes `savedFoodGroups`; `CoachAnalysisInputs.savedFoods` is wired in
+  `AppState`. A saved food with a group gets a same-group swap; one without gets none, as before.
+- Tests: `test/data/upgrade.test.ts` (31 to 32), `test/data/schemaFingerprint.test.ts` (32), the custom food repository
+  contract, `test/food/customFoods.test.tsx` (the chooser, the marks, About this food), `test/food/labelRead.test.tsx`
+  (the label's evidence), `test/state/catalogTradeCatalog.test.ts` and `test/engine/mealSwapSameGroup.test.ts` (the
+  saved biscuit's swap; the ticket named `mealMoves.test.ts`, but the group swap's own file is the sibling).
+
+**Left to a sibling PR:** the mark on the Library's rows (MM-706), once the two PRs meet.
