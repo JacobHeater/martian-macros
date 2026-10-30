@@ -1,6 +1,7 @@
 import type { Meta } from '@storybook/react-vite';
 import { screen, userEvent, within } from 'storybook/test';
 import type { BackupContents } from '../../domain/backup/BackupContents';
+import { CoachAiConfig } from '../../domain/integration/CoachAiConfig';
 import { encodePhotoArchive } from '../../domain/photos/encodePhotoArchive';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
 import { SettingsScreen } from '../../settings/SettingsScreen';
@@ -182,7 +183,7 @@ export const MoveConfirm = screenStory({
   device: async (services) => {
     const receiver = new FakeMoveReceiver({
       kind: 'receives',
-      payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([photo(60), photo(30), photo(1)]) },
+      payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([photo(60), photo(30), photo(1)]), coachAi: CoachAiConfig.off },
     });
     const restorer = new FakeDataRestorer();
     // Backed up today, after the last record: no nudge.
@@ -269,7 +270,7 @@ export const MoveApplying = screenStory({
   shows: 'Putting your records in place…',
   viewport: 'smallPhone',
   device: async (services) => {
-    const receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]) } });
+    const receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } });
     const restorer = new FakeDataRestorer();
     restorer.toDescribe = usedPhone;
     restorer.onRestore = () => new Promise<void>(() => undefined);

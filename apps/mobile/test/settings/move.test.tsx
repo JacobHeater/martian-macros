@@ -1,8 +1,11 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
+import { BackupFile } from '../../src/backup/BackupFile';
 import { FakeBackupPlatform } from '../../src/backup/FakeBackupPlatform';
+import { SodiumBackupCipher } from '../../src/backup/SodiumBackupCipher';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CoachAiConfig } from '../../src/domain/integration/CoachAiConfig';
 import { encodePhotoArchive } from '../../src/domain/photos/encodePhotoArchive';
 import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
@@ -37,7 +40,7 @@ beforeEach(async () => {
   restorer = new FakeDataRestorer();
   restorer.here = used;
   restorer.toDescribe = { ...used, weighIns: 45 };
-  receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot, photos: encodePhotoArchive([]) } });
+  receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot, photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } });
   sender = new FakeMoveSender();
   scanned = new MoveCode({ host: '192.168.1.24', port: 47_310 }, new Uint8Array(32).fill(3)).toText();
 });
@@ -229,4 +232,82 @@ it('says when the records could not be moved, instead of nothing', async () => {
   await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
   expect(await screen.findByText('Your records could not be moved. Nothing on this phone was changed.', {}, slowly)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Begin' })).toBeInTheDocument();
+});
+
+// MM-701: the coach's provider and key come with a move, put in place with the records; never with a backup.
+const key: CoachAiConfig = { provider: 'anthropic', apiKey: 'sk-ant-api03-MOVEDKEY' };
+
+const moveOntoFresh = async (coachAi: CoachAiConfig = key, before?: CoachAiConfig) => {
+  const fresh = new InMemoryRepositories();
+  await fresh.preferences.saveThemePreference('martian');
+  restorer.here = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: false };
+  receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot, photos: encodePhotoArchive([]), coachAi } });
+  let services: AppServices | undefined;
+  renderApp(fresh, today, {
+    change: (base: AppServices) => {
+      services = { ...base, restorer, moveReceiver: receiver, moveSender: sender, codeScanner: { scanCode: async () => scanned } };
+      return services;
+    },
+  });
+  if (before !== undefined) await services?.coachAi.saveConfig(before);
+  await userEvent.click(await screen.findByRole('button', { name: 'I have Martian Macros on another phone' }, slowly));
+  return { asks: await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly), coach: () => services!.coachAi.loadConfig() };
+};
+
+it('brings the coach’s provider and key with the move, once confirmed', async () => {
+  const { asks, coach } = await moveOntoFresh();
+  expect(await coach()).toEqual(CoachAiConfig.off);
+  await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
+  await waitFor(async () => expect(await coach()).toEqual(key), slowly);
+});
+
+it('keeps this phone’s own key when the other phone had none', async () => {
+  const mine: CoachAiConfig = { provider: 'openai', apiKey: 'sk-proj-MINE' };
+  const { asks, coach } = await moveOntoFresh(CoachAiConfig.off, mine);
+  await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
+  await waitFor(() => expect(restorer.restoredFrom).toHaveLength(1), slowly);
+  expect(await coach()).toEqual(mine);
+});
+
+it('changes no key when the move is cancelled', async () => {
+  const { asks, coach } = await moveOntoFresh();
+  await userEvent.click(within(asks).getByRole('button', { name: 'Cancel' }));
+  await screen.findByRole('button', { name: 'Begin' }, slowly);
+  expect(await coach()).toEqual(CoachAiConfig.off);
+});
+
+it('sends this phone’s coach key with the move', async () => {
+  let services: AppServices | undefined;
+  renderApp(repos, today, {
+    change: (base: AppServices) => {
+      services = { ...base, restorer, backup: new FakeBackupPlatform(async () => snapshot), moveSender: sender, codeScanner: { scanCode: async () => scanned } };
+      return services;
+    },
+  });
+  await services?.coachAi.saveConfig(key);
+  await startMove('Send from this phone');
+  await (within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly))).findByRole('heading', { name: 'Sent' }, slowly);
+  expect(sender.sent[0]?.payload.coachAi).toEqual(key);
+});
+
+it('never puts the coach key in a backup file', async () => {
+  const backup = new FakeBackupPlatform(async () => snapshot);
+  let services: AppServices | undefined;
+  renderApp(repos, today, {
+    change: (base: AppServices) => {
+      services = { ...base, restorer, backup };
+      return services;
+    },
+  });
+  await services?.coachAi.saveConfig(key);
+  const settings = await openSettings();
+  await userEvent.click(settings.getByRole('button', { name: /^Back up now/ }));
+  const sheet = within(await screen.findByRole('dialog', { name: 'A passphrase for this backup' }, slowly));
+  await userEvent.type(sheet.getByLabelText('Passphrase'), 'correct horse battery');
+  await userEvent.type(sheet.getByLabelText('Passphrase again'), 'correct horse battery');
+  await userEvent.click(sheet.getByRole('button', { name: 'Back up' }));
+  await waitFor(() => expect(backup.saved).toHaveLength(1), slowly);
+  const opened = await BackupFile.read(backup.saved[0]!.file, 'correct horse battery', new SodiumBackupCipher());
+  const text = new TextDecoder('latin1').decode(new Uint8Array([...backup.saved[0]!.file, ...opened.snapshot, ...(opened.photos ?? [])]));
+  expect(text).not.toContain('MOVEDKEY');
 });

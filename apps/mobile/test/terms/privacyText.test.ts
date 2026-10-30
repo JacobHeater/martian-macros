@@ -97,7 +97,9 @@ describe('the policy matches the app', () => {
 
   // MM-698: a move to the person's other phone, on their Wi-Fi, encrypted under the code's key, to no service of ours.
   it('says how a move to another phone leaves this one: only when chosen, straight to the other phone, encrypted', () => {
-    expect(both).toContain('sends your records and progress photos straight to your other phone on the same Wi-Fi, only when you choose it');
+    expect(both).toContain('sends your records, your progress photos and the coach key you entered straight to your other phone on the same Wi-Fi, only when you choose it');
+    // MM-701: the key goes with a move, never with a backup.
+    expect(both).toContain('The key is kept on this phone and is never in a backup file; it goes to your other phone only when you move to it.');
     expect(both).toContain('none of it goes over the internet or to any service of ours');
     expect(both).toContain('never sent anywhere except to your other phone when you move to it');
   });
