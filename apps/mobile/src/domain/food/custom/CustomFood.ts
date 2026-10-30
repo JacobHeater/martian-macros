@@ -1,6 +1,9 @@
+import type { FoodGroup } from '../FoodGroup';
+import type { FoodEvidence } from '../meal/FoodEvidence';
 import { Micronutrients } from '../micros/Micronutrients';
 import type { NutritionTotals } from '../portion/NutritionTotals';
 import type { CustomFoodKind } from './CustomFoodKind';
+import type { FoodIngredient } from './FoodIngredient';
 import type { RecipeIngredient } from './RecipeIngredient';
 
 interface CustomFoodInit {
@@ -17,6 +20,9 @@ interface CustomFoodInit {
   fiberG?: number | undefined;
   sugarAlcoholsG?: number | undefined;
   micros?: Micronutrients;
+  group?: FoodGroup | undefined;
+  evidence?: FoodEvidence | undefined;
+  madeOf?: readonly FoodIngredient[];
 }
 
 /**
@@ -60,6 +66,19 @@ export class CustomFood {
   /** Sodium and the micronutrients per serving, when stated (MM-309); a recipe has none. */
   readonly micros: Micronutrients;
 
+  /** What kind of food it is (MM-616, MM-710), so the coach can trade it within its group; none unless set. */
+  readonly group: FoodGroup | undefined;
+
+  /**
+   * Where its numbers came from (MM-710): read from a label, cited or
+   * matched by the person's assistant, its unverified estimate, or the
+   * person's own. None for a food saved before this was kept.
+   */
+  readonly evidence: FoodEvidence | undefined;
+
+  /** What went into a homemade food (MM-708), as a note; empty for any other food. */
+  readonly madeOf: readonly FoodIngredient[];
+
   constructor(init: CustomFoodInit) {
     this.id = init.id;
     this.name = init.name;
@@ -74,5 +93,8 @@ export class CustomFood {
     this.fiberG = init.fiberG;
     this.sugarAlcoholsG = init.sugarAlcoholsG;
     this.micros = init.micros ?? Micronutrients.none;
+    this.group = init.group;
+    this.evidence = init.evidence;
+    this.madeOf = init.madeOf ?? [];
   }
 }

@@ -210,11 +210,13 @@ export class CoachAnalysis {
     this.tradeCatalog = new StreamCell<TradeCatalog | undefined>(() => {
       const catalog = inputs.catalog();
       const entries = this.catalogEntries.value;
+      // The saved foods' groups (MM-710) go with the load, read here so the cell follows them as it follows the catalog.
+      const savedFoods = inputs.savedFoods() ?? [];
       if (catalog === undefined || entries === undefined || entries.length === 0) return just(undefined);
       return {
         subscribe: (listener) => {
           let stopped = false;
-          CatalogTradeCatalog.load(catalog, entries).then(
+          CatalogTradeCatalog.load(catalog, entries, { savedFoods }).then(
             (loaded) => {
               if (!stopped) listener(loaded);
             },

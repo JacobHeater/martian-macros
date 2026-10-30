@@ -32,5 +32,8 @@ export function copyOfPackFood(food: CatalogFood, servings: readonly CatalogServ
     fiberG: scaled(food.fiberG),
     sugarAlcoholsG: scaled(food.sugarAlcoholsG),
     micros: microsOfPackFood(food).times(f),
+    group: food.group,
+    // Corrected by the person, so its numbers are their own (MM-710).
+    evidence: { kind: 'yours' },
   });
 }

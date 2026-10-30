@@ -428,3 +428,62 @@ it('MM-635: pressing a saved food in Add food opens its amount step and logs it'
   await expect.poll(async () => (await logged()).map((f) => [f.name, f.kcal])).toEqual([['Protein bar', 120]]);
 });
 
+
+// MM-710: a saved food carries its group, where its numbers came from, and what went into it.
+it('MM-710: the typed form chooses a food group, a typed food is the person’s own, and the Saved step says so', async () => {
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  await press(sheet, 'New food');
+  await typeIn(sheet, 'Name', 'Protein bar');
+  await typeIn(sheet, 'One serving is', '1 bar');
+  await typeIn(sheet, 'Weighs g', '30');
+  await typeIn(sheet, 'Protein g', '10');
+  await typeIn(sheet, 'Carbs g', '12');
+  await typeIn(sheet, 'Fat g', '4');
+  await typeIn(sheet, 'Calories', '120');
+  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+  await userEvent.click(await screen.findByRole('option', { name: 'Snacks and sweets' }));
+  await press(sheet, 'Save food');
+  await within(sheet).findByRole('heading', { name: 'My foods' });
+  const [bar] = await saved();
+  expect(bar?.group).toBe('snacksAndSweets');
+  expect(bar?.evidence).toEqual({ kind: 'yours' });
+  expect(bar?.madeOf).toEqual([]);
+  expect(within(sheet).getByText(/^Your food · Entered by you/)).toBeInTheDocument();
+  // Edited, it keeps its group and its evidence; None takes the group away.
+  await editSaved(sheet, 'Protein bar');
+  expect(await within(sheet).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
+  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+  await userEvent.click(await screen.findByRole('option', { name: 'None' }));
+  await press(sheet, 'Save food');
+  await expect.poll(async () => (await saved())[0]?.group).toBeUndefined();
+  expect((await saved())[0]?.evidence).toEqual({ kind: 'yours' });
+});
+
+it('MM-710: an estimated food is marked to check in Saved, under Yours and on its amount step; About this food says what went into it', async () => {
+  await repos.customFoods.saveCustomFood(
+    new CustomFood({
+      id: 0,
+      name: 'Buttermilk biscuit',
+      kind: 'food',
+      servingDescription: '1 biscuit',
+      servingGrams: 60,
+      perServing: new NutritionTotals({ kcal: 212, proteinG: 3.9, carbsG: 26.4, fatG: 9.8 }),
+      group: 'breadsAndGrains',
+      evidence: { kind: 'estimated', citation: 'Estimated from the ingredients' },
+      madeOf: [{ name: 'All-purpose flour', grams: 30 }, { name: 'Butter' }],
+    }),
+  );
+  const sheet = await open();
+  await press(sheet, 'Saved');
+  expect(await within(sheet).findByText(/^AI estimate, unverified · Estimated from the ingredients/)).toHaveClass('food-trust-doubtful');
+  await press(sheet, 'Back');
+  await typeIn(sheet, 'Search foods', 'buttermilk');
+  expect(await within(sheet).findByText(/^AI estimate, unverified/)).toBeInTheDocument();
+  await userEvent.click(within(sheet).getByRole('button', { name: /^Buttermilk biscuit/ }));
+  await within(sheet).findByRole('button', { name: 'Log it' });
+  expect(within(sheet).getByText('Check this')).toBeInTheDocument();
+  expect(within(sheet).getByText('AI estimate, unverified · Estimated from the ingredients.')).toBeInTheDocument();
+  await userEvent.click(within(sheet).getByRole('button', { name: 'About this food' }));
+  expect(within(sheet).getByText('Made of: All-purpose flour 30 g, Butter.')).toBeVisible();
+});

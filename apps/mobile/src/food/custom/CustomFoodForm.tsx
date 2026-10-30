@@ -15,7 +15,10 @@ import { useApp } from '../../app/useApp';
 import { MmButton } from '../../ui/MmButton';
 import { MmDisclosure } from '../../ui/MmDisclosure';
 import { MmTextField } from '../../ui/MmTextField';
+import { MmDropdown } from '../../ui/MmDropdown';
 import { Notice } from '../../ui/Notice';
+import { foodGroupLabel } from '../../format/foodGroupLabel';
+import { FoodGroup } from '../../domain/food/FoodGroup';
 import '../food.css';
 
 interface CustomFoodFormProps {
@@ -66,6 +69,10 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
   const [carbs, setCarbs] = useState(start === undefined ? '' : oneDecimal(start.perServing.carbsG));
   const [fat, setFat] = useState(start === undefined ? '' : oneDecimal(start.perServing.fatG));
   const [barcode, setBarcode] = useState(start === undefined ? (initialBarcode ?? '') : (start.barcode ?? ''));
+  // What kind of food it is (MM-710), so the coach can trade it within its group; none unless chosen.
+  const [group, setGroup] = useState<FoodGroup | undefined>(start?.group);
+  // Whether a label was read into the form (MM-44): then the numbers are the label's, until typed over (MM-710).
+  const [fromLabel, setFromLabel] = useState(false);
   const [extras, setExtras] = useState<Readonly<Record<Extra, string>>>(
     () =>
       Object.fromEntries(
@@ -105,6 +112,7 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
     if (text === undefined) return;
     const r = parseNutritionLabel(text);
     setUnsure(r.unsure);
+    setFromLabel(!r.isEmpty);
     if (r.isEmpty) {
       setLabelNote(
         'No Nutrition Facts panel was found. Try again with the label flat and well lit, or type the numbers.',
@@ -174,6 +182,10 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
         fiberG: extraValue('fiber'),
         sugarAlcoholsG: extraValue('sugarAlcohols'),
         micros: new Micronutrients(Object.fromEntries(Micronutrient.values.map((n) => [n, extraValue(n)]))),
+        group,
+        // A food edited keeps where its numbers came from; a new one is the label's or the person's own (MM-710).
+        evidence: food?.evidence ?? (fromLabel ? { kind: 'label' } : { kind: 'yours' }),
+        madeOf: food?.madeOf ?? [],
       });
     const id = await services.customFoods.saveCustomFood(made);
     onDone(new CustomFood({ ...made, id }));
@@ -305,6 +317,14 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
           ))}
         </div>
       </MmDisclosure>
+      <div className="app-gap-small" />
+      {/* What kind of food it is (MM-710): with a group, the coach can swap it for a food of its kind (MM-684). */}
+      <MmDropdown<FoodGroup | 'none'>
+        label="Food group (optional)"
+        value={group ?? 'none'}
+        items={[{ value: 'none', label: 'None' }, ...FoodGroup.values.map((value) => ({ value, label: foodGroupLabel(value) }))]}
+        onChange={(chosen) => setGroup(chosen === 'none' ? undefined : chosen)}
+      />
       <div className="app-gap-small" />
       <MmTextField
         label="Barcode (optional)"

@@ -1741,6 +1741,7 @@ export class AppState {
       adviceRecord: s.adviceRecord,
       nowMinute: () => minuteOfDayNow(s.clock),
       catalog: () => of(this.foodCatalog),
+      savedFoods: () => of(this.customFoods),
       pauses: () => of(this.pauses),
       plannedShare: () => this.plannedShare(),
       foodInput: () => {
