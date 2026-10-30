@@ -18,7 +18,8 @@ a row in the drawer (MM-704) and opens as a pushed screen.
 
 Choices made without asking (say if any is wrong):
 - **`ProfileScreen`** is the sibling of `SettingsScreen`: a pushed `Screen` titled "Profile" holding `ProfileSection`
-  ("You") and `NutritionGoalsSection`, both folds, **both open on arrival**, since the screen is theirs.
+  ("You") and `NutritionGoalsSection`, both folds, **both open on arrival**, since the screen is theirs. *Wrong, and
+  reversed the same day by MM-712 (the owner): every fold starts closed; a way in about a row opens its section.*
 - **Settings keeps its other sections in their order.** `SettingsSectionId` keeps `profile` and `nutritionGoals` for the
   places that open a section by id; opening Settings on one of those two now opens Profile on it instead (one function,
   `openSettingsSection`, decides). Every caller that passed `open: 'nutritionGoals'` or `open: 'profile'` (the coach's

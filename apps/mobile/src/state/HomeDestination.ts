@@ -1,6 +1,6 @@
 const labels = { dashboard: 'Dashboard', food: 'Food', train: 'Train', progress: 'Progress', coach: 'Coach' } as const;
 
-/** The main destinations, in navigation-bar order. */
+/** The main destinations, in the drawer's order (MM-711). */
 export type HomeDestination = keyof typeof labels;
 
 export const HomeDestination = {

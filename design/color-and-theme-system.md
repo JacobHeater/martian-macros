@@ -49,8 +49,8 @@ values side by side):
   (`#E8FF1A`) is *do it*: the action's fills only. Hot pink (`chosen`, `#FF40A0`) is *chosen*: a chosen segment, chip
   and card, and the current tab's plate, whose label is the text colour; the owner also asked for it on the section
   marks (`mark`). Neon orange (`flare` and `arc`, `#FF7420`) is *food going in*: a meal's add plate and the calorie arc it
-  fills. Violet (`accent-line`, `#8A5CFF`) is the frame and means nothing: the hero's edge, the navigation bar's stripe
-  set, the calorie arc's track. Cards keep a quiet edge (`edge` = outline). No gradients in text, no glow.
+  fills. Violet (`accent-line`, `#8A5CFF`) is the frame and means nothing: the hero's edge, the stripe set in the
+  lettering, the calorie arc's track. Cards keep a quiet edge (`edge` = outline). No gradients in text, no glow.
 - **No macro collides with a neon.** Carbs are the planet's amber (`#FFA024`), apart from the arc's orange beside them
   in the hero; fat is violet (`#9A6BFF`), as in Dark, so it never reads as *chosen*. Protein stays the cyan stars.
 - **Danger is the ringed planet's red**, lifted to `#FF858B` for 4.5:1 text on overlay, where dialogs show their errors.
@@ -77,7 +77,7 @@ secondary text colours, the tracks, the selected state and the fat macro in one 
 21-35), so the screen read as one purple field and the only colour that stood out was the lime. The revision, from the
 panel's 90s research (`docs/agent-runs/mm375-warm-martian/`):
 - **A royal 90s violet**, bluer than the grape it replaces, with larger lightness steps (canvas 5.8, surface 12.5, raised
-  17.7, overlay 22.8 L*) so cards and the navigation bar stand off the canvas. A plum (hue about 329°) was drawn first and
+  17.7, overlay 22.8 L*) so cards and the drawer stand off the canvas. A plum (hue about 329°) was drawn first and
   rejected by the owner: it reads maroon, not a 90s purple.
 - **Secondary text near-neutral** (`text2` a warm off-white, `text3` a cool grey-lilac at chroma 9), so detail lines stop
   reading as part of the ground. This is a deliberate exception to the ban on desaturated warm neutrals, for text roles in

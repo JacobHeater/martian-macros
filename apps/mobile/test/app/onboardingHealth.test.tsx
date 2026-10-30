@@ -59,7 +59,7 @@ async function finish(): Promise<void> {
   await userEvent.click(next()); // health
   await userEvent.click(next()); // the goal
   await press('Start');
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
 }
 
 it('six months of scale data are read when connecting during onboarding', async () => {

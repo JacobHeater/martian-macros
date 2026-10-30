@@ -37,7 +37,7 @@ beforeEach(async () => {
 
 async function open(): Promise<void> {
   renderApp(repos, today, { change: (services) => ({ ...services, reminderScheduler: scheduler, exactAlarms }) });
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
 }
 
 const stored = () => first(repos.reminders.watchReminders());

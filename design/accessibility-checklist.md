@@ -126,7 +126,7 @@ TalkBack (Android) or VoiceOver (iOS):
 4. Progress: the trend figure reads "Trend weight …"; the chart reads its
    sentence; the Waist section's header reads its state when folded; the
    three fields are told apart.
-5. The navigation bar: each destination and which is current.
+5. The drawer: the menu button says it opens a dialog; each row, and which destination is current.
 6. 200% text with the reader on: nothing unreachable.
 
 Record the pass under `docs/agent-runs/` with the device, OS and reader

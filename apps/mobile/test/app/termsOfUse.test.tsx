@@ -144,10 +144,10 @@ describe('an installation with records and no agreement', () => {
   it('sees the terms before anything else, with its records untouched, and goes on to where it was going', async () => {
     open();
     expect(await screen.findByRole('heading', { level: 1, name: 'Terms of use' })).toBeInTheDocument();
-    expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
     expect((await repos.setup.loadSetup())?.profile.sex).toBe('male');
     await press('I agree');
-    expect(await screen.findByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Menu' })).toBeInTheDocument();
     expect((await first(repos.weights.watchWeights())).length).toBe(1);
   });
 
@@ -174,9 +174,9 @@ describe('terms that changed', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'The terms have changed' })).toBeInTheDocument();
     expect(screen.getByText(new RegExp(`You agreed to version ${termsOfUse.version - 1} on September 12, 2026\\.`))).toBeInTheDocument();
     expect(screen.getByText(/your answer here does not remove them/)).toBeInTheDocument();
-    expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
     await press('I agree');
-    expect(await screen.findByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Menu' })).toBeInTheDocument();
     expect((await accepted())?.version).toBe(termsOfUse.version);
   });
 });
@@ -203,7 +203,7 @@ describe('when storage goes wrong', () => {
     }));
     expect(await screen.findByText('Could not check whether you have agreed to the terms of use')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
-    expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
   });
 
   it('an answer that cannot be saved is said aloud, records nothing, and can be given again', async () => {

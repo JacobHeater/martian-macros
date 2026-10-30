@@ -26,13 +26,13 @@ async function due(sex: BiologicalSex = 'female', skips = 0): Promise<InMemoryRe
   return repos;
 }
 
-const shell = () => screen.findByRole('navigation', { name: 'Destinations' });
+const shell = () => screen.findByRole('button', { name: 'Menu' });
 
 it('is asked ninety days after the last, before anything else', async () => {
   renderApp(await due(), today);
   expect(await screen.findByRole('heading', { name: 'Health check' })).toBeInTheDocument();
   expect(screen.getByText(/Has anything changed since your last health check\?/)).toBeInTheDocument();
-  expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
 });
 
 it('confirming records the day, and the shell opens', async () => {

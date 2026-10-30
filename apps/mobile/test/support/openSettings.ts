@@ -5,8 +5,7 @@ import { topLayer } from './topLayer';
 
 /** Opens the drawer from the shell of an app already drawn (MM-704) and presses one of its rows. */
 export async function chooseFromMenu(row: string): Promise<void> {
-  await screen.findByRole('navigation', { name: 'Destinations' });
-  await userEvent.click(screen.getByRole('button', { name: 'Menu' }));
+  await userEvent.click(await screen.findByRole('button', { name: 'Menu' }));
   const drawer = await screen.findByRole('dialog', { name: 'Menu' });
   await userEvent.click(within(drawer).getByRole('button', { name: row }));
 }
@@ -29,13 +28,15 @@ export async function openSettings({ closed = false }: { closed?: boolean } = {}
 
 /**
  * Opens Profile through the drawer (MM-705): "You" and "Nutrition goals",
- * both open on arrival, and gives the way to look things up in it.
+ * both closed on arrival (MM-712), so every section is opened unless
+ * `closed`; and gives the way to look things up in it.
  */
-export async function openProfile() {
+export async function openProfile({ closed = false }: { closed?: boolean } = {}) {
   await chooseFromMenu('Profile');
   const profile = within(topLayer());
   await profile.findByRole('heading', { name: 'Profile' });
   await profile.findByRole('heading', { level: 2, name: 'Nutrition goals' });
+  if (!closed) await openEverySection();
   return profile;
 }
 
