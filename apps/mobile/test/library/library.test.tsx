@@ -54,7 +54,7 @@ const food = (init: {
     perServing: new NutritionTotals({ kcal: init.kcal, proteinG: init.proteinG, carbsG: init.carbsG, fatG: init.fatG }),
     servings: init.servings,
     fiberG: init.fiberG,
-    micros: init.micros,
+    ...(init.micros === undefined ? {} : { micros: init.micros }),
   });
 
 /** The biscuit of MM-706's scenario: a saved food whose numbers allow a grade. */

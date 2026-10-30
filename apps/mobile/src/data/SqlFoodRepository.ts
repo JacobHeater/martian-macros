@@ -97,7 +97,7 @@ export class SqlFoodRepository implements FoodRepository {
         "SELECT origin_food_id AS food_id, COUNT(*) AS times, MAX(epoch_day) AS last_day FROM food_entries " +
           "WHERE origin_pack_id = 'custom' AND origin_food_id IS NOT NULL GROUP BY origin_food_id",
       );
-      return new Map(rows.map((row) => [integer(row, 'food_id'), { times: integer(row, 'times'), lastDay: day(row, 'last_day') }]));
+      return new Map(rows.map((row): [number, SavedFoodUsage] => [integer(row, 'food_id'), { times: integer(row, 'times'), lastDay: day(row, 'last_day') }]));
     });
   }
 

@@ -45,7 +45,6 @@ import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
-import { useNavigator } from '../app/useNavigator';
 import { DayStepper } from '../ui/DayStepper';
 import { MmButton } from '../ui/MmButton';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -60,7 +59,6 @@ import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
 import { SavedFoodTrustMark } from './custom/SavedFoodTrustMark';
-import { LibraryScreen } from '../library/LibraryScreen';
 import { defaultMeal } from './defaultMeal';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
@@ -94,6 +92,8 @@ interface AddFoodSheetProps {
   estimateSize?: MealSize | undefined;
   /** Called once the food is logged or saved. */
   onDone: () => void;
+  /** Called when the Saved step asks for the Library (MM-707): the sheet is closed and the Library opened by the screen under it. */
+  onManage: () => void;
   /** Set while the meal's list holds foods, to ask before the sheet is left with them (MM-631). */
   mayLeave?: { current: (() => Promise<boolean>) | undefined } | undefined;
 }
@@ -332,13 +332,12 @@ type Step =
  * estimated, or typed by its macros. Recent foods refill the form in one
  * tap. An entry already logged is corrected here too.
  */
-export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone, mayLeave }: AddFoodSheetProps) {
+export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone, onManage, mayLeave }: AddFoodSheetProps) {
   const { services, state } = useApp();
   const { gradeOfFood } = useInsightPreview();
   const netCarbs = useNetCarbs();
   const today = useCell(state.today);
   const overlays = useOverlays();
-  const navigator = useNavigator();
   const hand = useCell(state.handSize);
   // Whether online is offered changes as the person's choice loads and is answered (MM-58); the chooser follows it (MM-652).
   useCell(state.onlineLookup.choice);
@@ -809,11 +808,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
         onBack={choices}
         onPick={pickCustom}
         onPickMeal={(m) => void logSavedMeal(m)}
-        // The sheet closes and the Library opens over the Food screen (MM-707).
-        onManage={() => {
-          onDone();
-          void navigator.push(() => <LibraryScreen />);
-        }}
+        // The sheet closes, and the screen that opened it pushes the Library (MM-707).
+        onManage={onManage}
       />
     );
   }
