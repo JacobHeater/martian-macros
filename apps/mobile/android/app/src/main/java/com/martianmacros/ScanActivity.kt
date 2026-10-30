@@ -31,22 +31,35 @@ class ScanActivity : AppCompatActivity() {
 
     companion object {
         const val RESULT_FAILED = 9
+
+        /** Set to read a QR code (a move code, MM-698) instead of a retail barcode. */
+        const val EXTRA_QR = "qr"
     }
+
+    /** Reading a move code's QR code, not a product's barcode: the two never mix. */
+    private val readsQr by lazy { intent.getBooleanExtra(EXTRA_QR, false) }
 
     private var done = false
 
-    private val scanner = BarcodeScanning.getClient(
-        BarcodeScannerOptions.Builder()
-            .setBarcodeFormats(
-                Barcode.FORMAT_UPC_A,
-                Barcode.FORMAT_UPC_E,
-                Barcode.FORMAT_EAN_13,
-                Barcode.FORMAT_EAN_8,
-            )
-            .build(),
-    )
+    private val scanner by lazy {
+        BarcodeScanning.getClient(
+            if (readsQr) {
+                BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build()
+            } else {
+                BarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(
+                        Barcode.FORMAT_UPC_A,
+                        Barcode.FORMAT_UPC_E,
+                        Barcode.FORMAT_EAN_13,
+                        Barcode.FORMAT_EAN_8,
+                    )
+                    .build()
+            },
+        )
+    }
 
     private fun symbology(format: Int): String? = when (format) {
+        Barcode.FORMAT_QR_CODE -> if (readsQr) "qr" else null
         Barcode.FORMAT_UPC_A -> "upcA"
         Barcode.FORMAT_UPC_E -> "upcE"
         Barcode.FORMAT_EAN_13 -> "ean13"

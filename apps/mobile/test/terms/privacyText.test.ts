@@ -95,6 +95,13 @@ describe('the policy matches the app', () => {
     expect(ios).toContain('the iPhone’s share sheet');
   });
 
+  // MM-698: a move to the person's other phone, on their Wi-Fi, encrypted under the code's key, to no service of ours.
+  it('says how a move to another phone leaves this one: only when chosen, straight to the other phone, encrypted', () => {
+    expect(both).toContain('sends your records and progress photos straight to your other phone on the same Wi-Fi, only when you choose it');
+    expect(both).toContain('none of it goes over the internet or to any service of ours');
+    expect(both).toContain('never sent anywhere except to your other phone when you move to it');
+  });
+
   it('says the public page is opened in the phone’s browser, which fetches it, not the app', () => {
     expect(both).toContain('The browser fetches it, not the app');
     expect(contactedHosts()).toContain('jacobheater.github.io');

@@ -2811,3 +2811,23 @@
     display: none;
   }
 }
+
+/* A QR code (MM-698): dark modules on a light ground in every palette, as large as the sheet allows. */
+.mm-qr {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+/* The drawing rounds its own corners, in the quiet zone; the wrapper clips nothing, so no focus ring is ever cut (MM-275). */
+.mm-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-control);
+}
+.mm-qr-ground {
+  fill: var(--code-light);
+}
+.mm-qr-modules {
+  fill: var(--code-dark);
+}

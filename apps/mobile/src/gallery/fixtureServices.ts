@@ -12,6 +12,8 @@ import { InMemoryPackStore } from '../foodCatalog/download/InMemoryPackStore';
 import { FoodCatalog } from '../foodCatalog/FoodCatalog';
 import { InMemoryOnlineFoodCache } from '../foodCatalog/online/InMemoryOnlineFoodCache';
 import { FakeBackupPlatform } from '../backup/FakeBackupPlatform';
+import { FakeMoveReceiver } from '../transfer/FakeMoveReceiver';
+import { FakeMoveSender } from '../transfer/FakeMoveSender';
 import { FakeDataRestorer } from '../fixtures/FakeDataRestorer';
 import { InMemoryClipboard } from '../fixtures/InMemoryClipboard';
 import { InMemoryCoachAiStore } from '../fixtures/InMemoryCoachAiStore';
@@ -47,6 +49,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     packManifestUrl: '',
     barcodeScanner: camera,
     labelReader: camera,
+    codeScanner: camera,
     // Never the device's vibration.
     restSignal: { restOver: () => undefined },
     haptics: new InMemoryHaptics(),
@@ -118,5 +121,9 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     // No real backup: a fake that keeps what is saved and gives what a test put there (MM-63).
     restorer: new FakeDataRestorer(),
     backup: new FakeBackupPlatform(),
+    // Never the network: a phone that waits for a code to be scanned, and one that sends at once (MM-698).
+    moveReceiver: new FakeMoveReceiver(),
+    moveSender: new FakeMoveSender(),
+    moveIdentity: async () => ({ app: '1.0 (1)', schema: 1 }),
   };
 }
