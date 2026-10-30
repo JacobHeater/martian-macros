@@ -73,13 +73,48 @@ const gradle = (dir: string) => resolve(dir, process.platform === 'win32' ? 'gra
 /**
  * Ids of connected devices and running emulators, from `adb devices`. An
  * `adb` that cannot be run is its own, named error, never an empty list
- * (MM-235).
+ * (MM-235). An `adb` whose server will not start is tried again through
+ * its libusb backend, and an `adb` that still fails is quoted, never read
+ * as "no phone" (MM-696).
  */
 export async function deviceIds(): Promise<string[]> {
-  const result = await capture([adbPath(), 'devices']);
+  let result = await capture([adbPath(), 'devices']);
   if (result.code === 127) throw adbMissing();
-  if (result.code !== 0) return [];
-  return result.stdout
+  if (result.code !== 0 && adbServerWouldNotStart(result.stderr) && process.platform !== 'win32' && process.env['ADB_LIBUSB'] !== '1') {
+    // MM-696: adb's native macOS USB backend hung while enumerating the
+    // owner's Mac; its libusb backend did not. Every adb this run starts
+    // inherits the switch, and the server it starts outlives the run.
+    stderr.write("adb's server would not start; trying its libusb USB backend (ADB_LIBUSB=1).\n");
+    process.env['ADB_LIBUSB'] = '1';
+    await capture([adbPath(), 'kill-server'], { timeoutMs: 5_000 });
+    result = await capture([adbPath(), 'devices']);
+  }
+  if (result.code !== 0) {
+    // Not "no phone": the owner must see adb's own words (MM-696).
+    stderr.write(`adb could not list devices: ${lastLineOf(result.stderr) ?? `exit ${result.code}`}\n`);
+    return [];
+  }
+  return connectedDeviceIds(result.stdout);
+}
+
+/** The last line of a command's output, or undefined when it said nothing. */
+export function lastLineOf(text: string): string | undefined {
+  const lines = text.split('\n').map((line) => line.trim()).filter((line) => line !== '');
+  return lines.at(-1);
+}
+
+/**
+ * Whether adb's stderr says its server could not be started or reached
+ * (MM-696): what `adb devices` prints when the server hangs in USB
+ * enumeration, as adb's native macOS backend did on the owner's Mac.
+ */
+export function adbServerWouldNotStart(stderr: string): boolean {
+  return /failed to start daemon|cannot connect to daemon|server didn't ACK|failed to check server version/i.test(stderr);
+}
+
+/** The ids `adb devices` lists as `device`: authorized and online, not `offline` or `unauthorized`. */
+export function connectedDeviceIds(stdout: string): string[] {
+  return stdout
     .split('\n')
     .slice(1)
     .map((line) => line.trim())
@@ -232,32 +267,81 @@ export function physicalAndroidDeviceId(ids: readonly string[]): string {
 }
 
 /**
- * The device a run is for, from `args` (MM-234): `-d DEVICE`, or with
- * `--env phone` the one physical phone, else the one connected device,
- * starting an emulator when none is. A number is the exit code of a failure.
+ * What `mm run` runs on, read from its arguments (MM-234, MM-695): the one
+ * physical phone (`--phone`, or `--env phone`), an exact device (`-d ID`
+ * or `--phone ID`), or whatever is connected, starting an emulator when
+ * nothing is. A string is the refusal. Every argument is accounted for:
+ * an unknown one refuses instead of running on the wrong device, which is
+ * how `--phone` went to the emulator before MM-695.
  */
-async function chosenDevice(args: readonly string[]): Promise<string | number> {
-  const env = args.includes('--env') ? args[args.indexOf('--env') + 1] : undefined;
-  if (env !== undefined && !['dev', 'prod', 'phone'].includes(env)) {
-    stderr.write('--env must be one of: dev, prod, phone\n');
-    return 64;
+export type RunTarget = { kind: 'phone' } | { kind: 'device'; id: string } | { kind: 'connected' };
+
+const runUsage = 'Usage: mm run [-d DEVICE | --phone [DEVICE]] [--prod | --env dev|prod|phone] [--live [--port N]]';
+
+export function runTargetOf(args: readonly string[]): RunTarget | string {
+  let env: string | undefined;
+  let device: string | undefined;
+  let phone = false;
+  for (let at = 0; at < args.length; at += 1) {
+    const arg = args[at]!;
+    const value = args[at + 1];
+    const valued = value !== undefined && !value.startsWith('-');
+    if (arg === '--env') {
+      if (!valued) return '--env needs a value: prod, dev or phone.';
+      env = value;
+      at += 1;
+    } else if (arg === '-d' || arg === '--device-id') {
+      if (!valued) return `${arg} needs a device ID. ${runUsage}`;
+      device = value;
+      at += 1;
+    } else if (arg === '--phone') {
+      phone = true;
+      if (valued) {
+        device = value;
+        at += 1;
+      }
+    } else if (arg === '--port') {
+      // liveRunPlan checks the number.
+      if (valued) at += 1;
+    } else if (!['--prod', '--live'].includes(arg)) {
+      return `Unknown argument "${arg}". ${runUsage}`;
+    }
   }
-  const device = args.includes('-d') ? args[args.indexOf('-d') + 1] : undefined;
+  if (env !== undefined && !['dev', 'prod', 'phone'].includes(env)) return '--env must be one of: dev, prod, phone';
   if (env === 'phone') {
     if (device !== undefined) {
-      stderr.write('Use mm run -d DEVICE_ID for an explicit device, or mm run --env phone for automatic phone selection.\n');
-      return 64;
+      return 'Use mm run -d DEVICE_ID for an explicit device, or mm run --phone for automatic phone selection.';
     }
+    phone = true;
+  }
+  if (device !== undefined) return { kind: 'device', id: device };
+  if (phone) return { kind: 'phone' };
+  return { kind: 'connected' };
+}
+
+/**
+ * The device a run is for (MM-234, MM-695): `runTargetOf` resolved against
+ * what adb lists. A number is the exit code of a failure.
+ */
+async function chosenDevice(args: readonly string[]): Promise<string | number> {
+  const target = runTargetOf(args);
+  if (typeof target === 'string') {
+    stderr.write(`${target}\n`);
+    return 64;
+  }
+  const env = args.includes('--env') ? args[args.indexOf('--env') + 1] : undefined;
+  if (env === 'dev' || env === 'prod') {
+    stdout.write('The build has no per-environment defines; --env chooses nothing here (MM-232).\n');
+  }
+  if (target.kind === 'device') return target.id;
+  if (target.kind === 'phone') {
     try {
       return physicalAndroidDeviceId(await deviceIds());
     } catch (error) {
       stderr.write(`${error instanceof Error ? error.message : error}\n`);
       return 69;
     }
-  } else if (env !== undefined) {
-    stdout.write('The build has no per-environment defines; --env chooses nothing here (MM-232).\n');
   }
-  if (device !== undefined) return device;
   const ready = await ensureDevice();
   if (ready !== 0) return ready;
   const devices = await deviceIds();
@@ -325,11 +409,12 @@ async function runLive(repoRoot: string, args: readonly string[]): Promise<numbe
 }
 
 /**
- * `mm run [--env dev|prod|phone] [-d DEVICE] [--live [--port N]]`: build,
- * install and launch. `--env phone` selects the one physical phone, never
- * an emulator; `dev` and `prod` are accepted and change nothing, since the
- * build has no per-environment defines (one config). `--live` serves the
- * app from the dev server with hot reload instead (MM-300).
+ * `mm run [-d DEVICE | --phone [DEVICE]] [--prod | --env dev|prod|phone]
+ * [--live [--port N]]`: build, install and launch. `--phone` (or
+ * `--env phone`) selects the one physical phone, never an emulator
+ * (MM-234, MM-695); `dev` and `prod` are accepted and change nothing, since
+ * the build has no per-environment defines (one config). `--live` serves
+ * the app from the dev server with hot reload instead (MM-300).
  */
 export async function runApp(repoRoot: string, args: readonly string[]): Promise<number> {
   if (args.includes('--live')) return runLive(repoRoot, args);
