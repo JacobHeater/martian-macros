@@ -203,6 +203,7 @@ workstream's.
 - Added 2026-10-28 (step 32, the owner from the phone): MM-692 (the day's completeness is a chip with a fill at the
   hero's top right, Complete, Partial or Not marked, not a wordless mark in the header; done).
 
+- Added 2026-10-30 (the owner, MM-703; step 33): MM-703 (epic: your foods made with your AI, kept in a Library, reached from a side drawer), MM-706 (the Library: foods, recipes, meals, usual foods and exercises in folds with usage), MM-707 (the Saved step picks; Manage in Library), MM-708 (Make a food with my AI), MM-709 (the food format, reader, checks, evidence rule, prompt, fix message), MM-710 (schema 32: a saved food's group, evidence and ingredients); all in progress.
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an
   estimate is an amount of food with a record of how it was measured and how

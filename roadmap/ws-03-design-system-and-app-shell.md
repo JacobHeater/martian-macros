@@ -153,6 +153,7 @@ conflicts with this one.
 - Added 2026-10-28 (the owner; step 15): MM-669 ("Save key" in one row with its field, 12 px apart; a secondary button outlined in the text colour, never the field's violet, done).
 - Added 2026-10-28 (the owner; step 15): MM-673 (a wait on the network is shown as a wait: `MmBusyLine`, `useCoachNarration`, the built-in words only once an ask failed or at once when off, done).
 - Added 2026-10-28 (the owner; step 15): MM-675 (the sheet's head stays put while its content scrolls; its drag and leaving run on the compositor, done).
+- Added 2026-10-30 (the owner, MM-703; step 25): MM-704 (a side drawer beside the bar: the menu button, the lettering, the four destinations, Profile, Library and Settings; the gear leaves), MM-705 (Profile is its own screen: the profile section and nutrition goals out of Settings); both in progress.
 
 ## Notes for whoever builds it
 - The current three-tab shell is recorded as built and marked superseded.
