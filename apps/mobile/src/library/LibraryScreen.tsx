@@ -141,9 +141,11 @@ export function LibraryScreen() {
     );
     if (saved !== undefined) reveal('foods', saved.id, `Saved ${saved.name}`);
   };
-  const editExercise = async (exercise?: Exercise) => {
-    const id = await navigator.push<string>((close) => <CustomExerciseScreen exercise={exercise} onSaved={close} />);
-    if (id !== undefined) reveal('exercises', id, `Saved ${exercises.find((e) => e.id === id)?.name ?? exercise?.name ?? 'exercise'}`);
+  const editExercise = async (exercise: Exercise) => {
+    const saved = await navigator.push<{ id: string; name: string }>((close) => (
+      <CustomExerciseScreen exercise={exercise} onSaved={(id, name) => close({ id, name })} />
+    ));
+    if (saved !== undefined) reveal('exercises', saved.id, `Saved ${saved.name}`);
   };
   const deleteExercise = async (exercise: Exercise) => {
     const ok = await overlays.confirm({
