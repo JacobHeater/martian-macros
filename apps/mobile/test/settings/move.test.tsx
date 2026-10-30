@@ -108,8 +108,9 @@ it('warns of records logged since the last backup, and runs the backup when aske
 
 it('shows the code at once when nothing was logged since the last backup', async () => {
   receiver.outcome = { kind: 'waits' };
+  // Only the backup's day is kept, so a record on that day counts as unbacked: the last one is the day before.
   restorer.here = { ...used, to: today.addDays(-1) };
-  await repos.preferences.saveLastBackupOn(today.addDays(-1));
+  await repos.preferences.saveLastBackupOn(today);
   render();
   await startMove('Receive on this phone');
   const code = within(await screen.findByRole('dialog', { name: 'Move to this phone' }, slowly));

@@ -2817,13 +2817,13 @@
   width: 100%;
   max-width: 280px;
   margin: 0 auto;
-  border-radius: var(--radius-control);
-  overflow: hidden;
 }
+/* The drawing rounds its own corners, in the quiet zone; the wrapper clips nothing, so no focus ring is ever cut (MM-275). */
 .mm-qr svg {
   display: block;
   width: 100%;
   height: auto;
+  border-radius: var(--radius-control);
 }
 .mm-qr-ground {
   fill: var(--code-light);
