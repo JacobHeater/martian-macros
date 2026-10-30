@@ -145,5 +145,5 @@ it('an unknown barcode, once read and saved, is found again', async () => {
   expect(saved?.perServing.kcal).toBe(180);
   // MM-710: a food read from the label says so, and its row marks it as the label's.
   expect(saved?.evidence).toEqual({ kind: 'label' });
-  expect(await within(sheet).findByText(/^Your food · Read from the label/)).toBeInTheDocument();
+  expect(await within(sheet).findByText('Read from the label')).toBeInTheDocument();
 });

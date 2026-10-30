@@ -88,7 +88,7 @@ describe('reading an answer', () => {
 
   it('says why text cannot be read', () => {
     expect(parseFoodAnalysis('Sure, here you go!')).toMatchObject({ kind: 'unreadable', reason: expect.stringMatching(/^There is no food in this text/) });
-    expect(parseFoodAnalysis('```json\n{ "format": "martian-macros-food", "foods": [ { "name": "x" ')).toMatchObject({
+    expect(parseFoodAnalysis('```json\n{ "format": "martian-macros-food", "foods": [ { "name": "x" }')).toMatchObject({
       kind: 'unreadable',
       reason: expect.stringMatching(/not complete JSON/),
     });

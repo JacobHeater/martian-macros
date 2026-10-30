@@ -96,7 +96,7 @@ export class CatalogTradeCatalog implements TradeCatalog {
   }
 
   groupOf(origin: Pick<FoodOrigin, 'packId' | 'foodId'>): FoodGroup | undefined {
-    if (origin.packId === 'custom') return undefined;
+    // A saved food is of the group it was given (MM-710), and of none otherwise.
     return this.groups.get(originKey(origin));
   }
 
