@@ -264,15 +264,17 @@ export const MoveFromWelcome = screenStory({
   },
 });
 
-/** MM-700: confirmed, while what arrived replaces this phone's records: a wait that cannot be closed half-way. */
+/** MM-700, MM-702: confirmed, while what arrived replaces this phone's records: a bar that fills, which cannot be closed half-way. */
 export const MoveApplying = screenStory({
   covers: ['MoveApplyingSheet'],
-  shows: 'Putting your records in place…',
+  shows: '42% in place',
   viewport: 'smallPhone',
   device: async (services) => {
     const receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } });
     const restorer = new FakeDataRestorer();
     restorer.toDescribe = usedPhone;
+    // MM-702: part-way, as the bar fills while the rows are written.
+    restorer.progressSteps = [[0, 18_400], [7_728, 18_400]];
     restorer.onRestore = () => new Promise<void>(() => undefined);
     return { ...services, restorer, moveReceiver: receiver };
   },

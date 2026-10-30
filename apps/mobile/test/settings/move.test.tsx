@@ -208,13 +208,15 @@ it('shows the wait while the records are put in place, and it cannot be closed h
   const fresh = new InMemoryRepositories();
   await fresh.preferences.saveThemePreference('martian');
   restorer.here = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: false };
+  restorer.progressSteps = [[0, 10], [3, 10]];
   restorer.onRestore = () => new Promise<void>(() => undefined);
   render(fresh);
   await userEvent.click(await screen.findByRole('button', { name: 'I have Martian Macros on another phone' }, slowly));
   const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly);
   await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
   const wait = await screen.findByRole('dialog', { name: 'Moving your records' }, slowly);
-  expect(within(wait).getByText('Putting your records in place…')).toBeInTheDocument();
+  // MM-702: a bar that fills, with the share in words, not a spinner.
+  expect(await within(wait).findByText('30% in place', {}, slowly)).toBeInTheDocument();
   await userEvent.keyboard('{Escape}');
   expect(screen.getByRole('dialog', { name: 'Moving your records' })).toBeInTheDocument();
 });

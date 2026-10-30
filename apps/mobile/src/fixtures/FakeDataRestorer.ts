@@ -13,6 +13,8 @@ export class FakeDataRestorer implements DataRestorer {
   toDescribe: BackupContents = nothing;
   here: BackupContents = nothing;
   readonly restoredFrom: Uint8Array[] = [];
+  /** The rows written of all rows a restore reports, in order, before `onRestore` runs (MM-702). */
+  progressSteps: readonly (readonly [done: number, total: number])[] = [];
   /** Called on a restore, so a test can change the stores as the real restore would. */
   onRestore: (snapshot: Uint8Array) => Promise<void> = async () => undefined;
 
@@ -24,8 +26,9 @@ export class FakeDataRestorer implements DataRestorer {
     return this.here;
   }
 
-  async restoreFrom(snapshot: Uint8Array): Promise<void> {
+  async restoreFrom(snapshot: Uint8Array, progress?: (done: number, total: number) => void): Promise<void> {
     this.restoredFrom.push(snapshot);
+    for (const [done, total] of this.progressSteps) progress?.(done, total);
     await this.onRestore(snapshot);
   }
 }
