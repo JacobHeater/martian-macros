@@ -162,10 +162,11 @@ async function otherPhone({ already = false, parcel }: { already?: boolean; parc
   return other;
 }
 
-const answer = async (title: string, button: string) => {
+/** Reads what the dialog named `title` says (`says` must be in it), then presses `button`. */
+const answer = async (title: string, button: string, says?: RegExp) => {
   const asks = within(await screen.findByRole('dialog', { name: title }, slowly));
+  if (says !== undefined) expect(asks.getByText(says)).toBeInTheDocument();
   await userEvent.click(asks.getByRole('button', { name: button }));
-  return asks;
 };
 
 it('MM-715: what arrived is said and confirmed, added on its day and meal, its Library food saved when asked for, and Undo takes all of it back', async () => {
@@ -174,8 +175,7 @@ it('MM-715: what arrived is said and confirmed, added on its day and meal, its L
   expect(asks.getByText(/Your other phone sent 2 foods for dinner yesterday: Mom’s salmon and Rice\./)).toBeInTheDocument();
   expect(asks.getByText(/Nothing here is replaced\./)).toBeInTheDocument();
   await userEvent.click(asks.getByRole('button', { name: 'Add' }));
-  const library_ = await answer('Save it to your Library?', 'Save');
-  expect(library_.getByText(/Mom’s salmon came from your other phone’s Library/)).toBeInTheDocument();
+  await answer('Save it to your Library?', 'Save', /Mom’s salmon came from your other phone’s Library/);
   await expect.poll(async () => (await logged(other, yesterday)).map((entry) => entry.name)).toEqual(['Mom’s salmon', 'Rice']);
   const saved = await library(other);
   expect(saved.map((food) => food.name)).toEqual(['Mom’s salmon']);
@@ -206,8 +206,7 @@ it('MM-715: a Library food this phone already has by name is kept, not duplicate
   const other = await otherPhone({ already: true });
   const mine = (await library(other))[0];
   await answer('Add foods from your other phone?', 'Add');
-  const asks = await answer('Save it to your Library?', 'Save');
-  expect(asks.getByText(/You already have Mom’s salmon; yours is kept as it is\./)).toBeInTheDocument();
+  await answer('Save it to your Library?', 'Save', /You already have Mom’s salmon; yours is kept as it is\./);
   await expect.poll(async () => (await logged(other, yesterday)).length).toBe(2);
   expect(await library(other)).toHaveLength(1);
   const salmon = (await logged(other, yesterday)).find((entry) => entry.name === 'Mom’s salmon');
