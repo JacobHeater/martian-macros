@@ -1,8 +1,7 @@
-import { screen, within } from '@testing-library/react';
+import { within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
-import { Profile } from '../../src/domain/Profile';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { openSettings } from '../support/openSettings';
@@ -27,7 +26,7 @@ it('opens with every section closed: each header shows and none of their rows', 
   const settings = await openSettings({ closed: true });
   // Health Connect is drawn once the platform has answered, so it is waited for (MM-407).
   await settings.findByRole('heading', { level: 2, name: 'Health Connect' });
-  for (const name of ['Today’s setup', 'Nutrition goals', 'You', 'Reminders', 'Health Connect', 'Data', 'Appearance', 'About', 'Erase']) {
+  for (const name of ['Today’s setup', 'Reminders', 'Health Connect', 'Data', 'Appearance', 'About', 'Erase']) {
     expect(settings.getByRole('heading', { level: 2, name })).toBeInTheDocument();
     expect(header(name)).toHaveAttribute('aria-expanded', 'false');
   }
@@ -46,15 +45,5 @@ it('a header opens its rows in place and closes them again, and two can be open 
   expect(settings.getByText('Erase all data and start over')).toBeVisible();
   expect(settings.getByText('Net carbs')).toBeVisible();
   await userEvent.click(header('Today’s setup'));
-  expect(header('Today’s setup')).toHaveAttribute('aria-expanded', 'false');
-});
-
-it('correcting the date of birth from the adults-only screen opens Settings at "You"', async () => {
-  const setup = typicalSetup({ onboardedOn: today.addDays(-30), healthCheckConfirmedOn: today });
-  await repos.setup.saveSetup(setup.copyWith({ profile: new Profile({ sex: 'male', birthDate: CalendarDate.of(today.year - 16, 1, 1), heightCm: 175 }) }));
-  renderApp(repos, today);
-  await userEvent.click(await screen.findByRole('button', { name: 'Correct date of birth' }));
-  await within(topLayer()).findByRole('heading', { level: 1, name: 'Settings' });
-  expect(header('You')).toHaveAttribute('aria-expanded', 'true');
   expect(header('Today’s setup')).toHaveAttribute('aria-expanded', 'false');
 });

@@ -53,3 +53,17 @@ Scenario: A link into the goals
 - Tests: `test/settings/profileScreen.test.tsx` (the three scenarios, and that every former caller of the two ids lands
   on Profile); the Settings tests that read those sections move.
 - Where: `apps/mobile/src/settings/ProfileScreen.tsx`, `openSettingsSection.ts` beside it.
+
+## Progress
+Built 2026-10-30 (PR A of MM-703, not run locally; CI validates): `ProfileScreen` ("You" and "Nutrition goals", each
+under its own `SettingsOpenSectionContext` so both are open on arrival and still fold); `SettingsScreen` without the two;
+`openSettingsSection(navigator, id)` is the one place that decides, and the adults-only screen's "Correct date of birth"
+goes through it. Stories: `Profile.stories.tsx` (Profile, DrawerOpensProfile, ProfileSmallPhone), and the fifteen
+Settings stories about those rows now open Profile and cover `ProfileScreen`. Tests: `test/settings/profileScreen.test.tsx`
+(the three scenarios), `openProfile()` in `test/support/openSettings.ts`, and the profile, height and goal tests
+rerouted through it.
+
+The coach's screens held no link into nutrition goals (grep found only the adults-only screen and the stories), so
+nothing else was rerouted.
+
+Owed on the phone: Profile from the drawer, and Settings' shorter list.

@@ -2831,3 +2831,111 @@
 .mm-qr-modules {
   fill: var(--code-dark);
 }
+
+/* ---- The drawer (MM-704): the app's menu, slid in from the left over a scrim ---- */
+
+.mm-scrim-drawer {
+  place-items: stretch start;
+  padding: 0;
+}
+.mm-drawer {
+  display: flex;
+  flex-direction: column;
+  width: min(320px, 85vw);
+  height: 100%;
+  padding: calc(var(--space-16) + env(safe-area-inset-top)) 0 calc(var(--space-16) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  background: var(--raised);
+  /* Its own layer from the start, as the sheet's (MM-675): promoted at the first drag, the text flashed. */
+  will-change: transform;
+  /* A sideways finger drags the drawer; an up-or-down one scrolls its rows. */
+  touch-action: pan-y;
+  animation: mm-drawer-in var(--motion-base) ease-out;
+}
+.theme-light .mm-drawer {
+  box-shadow: 8px 0 24px rgb(12 18 32 / 12%);
+}
+@keyframes mm-drawer-in {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+/* Arrived once, it never slides in again: letting go of a drag ran the slide-in over from nothing. */
+.mm-drawer-arrived {
+  animation: none;
+}
+/* Under the finger the panel follows at once on the compositor alone: a 3D transform set on the element, no
+   transition. Let go, it springs back or slides off on a transform transition, and the scrim fades with it. */
+.mm-drawer-dragging,
+.mm-drawer-settling,
+.mm-drawer-leaving {
+  animation: none;
+}
+.mm-drawer-dragging {
+  transition: none;
+}
+.mm-drawer-settling {
+  transition: transform var(--motion-base) ease-out;
+}
+.mm-drawer-leaving {
+  transition: transform var(--motion-base) ease-in;
+}
+.mm-drawer:focus-visible {
+  outline: 0;
+}
+/* The lettering at the head, across the width inside the gutters. */
+.mm-drawer-head {
+  padding: var(--space-8) var(--space-16) var(--space-16);
+}
+.mm-lettering {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mm-drawer-group {
+  padding: var(--space-8) var(--space-8);
+}
+.mm-drawer-group + .mm-drawer-group {
+  border-top: 1px solid var(--edge);
+}
+/* A row: the icon on a plate, the label beside it, as the bar draws a destination laid on its side. */
+.mm-drawer-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  min-height: 48px;
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-control);
+  color: var(--text2);
+  font: var(--type-body);
+  font-weight: 500;
+  text-align: left;
+}
+.mm-drawer-indicator {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 30px;
+  border-radius: var(--radius-nav-indicator);
+  transition: background var(--motion-base);
+}
+.mm-drawer-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.mm-drawer-row-current {
+  color: var(--ember);
+  font-weight: 700;
+}
+.mm-drawer-row-current .mm-drawer-indicator {
+  background: var(--chosen);
+}
+.theme-martian .mm-drawer-row-current .mm-drawer-indicator {
+  color: var(--on-chosen);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
+}
+.theme-martian .mm-drawer-row-current {
+  color: var(--text);
+}

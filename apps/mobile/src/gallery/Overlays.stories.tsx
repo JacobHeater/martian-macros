@@ -41,6 +41,10 @@ export const Sheet: Story = { args: { kind: 'sheet' }, parameters: { shows: /A s
 
 export const SheetBare: Story = { args: { kind: 'sheetBare' }, parameters: { shows: 'The sheet on its own.' } };
 
+/** MM-704: the drawer through the host, the app's menu slid in from the left with the lettering at its head. */
+export const Drawer: Story = { args: { kind: 'drawer' }, parameters: { shows: 'Dashboard' } };
+export const DrawerBare: Story = { args: { kind: 'drawerBare' }, parameters: { shows: 'The drawer on its own.' } };
+
 /** MM-272, MM-601: a snack with nothing to press goes after ten seconds. */
 export const Snack: Story = { args: { kind: 'snack' }, parameters: { shows: 'Saved.' } };
 

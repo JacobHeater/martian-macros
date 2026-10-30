@@ -3,6 +3,7 @@ import { MmButton } from './MmButton';
 import { MmClockTimeDialog } from './MmClockTimeDialog';
 import { MmDateDialog } from './MmDateDialog';
 import { MmDialog } from './MmDialog';
+import { MmDrawer } from './MmDrawer';
 import { MmIconButton } from './MmIconButton';
 import { MmMenu } from './MmMenu';
 import { MmOption } from './MmOption';
@@ -169,6 +170,14 @@ export function MmOverlays({ children }: { children: ReactNode }) {
           ),
           options?.mayLeave,
         );
+      },
+
+      drawer(label, content) {
+        return ask((finish) => (
+          <MmDrawer label={label} onDismiss={() => finish(undefined)}>
+            {content(finish)}
+          </MmDrawer>
+        ));
       },
 
       menu({ label, items, anchor }) {
