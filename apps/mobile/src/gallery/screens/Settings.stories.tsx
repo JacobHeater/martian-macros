@@ -5,6 +5,7 @@ import { storyPackHost } from './storyPackHost';
 import { reveal } from './reveal';
 import { failingWrite } from './failingWrite';
 import { demoWith } from './demoWith';
+import { openSettingsSection } from '../../settings/openSettingsSection';
 import { ProfileScreen } from '../../settings/ProfileScreen';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import type { SettingsSectionId } from '../../settings/SettingsSectionId';
@@ -316,10 +317,11 @@ export const WaterGoalHigh = screenStory({
 const profileScreen = ({ navigator }: Parameters<NonNullable<Parameters<typeof screenStory>[0]['open']>>[0]) =>
   void navigator.push(() => <ProfileScreen />);
 
+/** A way into Settings about one row: through the one function that knows which screen holds the section (MM-705). */
 const settingsAt =
   (open: SettingsSectionId) =>
   ({ navigator }: Parameters<NonNullable<Parameters<typeof screenStory>[0]['open']>>[0]) =>
-    void navigator.push(() => <SettingsScreen open={open} />);
+    void openSettingsSection(navigator, open);
 
 /** MM-320: a phone without Health Connect: one row says so. */
 export const HealthConnectAbsent = screenStory({
