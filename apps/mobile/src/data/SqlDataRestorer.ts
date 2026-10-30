@@ -7,6 +7,9 @@ import { AppDatabase } from './AppDatabase';
 import { describeDatabase } from './describeDatabase';
 import { tables } from './tables';
 
+/** The most parameters one statement takes: under 999, SQLite's limit before 3.32, which Android 8's SQLite has. */
+const largestParams = 900;
+
 /**
  * Restores by copying every table's rows from a copy of the backup into
  * this database in one write (MM-63), so the live connection stays and
@@ -49,11 +52,19 @@ export class SqlDataRestorer implements DataRestorer {
       await this.db.write(tables, async (db) => {
         for (const table of tables) await db.execute(`DELETE FROM ${table}`);
         for (const table of tables) {
-          for (const row of copied.get(table) ?? []) {
-            const columns = Object.keys(row);
+          const rows = copied.get(table) ?? [];
+          const first = rows[0];
+          if (first === undefined) continue;
+          // Every row of a table has the same columns. In batches (MM-699): one statement per row was minutes on a
+          // phone, every statement a trip across the native bridge.
+          const columns = Object.keys(first);
+          const perStatement = Math.max(1, Math.floor(largestParams / columns.length));
+          const tuple = `(${columns.map(() => '?').join(', ')})`;
+          for (let at = 0; at < rows.length; at += perStatement) {
+            const batch = rows.slice(at, at + perStatement);
             await db.execute(
-              `INSERT INTO ${table} (${columns.map((c) => `"${c}"`).join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`,
-              columns.map((c) => row[c] as SqlValue),
+              `INSERT INTO ${table} (${columns.map((c) => `"${c}"`).join(', ')}) VALUES ${batch.map(() => tuple).join(', ')}`,
+              batch.flatMap((row) => columns.map((c) => row[c] as SqlValue)),
             );
           }
         }

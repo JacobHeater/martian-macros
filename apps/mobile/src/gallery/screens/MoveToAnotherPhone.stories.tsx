@@ -262,3 +262,23 @@ export const MoveFromWelcome = screenStory({
     await userEvent.click(await within(canvas).findByRole('button', { name: 'I have Martian Macros on another phone' }, { timeout: 10000 }));
   },
 });
+
+/** MM-700: confirmed, while what arrived replaces this phone's records: a wait that cannot be closed half-way. */
+export const MoveApplying = screenStory({
+  covers: ['MoveApplyingSheet'],
+  shows: 'Putting your records in place…',
+  viewport: 'smallPhone',
+  device: async (services) => {
+    const receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]) } });
+    const restorer = new FakeDataRestorer();
+    restorer.toDescribe = usedPhone;
+    restorer.onRestore = () => new Promise<void>(() => undefined);
+    return { ...services, restorer, moveReceiver: receiver };
+  },
+  scenario: newInstallScenario,
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'I have Martian Macros on another phone' }, { timeout: 10000 }));
+    const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, { timeout: 10000 });
+    await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
+  },
+});
