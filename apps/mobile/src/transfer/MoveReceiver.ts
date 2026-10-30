@@ -7,7 +7,7 @@ import { MoveCode } from './MoveCode';
 import type { MoveIdentity } from './MoveIdentity';
 import type { MoveReceiving } from './MoveReceiving';
 import type { MoveOpener } from './MoveOpener';
-import type { MovePayload } from './MovePayload';
+import type { MoveParcel } from './MoveParcel';
 import { MoveProblem } from './MoveProblem';
 import type { MoveProgress } from './MoveProgress';
 
@@ -17,6 +17,9 @@ const message = (value: object) => encoder.encode(JSON.stringify(value));
 
 /** The most a move may carry: well past any phone's records and photos, short of what a phone could hold in memory. */
 const largestPayload = 1024 * 1024 * 1024;
+
+/** The most a copy of foods may carry (MM-715): a few entries and their Library foods are kilobytes. */
+const largestFoodCopy = 16 * 1024 * 1024;
 
 /** How long a connection has to say hello before it is dropped, so a stray one cannot hold the listener. */
 const helloWithinMs = 10_000;
@@ -42,10 +45,10 @@ function within<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
 }
 
 /**
- * The receiving phone's part of a move (MM-698). `open` makes a fresh key and listens, and gives the code to show;
- * `receive` waits for the phone that scanned it. A connection that does not open under the key is dropped before
+ * The receiving phone's part of a move (MM-698), or of a copy of foods (MM-715). `open` makes a fresh key and
+ * listens, and gives the code to show; `receive` waits for the phone that scanned it. A connection that does not open under the key is dropped before
  * anything else is read, and the phone keeps waiting. The right phone's version is compared with this one's; only
- * when they are the same is the payload taken, every frame checked as it comes. The listener stops once a move is
+ * when they are the same is the parcel taken, every frame checked as it comes. The listener stops once a move is
  * received, fails, or `stop` is called; a new code needs a new `open`.
  */
 export class MoveReceiver implements MoveReceiving {
@@ -68,10 +71,10 @@ export class MoveReceiver implements MoveReceiving {
   }
 
   /**
-   * The payload the scanning phone sent. Fails with a `MoveProblem`: `stopped`, `versionMismatch` (with the sending
+   * The parcel the scanning phone sent. Fails with a `MoveProblem`: `stopped`, `versionMismatch` (with the sending
    * phone's identity) or `broken`.
    */
-  async receive(progress?: MoveProgress): Promise<MovePayload> {
+  async receive(progress?: MoveProgress): Promise<MoveParcel> {
     const key = this.key;
     if (key === undefined) throw new MoveProblem('stopped');
     try {
@@ -91,7 +94,7 @@ export class MoveReceiver implements MoveReceiving {
     await this.listener.stop().catch(() => undefined);
   }
 
-  private async serve(connection: LinkConnection, key: Uint8Array, progress?: MoveProgress): Promise<MovePayload | typeof refused> {
+  private async serve(connection: LinkConnection, key: Uint8Array, progress?: MoveProgress): Promise<MoveParcel | typeof refused> {
     try {
       const greeted = await this.greeting(connection, key);
       if (greeted === refused) return refused;
@@ -114,27 +117,36 @@ export class MoveReceiver implements MoveReceiving {
           kind?: unknown;
           snapshot?: unknown;
           photos?: unknown;
+          foods?: unknown;
           coachAi?: { provider?: unknown; apiKey?: unknown };
         };
-        const { snapshot, photos } = sizes;
+        if (sizes.kind !== 'sizes') throw new MoveProblem('broken');
+        const { snapshot, photos, foods } = sizes;
+        // A copy of foods (MM-715) says only its length; a move says its snapshot's and its photos'.
+        const expected = ((): { total: number; snapshot: number | undefined } => {
+          if (foods !== undefined) {
+            if (typeof foods !== 'number' || !Number.isInteger(foods) || foods < 1 || foods > largestFoodCopy) throw new MoveProblem('broken');
+            return { total: foods, snapshot: undefined };
+          }
+          if (
+            typeof snapshot !== 'number' ||
+            typeof photos !== 'number' ||
+            !Number.isInteger(snapshot) ||
+            !Number.isInteger(photos) ||
+            snapshot < 1 ||
+            photos < 0 ||
+            snapshot + photos > largestPayload
+          ) {
+            throw new MoveProblem('broken');
+          }
+          return { total: snapshot + photos, snapshot };
+        })();
         // The coach's provider and key (MM-701): one the app knows with a key, or none.
         const provider = CoachAiProvider.values.find((known) => known === sizes.coachAi?.provider);
         const apiKey = sizes.coachAi?.apiKey;
         const coachAi: CoachAiConfig =
           provider !== undefined && typeof apiKey === 'string' ? { provider, apiKey: apiKey.trim() } : CoachAiConfig.off;
-        if (
-          sizes.kind !== 'sizes' ||
-          typeof snapshot !== 'number' ||
-          typeof photos !== 'number' ||
-          !Number.isInteger(snapshot) ||
-          !Number.isInteger(photos) ||
-          snapshot < 1 ||
-          photos < 0 ||
-          snapshot + photos > largestPayload
-        ) {
-          throw new MoveProblem('broken');
-        }
-        const total = snapshot + photos;
+        const total = expected.total;
         const whole = new Uint8Array(total);
         let received = 0;
         for (;;) {
@@ -147,7 +159,8 @@ export class MoveReceiver implements MoveReceiving {
         }
         if (received !== total) throw new MoveProblem('broken');
         await connection.send(sealer.seal(message({ kind: 'received' }), true));
-        return { snapshot: whole.slice(0, snapshot), photos: whole.slice(snapshot), coachAi };
+        if (expected.snapshot === undefined) return { kind: 'foods', foods: whole };
+        return { kind: 'everything', payload: { snapshot: whole.slice(0, expected.snapshot), photos: whole.slice(expected.snapshot), coachAi } };
       } catch (error) {
         throw error instanceof MoveProblem ? error : new MoveProblem('broken');
       }

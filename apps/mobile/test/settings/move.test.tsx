@@ -40,7 +40,7 @@ beforeEach(async () => {
   restorer = new FakeDataRestorer();
   restorer.here = used;
   restorer.toDescribe = { ...used, weighIns: 45 };
-  receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot, photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } });
+  receiver = new FakeMoveReceiver({ kind: 'receives', parcel: { kind: 'everything', payload: { snapshot, photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } } });
   sender = new FakeMoveSender();
   scanned = new MoveCode({ host: '192.168.1.24', port: 47_310 }, new Uint8Array(32).fill(3)).toText();
 });
@@ -149,7 +149,7 @@ it('sends this phone’s records and photos to the phone whose code it scanned, 
   const sheet = within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly));
   expect(await sheet.findByRole('heading', { name: 'Sent' }, slowly)).toBeInTheDocument();
   expect(sender.sent).toHaveLength(1);
-  expect(sender.sent[0]?.payload.snapshot).toEqual(snapshot);
+  expect(sender.sent[0]?.parcel).toMatchObject({ kind: 'everything', payload: { snapshot } });
   expect(sender.sent[0]?.code.address).toEqual({ host: '192.168.1.24', port: 47_310 });
   expect(restorer.restoredFrom).toHaveLength(0);
 });
@@ -243,7 +243,7 @@ const moveOntoFresh = async (coachAi: CoachAiConfig = key, before?: CoachAiConfi
   const fresh = new InMemoryRepositories();
   await fresh.preferences.saveThemePreference('martian');
   restorer.here = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: false };
-  receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot, photos: encodePhotoArchive([]), coachAi } });
+  receiver = new FakeMoveReceiver({ kind: 'receives', parcel: { kind: 'everything', payload: { snapshot, photos: encodePhotoArchive([]), coachAi } } });
   let services: AppServices | undefined;
   renderApp(fresh, today, {
     change: (base: AppServices) => {
@@ -289,7 +289,7 @@ it('sends this phone’s coach key with the move', async () => {
   await services?.coachAi.saveConfig(key);
   await startMove('Send from this phone');
   await (within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly))).findByRole('heading', { name: 'Sent' }, slowly);
-  expect(sender.sent[0]?.payload.coachAi).toEqual(key);
+  expect(sender.sent[0]?.parcel).toMatchObject({ kind: 'everything', payload: { coachAi: key } });
 });
 
 it('never puts the coach key in a backup file', async () => {

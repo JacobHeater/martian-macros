@@ -260,7 +260,7 @@ export const FoodEntryMenu = screenStory({
   },
 });
 
-/** MM-714: the food's menu, all seven items, on a 360 px phone. */
+/** MM-714, MM-715: the food's menu, all eight items, on a 360 px phone. */
 export const FoodEntryMenuSmallPhone = screenStory({
   covers: ['FoodScreen'],
   shows: 'Copy to another meal',

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../app/useApp';
 import type { MoveCode } from '../transfer/MoveCode';
 import type { MoveIdentity } from '../transfer/MoveIdentity';
-import type { MovePayload } from '../transfer/MovePayload';
+import type { MoveParcel } from '../transfer/MoveParcel';
 import { MoveProblem } from '../transfer/MoveProblem';
 import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmButton } from '../ui/MmButton';
@@ -25,7 +25,7 @@ interface ReceiveMoveSheetProps {
   /** Records on this phone that no backup holds: logged since the last one, or never backed up at all. */
   unbacked: 'since' | 'never' | undefined;
   onBackUpFirst: () => void;
-  onReceived: (payload: MovePayload) => void;
+  onReceived: (parcel: MoveParcel) => void;
   onCancel: () => void;
 }
 
@@ -42,10 +42,10 @@ function spoken(stage: Stage): string {
 }
 
 /**
- * The receiving phone's side of a move (MM-698). When this phone holds records no backup has, it says so first and
- * offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
- * in it, until a move arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole, to be
- * confirmed before it replaces anything; nothing here changes this phone's data. One status region stays in place
+ * The receiving phone's side of a move (MM-698), or of a copy of foods (MM-715). When this phone holds records no
+ * backup has, it says so first and offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
+ * in it, until a move or a copy arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole,
+ * to be confirmed before it replaces or adds anything; nothing here changes this phone's data. One status region stays in place
  * across the stages, so a reader hears an expired code or a failure, and the headline takes focus when one comes.
  */
 export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel }: ReceiveMoveSheetProps) {
@@ -71,10 +71,10 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
         if (!live) return;
         setStage({ kind: 'code', code });
         expiry = setTimeout(() => void receiver.stop(), moveCodeLifetimeMs);
-        const payload = await receiver.receive((done, total) => {
+        const parcel = await receiver.receive((done, total) => {
           if (live) setStage({ kind: 'receiving', done, total });
         });
-        if (live) onReceived(payload);
+        if (live) onReceived(parcel);
       } catch (error) {
         if (live) await fail(error);
       } finally {
@@ -167,7 +167,8 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
       <>
         <h2 className="app-headline">Scan this from your other phone</h2>
         <p className="app-text">
-          On the phone you are moving from, open Settings, then Backup, Move to another phone, and Send from this phone.
+          On the phone you are moving from, open Settings, then Backup, Move to another phone, and Send from this phone. To copy only some
+          foods, choose Copy to another phone from a food’s menu there.
         </p>
         {stage.kind === 'code' ? (
           <>

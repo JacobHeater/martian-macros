@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../app/useApp';
 import type { MoveCode } from '../transfer/MoveCode';
 import type { MoveIdentity } from '../transfer/MoveIdentity';
+import type { MoveParcel } from '../transfer/MoveParcel';
 import { MoveProblem } from '../transfer/MoveProblem';
 import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmButton } from '../ui/MmButton';
@@ -18,32 +19,40 @@ type Stage =
 interface SendMoveSheetProps {
   /** The code scanned on the other phone; undefined when what was scanned is not a move code. */
   code: MoveCode | undefined;
+  /** What to send, gathered once the code is in hand. */
+  parcel: () => Promise<MoveParcel>;
+  /** Whose words the sheet speaks: a move of everything (MM-698) or a copy of foods (MM-715). */
+  what: 'everything' | 'foods';
   onScanAgain: () => void;
   onClose: () => void;
 }
 
+/** What did not happen, in the sheet's headline and what is said. */
+const didNotHappen = (what: SendMoveSheetProps['what']) => (what === 'foods' ? 'The copy did not happen' : 'The move did not happen');
+
 /** What the status region says for a stage, once, when it begins (the UX guard's F3, F4). */
-function spoken(stage: Stage): string {
+function spoken(stage: Stage, what: SendMoveSheetProps['what']): string {
   switch (stage.kind) {
     case 'sending':
       return 'Sending to your other phone.';
     case 'sent':
       return 'Sent. Confirm on your other phone to finish.';
     case 'failed':
-      return `The move did not happen. ${moveProblemWords(stage.problem, stage.here, 'send')}`;
+      return `${didNotHappen(what)}. ${moveProblemWords(stage.problem, stage.here, 'send')}`;
     default:
       return '';
   }
 }
 
 /**
- * The sending phone's side of a move (MM-698), once the other phone's code is scanned: this phone's records and
- * progress photos, as a backup takes them, sent to it sealed under the code's key. This phone keeps everything; the
- * other phone asks before it replaces anything, so the move finishes there. Something scanned that is not a move code
+ * The sending phone's side of a move (MM-698), or of a copy of foods (MM-715), once the other phone's code is
+ * scanned: the parcel, this phone's records and progress photos as a backup takes them or the foods chosen, sent
+ * to it sealed under the code's key. This phone keeps everything; the other phone asks before it replaces or adds
+ * anything, so the move finishes there. Something scanned that is not a move code
  * is a failure here too, with Scan again (the UX guard's F2). One status region stays in place across the stages,
  * and the headline takes focus when the outcome comes.
  */
-export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps) {
+export function SendMoveSheet({ code, parcel, what, onScanAgain, onClose }: SendMoveSheetProps) {
   const { services } = useApp();
   const [stage, setStage] = useState<Stage>({ kind: 'connecting' });
   const headline = useRef<HTMLHeadingElement>(null);
@@ -57,11 +66,7 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
     void (async () => {
       if (code === undefined) return fail(new MoveProblem('notACode'));
       try {
-        const snapshot = await services.backup.snapshot();
-        const photos = await services.progressPhotos.exportArchive();
-        // The coach's provider and key go with a move, never with a backup (MM-701).
-        const coachAi = await services.coachAi.loadConfig();
-        await services.moveSender.send(code, { snapshot, photos, coachAi }, (done, total) => {
+        await services.moveSender.send(code, await parcel(), (done, total) => {
           if (live) setStage({ kind: 'sending', done, total });
         });
         if (live) setStage({ kind: 'sent' });
@@ -72,7 +77,7 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
     return () => {
       live = false;
     };
-  }, [code, services]);
+  }, [code, parcel, services]);
 
   const ended = stage.kind === 'sent' || stage.kind === 'failed';
   useEffect(() => {
@@ -83,7 +88,7 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
     <div className="settings-sheet">
       {body()}
       <span className="mm-visually-hidden" role="status">
-        {spoken(stage)}
+        {spoken(stage, what)}
       </span>
     </div>
   );
@@ -95,7 +100,11 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
           <h2 className="app-headline" ref={headline} tabIndex={-1}>
             Sent
           </h2>
-          <p className="app-text">Your other phone has everything. Confirm there to finish; this phone keeps its records.</p>
+          <p className="app-text">
+            {what === 'foods'
+              ? 'Your other phone has the foods. Confirm there to add them; this phone keeps its own.'
+              : 'Your other phone has everything. Confirm there to finish; this phone keeps its records.'}
+          </p>
           <div className="app-gap" />
           <div className="app-row app-row-end">
             <MmButton label="Done" onPress={onClose} />
@@ -110,7 +119,7 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
       return (
         <>
           <h2 className="app-headline" ref={headline} tabIndex={-1}>
-            The move did not happen
+            {didNotHappen(what)}
           </h2>
           <p className="app-text">{moveProblemWords(stage.problem, stage.here, 'send')}</p>
           <div className="app-gap" />
@@ -144,7 +153,7 @@ export function SendMoveSheet({ code, onScanAgain, onClose }: SendMoveSheetProps
         )}
         <div className="app-gap" />
         <div className="app-row app-row-end">
-          {/* Not a cancel: what is sent is only a copy, and the other phone asks before it replaces anything. */}
+          {/* Not a cancel: what is sent is only a copy, and the other phone asks before it replaces or adds anything. */}
           <MmButton label="Close" kind="text" onPress={onClose} />
         </div>
       </>

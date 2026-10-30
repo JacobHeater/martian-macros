@@ -1,6 +1,9 @@
 import type { Meta } from '@storybook/react-vite';
 import { screen, userEvent, within } from 'storybook/test';
 import type { BackupContents } from '../../domain/backup/BackupContents';
+import { CustomFood } from '../../domain/food/custom/CustomFood';
+import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
+import { FoodEntry } from '../../domain/FoodEntry';
 import { CoachAiConfig } from '../../domain/integration/CoachAiConfig';
 import { encodePhotoArchive } from '../../domain/photos/encodePhotoArchive';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
@@ -8,7 +11,9 @@ import { SettingsScreen } from '../../settings/SettingsScreen';
 import type { AppServices } from '../../state/AppServices';
 import { FakeMoveReceiver } from '../../transfer/FakeMoveReceiver';
 import { FakeMoveSender } from '../../transfer/FakeMoveSender';
+import { foodCopyBytes } from '../../transfer/foodCopyBytes';
 import { MoveCode } from '../../transfer/MoveCode';
+import type { MoveParcel } from '../../transfer/MoveParcel';
 import { MoveProblem } from '../../transfer/MoveProblem';
 import { demoWith } from './demoWith';
 import { newInstallScenario } from './newInstallScenario';
@@ -183,7 +188,10 @@ export const MoveConfirm = screenStory({
   device: async (services) => {
     const receiver = new FakeMoveReceiver({
       kind: 'receives',
-      payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([photo(60), photo(30), photo(1)]), coachAi: CoachAiConfig.off },
+      parcel: {
+        kind: 'everything',
+        payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([photo(60), photo(30), photo(1)]), coachAi: CoachAiConfig.off },
+      },
     });
     const restorer = new FakeDataRestorer();
     // Backed up today, after the last record: no nudge.
@@ -264,13 +272,87 @@ export const MoveFromWelcome = screenStory({
   },
 });
 
+/** A phone with nothing on it yet: no backup to offer before the code. */
+const emptyPhone: BackupContents = { ...usedPhone, hasSetup: false, weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0 };
+
+/** The longest names a lunch holds in the demo, as a copy of foods from the other phone (MM-715), one of them from its Library. */
+const foodsParcel = (): MoveParcel => {
+  const day = storyToday;
+  const library = new CustomFood({
+    id: 12,
+    name: 'HARRIS TEETER, FOUR CHEESE MEXICAN BLEND, SHREDDED (Harris Teeter)',
+    kind: 'food',
+    servingDescription: '1/4 cup',
+    servingGrams: 28,
+    perServing: new NutritionTotals({ kcal: 100, proteinG: 6, carbsG: 1, fatG: 9 }),
+    group: 'dairyAndYogurt',
+  });
+  const entries = [
+    new FoodEntry({ id: 0, date: day, meal: 'lunch', name: '80/20 Ground Beef (Aldi)', kcal: 375, proteinG: 25, carbsG: 0, fatG: 29, source: 'weighed' }),
+    new FoodEntry({
+      id: 0,
+      date: day,
+      meal: 'lunch',
+      name: library.name,
+      kcal: 54,
+      proteinG: 3,
+      carbsG: 0,
+      fatG: 5,
+      source: 'weighed',
+      portion: { method: 'weighed', basis: 'calculated', quantity: 15, unit: 'gram', origin: { packId: 'custom', foodId: 12, source: 'user' } },
+    }),
+    new FoodEntry({ id: 0, date: day, meal: 'lunch', name: '"Frizzle" High Heat Cooking Oil (Graza)', kcal: 118, proteinG: 0, carbsG: 0, fatG: 14, source: 'householdMeasure' }),
+  ];
+  return { kind: 'foods', foods: foodCopyBytes({ day, entries, foods: [library] }) };
+};
+
+/** MM-715: a copy of foods arrived: what came, for which meal and day, asked before it is added, at phone width with the longest names. */
+export const CopyFoodsConfirm = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Add foods from your other phone?',
+  viewport: 'smallPhone',
+  device: withReceiver(new FakeMoveReceiver({ kind: 'receives', parcel: foodsParcel() }), emptyPhone),
+  open: openBackup,
+  walk: choose('Receive on this phone'),
+});
+
+/** MM-715: the foods confirmed, the Library food that came with them is the person's call. */
+export const CopyFoodsLibraryAsk = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Save it to your Library?',
+  viewport: 'smallPhone',
+  device: withReceiver(new FakeMoveReceiver({ kind: 'receives', parcel: foodsParcel() }), emptyPhone),
+  open: openBackup,
+  walk: async (canvas) => {
+    await choose('Receive on this phone')(canvas);
+    const asks = await screen.findByRole('dialog', { name: 'Add foods from your other phone?' }, { timeout: 10000 });
+    await userEvent.click(within(asks).getByRole('button', { name: 'Add' }));
+  },
+});
+
+/** MM-715: "Copy to another phone" from a food's menu: the other phone's code scanned, the foods sent, with the copy's words. */
+export const CopyFoodsSent = screenStory({
+  covers: ['SendMoveSheet'],
+  shows: 'Your other phone has the foods. Confirm there to add them; this phone keeps its own.',
+  device: withSender(new FakeMoveSender({ kind: 'sends' })),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Copy to another phone' }));
+  },
+});
+
 /** MM-700, MM-702: confirmed, while what arrived replaces this phone's records: a bar that fills, which cannot be closed half-way. */
 export const MoveApplying = screenStory({
   covers: ['MoveApplyingSheet'],
   shows: '42% in place',
   viewport: 'smallPhone',
   device: async (services) => {
-    const receiver = new FakeMoveReceiver({ kind: 'receives', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } });
+    const receiver = new FakeMoveReceiver({
+      kind: 'receives',
+      parcel: { kind: 'everything', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } },
+    });
     const restorer = new FakeDataRestorer();
     restorer.toDescribe = usedPhone;
     // MM-702: part-way, as the bar fills while the rows are written.

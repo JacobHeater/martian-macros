@@ -39,6 +39,7 @@ import { addFoodFrom } from './addFoodFrom';
 import { showMealBreakdownSheet } from './showMealBreakdownSheet';
 import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { showMealSplitSheet } from './showMealSplitSheet';
+import { useCopyToAnotherPhone } from './phone/useCopyToAnotherPhone';
 import { SolidProteinMarker } from './SolidProteinMarker';
 import type { TogetherAction } from './TogetherAction';
 import { togetherActionItems } from './togetherActionItems';
@@ -83,6 +84,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
   const overlays = useOverlays();
   const navigator = useNavigator();
   const today = useCell(state.today);
+  const copyToPhone = useCopyToAnotherPhone();
   const total = entries.reduce((sum, e) => sum + e.kcal, 0);
   const protein = entries.reduce((sum, e) => sum + e.proteinG, 0);
   const netCarbs = useNetCarbs();
@@ -144,6 +146,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
       slot: meal,
       day,
       today,
+      toPhone: (foods) => copyToPhone(foods, day),
     });
   };
 
@@ -186,7 +189,16 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
     if (action === 'delete') remove(entry);
     // Several foods changed together: this one first (MM-634).
     else if (action === 'select') onStartSelection?.(`food:${entry.id}`);
-    else void changeTogether(services.food, overlays, { action, entries: [entry], subject: entry.name, slot: entry.meal, day, today });
+    else
+      void changeTogether(services.food, overlays, {
+        action,
+        entries: [entry],
+        subject: entry.name,
+        slot: entry.meal,
+        day,
+        today,
+        toPhone: (foods) => copyToPhone(foods, day),
+      });
   };
 
   return (

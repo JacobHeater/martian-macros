@@ -1,5 +1,5 @@
 import { MoveCode } from './MoveCode';
-import type { MovePayload } from './MovePayload';
+import type { MoveParcel } from './MoveParcel';
 import { MoveProblem } from './MoveProblem';
 import type { FakeReceiveOutcome } from './FakeReceiveOutcome';
 import type { MoveProgress } from './MoveProgress';
@@ -30,18 +30,20 @@ export class FakeMoveReceiver implements MoveReceiving {
     return new MoveCode({ host: '192.168.1.24', port: 47_310 }, new Uint8Array(32).map((_, i) => (i * 7 + this.opened) % 256));
   }
 
-  receive(progress?: MoveProgress): Promise<MovePayload> {
+  receive(progress?: MoveProgress): Promise<MoveParcel> {
     const outcome = this.outcome;
     switch (outcome.kind) {
       case 'waits':
-        return new Promise<MovePayload>(() => undefined);
+        return new Promise<MoveParcel>(() => undefined);
       case 'receiving':
         progress?.(outcome.done, outcome.total);
-        return new Promise<MovePayload>(() => undefined);
-      case 'receives':
+        return new Promise<MoveParcel>(() => undefined);
+      case 'receives': {
         this.listening = false;
-        progress?.(outcome.payload.snapshot.length, outcome.payload.snapshot.length);
-        return Promise.resolve(outcome.payload);
+        const size = outcome.parcel.kind === 'everything' ? outcome.parcel.payload.snapshot.length : outcome.parcel.foods.length;
+        progress?.(size, size);
+        return Promise.resolve(outcome.parcel);
+      }
       case 'fails':
         this.listening = false;
         return Promise.reject(outcome.problem);

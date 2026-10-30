@@ -13,7 +13,8 @@ import type { TogetherAction } from './TogetherAction';
 /**
  * Asks what `action` needs and does it to every one of `entries` at once,
  * in one step (MM-625), with Undo (MM-630, MM-633, MM-634, MM-714): one time eaten,
- * another meal or day, copies at another meal or on another day, or removal. Only the field
+ * another meal or day, copies at another meal or on another day, a copy to the other phone (MM-715,
+ * through `toPhone`, which carries no Undo here: the other phone asks), or removal. Only the field
  * chosen changes; amounts, numbers and where they came from never do. A
  * food moved to another day keeps its time eaten (the owner, 2026-10-26).
  * `subject` names them in what is said: "dinner" with "all 3 foods", or
@@ -30,6 +31,7 @@ export async function changeTogether(
     slot,
     day,
     today,
+    toPhone,
   }: {
     action: TogetherAction;
     entries: readonly FoodEntry[];
@@ -40,6 +42,8 @@ export async function changeTogether(
     slot?: Meal | undefined;
     day: CalendarDate;
     today: CalendarDate;
+    /** Sends `entries` to the person's other phone (MM-715); without it, that action does nothing. */
+    toPhone?: ((entries: readonly FoodEntry[]) => Promise<void>) | undefined;
   },
 ): Promise<void> {
   const Subject = subject.charAt(0).toUpperCase() + subject.slice(1);
@@ -71,6 +75,10 @@ export async function changeTogether(
     return picked === undefined ? undefined : { entries: entriesCopiedTo(day, entries, { meal: picked.value }), where: picked.label.toLowerCase() };
   };
 
+  if (action === 'phone') {
+    await toPhone?.(entries);
+    return;
+  }
   if (action === 'time') {
     const times = new Set(entries.map((entry) => entry.eatenAt));
     const usual = mealUsualMinute(slot ?? entries[0]?.meal ?? 'snack');
