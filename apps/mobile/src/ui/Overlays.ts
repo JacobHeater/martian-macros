@@ -84,6 +84,14 @@ export interface Overlays {
   ): Promise<T | undefined>;
 
   /**
+   * Slides a panel in from the left side of the screen (MM-704): the app's
+   * menu. `content` draws it and is given the way to close it, with an
+   * answer or without one; a press on the scrim, Escape, Back or a drag
+   * back close it without one.
+   */
+  drawer<T>(label: string, content: (close: (answer?: T) => void) => ReactNode): Promise<T | undefined>;
+
+  /**
    * Opens a short menu of actions at `anchor` (the trigger's edges), drawn
    * where nothing can clip it (MM-268). A choice between values is
    * `options`, not a menu.

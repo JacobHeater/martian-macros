@@ -3,20 +3,40 @@ import userEvent from '@testing-library/user-event';
 import { pickDate, pickTime } from './pickers';
 import { topLayer } from './topLayer';
 
+/** Opens the drawer from the shell of an app already drawn (MM-704) and presses one of its rows. */
+export async function chooseFromMenu(row: string): Promise<void> {
+  await screen.findByRole('navigation', { name: 'Destinations' });
+  await userEvent.click(screen.getByRole('button', { name: 'Menu' }));
+  const drawer = await screen.findByRole('dialog', { name: 'Menu' });
+  await userEvent.click(within(drawer).getByRole('button', { name: row }));
+}
+
 /**
- * Opens Settings from the shell of an app already drawn, and gives the way
- * to look things up in it. Settings' sections start closed (MM-398); most
- * tests are about the rows, so every section is opened unless `closed`.
+ * Opens Settings from the shell of an app already drawn, through the
+ * drawer, and gives the way to look things up in it. Settings' sections
+ * start closed (MM-398); most tests are about the rows, so every section is
+ * opened unless `closed`.
  */
 export async function openSettings({ closed = false }: { closed?: boolean } = {}) {
-  await screen.findByRole('navigation', { name: 'Destinations' });
-  await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
+  await chooseFromMenu('Settings');
   const settings = within(topLayer());
   await settings.findByRole('heading', { name: 'Settings' });
   // Erase is the last section: once it is drawn, the sections that wait for nothing are too.
   await settings.findByRole('heading', { level: 2, name: 'Erase' });
   if (!closed) await openEverySection();
   return settings;
+}
+
+/**
+ * Opens Profile through the drawer (MM-705): "You" and "Nutrition goals",
+ * both open on arrival, and gives the way to look things up in it.
+ */
+export async function openProfile() {
+  await chooseFromMenu('Profile');
+  const profile = within(topLayer());
+  await profile.findByRole('heading', { name: 'Profile' });
+  await profile.findByRole('heading', { level: 2, name: 'Nutrition goals' });
+  return profile;
 }
 
 /** Opens every closed section of Settings; a section drawn later (Health Connect, once read) is opened again. */

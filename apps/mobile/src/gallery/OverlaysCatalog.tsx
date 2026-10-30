@@ -5,6 +5,10 @@ import { MmClockTimeDialog } from '../ui/MmClockTimeDialog';
 import { MmDateDialog } from '../ui/MmDateDialog';
 import { MmDatePicker } from '../ui/MmDatePicker';
 import { MmDialog } from '../ui/MmDialog';
+import { MmDrawer } from '../ui/MmDrawer';
+import { MmDrawerGroup } from '../ui/MmDrawerGroup';
+import { MmDrawerRow } from '../ui/MmDrawerRow';
+import { MmLettering } from '../ui/MmLettering';
 import { MmMenu } from '../ui/MmMenu';
 import { MmMenuButton } from '../ui/MmMenuButton';
 import { MmOverlays } from '../ui/MmOverlays';
@@ -60,6 +64,27 @@ function Opener({ kind }: { kind: OverlayKind }) {
           <div className="gallery-stack" style={{ padding: 'var(--space-16)' }}>
             <p style={{ margin: 0 }}>A sheet rises on the raised surface with the sheet-top radius, a handle that drags it away and a Close action.</p>
           </div>
+        ));
+        break;
+      case 'drawer':
+        void overlays.drawer('Menu', () => (
+          <>
+            <div className="mm-drawer-head">
+              <MmLettering />
+            </div>
+            <MmDrawerGroup label="Destinations">
+              <MmDrawerRow icon="home" label="Dashboard" current onPress={nothing} />
+              <MmDrawerRow icon="food" label="Food" onPress={nothing} />
+              <MmDrawerRow icon="train" label="Train" onPress={nothing} />
+              <MmDrawerRow icon="coach" label="Coach" onPress={nothing} />
+            </MmDrawerGroup>
+            <MmDrawerGroup label="You">
+              <MmDrawerRow icon="person" label="Profile" onPress={nothing} />
+            </MmDrawerGroup>
+            <MmDrawerGroup label="Settings">
+              <MmDrawerRow icon="settings" label="Settings" onPress={nothing} />
+            </MmDrawerGroup>
+          </>
         ));
         break;
       case 'snack':
@@ -149,6 +174,13 @@ export function OverlaysCatalog({ kind }: { kind: OverlayKind }) {
             <p style={{ margin: 0 }}>The sheet on its own.</p>
           </div>
         </MmSheet>
+      ) : null}
+      {kind === 'drawerBare' ? (
+        <MmDrawer label="Menu" onDismiss={nothing}>
+          <div className="gallery-stack" style={{ padding: 'var(--space-16)' }}>
+            <p style={{ margin: 0 }}>The drawer on its own.</p>
+          </div>
+        </MmDrawer>
       ) : null}
       {kind === 'menu' ? (
         <MmMenu

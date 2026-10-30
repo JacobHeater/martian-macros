@@ -7,7 +7,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { HealthImporter } from '../../src/healthIngest/HealthImporter';
 import { FakeHealthSource } from '../../src/healthIngest/testing/FakeHealthSource';
 import { expectClose } from '../support/expectClose';
-import { openSettings } from '../support/openSettings';
+import { openProfile } from '../support/openSettings';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -44,7 +44,7 @@ const setup = async () => {
 it('a different height is offered under the row, and saved only when chosen', async () => {
   await platformHeights(181, 176);
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   // The newest reading is the one offered.
   expect(await settings.findByText('Health Connect says 5′ 9″')).toBeInTheDocument();
   expect((await setup()).profile.heightCm).toBe(180);
@@ -69,14 +69,14 @@ it('a different height is offered under the row, and saved only when chosen', as
 it('a height that shows the same as the profile is not offered', async () => {
   await platformHeights(180.3);
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   await settings.findByText('5′ 11″');
   expect(settings.queryByText(/Health Connect says/)).toBeNull();
 });
 
 it('with no height read, nothing is offered', async () => {
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   await userEvent.click(settings.getByRole('button', { name: /^Height/ }));
   const sheet = within(await screen.findByRole('dialog', { name: 'Height' }));
   expect(sheet.queryByRole('button', { name: /^Use / })).toBeNull();

@@ -6,7 +6,7 @@ import { ScreeningAnswers } from '../../src/domain/ScreeningAnswers';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { first } from '../support/first';
-import { openSettings } from '../support/openSettings';
+import { openProfile } from '../support/openSettings';
 import { renderApp } from '../support/renderApp';
 
 /** MM-358, MM-359: the water goal in Settings, on by default and suggested for the person. */
@@ -24,7 +24,7 @@ const setUp = async (screening = new ScreeningAnswers()) =>
 it('with nothing set, the goal is on and its amount is suggested for the person', async () => {
   await setUp();
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   expect(await settings.findByRole('switch', { name: /^Daily water goal/ })).toBeChecked();
   expect(settings.getByText(/^Suggested from your protein target and training./)).toBeInTheDocument();
   expect(settings.getByRole('textbox', { name: /^Daily water goal, / })).not.toHaveValue('');
@@ -34,7 +34,7 @@ it('an amount typed is their own, and "Use suggested" returns to the suggestion'
   await setUp();
   await repos.preferences.saveWaterGoal(3500);
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   // An amount the person typed needs no note: the hint is the range alone (MM-401).
   expect(await settings.findByText(/^17 to 202 fl oz.$/)).toBeInTheDocument();
   await userEvent.click(settings.getByRole('button', { name: /^Use the suggested amount/ }));
@@ -47,7 +47,7 @@ it('an amount typed is their own, and "Use suggested" returns to the suggestion'
 it('switched off, it stays off', async () => {
   await setUp();
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   await userEvent.click(await settings.findByRole('switch', { name: /^Daily water goal/ }));
   expect((await first(repos.preferences.watchNutritionGoals())).waterGoalOff).toBe(true);
   expect(settings.queryByText(/^Suggested from your/)).not.toBeInTheDocument();
@@ -56,7 +56,7 @@ it('switched off, it stays off', async () => {
 it('where a clinician limits what is drunk, nothing is suggested and the reason is said', async () => {
   await setUp(new ScreeningAnswers({ fluidLimitedByClinician: true }));
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   const toggle = await settings.findByRole('switch', { name: /^Daily water goal/ });
   expect(toggle).not.toBeChecked();
   expect(settings.getByText('Your clinician limits your fluids.')).toBeInTheDocument();
@@ -81,7 +81,7 @@ it('MM-359: the health check asks whether a clinician limits what the person dri
 it('MM-359: a clinician’s fluid limit counts among the health check answers ticked', async () => {
   await setUp(new ScreeningAnswers({ fluidLimitedByClinician: true }));
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   expect(await settings.findByText('1 answer ticked')).toBeInTheDocument();
 });
 
@@ -89,6 +89,6 @@ it('with an eating-disorder history, a goal above 3.5 L is said to be more than 
   await setUp(new ScreeningAnswers({ eatingDisorderHistory: true }));
   await repos.preferences.saveWaterGoal(3800);
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   expect(await settings.findByText(/More than most people need; spread it through the day\./)).toBeInTheDocument();
 });

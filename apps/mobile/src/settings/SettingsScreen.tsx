@@ -41,8 +41,6 @@ import { MmSwitchRow } from '../ui/MmSwitchRow';
 import { useOverlays } from '../ui/useOverlays';
 import { CoachSettingsSection } from './CoachSettingsSection';
 import { HealthPlatformSection } from './HealthPlatformSection';
-import { NutritionGoalsSection } from './NutritionGoalsSection';
-import { ProfileSection } from './ProfileSection';
 import { BackupSection } from './BackupSection';
 import { RemindersSection } from './RemindersSection';
 import { ThemeSettings } from './ThemeSettings';
@@ -58,7 +56,8 @@ const unitLabels: Readonly<Record<UnitSystem, string>> = { imperial: 'lb / in', 
 /**
  * Everything the user set up and can change (MM-259): sections of rows in
  * the order of use, every row with its icon, the choosers one tap away,
- * and the one destructive action last in a section of its own. Each
+ * and the one destructive action last in a section of its own. Who the
+ * person is and what they aim for are on Profile, not here (MM-705). Each
  * section opens and closes in place and starts closed (MM-398), unless a
  * way into Settings about one row asks for its section with `open`.
  */
@@ -246,8 +245,6 @@ export function SettingsScreen({ open }: { open?: SettingsSectionId } = {}) {
           </MmListGroup>
         </MmSection>
         {coachSettings ? <CoachSettingsSection /> : null}
-        <NutritionGoalsSection />
-        <ProfileSection />
         <RemindersSection />
         <HealthPlatformSection />
         <MmSection icon="lock" title="Data" {...fold('data')}>
