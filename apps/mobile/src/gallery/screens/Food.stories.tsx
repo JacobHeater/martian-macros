@@ -138,7 +138,7 @@ export const MealCoachBreakdown = screenStory({
   },
 });
 
-/** MM-711: the owner's breakfast, 243 kcal for 5 g, is fine: no drag row, no move row, and the coach says so and where the protein comes from. */
+/** MM-713: the owner's breakfast, 243 kcal for 5 g, is fine: no drag row, no move row, and the coach says so and where the protein comes from. */
 export const MealCoachBreakdownFine = screenStory({
   covers: ['FoodScreen', 'MealBreakdownSheet'],
   shows: /Nothing to fix here/,

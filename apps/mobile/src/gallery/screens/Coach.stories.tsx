@@ -74,7 +74,7 @@ export const Coach = screenStory({
   open: ({ state }) => state.homeTab.put('coach'),
 });
 
-/** MM-711: a light breakfast on a day on track: the brief says so and which meals carry the protein, no drag, no squeeze; the lift is the one order. */
+/** MM-713: a light breakfast on a day on track: the brief says so and which meals carry the protein, no drag, no squeeze; the lift is the one order. */
 export const CoachOnTrackDay = screenStory({
   covers: ['CoachScreen'],
   shows: /Nothing to fix/,

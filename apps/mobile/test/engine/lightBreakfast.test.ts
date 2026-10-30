@@ -12,7 +12,7 @@ import { food, inputOf, safeguards, targets, today, yesterday } from './support/
 import { catalogFood, catalogOf } from './support/movesFixtures';
 
 /**
- * MM-711: the owner's breakfast of 2026-10-30, oatmeal, maple syrup and
+ * MM-713: the owner's breakfast of 2026-10-30, oatmeal, maple syrup and
  * butter, 243 kcal for 5 g on a 2,178 kcal and 187 g day. The sheet called
  * the oatmeal "the drag" and ordered a chicken breast into it; the brief
  * called the day "tight" and said breakfast "drove the squeeze". Nothing

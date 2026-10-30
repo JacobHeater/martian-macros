@@ -163,9 +163,10 @@ it('after a check-in the coach line says what changed', async () => {
 
 it('pressing the intake figure opens the Food destination', async () => {
   await seed({ history: [targets(today.addDays(-30), 2400)] });
-  const view = renderApp(repos, today);
+  renderApp(repos, today);
   await userEvent.click(await screen.findByRole('button', { name: 'Open today’s food' }));
-  expect(view.container.querySelector('[aria-current="page"]')).toHaveTextContent('Food');
+  // Food is showing: its meals (there is no bar to read, MM-711).
+  expect(await screen.findByRole('heading', { name: 'Breakfast' })).toBeInTheDocument();
 });
 
 it('pressing the coach line opens the Coach destination', async () => {
@@ -230,7 +231,7 @@ it('opens Progress from the waist confirmation', async () => {
   renderApp(repos, today);
   await userEvent.type(await screen.findByRole('textbox', { name: 'Today’s waist, inches' }), '36{Enter}');
   await userEvent.click(await screen.findByRole('button', { name: 'Open Progress' }));
-  expect(await screen.findByRole('button', { name: 'Coach', current: 'page' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { level: 1, name: 'Coach' })).toBeInTheDocument();
 });
 
 it('refuses a waist that cannot be one, and records nothing', async () => {

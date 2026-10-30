@@ -22,7 +22,7 @@ const systemPrompt =
   'Speak as the coach who looked at the day: never mention figures, JSON, instructions or tools, never say what you are about to do or how you will answer, and never say that something is marked or flagged. ' +
   'When the protein left cannot fit inside the calories left today, say that it does not fit, tell the person to hold their calorie ceiling tonight and spend it on lean protein, and to front-load protein in the morning.';
 
-/** The verdict on the day in plain words (MM-711), never a camelCase state the model could read aloud. */
+/** The verdict on the day in plain words (MM-713), never a camelCase state the model could read aloud. */
 const verdictWords: Record<ExecutiveBrief['runwayState'], string> = {
   nothingLogged: 'no food logged today',
   onTrack: 'on track: nothing to fix',
@@ -48,7 +48,7 @@ const toolGuidance =
  * deterministic state hash and allowed numbers with the offline archetype
  * fallback (MM-665); with the day's tools when a toolbox is given (MM-685),
  * and the brief's sentences and words at most (MM-693). A day on track
- * (MM-711) goes without its totals, and none is allowed back: the rows
+ * (MM-713) goes without its totals, and none is allowed back: the rows
  * under the words hold them, and there is nothing to order.
  */
 export function executiveBriefNarrationRequest(brief: ExecutiveBrief, toolbox?: CoachToolbox): CoachNarrationRequest {
@@ -98,7 +98,7 @@ export function executiveBriefNarrationRequest(brief: ExecutiveBrief, toolbox?: 
           stepsFloor: t.stepsFloor,
           stepsMorePerDay: t.stepsPerDay === undefined ? undefined : Math.max(0, t.stepsFloor - t.stepsPerDay),
         };
-  // The day's totals (MM-711): none on a day on track, the calories left when protein is covered, all otherwise.
+  // The day's totals (MM-713): none on a day on track, the calories left when protein is covered, all otherwise.
   const onTrack = brief.runwayState === 'onTrack';
   const totals: Readonly<Record<string, number>> = onTrack
     ? {}

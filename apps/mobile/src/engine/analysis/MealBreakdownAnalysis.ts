@@ -44,6 +44,6 @@ export interface MealBreakdownAnalysis {
     | undefined;
   /** The meal's moves, ranked by the day's gap, and the one ordered (MM-684). */
   readonly moves: MealMoves;
-  /** What the coach makes of the meal (MM-711): fine, a drag in it, or the day's order with the meal itself fine. */
+  /** What the coach makes of the meal (MM-713): fine, a drag in it, or the day's order with the meal itself fine. */
   readonly verdict: MealVerdict;
 }

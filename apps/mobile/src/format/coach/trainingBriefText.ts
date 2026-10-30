@@ -6,7 +6,7 @@ import { sentenceCase } from './sentenceCase';
 
 /**
  * The training end of the coach's brief (MM-681), in the owner's shape
- * (MM-693, MM-711): one line, one order, at most one number, lifting
+ * (MM-693, MM-713): one line, one order, at most one number, lifting
  * first. The week's rows stand under the words, so nothing is recited:
  * lifting behind is the line; lifting covered, cardio short is; both
  * covered, steps short is; all covered, one sentence says so. On

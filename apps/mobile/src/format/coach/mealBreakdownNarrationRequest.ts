@@ -7,7 +7,7 @@ import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { mealBreakdownArchetypeText } from './mealBreakdownArchetypeText';
 import { mealMoveFigures } from '../../engine/analysis/moves/mealMoveFigures';
 
-/** The sheet's sentences and words at most (MM-711): the approved line A (MM-682) is five sentences and 64 words. */
+/** The sheet's sentences and words at most (MM-713): the approved line A (MM-682) is five sentences and 64 words. */
 const maxSentences = 5;
 const maxWords = 80;
 
@@ -27,7 +27,7 @@ const toolGuidance =
   ' You have tools. Before you order, read meal_and_day and moves; when the moves lack a food you want, search_catalog for one; price any move you propose with price_move, and give only a move it allows. ' +
   'You may pick a different move than the first, but every number you say must come from what you were given or a tool’s answer. Then answer in words alone, with no tool call, and without a word about the tools.';
 
-/** The verdict in plain words (MM-711), never a camelCase value the model could read aloud. */
+/** The verdict in plain words (MM-713), never a camelCase value the model could read aloud. */
 const verdictWords: Record<MealVerdict, string> = {
   fine: 'fine: nothing to fix',
   drag: 'built wrong: a drag and a move',
@@ -51,7 +51,7 @@ function proteinComesAt(meal: Meal): string {
 /**
  * Builds a `CoachNarrationRequest` from a `MealBreakdownAnalysis` (MM-665,
  * MM-666), with the meal's tools when a toolbox is given (MM-685). A fine
- * meal (MM-711) is asked plainly, without the day's totals, without tools,
+ * meal (MM-713) is asked plainly, without the day's totals, without tools,
  * and with no number allowed back: there is nothing to order.
  */
 export function mealBreakdownNarrationRequest(analysis: MealBreakdownAnalysis, toolbox?: CoachToolbox): CoachNarrationRequest {

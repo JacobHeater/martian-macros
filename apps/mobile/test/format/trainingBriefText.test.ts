@@ -3,7 +3,7 @@ import type { TrainingBrief } from '../../src/engine/analysis/TrainingBrief';
 import { trainingBriefText } from '../../src/format/coach/trainingBriefText';
 import { coachBannedWords } from '../support/coachBannedWords';
 
-/** MM-681: the training end of the brief, in the coach's voice; since MM-711 one line, one order, lifting first. */
+/** MM-681: the training end of the brief, in the coach's voice; since MM-713 one line, one order, lifting first. */
 const brief = (over: Partial<TrainingBrief> = {}): TrainingBrief => ({
   goal: 'fatLoss',
   cardioHeld: true,
@@ -20,7 +20,7 @@ const brief = (over: Partial<TrainingBrief> = {}): TrainingBrief => ({
 });
 const clean = (text: string) => expect(coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name)).toEqual([]);
 
-it('one line, one order, at most one number, lifting first (MM-711)', () => {
+it('one line, one order, at most one number, lifting first (MM-713)', () => {
   const text = trainingBriefText(brief());
   expect(text).toBe('One of the four lifts you set is in: three to go this week.');
   expect(text).not.toContain('!');

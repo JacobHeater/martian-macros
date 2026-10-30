@@ -42,7 +42,7 @@ it('the Executive summary holds the person to the sessions set, the cardio floor
   renderApp(repos, today);
   await openCoach();
   const card = await summary();
-  // One training line, lifting first (MM-711); the cardio and steps stand in the rows under the words.
+  // One training line, lifting first (MM-713); the cardio and steps stand in the rows under the words.
   await expect.poll(() => card.textContent).toContain('One of the three lifts you set is in: two to go this week.');
   expect(card.textContent).not.toContain('Cardio 1 h 36 min against');
   expect(within(card).getByText('Lifting this week')).toBeInTheDocument();
@@ -70,7 +70,7 @@ it('without a watch on a cut the summary says nothing is being counted; on maint
   const { unmount } = renderApp(repos, today);
   await openCoach();
   let card = await summary();
-  // Lifting behind is the one line (MM-711); the row under it says no watch is connected.
+  // Lifting behind is the one line (MM-713); the row under it says no watch is connected.
   await expect.poll(() => card.textContent).toContain('Zero lifts of the three you set this week: book one tonight.');
   expect(within(card).getByText('No watch connected')).toBeInTheDocument();
   unmount();

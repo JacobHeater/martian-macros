@@ -16,7 +16,7 @@ export const MoveRule = {
   /**
    * The outlier is worth a move only when its own calories not backed by
    * protein at the day's target density are at least this share of the
-   * day's calories (MM-711): the owner's oatmeal, 160 kcal for 5 g on a
+   * day's calories (MM-713): the owner's oatmeal, 160 kcal for 5 g on a
    * 2,178 kcal day, has 102 unbacked, under 5%, and is nothing to fix; the
    * approved croissant (MM-682, line C), 300 kcal for 6 g on 2,400, has
    * 215, 9%; the biscuit and the fries far more.
