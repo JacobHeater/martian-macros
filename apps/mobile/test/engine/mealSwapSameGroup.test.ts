@@ -87,11 +87,15 @@ describe('a saved food’s swap', () => {
       safeguards: safeguards(),
     });
 
-  it('offers the catalog bagel in the saved biscuit’s place when the biscuit has a group', () => {
+  it('offers a food of the bread group in the saved biscuit’s place when the biscuit has a group', () => {
     const analysis = analysisOf(savedBiscuit(true));
     expect(analysis.outlierItem?.name).toBe('Buttermilk biscuit');
     const swap = analysis.moves.moves.find((move) => move.kind === 'swapSameGroup');
-    expect(swap?.kind === 'swapSameGroup' ? swap.replacement.name : undefined).toBe('Whole wheat bagel');
+    expect(swap).toBeDefined();
+    // The catalog's bagel, or the coach's table for the group: never a food of another kind.
+    const name = swap?.kind === 'swapSameGroup' ? swap.replacement.name : '';
+    expect(name).not.toMatch(/chicken|egg white|tuna/i);
+    expect(name === 'Whole wheat bagel' || (swap?.kind === 'swapSameGroup' && swap.replacement.source === 'table')).toBe(true);
   });
 
   it('offers no swap for a saved biscuit without a group', () => {

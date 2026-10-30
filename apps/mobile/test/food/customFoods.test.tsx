@@ -91,7 +91,8 @@ it('a saved food is logged in any amount', async () => {
   expect(within(sheet).getByRole('button', { name: /^Protein bar(?!:)/ })).toBeInTheDocument();
   await press(sheet, 'Back');
   await typeIn(sheet, 'Search foods', 'protein');
-  expect(await within(sheet).findByText('Your food · 1 bar · 120 kcal')).toBeInTheDocument();
+  expect(await within(sheet).findByText('1 bar · 120 kcal')).toBeInTheDocument();
+  expect(within(sheet).getByText(/^Your food/), 'the mark says it is the person’s own (MM-710)').toBeInTheDocument();
   await press(sheet, /^Protein bar(?!:)/);
   await press(sheet, 'Grams');
   await typeIn(sheet, /^Amount/, '45');
@@ -449,7 +450,7 @@ it('MM-710: the typed form chooses a food group, a typed food is the person’s 
   expect(bar?.group).toBe('snacksAndSweets');
   expect(bar?.evidence).toEqual({ kind: 'yours' });
   expect(bar?.madeOf).toEqual([]);
-  expect(within(sheet).getByText(/^Your food · Entered by you/)).toBeInTheDocument();
+  expect(within(sheet).getByText('Entered by you')).toBeInTheDocument();
   // Edited, it keeps its group and its evidence; None takes the group away.
   await editSaved(sheet, 'Protein bar');
   expect(await within(sheet).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
