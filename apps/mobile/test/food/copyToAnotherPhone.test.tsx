@@ -102,7 +102,7 @@ const sentSheet = async () => {
   return sheet;
 };
 
-it('MM-715: a food’s menu sends a fresh copy for the same day and meal, with the Library food it came from; this phone keeps its own', async () => {
+it('MM-715, MM-717: a food’s menu sends a fresh copy for the same day, meal and time eaten, with the Library food it came from; this phone keeps its own', async () => {
   render();
   await openTab('Food');
   await userEvent.click(await screen.findByRole('button', { name: 'More actions for Mom’s salmon' }));
@@ -112,7 +112,7 @@ it('MM-715: a food’s menu sends a fresh copy for the same day and meal, with t
   const copy = sentCopy();
   expect(copy.day).toBe(today);
   expect(copy.entries).toHaveLength(1);
-  expect(copy.entries[0]).toMatchObject({ id: 0, name: 'Mom’s salmon', meal: 'dinner', kcal: 400, eatenAt: undefined });
+  expect(copy.entries[0]).toMatchObject({ id: 0, name: 'Mom’s salmon', meal: 'dinner', kcal: 400, eatenAt: 19 * 60 });
   expect(copy.entries[0]?.date).toBe(today);
   expect(copy.entries[0]?.portion?.origin).toMatchObject({ packId: 'custom', foodId: momId });
   expect(copy.foods.map((food) => [food.id, food.name])).toEqual([[momId, 'Mom’s salmon']]);
@@ -152,7 +152,7 @@ async function otherPhone({ already = false, parcel }: { already?: boolean; parc
   const other = new InMemoryRepositories();
   await other.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-40), healthCheckConfirmedOn: today }));
   if (already) await other.customFoods.saveCustomFood(momsSalmon(0));
-  const copy = foodCopyBytes({ day: yesterday, entries: [salmonFrom(42, yesterday), foodOn(yesterday, { name: 'Rice', meal: 'dinner', kcal: 200 })], foods: [momsSalmon(42)] });
+  const copy = foodCopyBytes({ day: yesterday, entries: [salmonFrom(42, yesterday, 19 * 60), foodOn(yesterday, { name: 'Rice', meal: 'dinner', kcal: 200 })], foods: [momsSalmon(42)] });
   receiver = new FakeMoveReceiver({ kind: 'receives', parcel: parcel ?? { kind: 'foods', foods: copy } });
   render(other);
   const settings = await openSettings();
@@ -182,7 +182,7 @@ it('MM-715: what arrived is said and confirmed, added on its day and meal, its L
   const salmon = (await logged(other, yesterday)).find((entry) => entry.name === 'Mom’s salmon');
   expect(salmon?.portion?.origin?.foodId, 'linked to this phone’s own copy').toBe(saved[0]?.id);
   expect(salmon?.meal).toBe('dinner');
-  expect(salmon?.eatenAt).toBeUndefined();
+  expect(salmon?.eatenAt, 'the time eaten travels (MM-717)').toBe(19 * 60);
   expect(await logged(other, today), 'nothing on other days').toHaveLength(0);
   expect(screen.getByText('Added 2 foods from your other phone, and 1 food to your Library')).toBeInTheDocument();
   await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
