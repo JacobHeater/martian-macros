@@ -79,6 +79,34 @@ it('MM-634: a logged meal chosen counts as all its foods, and they move together
   await expect.poll(async () => (await logged()).filter((f) => f.loggedMeal?.key === 'k1').map((f) => f.meal)).toEqual(['dinner', 'dinner', 'dinner']);
 });
 
+it('MM-714: chosen foods copied to another meal are fresh copies there; the originals stay', async () => {
+  await startFrom('Salmon');
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Apple · 95 kcal' }));
+  // The same items as a food's own menu, in its order (MM-714).
+  await userEvent.click(screen.getByRole('button', { name: 'Change 2 foods' }));
+  const dialog = await screen.findByRole('dialog');
+  expect(within(dialog).getAllByRole('option').map((option) => option.textContent)).toEqual([
+    'Change time',
+    'Move to another meal',
+    'Move to another day',
+    'Copy to another meal',
+    'Copy to another day',
+    'Delete',
+  ]);
+  await userEvent.click(within(dialog).getByRole('option', { name: 'Copy to another meal' }));
+  const meals = await screen.findByRole('dialog');
+  await userEvent.click(within(meals).getByRole('option', { name: /^Lunch/ }));
+  await expect.poll(async () => (await logged()).filter((f) => f.meal === 'lunch').map((f) => f.name)).toEqual(['Salmon', 'Apple']);
+  const copy = (await logged()).find((f) => f.meal === 'lunch' && f.name === 'Salmon');
+  expect(copy?.eatenAt, 'a copy has no time eaten (MM-570)').toBeUndefined();
+  expect(copy?.kcal).toBe(400);
+  expect((await byName('Salmon'))?.meal, 'the original stays at dinner').toBe('dinner');
+  expect(screen.getByText('Copied 2 foods to lunch')).toBeInTheDocument();
+  await userEvent.click(screen.getByRole('button', { name: 'Undo' }));
+  await expect.poll(async () => (await logged()).filter((f) => f.meal === 'lunch')).toHaveLength(0);
+  expect(await logged()).toHaveLength(4);
+});
+
 it('MM-634: chosen foods deleted together come back together with Undo', async () => {
   await startFrom('Rice');
   await userEvent.click(screen.getByRole('checkbox', { name: 'Salad · 80 kcal' }));

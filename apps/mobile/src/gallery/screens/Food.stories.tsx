@@ -249,6 +249,42 @@ export const FoodChoosingNone = screenStory({
   },
 });
 
+/** MM-714 (the owner): a food's ⋯ menu offers what the chosen foods' dialog does, Copy to another meal among them. */
+export const FoodEntryMenu = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy to another meal',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+  },
+});
+
+/** MM-714: the food's menu, all seven items, on a 360 px phone. */
+export const FoodEntryMenuSmallPhone = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy to another meal',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+  },
+  viewport: 'smallPhone',
+});
+
+/** MM-714: the chosen foods' dialog, the same six items as a food's menu. */
+export const FoodChoosingActions = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy to another meal',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Select' }));
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Change 1 food/ }));
+  },
+});
+
 /** MM-630: a meal's menu: its macro split, and one time, meal or day for all its foods. */
 export const FoodMealMenu = screenStory({
   covers: ['FoodScreen'],

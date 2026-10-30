@@ -3,6 +3,7 @@ import { MmButton } from '../ui/MmButton';
 import { MmSection } from '../ui/MmSection';
 import { useOverlays } from '../ui/useOverlays';
 import type { TogetherAction } from './TogetherAction';
+import { togetherActionItems } from './togetherActionItems';
 
 interface SelectionBarProps {
   /** The foods chosen, a meal counting as all its foods. */
@@ -10,14 +11,6 @@ interface SelectionBarProps {
   onAction: (action: TogetherAction) => void | Promise<void>;
   onDone: () => void;
 }
-
-const actions: readonly { value: TogetherAction; label: string }[] = [
-  { value: 'time', label: 'Change time' },
-  { value: 'meal', label: 'Move to another meal' },
-  { value: 'day', label: 'Move to another day' },
-  { value: 'copy', label: 'Copy to another day' },
-  { value: 'delete', label: 'Delete' },
-];
 
 /**
  * While foods are being chosen to change together (MM-634): how many are
@@ -29,7 +22,8 @@ export function SelectionBar({ entries, onAction, onDone }: SelectionBarProps) {
   const overlays = useOverlays();
   const count = entries.length === 1 ? '1 food' : `${entries.length} foods`;
   const choose = async () => {
-    const picked = await overlays.options({ title: `Change ${count}`, options: actions });
+    // The same items a food's own menu offers (MM-714).
+    const picked = await overlays.options({ title: `Change ${count}`, options: togetherActionItems });
     if (picked !== undefined) await onAction(picked.value);
   };
   return (

@@ -40,11 +40,16 @@ import { showMealBreakdownSheet } from './showMealBreakdownSheet';
 import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { showMealSplitSheet } from './showMealSplitSheet';
 import { SolidProteinMarker } from './SolidProteinMarker';
+import type { TogetherAction } from './TogetherAction';
+import { togetherActionItems } from './togetherActionItems';
 import { useNetCarbs } from './useNetCarbs';
 import './food.css';
 
-/** What a slot's ⋯ menu does (MM-597, MM-630, MM-666). */
-type SlotAction = 'breakdown' | 'split' | 'time' | 'meal' | 'day' | 'copy' | 'save';
+/** What a slot's ⋯ menu does (MM-597, MM-630, MM-666, MM-714): its own two, every together action, and a save. */
+type SlotAction = 'breakdown' | 'split' | TogetherAction | 'save';
+
+/** What a food's ⋯ menu does (MM-634, MM-714): choosing, or any together action on this one food. */
+type EntryAction = 'select' | TogetherAction;
 
 interface MealSectionProps {
   meal: Meal;
@@ -116,7 +121,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
   };
   const mealGrade = preview.mealGrades?.get(meal) ?? gradeOfMeal(entries.map((entry) => ({ kcal: entry.kcal, grade: gradeOf(entry) })), 'meal');
 
-  /** The slot's ⋯ menu: its macro split (MM-597), or a time, meal, day or copy for all its foods (MM-630, MM-633). */
+  /** The slot's ⋯ menu: its macro split (MM-597), or a time, meal, day or copy for all its foods (MM-630, MM-633, MM-714). */
   const slotAction = async (action: SlotAction) => {
     if (action === 'breakdown') {
       void showMealBreakdownSheet(overlays, day, meal, entries);
@@ -176,6 +181,14 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
     });
   };
 
+  /** A food's ⋯ menu (MM-714): the same actions the chosen foods have, on this one food, named by it. */
+  const entryAction = (entry: FoodEntry, action: EntryAction) => {
+    if (action === 'delete') remove(entry);
+    // Several foods changed together: this one first (MM-634).
+    else if (action === 'select') onStartSelection?.(`food:${entry.id}`);
+    else void changeTogether(services.food, overlays, { action, entries: [entry], subject: entry.name, slot: entry.meal, day, today });
+  };
+
   return (
     // Each meal is a card, as the hero is, with its rows on the header's columns (MM-569).
     <MmSection
@@ -223,13 +236,11 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
             <MmMenuButton<SlotAction>
               icon="more"
               label={`Options for ${label.toLowerCase()}`}
+              // The same together actions a food's menu and the chosen foods' dialog offer (MM-714), between the slot's own.
               items={[
                 { value: 'breakdown', label: 'Coach breakdown' },
                 { value: 'split', label: 'Macro split' },
-                { value: 'time', label: 'Change time' },
-                { value: 'meal', label: 'Move to another meal' },
-                { value: 'day', label: 'Move to another day' },
-                { value: 'copy', label: 'Copy to another day' },
+                ...togetherActionItems,
                 { value: 'save', label: 'Save as a meal' },
               ]}
               onSelect={(action) => void slotAction(action)}
@@ -287,15 +298,11 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
                 </MmPressable>
               </div>
               {grade === undefined ? null : <FoodGrade grade={grade} subject={entry.name} />}
-              <MmMenuButton<string>
+              <MmMenuButton<EntryAction>
                 icon="more"
                 label={`More actions for ${entry.name}`}
-                items={[...(onStartSelection === undefined ? [] : [{ value: 'select', label: 'Select' }]), { value: 'delete', label: 'Delete' }]}
-                onSelect={(action) => {
-                  if (action === 'delete') remove(entry);
-                  // Several foods changed together: this one first (MM-634).
-                  if (action === 'select') onStartSelection?.(`food:${entry.id}`);
-                }}
+                items={[...(onStartSelection === undefined ? [] : [{ value: 'select' as const, label: 'Select' }]), ...togetherActionItems]}
+                onSelect={(action) => entryAction(entry, action)}
               />
             </div>
             {/* The coach's line travels with its entry when it is swiped (MM-362). */}
