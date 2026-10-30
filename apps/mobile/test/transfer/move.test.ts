@@ -6,6 +6,7 @@ import { MoveProblem } from '../../src/transfer/MoveProblem';
 import { MoveReceiver } from '../../src/transfer/MoveReceiver';
 import { MoveSender } from '../../src/transfer/MoveSender';
 import { SodiumMoveCipher } from '../../src/transfer/SodiumMoveCipher';
+import type { MoveParcel } from '../../src/transfer/MoveParcel';
 import { moveChunkBytes } from '../../src/transfer/moveChunkBytes';
 
 /**
@@ -26,6 +27,16 @@ const marked = (word: string, length: number) => {
 /** A payload larger than one frame, so it crosses in several. */
 const payload = { snapshot: marked('Weigh-in 82.4 kg on 2026-10-12', moveChunkBytes + 1000), photos: marked('front pose photo', 5000),
   coachAi: { provider: 'anthropic' as const, apiKey: 'sk-ant-api03-SECRETKEYVALUE' },
+};
+/** The move's parcel: everything (MM-698). */
+const everything: MoveParcel = { kind: 'everything', payload };
+/** A copy of foods (MM-715), as the food layer's bytes, larger than one frame. */
+const foods: MoveParcel = { kind: 'foods', foods: marked('{"name":"Salmon","kcal":400}', moveChunkBytes + 300) };
+
+/** The move's payload from what arrived, which a move test expects to be everything. */
+const payloadOf = (parcel: MoveParcel) => {
+  if (parcel.kind !== 'everything') throw new Error(`Expected everything, got ${parcel.kind}.`);
+  return parcel.payload;
 };
 
 function phones({ receiving = same, sending = same }: { receiving?: MoveIdentity; sending?: MoveIdentity } = {}) {
@@ -50,8 +61,8 @@ describe('a move', () => {
     const code = await receiver.open();
     const progress: number[] = [];
     const received = receiver.receive((done) => progress.push(done));
-    await sender.send(code, payload);
-    const arrived = await received;
+    await sender.send(code, everything);
+    const arrived = payloadOf(await received);
     expect(arrived.snapshot).toEqual(payload.snapshot);
     expect(arrived.photos).toEqual(payload.photos);
     // MM-701: the coach's provider and key come too.
@@ -64,15 +75,37 @@ describe('a move', () => {
     const { receiver, sender } = phones();
     const code = await receiver.open();
     const received = receiver.receive();
-    await sender.send(code, { snapshot: payload.snapshot, photos: new Uint8Array(), coachAi: payload.coachAi });
-    expect((await received).photos).toHaveLength(0);
+    await sender.send(code, { kind: 'everything', payload: { snapshot: payload.snapshot, photos: new Uint8Array(), coachAi: payload.coachAi } });
+    expect(payloadOf(await received).photos).toHaveLength(0);
+  });
+
+  it('MM-715: carries a copy of foods, whole and apart from a move, under the same opening and the same seal', async () => {
+    const { network, receiver, sender } = phones();
+    const code = await receiver.open();
+    const progress: number[] = [];
+    const received = receiver.receive((done) => progress.push(done));
+    await sender.send(code, foods);
+    const arrived = await received;
+    expect(arrived.kind).toBe('foods');
+    if (arrived.kind === 'foods') expect(arrived.foods).toEqual(foods.foods);
+    expect(progress.at(-1)).toBe(foods.foods.length);
+    const wire = new TextDecoder('latin1').decode(new Uint8Array(network.frames.flatMap((frame) => [...frame])));
+    for (const word of ['Salmon', 'kcal', 'foods', 'sizes']) expect(wire).not.toContain(word);
+  });
+
+  it('MM-715: a copy of foods is refused when the versions differ, as a move is', async () => {
+    const { receiver, sender } = phones({ sending: { ...same, schema: 13 } });
+    const code = await receiver.open();
+    const received = problemOf(receiver.receive());
+    expect(await problemOf(sender.send(code, foods))).toMatchObject({ kind: 'versionMismatch' });
+    await received;
   });
 
   it('puts nothing readable on the network: every frame is sealed under the code’s key', async () => {
     const { network, receiver, sender } = phones();
     const code = await receiver.open();
     const received = receiver.receive();
-    await sender.send(code, payload);
+    await sender.send(code, everything);
     await received;
     const wire = new TextDecoder('latin1').decode(new Uint8Array(network.frames.flatMap((frame) => [...frame])));
     for (const word of ['Weigh-in', '82.4', '2026-10-12', 'front pose', 'hello', same.app, 'SECRETKEY', 'anthropic']) expect(wire).not.toContain(word);
@@ -83,10 +116,10 @@ describe('a move', () => {
     const code = await receiver.open();
     const received = receiver.receive();
     const stranger = new MoveCode(code.address, new Uint8Array(32).fill(1));
-    expect(await problemOf(sender.send(stranger, payload))).toMatchObject({ kind: 'broken' });
+    expect(await problemOf(sender.send(stranger, everything))).toMatchObject({ kind: 'broken' });
     expect(network.listening).toBe(true);
-    await sender.send(code, payload);
-    expect((await received).snapshot).toEqual(payload.snapshot);
+    await sender.send(code, everything);
+    expect(payloadOf(await received).snapshot).toEqual(payload.snapshot);
   });
 
   it('refuses a payload with one byte changed on the way, and the receiving phone gets nothing', async () => {
@@ -100,7 +133,7 @@ describe('a move', () => {
       return changed;
     };
     const received = problemOf(receiver.receive());
-    const sent = problemOf(sender.send(code, payload));
+    const sent = problemOf(sender.send(code, everything));
     expect(await received).toMatchObject({ kind: 'broken' });
     expect(await sent).toMatchObject({ kind: 'broken' });
   });
@@ -110,7 +143,7 @@ describe('a move', () => {
     const { network, receiver, sender } = phones({ sending: newer });
     const code = await receiver.open();
     const received = problemOf(receiver.receive());
-    const sent = await problemOf(sender.send(code, payload));
+    const sent = await problemOf(sender.send(code, everything));
     expect(sent).toMatchObject({ kind: 'versionMismatch', other: same });
     expect(await received).toMatchObject({ kind: 'versionMismatch', other: newer });
     // The sender's header and hello, the receiver's header and its answer: no payload frame.
@@ -121,7 +154,7 @@ describe('a move', () => {
     const { receiver, sender } = phones({ sending: { ...same, schema: 13 } });
     const code = await receiver.open();
     const received = problemOf(receiver.receive());
-    expect(await problemOf(sender.send(code, payload))).toMatchObject({ kind: 'versionMismatch' });
+    expect(await problemOf(sender.send(code, everything))).toMatchObject({ kind: 'versionMismatch' });
     await received;
   });
 
@@ -129,10 +162,10 @@ describe('a move', () => {
     const { network, receiver, sender } = phones();
     const code = await receiver.open();
     const received = receiver.receive();
-    await sender.send(code, payload);
+    await sender.send(code, everything);
     await received;
     expect(network.listening).toBe(false);
-    expect(await problemOf(sender.send(code, payload))).toMatchObject({ kind: 'unreachable' });
+    expect(await problemOf(sender.send(code, everything))).toMatchObject({ kind: 'unreachable' });
   });
 
   it('stops when told to: a waiting receive ends as stopped', async () => {

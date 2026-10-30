@@ -18,6 +18,7 @@ import { useNetCarbs } from '../useNetCarbs';
 import { changeTogether } from '../changeTogether';
 import type { TogetherAction } from '../TogetherAction';
 import { togetherActionItems } from '../togetherActionItems';
+import { useCopyToAnotherPhone } from '../phone/useCopyToAnotherPhone';
 import { removeMeal } from './removeMeal';
 import { showViewMealSheet } from './showViewMealSheet';
 import '../food.css';
@@ -47,6 +48,7 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, a
   const { services, state } = useApp();
   const overlays = useOverlays();
   const today = useCell(state.today);
+  const copyToPhone = useCopyToAnotherPhone();
   const level = useLoaded(state.detailLevel) ?? 'standard';
   const netCarbs = useNetCarbs();
   const linesId = `food-meal-${loggedMeal.key}-lines`;
@@ -58,7 +60,15 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, a
   const remove = () => void removeMeal(services.food, overlays, loggedMeal);
   /** The same actions a food's menu has, on every food of the meal, named by the meal (MM-714). */
   const change = (action: Exclude<TogetherAction, 'delete'>) =>
-    void changeTogether(services.food, overlays, { action, entries: loggedMeal.items, subject: loggedMeal.name, slot: loggedMeal.meal, day, today });
+    void changeTogether(services.food, overlays, {
+      action,
+      entries: loggedMeal.items,
+      subject: loggedMeal.name,
+      slot: loggedMeal.meal,
+      day,
+      today,
+      toPhone: (foods) => copyToPhone(foods, day),
+    });
   return (
     <MmSwipeToRemove onRemove={remove}>
       <div className="food-meal-entry">

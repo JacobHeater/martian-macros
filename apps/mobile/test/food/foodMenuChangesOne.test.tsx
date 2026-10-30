@@ -45,9 +45,18 @@ async function pickMeal(name: RegExp): Promise<void> {
   await userEvent.click(within(dialog).getByRole('option', { name }));
 }
 
-it("MM-714: a food's menu holds Select and then the chosen foods' six items, in their order", async () => {
+it("MM-714: a food's menu holds Select and then the chosen foods' seven items, in their order", async () => {
   await openMenuOf('Salmon');
-  expect(menuItems()).toEqual(['Select', 'Change time', 'Move to another meal', 'Move to another day', 'Copy to another meal', 'Copy to another day', 'Delete']);
+  expect(menuItems()).toEqual([
+    'Select',
+    'Change time',
+    'Move to another meal',
+    'Move to another day',
+    'Copy to another meal',
+    'Copy to another day',
+    'Copy to another phone',
+    'Delete',
+  ]);
 });
 
 it('MM-714: one food moved to another meal from its menu; nothing else about it changes', async () => {
@@ -92,7 +101,17 @@ it("MM-714: a logged meal's menu copies all its foods to another meal as a new m
     await repos.food.addFood(entryOfMealItem(item, { date: today, meal: 'lunch', eatenAt: 12 * 60, loggedMeal: { key: 'k1', name: 'Chicken and rice' } }));
   }
   await openMenuOf('Chicken and rice');
-  expect(menuItems()).toEqual(['View meal', 'Select', 'Change time', 'Move to another meal', 'Move to another day', 'Copy to another meal', 'Copy to another day', 'Delete']);
+  expect(menuItems()).toEqual([
+    'View meal',
+    'Select',
+    'Change time',
+    'Move to another meal',
+    'Move to another day',
+    'Copy to another meal',
+    'Copy to another day',
+    'Copy to another phone',
+    'Delete',
+  ]);
   await userEvent.click(screen.getByRole('menuitem', { name: 'Copy to another meal' }));
   await pickMeal(/^Snack/);
   await expect.poll(async () => (await logged()).filter((f) => f.meal === 'snack')).toHaveLength(3);

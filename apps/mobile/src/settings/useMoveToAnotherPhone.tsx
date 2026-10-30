@@ -1,27 +1,30 @@
 import { useApp } from '../app/useApp';
 import { currentValueOf } from '../lang/currentValueOf';
 import { decodePhotoArchive } from '../domain/photos/decodePhotoArchive';
-import { MoveCode } from '../transfer/MoveCode';
+import { addReceivedFoods } from '../food/phone/addReceivedFoods';
+import type { MoveParcel } from '../transfer/MoveParcel';
 import type { MovePayload } from '../transfer/MovePayload';
 import { useOverlays } from '../ui/useOverlays';
 import { MoveApplyingSheet } from './MoveApplyingSheet';
 import { MoveChoiceSheet } from './MoveChoiceSheet';
 import { moveWords } from './moveWords';
 import { ReceiveMoveSheet } from './ReceiveMoveSheet';
-import { SendMoveSheet } from './SendMoveSheet';
+import { useSendToAnotherPhone } from './useSendToAnotherPhone';
 
-type Received = { kind: 'backUpFirst' } | { kind: 'received'; payload: MovePayload };
+type Received = { kind: 'backUpFirst' } | { kind: 'received'; parcel: MoveParcel };
 
 /**
  * Moving to another phone (MM-698), from Settings > Backup or the first-run welcome. `choose` asks which way the move
  * goes; `receive` shows this phone's code, after offering a backup when it holds records none has (`backUp`, absent
  * on a fresh install), and replaces this phone's data only once the person confirms what arrived; `send` scans the
  * other phone's code and sends this phone's records and photos. The photos are behind the phone's lock, so sending
- * them, or replacing this phone's, asks for it first.
+ * them, or replacing this phone's, asks for it first. A copy of foods from the other phone (MM-715) arrives by the
+ * same code and is added, once confirmed, never replacing anything.
  */
 export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void> } = {}) {
   const { services } = useApp();
   const overlays = useOverlays();
+  const sendToOtherPhone = useSendToAnotherPhone();
 
   const unlocked = async (reason: string) => (await services.deviceLock.unlock(reason)) !== 'refused';
   const holdsPhotos = async () => (await services.progressPhotos.totalBytes()) > 0;
@@ -112,7 +115,7 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
           <ReceiveMoveSheet
             unbacked={nudge}
             onBackUpFirst={() => close({ kind: 'backUpFirst' })}
-            onReceived={(payload) => close({ kind: 'received', payload })}
+            onReceived={(parcel) => close({ kind: 'received', parcel })}
             onCancel={() => close()}
           />
         ),
@@ -120,7 +123,8 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
       );
       if (answer === undefined) return;
       if (answer.kind === 'received') {
-        await apply(answer.payload);
+        if (answer.parcel.kind === 'foods') await addReceivedFoods(services, overlays, answer.parcel.foods, services.clock.today());
+        else await apply(answer.parcel.payload);
         return;
       }
       await backUp?.();
@@ -133,24 +137,16 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
       overlays.snack('Your progress photos stayed locked, so nothing was sent.');
       return;
     }
-    for (;;) {
-      let text: string | undefined;
-      try {
-        text = await services.codeScanner.scanCode();
-      } catch {
-        overlays.snack('The camera could not be opened. Allow Martian Macros to use it in the phone’s settings.');
-        return;
-      }
-      if (text === undefined) return;
-      // Not a move code: the sheet says so, with Scan again (the UX guard's F2).
-      const code = MoveCode.parse(text);
-      const again = await overlays.sheet<'again'>(
-        'Sending to your other phone',
-        (close) => <SendMoveSheet code={code} onScanAgain={() => close('again')} onClose={() => close()} />,
-        { size: 'tall' },
-      );
-      if (again === undefined) return;
-    }
+    await sendToOtherPhone({
+      what: 'everything',
+      parcel: async () => {
+        const snapshot = await services.backup.snapshot();
+        const photos = await services.progressPhotos.exportArchive();
+        // The coach's provider and key go with a move, never with a backup (MM-701).
+        const coachAi = await services.coachAi.loadConfig();
+        return { kind: 'everything', payload: { snapshot, photos, coachAi } };
+      },
+    });
   };
 
   const choose = async () => {

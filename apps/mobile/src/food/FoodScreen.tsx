@@ -28,6 +28,7 @@ import { FoodDayMarkRow } from './FoodDayMarkRow';
 import { changeTogether } from './changeTogether';
 import { MealSection } from './MealSection';
 import { keepRowInPlace } from './keepRowInPlace';
+import { useCopyToAnotherPhone } from './phone/useCopyToAnotherPhone';
 import type { MmAnchor } from '../ui/MmAnchor';
 import { SelectionBar } from './SelectionBar';
 import type { TogetherAction } from './TogetherAction';
@@ -44,6 +45,7 @@ import './food.css';
  */
 export function FoodScreen() {
   const { services, state } = useApp();
+  const copyToPhone = useCopyToAnotherPhone();
   const pausesState = useCell(state.pauses);
   // Asked again after a failure, the day stays drawn and the button keeps its place (MM-183).
   const pausesRead = useHeldFailure(pausesState, () => state.retryPauses());
@@ -117,6 +119,7 @@ export function FoodScreen() {
       slot: meals.size === 1 ? foods[0]?.meal : undefined,
       day,
       today,
+      toPhone: (chosenFoods) => copyToPhone(chosenFoods, day),
     });
     // The row choosing started from may have left the day (deleted, or moved to another day): then the focus goes
     // to the first row still here, never nowhere (MM-649).
