@@ -385,32 +385,35 @@ it('MM-635: pressing a saved food in Add food opens its amount step and logs it'
 
 
 // MM-710: a saved food carries its group, where its numbers came from, and what went into it.
-it('MM-710: the typed form chooses a food group, a typed food is the person’s own, and the Saved step says so', async () => {
-  const sheet = await open();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
-  await typeIn(sheet, 'Name', 'Protein bar');
-  await typeIn(sheet, 'One serving is', '1 bar');
-  await typeIn(sheet, 'Weighs g', '30');
-  await typeIn(sheet, 'Protein g', '10');
-  await typeIn(sheet, 'Carbs g', '12');
-  await typeIn(sheet, 'Fat g', '4');
-  await typeIn(sheet, 'Calories', '120');
-  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+it('MM-710: the typed form chooses a food group, a typed food is the person’s own, and the Library’s row says so', async () => {
+  renderApp(repos, today);
+  await openTab('Food');
+  const library = await openLibrary();
+  let form = await newFoodBy(library, 'Type it in');
+  await typeIn(form, 'Name', 'Protein bar');
+  await typeIn(form, 'One serving is', '1 bar');
+  await typeIn(form, 'Weighs g', '30');
+  await typeIn(form, 'Protein g', '10');
+  await typeIn(form, 'Carbs g', '12');
+  await typeIn(form, 'Fat g', '4');
+  await typeIn(form, 'Calories', '120');
+  await userEvent.click(within(form).getByRole('button', { name: /^Food group \(optional\)/ }));
   await userEvent.click(await screen.findByRole('option', { name: 'Snacks and sweets' }));
-  await press(sheet, 'Save food');
-  await within(sheet).findByRole('heading', { name: 'My foods' });
+  await press(form, 'Save food');
+  await expect.poll(async () => (await saved()).length).toBe(1);
   const [bar] = await saved();
   expect(bar?.group).toBe('snacksAndSweets');
   expect(bar?.evidence).toEqual({ kind: 'yours' });
   expect(bar?.madeOf).toEqual([]);
-  expect(within(sheet).getByText('Entered by you')).toBeInTheDocument();
+  // The Foods fold opened on it (MM-706), and its row says where its numbers came from (MM-710).
+  expect(await within(library).findByText('Entered by you')).toBeInTheDocument();
   // Edited, it keeps its group and its evidence; None takes the group away.
-  await editSaved(sheet, 'Protein bar');
-  expect(await within(sheet).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
-  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+  await editInLibrary(library, 'Protein bar');
+  form = await libraryForm('Edit your food');
+  expect(await within(form).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
+  await userEvent.click(within(form).getByRole('button', { name: /^Food group \(optional\)/ }));
   await userEvent.click(await screen.findByRole('option', { name: 'None' }));
-  await press(sheet, 'Save food');
+  await press(form, 'Save food');
   await expect.poll(async () => (await saved())[0]?.group).toBeUndefined();
   expect((await saved())[0]?.evidence).toEqual({ kind: 'yours' });
 });
