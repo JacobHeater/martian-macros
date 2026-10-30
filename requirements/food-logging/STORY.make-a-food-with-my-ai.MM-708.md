@@ -134,10 +134,9 @@ Built 2026-10-30 (PR C of MM-703, worktree `mm-wt/ai-food`), not run locally; CI
 - Tests: `test/food/makeFoodWithAi.test.tsx` (every scenario above), `test/format/foodPrompt.test.ts`;
   `test/support/renderApp.tsx` gained `open`, so a test reaches a screen with no way in yet.
 
-**Left to a sibling PR:** the way in. The Library's New food chooser (MM-706) is built in its own PR and is not on this
-branch; whichever PR lands later wires "With my AI" to `MakeFoodWithAiScreen` (`navigator.push((close) =>
-<MakeFoodWithAiScreen onDone={(saved) => close(saved)} />)`) and opens the Foods fold on what came back. The stories
-and the tests open the screen directly. Nothing is stubbed.
+**The way in** was wired in MM-706's PR, which landed after this one: the Library's New food chooser offers "With my
+AI" first, pushes `MakeFoodWithAiScreen`, and opens the Foods fold on what came back with "Saved X" or "Saved 3
+foods" (`LibraryScreen`, story `LibraryWithMyAi`, `test/library/library.test.tsx`).
 
 **Owed on the phone:** the share sheet with photos, the paste from a real assistant's answer, the barcode scan from
 here, and the owner's read of the review at phone width.

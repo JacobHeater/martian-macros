@@ -213,10 +213,19 @@ export const LibraryExercises = screenStory({
 /** New food's chooser: a label, typing, or a recipe. */
 export const LibraryNewFood = screenStory({
   covers: ['LibraryScreen', 'NewFoodSheet'],
-  shows: /^Scan a label/,
+  shows: /^With my AI/,
   scenario: withLibrary,
   open: openLibrary,
   walk: press('New food'),
+});
+
+/** With my AI from New food (MM-708): its screen pushed over the Library. */
+export const LibraryWithMyAi = screenStory({
+  covers: ['LibraryScreen', 'MakeFoodWithAiScreen'],
+  shows: 'With my AI',
+  scenario: withLibrary,
+  open: openLibrary,
+  walk: newFoodBy(/^With my AI/),
 });
 
 /** The form a food is typed into, opened from New food (moved from the Saved step, MM-707). */

@@ -126,9 +126,11 @@ Decided while building (say if any is wrong):
 - **An exercise's usage** is read from the workouts already in the state (a workout with a set of it counts once), not a
   new reader.
 
-Left to sibling PRs, wired by whichever lands later: the trust mark on a row (MM-710's evidence columns), the "With my
-AI" route in New food (MM-708), the drawer's Library row (MM-704). On this branch the Library is reached from the Saved
-step's "Manage in Library" (MM-707).
+This PR landed after its siblings, so it wired what they left: the drawer's Library row (MM-704; `DrawerChoice`
+`library`, the `library` icon), the "With my AI" route first in New food (MM-708; the screen pushed, the Foods fold
+opened on what came back), and the trust mark on every food's row (MM-710's `SavedFoodTrustMark`). The Library is also
+reached from the Saved step's "Manage in Library" (MM-707); a sheet cannot push a screen, so the sheet answers
+`manage` and the screen that opened it pushes the Library (`addFoodFrom`).
 
 Not run locally; CI validates. Owed on the phone: the folds and the sheets over the Library, the row at 360 px with the
 grade and the menu, "Scan a label" starting the camera at once.

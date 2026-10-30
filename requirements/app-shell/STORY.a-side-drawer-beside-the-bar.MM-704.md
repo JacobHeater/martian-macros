@@ -103,8 +103,8 @@ in the app bar's leading slot and the gear gone (`HomeShell`); the `menu` icon. 
 size) and the Overlays catalog's Drawer and DrawerBare. Tests: `test/app/drawer.test.tsx` (every scenario, and the motion
 token rule), `test/support/openSettings.ts` reaches Settings through the drawer.
 
-**Not wired here: the Library row.** `LibraryScreen` (MM-706) is built in a sibling PR; whichever lands later adds the
-row beside Profile. Nothing is stubbed.
+**The Library row** was wired in MM-706's PR, which landed after this one: a row beside Profile (the `library` icon),
+pushing `LibraryScreen` (`DrawerChoice` gained `library`; `test/app/drawer.test.tsx`, story `DrawerOpensLibrary`).
 
 Owed on the phone: the slide-in and the drag on both phones, Android's back closing it, the lettering at the drawer's
 width in each palette.
