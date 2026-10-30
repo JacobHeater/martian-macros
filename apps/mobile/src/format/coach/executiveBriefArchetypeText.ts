@@ -103,7 +103,7 @@ function foodBriefText(brief: ExecutiveBrief): string {
           return 'On track through lunch. Nothing to fix. Build dinner around protein.';
         case 'dinner':
           return 'On track through dinner with protein still to go. Close it before bed with lean protein.';
-        case undefined:
+        default:
           return 'Only a snack is in and the day is on track. Build your meals around protein.';
       }
     }
