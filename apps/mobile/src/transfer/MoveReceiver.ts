@@ -1,3 +1,5 @@
+import { CoachAiConfig } from '../domain/integration/CoachAiConfig';
+import { CoachAiProvider } from '../domain/integration/CoachAiProvider';
 import type { LinkConnection } from './LinkConnection';
 import type { LinkListener } from './LinkListener';
 import type { MoveCipher } from './MoveCipher';
@@ -108,8 +110,18 @@ export class MoveReceiver implements MoveReceiving {
           if (frame === undefined) throw new MoveProblem('broken');
           return opener.open(frame);
         };
-        const sizes = JSON.parse(decoder.decode((await next()).plain)) as { kind?: unknown; snapshot?: unknown; photos?: unknown };
+        const sizes = JSON.parse(decoder.decode((await next()).plain)) as {
+          kind?: unknown;
+          snapshot?: unknown;
+          photos?: unknown;
+          coachAi?: { provider?: unknown; apiKey?: unknown };
+        };
         const { snapshot, photos } = sizes;
+        // The coach's provider and key (MM-701): one the app knows with a key, or none.
+        const provider = CoachAiProvider.values.find((known) => known === sizes.coachAi?.provider);
+        const apiKey = sizes.coachAi?.apiKey;
+        const coachAi: CoachAiConfig =
+          provider !== undefined && typeof apiKey === 'string' ? { provider, apiKey: apiKey.trim() } : CoachAiConfig.off;
         if (
           sizes.kind !== 'sizes' ||
           typeof snapshot !== 'number' ||
@@ -135,7 +147,7 @@ export class MoveReceiver implements MoveReceiving {
         }
         if (received !== total) throw new MoveProblem('broken');
         await connection.send(sealer.seal(message({ kind: 'received' }), true));
-        return { snapshot: whole.slice(0, snapshot), photos: whole.slice(snapshot) };
+        return { snapshot: whole.slice(0, snapshot), photos: whole.slice(snapshot), coachAi };
       } catch (error) {
         throw error instanceof MoveProblem ? error : new MoveProblem('broken');
       }

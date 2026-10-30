@@ -82,6 +82,8 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
               console.error('The moved photos could not be put in place.', error);
               photosFailed = true;
             }
+            // The coach's key comes with the move (MM-701); a phone that sent none leaves this phone's own in place.
+            if (payload.coachAi.provider !== 'none' && payload.coachAi.apiKey !== '') await services.coachAi.saveConfig(payload.coachAi);
           }}
           onSettled={(error) => close(error === undefined ? undefined : { error })}
         />
