@@ -9,7 +9,9 @@ import { foodLimitsOf } from './food/foodLimitsOf';
 import { FoodSignalRule } from './food/FoodSignalRule';
 import { mealBreakdownOf } from './food/mealBreakdownOf';
 import { recordOnOf } from './food/recordOnOf';
+import type { Meal } from '../../domain/Meal';
 import { mealMovesOf } from './moves/mealMovesOf';
+import { runwayIsTight } from './runwayIsTight';
 
 const sum = (values: readonly number[]) => values.reduce((s, v) => s + v, 0);
 
@@ -45,6 +47,10 @@ export function executiveBriefOf(
   const proteinRemainingG = Math.max(0, proteinTargetG - proteinLoggedG);
   const minKcalForProtein = proteinRemainingG * 4;
   const requiredProteinDensity = kcalRemaining > 0 ? minKcalForProtein / kcalRemaining : proteinRemainingG > 0 ? 1 : 0;
+  const targetProteinDensity = kcalTarget > 0 ? (proteinTargetG * 4) / kcalTarget : 0;
+  // The latest main meal with food today (MM-711), so the brief can say which meals carry the protein.
+  const mains: readonly Meal[] = ['breakfast', 'lunch', 'dinner'];
+  const lastMeal = [...mains].reverse().find((meal) => todayEntries.some((e) => e.meal === meal));
 
   const band = new CalorieBand(kcalTarget);
   const overBand = kcalLogged > band.highKcal;
@@ -60,7 +66,8 @@ export function executiveBriefOf(
     runwayState = 'proteinUnrecoverable';
   } else if (proteinRemainingG <= 0) {
     runwayState = 'targetsLocked';
-  } else if (requiredProteinDensity > 0.35) {
+  } else if (runwayIsTight(requiredProteinDensity, targetProteinDensity)) {
+    // Tight is lean protein only from here (MM-711), never a few points over the day's own density.
     runwayState = 'tightRunway';
   } else {
     runwayState = 'onTrack';
@@ -150,6 +157,7 @@ export function executiveBriefOf(
     today.toString(),
     limits.proteinOnly ? 'protected' : 'full',
     runwayState,
+    lastMeal ?? '',
     Math.round(kcalTarget),
     Math.round(kcalLogged),
     Math.round(proteinTargetG),
@@ -179,6 +187,7 @@ export function executiveBriefOf(
     proteinRemainingG,
     requiredProteinDensity,
     proteinUnrecoverable,
+    ...(lastMeal === undefined ? {} : { lastMeal }),
     briefHash,
     ...(primaryDriver === undefined ? {} : { primaryDriver }),
     sevenDay: {

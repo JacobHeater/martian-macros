@@ -3,7 +3,7 @@ import type { TrainingBrief } from '../../src/engine/analysis/TrainingBrief';
 import { trainingBriefText } from '../../src/format/coach/trainingBriefText';
 import { coachBannedWords } from '../support/coachBannedWords';
 
-/** MM-681: the training end of the brief, in the coach's voice: the number, then the order. */
+/** MM-681: the training end of the brief, in the coach's voice; since MM-711 one line, one order, lifting first. */
 const brief = (over: Partial<TrainingBrief> = {}): TrainingBrief => ({
   goal: 'fatLoss',
   cardioHeld: true,
@@ -20,29 +20,27 @@ const brief = (over: Partial<TrainingBrief> = {}): TrainingBrief => ({
 });
 const clean = (text: string) => expect(coachBannedWords.filter(([, pattern]) => pattern.test(text)).map(([name]) => name)).toEqual([]);
 
-it('holds the person to the sessions set, the cardio floor and the steps floor, with the shortfalls as orders', () => {
+it('one line, one order, at most one number, lifting first (MM-711)', () => {
   const text = trainingBriefText(brief());
-  expect(text).toBe(
-    'Lifting: 1 of the 4 sessions you set this week; 3 to go. ' +
-      'Cardio 1 h 36 min against the 2 h 30 min floor: 54 min more on the watch this week. ' +
-      'Steps about 6,100 a day against 8,000: 1,900 more a day.',
-  );
+  expect(text).toBe('One of the four lifts you set is in: three to go this week.');
   expect(text).not.toContain('!');
   clean(text);
+  expect(trainingBriefText(brief({ sessionsThisWeek: 0, daysSinceSession: 12 }))).toBe('No lift in 12 days: book one tonight.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 0, daysSinceSession: undefined }))).toBe('Zero lifts of the four you set this week: book one tonight.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 0, sessionsTarget: 3, daysSinceSession: 3 }))).toBe('Zero lifts of the three you set this week: book one tonight.');
 });
 
-it('a covered week, floors met, and a week or more without lifting', () => {
-  expect(trainingBriefText(brief({ sessionsThisWeek: 4, cardioMinutes: 160, stepsPerDay: 8400 }))).toBe(
-    'Lifting: 4 of the 4 sessions you set this week; the week is covered. Cardio 2 h 40 min, over the floor. Steps about 8,400 a day, over the floor.',
-  );
-  expect(trainingBriefText(brief({ sessionsThisWeek: 0, daysSinceSession: 12 }))).toMatch(/^No lifting in 12 days\. 4 sessions a week is what you set; book the first one\./);
-  expect(trainingBriefText(brief({ sessionsThisWeek: 0, daysSinceSession: undefined }))).toMatch(/^No lifting logged yet\./);
+it('lifting covered, the cardio floor, then the steps floor; all covered, one sentence', () => {
+  expect(trainingBriefText(brief({ sessionsThisWeek: 4 }))).toBe('Lifting is covered; cardio is 54 min short of the floor this week: get it on the watch.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 4, cardioMinutes: 160 }))).toBe('Lifting and cardio are covered; steps are 1,900 a day under the floor: walk more.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 4, cardioMinutes: 160, stepsPerDay: 8400 }))).toBe('Training is covered this week: lifting, cardio and steps.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 4, cardioMinutes: 160, stepsPerDay: undefined, stepsDays: 0 }))).toBe('Lifting and cardio are covered; no steps were counted this week.');
 });
 
-it('on maintenance only the lifting is said; without a watch on a cut, that nothing is being counted', () => {
-  expect(trainingBriefText(brief({ goal: 'maintenance', cardioHeld: false }))).toBe('Lifting: 1 of the 4 sessions you set this week; 3 to go.');
-  expect(trainingBriefText(brief({ wearableInUse: false, cardioMinutes: 0, stepsPerDay: undefined, stepsDays: 0 }))).toBe(
-    'Lifting: 1 of the 4 sessions you set this week; 3 to go. No watch connected: cardio and steps are not being counted. Connect one in Settings › Health.',
+it('on maintenance only the lifting is held; without a watch on a cut, that nothing is being counted', () => {
+  expect(trainingBriefText(brief({ goal: 'maintenance', cardioHeld: false, sessionsThisWeek: 4 }))).toBe('Lifting is covered this week.');
+  expect(trainingBriefText(brief({ goal: 'maintenance', cardioHeld: false }))).toBe('One of the four lifts you set is in: three to go this week.');
+  expect(trainingBriefText(brief({ sessionsThisWeek: 4, wearableInUse: false, cardioMinutes: 0, stepsPerDay: undefined, stepsDays: 0 }))).toBe(
+    'Lifting is covered; no watch is connected, so cardio and steps are not being counted.',
   );
-  expect(trainingBriefText(brief({ stepsPerDay: undefined, stepsDays: 0 }))).toContain('No steps counted this week against the 8,000 floor.');
 });

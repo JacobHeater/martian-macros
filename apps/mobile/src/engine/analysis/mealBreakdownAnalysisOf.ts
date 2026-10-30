@@ -6,6 +6,7 @@ import type { Meal } from '../../domain/Meal';
 import type { InsightSafeguards } from '../InsightSafeguards';
 import { foodLimitsOf } from './food/foodLimitsOf';
 import type { MealBreakdownAnalysis } from './MealBreakdownAnalysis';
+import type { MealVerdict } from './MealVerdict';
 import { mealMovesOf } from './moves/mealMovesOf';
 import type { TradeCatalog } from './TradeCatalog';
 
@@ -92,6 +93,8 @@ export function mealBreakdownAnalysisOf(input: {
       ? undefined
       : { name: outlier.name, kcal: outlier.kcal, proteinG: outlier.proteinG, fatG: outlier.fatG ?? 0, proteinDensity: outlier.proteinDensity };
   const best = moves.best;
+  // The verdict (MM-711): a drag in the meal; else the day's order (a move, or the day over with protein covered); else fine.
+  const verdict: MealVerdict = outlierItem !== undefined ? 'drag' : best !== undefined || kcalRemaining < 0 ? 'order' : 'fine';
   const bestName = best === undefined ? '' : best.kind === 'nextMeal' ? (best.food?.name ?? '') : best.kind === 'addProtein' ? best.added.name : best.kind === 'swapSameGroup' ? best.replacement.name : '';
 
   const analysisHash = [
@@ -105,6 +108,7 @@ export function mealBreakdownAnalysisOf(input: {
     outlierItem?.name ?? '',
     best?.kind ?? '',
     bestName,
+    verdict,
   ].join(':');
 
   return {
@@ -126,5 +130,6 @@ export function mealBreakdownAnalysisOf(input: {
     analysisHash,
     ...(outlierItem === undefined ? {} : { outlierItem }),
     moves,
+    verdict,
   };
 }

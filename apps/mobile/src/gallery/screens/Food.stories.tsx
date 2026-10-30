@@ -25,6 +25,7 @@ import { constant } from '../../lang/constant';
 import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
+import { lightBreakfastScenario } from './lightBreakfastScenario';
 import { writingCoach } from './writingCoach';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
@@ -129,6 +130,19 @@ export const MealSplit = screenStory({
 export const MealCoachBreakdown = screenStory({
   covers: ['FoodScreen', 'MealBreakdownSheet'],
   shows: 'Meal impact',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });
+    if (options !== undefined) await userEvent.click(options);
+    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Coach breakdown' }));
+  },
+});
+
+/** MM-711: the owner's breakfast, 243 kcal for 5 g, is fine: no drag row, no move row, and the coach says so and where the protein comes from. */
+export const MealCoachBreakdownFine = screenStory({
+  covers: ['FoodScreen', 'MealBreakdownSheet'],
+  shows: /Nothing to fix here/,
+  scenario: lightBreakfastScenario,
   open: ({ state }) => state.homeTab.put('food'),
   walk: async (canvas) => {
     const [options] = await within(canvas).findAllByRole('button', { name: /^Options for/ });

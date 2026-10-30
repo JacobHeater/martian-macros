@@ -58,7 +58,8 @@ describe('the figures sent to the model', () => {
     for (const allowed of [4, 96, 150, 54, 6100, 8000, 1900, 1, 36, 2, 30]) expect(req.allowedNumbers).toContain(allowed);
     expect(req.systemPrompt).toContain('hold the person to it');
     expect(req.systemPrompt).not.toMatch(/burn off|earn/);
-    expect(req.fallbackText).toContain('Cardio 1 h 36 min against the 2 h 30 min floor');
+    // One training line, lifting first (MM-711): the cardio and steps stand in the rows under the words.
+    expect(req.fallbackText).toContain('Zero lifts of the four you set this week: book one tonight.');
   });
 
   it('are whole in a meal’s request too', () => {
