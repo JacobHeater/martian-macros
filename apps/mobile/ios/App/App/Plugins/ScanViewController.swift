@@ -49,8 +49,9 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
         guard session.canAddOutput(output) else { unusable = true; return }
         session.addOutput(output)
         output.setMetadataObjectsDelegate(self, queue: .main)
-        let wanted: [AVMetadataObject.ObjectType] = readsQr ? [.qr] : [.ean13, .ean8, .upce]
-        output.metadataObjectTypes = wanted.filter { output.availableMetadataObjectTypes.contains($0) }
+        let wanted: [AVMetadataObject.ObjectType] = [.ean13, .ean8, .upce]
+        let reading: [AVMetadataObject.ObjectType] = readsQr ? [.qr] : wanted
+        output.metadataObjectTypes = reading.filter { output.availableMetadataObjectTypes.contains($0) }
 
         let preview = AVCaptureVideoPreviewLayer(session: session)
         preview.videoGravity = .resizeAspectFill

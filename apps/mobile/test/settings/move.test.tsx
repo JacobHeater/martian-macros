@@ -136,7 +136,7 @@ it('names the phone to update when the versions differ, and changes nothing', as
   render();
   await startMove('Receive on this phone');
   const failed = within(await screen.findByRole('dialog', { name: 'Move to this phone' }, slowly));
-  expect(await failed.findByText(/Update Martian Macros on the other phone/, {}, slowly)).toBeInTheDocument();
+  expect(await failed.findByText(/Update Martian Macros on the other phone/, { selector: 'p' }, slowly)).toBeInTheDocument();
   expect(restorer.restoredFrom).toHaveLength(0);
 });
 
@@ -156,7 +156,7 @@ it('says the phones must share a Wi-Fi when the other cannot be reached, and off
   render();
   await startMove('Send from this phone');
   const sheet = within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly));
-  expect(await sheet.findByText(/Both phones need the same Wi-Fi/, {}, slowly)).toBeInTheDocument();
+  expect(await sheet.findByText(/Both phones need the same Wi-Fi/, { selector: 'p' }, slowly)).toBeInTheDocument();
   expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
 });
 
@@ -165,7 +165,7 @@ it('sends nothing for a code that is not a move code, and offers to scan again',
   render();
   await startMove('Send from this phone');
   const sheet = within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly));
-  expect(await sheet.findByText(/not a Martian Macros move code/, {}, slowly)).toBeInTheDocument();
+  expect(await sheet.findByText(/not a Martian Macros move code/, { selector: 'p' }, slowly)).toBeInTheDocument();
   expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
   expect(sheet.getByRole('heading', { name: 'The move did not happen' })).toHaveFocus();
   expect(sender.sent).toHaveLength(0);

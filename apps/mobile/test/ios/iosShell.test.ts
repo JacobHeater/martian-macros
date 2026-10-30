@@ -61,7 +61,7 @@ it('supports iOS 15 and later, in portrait', () => {
 });
 
 it('says the local network is for moving to another phone (MM-695)', () => {
-  const why = /<key>NSLocalNetworkUsageDescription</key>s*<string>([^<]+)</string>/.exec(plist)?.[1] ?? '';
+  const why = /<key>NSLocalNetworkUsageDescription<\/key>\s*<string>([^<]+)<\/string>/.exec(plist)?.[1] ?? '';
   expect(why).toMatch(/Move to another phone/);
   expect(why).toMatch(/Nothing goes to the internet/);
 });
