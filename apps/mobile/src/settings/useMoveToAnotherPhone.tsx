@@ -12,7 +12,7 @@ import { SendMoveSheet } from './SendMoveSheet';
 type Received = { kind: 'backUpFirst' } | { kind: 'received'; payload: MovePayload };
 
 /**
- * Moving to another phone (MM-695), from Settings > Backup or the first-run welcome. `choose` asks which way the move
+ * Moving to another phone (MM-697), from Settings > Backup or the first-run welcome. `choose` asks which way the move
  * goes; `receive` shows this phone's code, after offering a backup when it holds records none has (`backUp`, absent
  * on a fresh install), and replaces this phone's data only once the person confirms what arrived; `send` scans the
  * other phone's code and sends this phone's records and photos. The photos are behind the phone's lock, so sending

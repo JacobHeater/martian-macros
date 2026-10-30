@@ -17,7 +17,7 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
     }
 
     private let done: (Outcome) -> Void
-    /// Reading a move code's QR code (MM-695), not a product's barcode: the two never mix.
+    /// Reading a move code's QR code (MM-697), not a product's barcode: the two never mix.
     private let readsQr: Bool
     private let session = AVCaptureSession()
     private var preview: AVCaptureVideoPreviewLayer?

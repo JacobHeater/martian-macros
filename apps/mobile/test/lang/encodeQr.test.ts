@@ -6,7 +6,7 @@ import { qrLogoArea } from '../../src/lang/qrLogoArea';
 import { MoveCode } from '../../src/transfer/MoveCode';
 
 /**
- * MM-695: the app draws its own QR codes. Each is read back by an independent decoder (jsQR), as a camera would read
+ * MM-697: the app draws its own QR codes. Each is read back by an independent decoder (jsQR), as a camera would read
  * the screen: once plain, once with the logo's square left light, and once with that square filled dark, worse than
  * any icon drawn there.
  */
@@ -60,7 +60,7 @@ const moveCodes = [
 ];
 
 describe('a QR code the app draws', () => {
-  it.each(['HELLO WORLD', '0123456789', 'A', 'MM-695 $%*+-./:', ...moveCodes])('reads back as %s', (text) => {
+  it.each(['HELLO WORLD', '0123456789', 'A', 'MM-697 $%*+-./:', ...moveCodes])('reads back as %s', (text) => {
     expect(read(encodeQr(text), 'none')).toBe(text);
   });
 

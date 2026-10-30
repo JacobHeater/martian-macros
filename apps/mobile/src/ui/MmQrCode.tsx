@@ -14,7 +14,7 @@ interface MmQrCodeProps {
 }
 
 /**
- * A QR code with the app's icon in its middle (MM-695): drawn by the app, dark on light in every palette so any
+ * A QR code with the app's icon in its middle (MM-697): drawn by the app, dark on light in every palette so any
  * camera reads it, at error-correction level H, which restores what the icon covers. The icon sits on a light square
  * of its own (`qrLogoArea`), so its colours never touch a module.
  */

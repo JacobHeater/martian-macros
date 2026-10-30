@@ -7,7 +7,7 @@ export interface MmScannerApi {
   /** Opens the camera on a barcode. Cancelled when the person closed it. */
   scan(): Promise<{ cancelled: boolean; digits?: string; symbology?: string }>;
 
-  /** Opens the camera on a QR code (MM-695): its text. Cancelled when the person closed it. */
+  /** Opens the camera on a QR code (MM-697): its text. Cancelled when the person closed it. */
   scanCode(): Promise<{ cancelled: boolean; text?: string }>;
 
   /** Photographs a label and gives the text read off it. */

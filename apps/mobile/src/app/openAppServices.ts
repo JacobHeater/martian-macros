@@ -110,7 +110,7 @@ export async function openAppServices(): Promise<AppServices> {
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
-  // Moving to another phone on the same Wi-Fi (MM-695): the shell's sockets, sealed under the key in the code. A
+  // Moving to another phone on the same Wi-Fi (MM-697): the shell's sockets, sealed under the key in the code. A
   // browser has no socket to listen on, so there it says there is no Wi-Fi.
   const localLink = native ? new NativeLocalLink(mmTransfer) : new NoLocalLink();
   const appVersion = native ? new CapacitorAppVersion() : new FixedAppVersion('browser');

@@ -1,5 +1,5 @@
 /**
- * A QR code as modules (MM-695): `size` by `size`, `dark[row][column]` true
+ * A QR code as modules (MM-697): `size` by `size`, `dark[row][column]` true
  * where the module is dark. The quiet zone around it is not included.
  */
 export interface QrMatrix {

@@ -16,7 +16,7 @@ import { openSettings } from '../support/openSettings';
 import { renderApp } from '../support/renderApp';
 
 /**
- * MM-695: Settings > Backup > Move to another phone, and the first-run welcome's way in. The receiving phone offers
+ * MM-697: Settings > Backup > Move to another phone, and the first-run welcome's way in. The receiving phone offers
  * a backup when it holds records none has, shows its code, and replaces nothing until the person confirms what
  * arrived; the sending phone scans the code and sends its records and photos, and keeps them.
  */
