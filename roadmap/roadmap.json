@@ -1634,6 +1634,8 @@
      "MM-601",
      "MM-603",
      "MM-679",
+     "MM-704",
+     "MM-705",
      "MM-691"
     ]
    },
@@ -1955,6 +1957,14 @@
      "title": "A crash while drawing is said in words, never a blank screen (the owner, 2026-10-28, MM-679): one boundary inside the app with the theme and one around it",
      "tickets": [
       "MM-679"
+     ]
+    },
+    {
+     "step": 25,
+     "title": "A side drawer beside the bar (the owner, 2026-10-30, MM-703): opened from a menu button, the Martian Macros lettering at its head, the four destinations, Profile, Library and Settings as rows; the gear leaves the app bar (MM-704); Profile is its own screen with the profile section and nutrition goals out of Settings (MM-705)",
+     "tickets": [
+      "MM-704",
+      "MM-705"
      ]
     }
    ],
@@ -2692,6 +2702,12 @@
      "MM-37",
      "MM-305",
      "MM-586",
+     "MM-703",
+     "MM-706",
+     "MM-707",
+     "MM-708",
+     "MM-709",
+     "MM-710",
      "MM-587",
      "MM-597",
      "MM-598",
@@ -3062,6 +3078,18 @@
      "title": "From the phone (the owner, 2026-10-28): the day's completeness is a chip with a fill at the hero's top right, not a mark in the header (MM-692)",
      "tickets": [
       "MM-692"
+     ]
+    },
+    {
+     "step": 33,
+     "title": "Your foods, made with your AI, kept in a Library (the owner, 2026-10-30, MM-703): the Library screen with its folds, rows and usage and New food's four routes (MM-706); the Saved step as a picker with Manage in Library (MM-707); Make a food with my AI, the questions, the photos sent, the answer pasted, the review and Save (MM-708); the food format, its reader, checks, evidence rule, prompt and fix message (MM-709); schema 32, a saved food's group, evidence and ingredients, the group chooser and the trust mark (MM-710)",
+     "tickets": [
+      "MM-703",
+      "MM-706",
+      "MM-707",
+      "MM-708",
+      "MM-709",
+      "MM-710"
      ]
     }
    ],
@@ -5009,6 +5037,18 @@
     "MM-677"
    ],
    "reason": "MM-678's cardio and steps signals, floors and stall explanation read the sessions and steps MM-677 keeps."
+  },
+  {
+   "from": "WS-03",
+   "to": "WS-08",
+   "type": "soft-preferred-order",
+   "scope": [
+    33
+   ],
+   "satisfiedBy": [
+    "MM-704"
+   ],
+   "reason": "The Library (MM-706) is reached from the drawer's row (MM-704) and from the Saved step (MM-707); whichever PR lands later wires the row. Built in parallel from main."
   }
  ],
  "parallelGroups": [
