@@ -7,6 +7,7 @@ import { currentValueOf } from '../../lang/currentValueOf';
 import { useSendToAnotherPhone } from '../../settings/useSendToAnotherPhone';
 import type { FoodCopy } from '../../transfer/FoodCopy';
 import { foodCopyBytes } from '../../transfer/foodCopyBytes';
+import type { WholeDay } from '../../transfer/WholeDay';
 import { entriesCopiedTo } from '../entriesCopiedTo';
 
 /**
@@ -15,7 +16,8 @@ import { entriesCopiedTo } from '../entriesCopiedTo';
  * fresh entries for the same day and meal, a logged meal as a new meal (MM-587), each with its time eaten, since it
  * is the same eating and not another (the owner, MM-717), and with them the Library foods they were logged from
  * (origin pack `custom`), so the other phone can keep those too. Water goes as it was had: its day, amount and
- * moment. This phone's log is not touched; the other phone asks before it adds anything.
+ * moment. A whole day goes with its marks (`whole`, MM-719), for the other phone to make its day match. This
+ * phone's log is not touched; the other phone asks before it adds or replaces anything.
  */
 export function useCopyToAnotherPhone() {
   const { services } = useApp();
@@ -29,15 +31,19 @@ export function useCopyToAnotherPhone() {
     return library.filter((food) => wanted.has(food.id));
   };
 
-  return (day: CalendarDate, { entries = [], water = [] }: { entries?: readonly FoodEntry[]; water?: readonly WaterEntry[] }): Promise<void> =>
+  return (
+    day: CalendarDate,
+    { entries = [], water = [], whole }: { entries?: readonly FoodEntry[]; water?: readonly WaterEntry[]; whole?: WholeDay },
+  ): Promise<void> =>
     send({
-      what: entries.length > 0 ? 'foods' : 'water',
+      what: whole !== undefined ? 'day' : entries.length > 0 ? 'foods' : 'water',
       parcel: async () => {
         const copy: FoodCopy = {
           day,
           entries: entriesCopiedTo(day, entries, { keepTimeEaten: true }),
           water,
           foods: await libraryFoodsOf(entries),
+          whole,
         };
         return { kind: 'foods', foods: foodCopyBytes(copy) };
       },

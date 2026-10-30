@@ -85,7 +85,7 @@ const food = (f: CustomFood) => ({
 /**
  * A copy of foods or water as the bytes that cross to the other phone (MM-715, MM-718): JSON, the format named
  * and versioned first, the day as its epoch day, every entry, every drink and every Library food with all it
- * holds. What is undefined is left out. `foodCopyOfBytes` reads it back.
+ * holds, and the day's marks when it is a whole day (MM-719). What is undefined is left out. `foodCopyOfBytes` reads it back.
  */
 export function foodCopyBytes(copy: FoodCopy): Uint8Array {
   return new TextEncoder().encode(
@@ -95,6 +95,7 @@ export function foodCopyBytes(copy: FoodCopy): Uint8Array {
       entries: copy.entries.map(entry),
       water: copy.water.map(water),
       foods: copy.foods.map(food),
+      whole: copy.whole,
     }),
   );
 }

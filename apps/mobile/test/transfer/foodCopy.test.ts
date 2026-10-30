@@ -107,6 +107,12 @@ describe('a copy of foods', () => {
     expect(drink?.at.getTime(), 'the moment it was had (MM-718)').toBe(glass.at.getTime());
   });
 
+  it('MM-719: a whole day carries its marks, and a copy that is not one carries none', () => {
+    const read = foodCopyOfBytes(foodCopyBytes({ ...copy, whole: { kind: 'refeed', completeness: 'complete' } }));
+    expect(read?.whole).toEqual({ kind: 'refeed', completeness: 'complete' });
+    expect(foodCopyOfBytes(foodCopyBytes(copy))?.whole).toBeUndefined();
+  });
+
   it('MM-718: water alone is a copy; nothing at all is not', () => {
     const read = foodCopyOfBytes(foodCopyBytes({ day, entries: [], water: [glass], foods: [] }));
     expect(read?.entries).toEqual([]);
@@ -133,6 +139,8 @@ describe('a copy of foods', () => {
       JSON.stringify({ ...good, water: [{ date: day.epochDay, ml: 0, at: 1 }] }),
       JSON.stringify({ ...good, water: [{ date: day.epochDay, ml: 250, at: 'morning' }] }),
       JSON.stringify({ ...good, water: undefined }),
+      JSON.stringify({ ...good, whole: { kind: 'cheat', completeness: 'complete' } }),
+      JSON.stringify({ ...good, whole: { kind: 'refeed' } }),
       JSON.stringify({ ...good, entries: [{ ...entries[0], meal: 'brunch' }] }),
       JSON.stringify({ ...good, entries: [{ ...entries[0], kcal: 'lots' }] }),
       JSON.stringify({ ...good, entries: [{ ...entries[1], portion: { method: 'weighed', basis: 'per100g' } }] }),

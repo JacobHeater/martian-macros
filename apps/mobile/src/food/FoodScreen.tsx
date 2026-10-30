@@ -25,6 +25,7 @@ import { FoodCompletenessChip } from './FoodCompletenessChip';
 import { FoodCompletenessRow } from './FoodCompletenessRow';
 import { FoodDayGradeRow } from './FoodDayGradeRow';
 import { FoodDayMarkRow } from './FoodDayMarkRow';
+import { FoodDaySyncRow } from './FoodDaySyncRow';
 import { changeTogether } from './changeTogether';
 import { MealSection } from './MealSection';
 import { keepRowInPlace } from './keepRowInPlace';
@@ -208,8 +209,9 @@ export function FoodScreen() {
         ))}
       </InlineNarrationProvider>
       <WaterSection day={day} />
-      {/* The day's rows: completeness and its grade once anything is logged; its Refeed or Day off for any day up to
-          today, with or without entries (MM-611, MM-655: a day off may have nothing logged). */}
+      {/* The day's rows: completeness and its grade once anything is logged; the sync to the other phone once anything
+          is (MM-719); its Refeed or Day off for any day up to today, with or without entries (MM-611, MM-655: a day
+          off may have nothing logged). */}
       {entries.length === 0 && day.isAfter(today) ? null : (
         <div className="food-complete-row">
           {entries.length === 0 ? null : (
@@ -218,6 +220,7 @@ export function FoodScreen() {
               <FoodDayGradeRow entries={entries} />
             </>
           )}
+          <FoodDaySyncRow day={day} entries={entries} />
           <FoodDayMarkRow day={day} />
         </div>
       )}
