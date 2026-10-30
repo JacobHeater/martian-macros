@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../app/useApp';
 import type { MoveCode } from '../transfer/MoveCode';
 import type { MoveIdentity } from '../transfer/MoveIdentity';
@@ -29,16 +29,30 @@ interface ReceiveMoveSheetProps {
   onCancel: () => void;
 }
 
+/** What the status region says for a stage, once, when it begins (the UX guard's F3, F4). */
+function spoken(stage: Stage): string {
+  switch (stage.kind) {
+    case 'receiving':
+      return 'Receiving from your other phone.';
+    case 'failed':
+      return `The move did not happen. ${moveProblemWords(stage.problem, stage.here, 'receive')}`;
+    default:
+      return '';
+  }
+}
+
 /**
  * The receiving phone's side of a move (MM-695). When this phone holds records no backup has, it says so first and
  * offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
  * in it, until a move arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole, to be
- * confirmed before it replaces anything; nothing here changes this phone's data.
+ * confirmed before it replaces anything; nothing here changes this phone's data. One status region stays in place
+ * across the stages, so a reader hears an expired code or a failure, and the headline takes focus when one comes.
  */
 export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel }: ReceiveMoveSheetProps) {
   const { services } = useApp();
   const [stage, setStage] = useState<Stage>(unbacked === undefined ? { kind: 'opening' } : { kind: 'nudge' });
   const [attempt, setAttempt] = useState(0);
+  const headline = useRef<HTMLHeadingElement>(null);
   const listening = stage.kind !== 'nudge';
 
   useEffect(() => {
@@ -75,77 +89,101 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
     // The callbacks are the sheet's own and do not change while it is open; a new attempt listens again.
   }, [listening, attempt]);
 
-  if (stage.kind === 'nudge') {
+  const failed = stage.kind === 'failed';
+  useEffect(() => {
+    if (failed) headline.current?.focus();
+  }, [failed]);
+
+  return (
+    <div className="settings-sheet">
+      {body()}
+      <span className="mm-visually-hidden" role="status">
+        {spoken(stage)}
+      </span>
+    </div>
+  );
+
+  function body() {
+    if (stage.kind === 'nudge') {
+      return (
+        <>
+          <h2 className="app-headline">Back up this phone first?</h2>
+          <p className="app-text">
+            {unbacked === 'never'
+              ? 'This phone has never been backed up. Moving replaces its records, and only a backup could bring them back.'
+              : 'This phone has records logged since its last backup. Moving replaces them, and only a backup could bring them back.'}
+          </p>
+          <div className="app-gap" />
+          <div className="app-row app-row-end">
+            <MmButton label="Skip the backup" kind="text" onPress={() => setStage({ kind: 'opening' })} />
+            <MmButton label="Back up first" onPress={onBackUpFirst} />
+          </div>
+        </>
+      );
+    }
+
+    if (stage.kind === 'failed') {
+      // Updating comes before another try, so a version mismatch offers no retry that would fail the same way (F5).
+      const retry = stage.problem.kind === 'versionMismatch' ? undefined : stage.problem.kind === 'noWifi' ? 'Try again' : 'Show a new code';
+      return (
+        <>
+          <h2 className="app-headline" ref={headline} tabIndex={-1}>
+            The move did not happen
+          </h2>
+          <p className="app-text">{moveProblemWords(stage.problem, stage.here, 'receive')}</p>
+          <div className="app-gap" />
+          <div className="app-row app-row-end">
+            {retry === undefined ? (
+              <MmButton label="Close" onPress={onCancel} />
+            ) : (
+              <>
+                <MmButton label="Close" kind="text" onPress={onCancel} />
+                <MmButton label={retry} onPress={() => setAttempt((was) => was + 1)} />
+              </>
+            )}
+          </div>
+        </>
+      );
+    }
+
+    if (stage.kind === 'receiving') {
+      const share = stage.total === 0 ? 0 : stage.done / stage.total;
+      return (
+        <>
+          <h2 className="app-headline">Receiving from your other phone</h2>
+          <p className="app-text">Keep both phones open and on the same Wi-Fi until it finishes.</p>
+          <MmProgressBar value={share} />
+          <div className="app-gap-small" />
+          <p className="app-caption">{`${Math.floor(share * 100)}% received`}</p>
+          <div className="app-gap" />
+          <div className="app-row app-row-end">
+            <MmButton label="Cancel" kind="text" onPress={onCancel} />
+          </div>
+        </>
+      );
+    }
+
     return (
-      <div className="settings-sheet">
-        <h2 className="app-headline">Back up this phone first?</h2>
+      <>
+        <h2 className="app-headline">Scan this from your other phone</h2>
         <p className="app-text">
-          {unbacked === 'never'
-            ? 'This phone has never been backed up. Moving replaces its records, and only a backup could bring them back.'
-            : 'This phone has records logged since its last backup. Moving replaces them, and only a backup could bring them back.'}
+          On the phone you are moving from, open Settings, then Backup, Move to another phone, and Send from this phone.
         </p>
-        <div className="app-gap" />
-        <div className="app-row app-row-end">
-          <MmButton label="Continue without a backup" kind="text" onPress={() => setStage({ kind: 'opening' })} />
-          <MmButton label="Back up first" onPress={onBackUpFirst} />
-        </div>
-      </div>
-    );
-  }
-
-  if (stage.kind === 'failed') {
-    return (
-      <div className="settings-sheet">
-        <h2 className="app-headline">The move did not happen</h2>
-        <p className="app-text">{moveProblemWords(stage.problem, stage.here, 'receive')}</p>
-        <div className="app-gap" />
-        <div className="app-row app-row-end">
-          <MmButton label="Close" kind="text" onPress={onCancel} />
-          <MmButton label={stage.problem.kind === 'noWifi' ? 'Try again' : 'Show a new code'} onPress={() => setAttempt((was) => was + 1)} />
-        </div>
-      </div>
-    );
-  }
-
-  if (stage.kind === 'receiving') {
-    const share = stage.total === 0 ? 0 : stage.done / stage.total;
-    return (
-      <div className="settings-sheet">
-        <h2 className="app-headline">Receiving from your other phone</h2>
-        <p className="app-text">Keep both phones open and on the same Wi-Fi until it finishes.</p>
-        <MmProgressBar value={share} />
-        <div className="app-gap-small" />
-        <p className="app-caption" role="status">
-          {`${Math.floor(share * 100)}% received`}
-        </p>
+        {stage.kind === 'code' ? (
+          <>
+            <MmQrCode text={stage.code.toText()} label="QR code for your other phone to scan" />
+            <div className="app-gap-small" />
+            <MmBusyLine label="Waiting for your other phone…" />
+            <p className="app-caption">The code works once, for five minutes.</p>
+          </>
+        ) : (
+          <MmBusyLine label="Getting a code ready…" />
+        )}
         <div className="app-gap" />
         <div className="app-row app-row-end">
           <MmButton label="Cancel" kind="text" onPress={onCancel} />
         </div>
-      </div>
+      </>
     );
   }
-
-  return (
-    <div className="settings-sheet">
-      <h2 className="app-headline">Scan this from your other phone</h2>
-      <p className="app-text">
-        On the phone with your records, open Settings, then Backup, Move to another phone, and Send from this phone.
-      </p>
-      {stage.kind === 'code' ? (
-        <>
-          <MmQrCode text={stage.code.toText()} label="The code for your other phone to scan" />
-          <div className="app-gap-small" />
-          <MmBusyLine label="Waiting for your other phone…" />
-          <p className="app-caption">The code works once, for five minutes.</p>
-        </>
-      ) : (
-        <MmBusyLine label="Getting a code ready…" />
-      )}
-      <div className="app-gap" />
-      <div className="app-row app-row-end">
-        <MmButton label="Cancel" kind="text" onPress={onCancel} />
-      </div>
-    </div>
-  );
 }

@@ -12,6 +12,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(MmScannerPlugin())
         bridge?.registerPluginInstance(MmHealthPlugin())
         bridge?.registerPluginInstance(MmBackupPlugin())
+        bridge?.registerPluginInstance(MmTransferPlugin())
         // `mm screenshot --phone` (MM-536): every identity while the owner is the only user; the real app is blocked
         // again before any release (MM-552).
         if MmScreenshotPlugin.isAllowed {

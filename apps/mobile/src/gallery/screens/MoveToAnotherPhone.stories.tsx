@@ -138,6 +138,7 @@ export const MoveReceiveNoWifi = screenStory({
 export const MoveReceiveOtherVersion = screenStory({
   covers: ['ReceiveMoveSheet'],
   shows: /Update Martian Macros on this phone/,
+  viewport: 'smallPhone',
   device: failingReceive(new MoveProblem('versionMismatch', { app: '1.1 (4)', schema: 1 })),
   open: openBackup,
   walk: choose('Receive on this phone'),
@@ -159,22 +160,41 @@ export const MoveReceiveBroken = screenStory({
   walk: choose('Receive on this phone'),
 });
 
-/** What arrived, and what it replaces, asked before anything changes. */
+/** A progress photo of the person, as the fixtures hold one: its bytes do not matter here. */
+const photo = (daysAgo: number) => ({
+  date: storyToday.addDays(-daysAgo),
+  pose: 'front' as const,
+  takenAt: new Date(2026, 9, 12 - daysAgo, 7, 30),
+  width: 3,
+  height: 4,
+  jpeg: new Uint8Array([0xff, 0xd8, 0xff, 0xd9]),
+});
+
+/**
+ * What arrived, and what it replaces, asked before anything changes: at phone width, with the most a long-used
+ * phone holds on both sides and photos arriving while this phone has its own.
+ */
 export const MoveConfirm = screenStory({
   covers: ['ReceiveMoveSheet'],
   shows: 'Replace this phone’s data?',
+  viewport: 'smallPhone',
   device: async (services) => {
     const receiver = new FakeMoveReceiver({
       kind: 'receives',
-      payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]) },
+      payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([photo(60), photo(30), photo(1)]) },
     });
     const restorer = new FakeDataRestorer();
     // Backed up today, after the last record: no nudge.
-    restorer.here = { ...usedPhone, weighIns: 4, foodDays: 3, workouts: 0, customFoods: 0, from: storyToday.addDays(-3), to: storyToday.addDays(-1) };
-    restorer.toDescribe = usedPhone;
+    restorer.here = { weighIns: 214, foodDays: 187, workouts: 96, customFoods: 41, from: storyToday.addDays(-240), to: storyToday.addDays(-1), hasSetup: true };
+    restorer.toDescribe = { weighIns: 1365, foodDays: 1102, workouts: 518, customFoods: 127, from: storyToday.addDays(-1500), to: storyToday, hasSetup: true };
     return { ...services, restorer, moveReceiver: receiver };
   },
-  scenario: demoWith({ then: async (repos, today) => repos.preferences.saveLastBackupOn(today) }),
+  scenario: demoWith({
+    then: async (repos, today) => {
+      await repos.preferences.saveLastBackupOn(today);
+      await repos.progressPhotos.savePhoto(photo(14));
+    },
+  }),
   open: openBackup,
   walk: choose('Receive on this phone'),
 });
@@ -216,6 +236,7 @@ export const MoveSendUnreachable = screenStory({
 export const MoveSendOlderReceiver = screenStory({
   covers: ['SendMoveSheet'],
   shows: /Update Martian Macros on the other phone/,
+  viewport: 'smallPhone',
   device: withSender(new FakeMoveSender({ kind: 'fails', problem: new MoveProblem('versionMismatch', { app: '0.9 (1)', schema: 1 }) })),
   open: openBackup,
   walk: choose('Send from this phone'),
@@ -223,7 +244,7 @@ export const MoveSendOlderReceiver = screenStory({
 
 /** Something other than a move code was scanned: a product's barcode, another app's code. */
 export const MoveScannedNotACode = screenStory({
-  covers: ['SettingsScreen'],
+  covers: ['SendMoveSheet'],
   shows: /not a Martian Macros move code/,
   device: withSender(new FakeMoveSender(), 'https://example.com/menu'),
   open: openBackup,

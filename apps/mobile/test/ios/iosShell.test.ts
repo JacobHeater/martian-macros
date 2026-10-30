@@ -19,7 +19,7 @@ const plist = read('ios/App/App/Info.plist');
 const androidPlugins = [...mainActivity.matchAll(/registerPlugin\((\w+)\.class\)/g)].map((m) => m[1]);
 
 it('the Android shell registers the plugins this test checks', () => {
-  expect(androidPlugins).toEqual(['MmDbPlugin', 'MmPacksPlugin', 'MmRemindersPlugin', 'MmScannerPlugin', 'MmHealthPlugin', 'MmBackupPlugin']);
+  expect(androidPlugins).toEqual(['MmDbPlugin', 'MmPacksPlugin', 'MmRemindersPlugin', 'MmScannerPlugin', 'MmHealthPlugin', 'MmBackupPlugin', 'MmTransferPlugin']);
 });
 
 describe.each(androidPlugins)('%s', (plugin) => {
@@ -58,6 +58,12 @@ it('supports iOS 15 and later, in portrait', () => {
   expect([...targets]).toEqual(['15.0']);
   const orientations = /<key>UISupportedInterfaceOrientations<\/key>\s*<array>([\s\S]*?)<\/array>/.exec(plist)?.[1] ?? '';
   expect([...orientations.matchAll(/<string>(\w+)<\/string>/g)].map((m) => m[1])).toEqual(['UIInterfaceOrientationPortrait']);
+});
+
+it('says the local network is for moving to another phone (MM-695)', () => {
+  const why = /<key>NSLocalNetworkUsageDescription</key>s*<string>([^<]+)</string>/.exec(plist)?.[1] ?? '';
+  expect(why).toMatch(/Move to another phone/);
+  expect(why).toMatch(/Nothing goes to the internet/);
 });
 
 it('says why it uses the camera and Apple Health', () => {

@@ -40,7 +40,7 @@ export function moveProblemWords(problem: MoveProblem, here: MoveIdentity, side:
     case 'stopped':
       return 'The code expired. Show a new one when your other phone is ready to scan it.';
     case 'notACode':
-      return 'That is not a Martian Macros move code. Scan the code on your other phone’s Move to this phone screen.';
+      return 'That is not a Martian Macros move code. On your other phone, choose Receive on this phone, then scan the code it shows.';
     case 'broken':
       return side === 'send'
         ? 'The move stopped before it finished. Nothing on either phone was changed.'

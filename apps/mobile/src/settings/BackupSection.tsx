@@ -161,7 +161,7 @@ export function BackupSection() {
           }}
         />
         <MmListRow
-          leadingIcon="sync"
+          leadingIcon="movePhone"
           title="Move to another phone"
           subtitle="Send this phone’s records to another phone on the same Wi-Fi, or receive them here."
           onPress={() => {
