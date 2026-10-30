@@ -24,7 +24,7 @@ const systemPrompt =
 
 /** The verdict on the day in plain words (MM-711), never a camelCase state the model could read aloud. */
 const verdictWords: Record<ExecutiveBrief['runwayState'], string> = {
-  nothingLogged: 'nothing logged yet',
+  nothingLogged: 'no food logged today',
   onTrack: 'on track: nothing to fix',
   tightRunway: 'tight: lean protein only from here',
   proteinUnrecoverable: 'the protein left does not fit in the calories left',
