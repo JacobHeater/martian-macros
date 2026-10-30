@@ -243,10 +243,34 @@ async function installAndLaunch(
   const built = await runBuild(repoRoot, ['android'], { seed, identity });
   if (built !== 0) return built;
   const apk = `${repoRoot}/${androidDir}/${apkPathOf(identity, { release: false })}`;
-  const installed = await run([adbPath(), '-s', device, 'install', '-r', apk]);
-  if (installed !== 0) return installed;
+  const install = [adbPath(), '-s', device, 'install', '-r', apk];
+  stdout.write(`\x1B[2m$ ${install.join(' ')}  (in .)\x1B[0m\n`);
+  const installed = await capture(install);
+  stdout.write(installed.stdout);
+  stderr.write(installed.stderr);
+  if (installed.code !== 0) {
+    const advice = installRefusalAdvice(`${installed.stdout}\n${installed.stderr}`, appIdOf(identity), device);
+    if (advice !== undefined) stderr.write(`\n${advice}\n`);
+    return installed.code;
+  }
   // The activity's class keeps the package the code is in; the app id differs by flavor.
   return run([adbPath(), '-s', device, 'shell', 'am', 'start', '-n', `${appIdOf(identity)}/com.martianmacros.MainActivity`]);
+}
+
+/**
+ * What to do when adb refuses to install over the app already on the
+ * device, in the owner's words rather than adb's (MM-697). Only the
+ * signature mismatch is explained: it happens whenever the app on the
+ * phone came from another machine's debug key, and Android's remedy
+ * (uninstall) deletes that app's data, so the runner never does it alone.
+ */
+export function installRefusalAdvice(output: string, appId: string, device: string): string | undefined {
+  if (!/INSTALL_FAILED_UPDATE_INCOMPATIBLE/.test(output)) return undefined;
+  return (
+    `The ${appId} on ${device} was signed with a different debug key (installed from another machine, or after that key changed), so Android refuses this build as an update.\n` +
+    `Either sign with that key here (copy its ~/.android/debug.keystore over this machine's, then build again), ` +
+    `or remove the app and its data first: adb -s ${device} uninstall ${appId}`
+  );
 }
 
 /**
