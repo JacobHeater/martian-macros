@@ -53,6 +53,7 @@ import { analysisSeasonScenario } from './analysisSeasonScenario';
 import { analysisTodayTradeScenario } from './analysisTodayTradeScenario';
 import { buffetDayScenario } from './buffetDayScenario';
 import { firstMorningScenario } from './firstMorningScenario';
+import { lightBreakfastScenario } from './lightBreakfastScenario';
 import { nothingLoggedScenario } from './nothingLoggedScenario';
 import { quietWeekScenario } from './quietWeekScenario';
 
@@ -70,6 +71,14 @@ export const Coach = screenStory({
   covers: ['CoachScreen'],
   shows: 'Your metabolism',
   // As first seen: every fold closed (MM-676); the other stories draw the folds open.
+  open: ({ state }) => state.homeTab.put('coach'),
+});
+
+/** MM-711: a light breakfast on a day on track: the brief says so and which meals carry the protein, no drag, no squeeze; the lift is the one order. */
+export const CoachOnTrackDay = screenStory({
+  covers: ['CoachScreen'],
+  shows: /Nothing to fix/,
+  scenario: lightBreakfastScenario,
   open: ({ state }) => state.homeTab.put('coach'),
 });
 

@@ -1,15 +1,18 @@
 import type { ExecutiveBrief } from '../../engine/analysis/ExecutiveBrief';
-import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { Fmt } from '../Fmt';
 import { mealLabel } from '../mealLabel';
+import { briefMoveOrder } from './briefMoveOrder';
 import { foodInSentence } from './foodInSentence';
-import { mealMoveOrder } from './mealMoveOrder';
+import { foodNameIsPlural } from './foodNameIsPlural';
 import { phrasingIndex } from './phrasingIndex';
 import { trainingBriefText } from './trainingBriefText';
 
 /**
  * Synthesizes a cohesive, whole-situation coaching paragraph from an
- * `ExecutiveBrief` (MM-663).
+ * `ExecutiveBrief` (MM-663), in the owner's shape (MM-693): the verdict on
+ * the day, the drag, the order, one training line; at most four sentences.
+ * A day on track is told so, with which meals carry the protein and not
+ * a number (MM-711): the rows under the words hold the figures.
  *
  * Used immediately in offline mode or when no BYOK key is configured, and as
  * the guaranteed fallback whenever a remote narration fails verification.
@@ -49,11 +52,11 @@ function foodBriefText(brief: ExecutiveBrief): string {
   }
 
   const driver = brief.primaryDriver;
-  // The drag named with its figures and the meal's own fix for next time (MM-684).
+  // The drag named once with its two figures and its fix for the next time that meal is built (MM-684, MM-693).
   const driverClause =
     driver === undefined
       ? ''
-      : ` ${mealLabel(driver.meal)} drove the squeeze: ${foodInSentence(driver.foodName)}, ${Fmt.kcal(driver.kcal)} for ${Fmt.grams(driver.proteinG)}.${driver.move === undefined ? '' : ` ${mealMoveOrder(driver.move, driver.meal)}`}`;
+      : ` The ${mealLabel(driver.meal).toLowerCase()} ${foodInSentence(driver.foodName)}, ${Fmt.kcal(driver.kcal)} for ${Fmt.grams(driver.proteinG)}, ${foodNameIsPlural(driver.foodName) ? 'are' : 'is'} the drag${driver.move === undefined ? '.' : `: ${briefMoveOrder(driver.move, driver.meal)}.`}`;
 
   switch (brief.runwayState) {
     case 'proteinUnrecoverable': {
@@ -80,28 +83,29 @@ function foodBriefText(brief: ExecutiveBrief): string {
       return `${lead}${driverClause} ${directive}`;
     }
     case 'tightRunway': {
-      const densityPct = roundHalfAwayFromZero(brief.requiredProteinDensity * 100) + 0;
-      const lead = pick('tight', [
-        `Runway is tight with ${kcalLeft} left and ${proteinLeft} of protein still to hit (${densityPct}% of remaining calories from protein).`,
-        `You have ${kcalLeft} left to cover ${proteinLeft} of protein (${densityPct}% protein density required).`,
-      ]);
+      // Tight is lean protein only from here (MM-711): the two figures the order needs, and the order.
+      const lead = pick('tight', [`Runway is tight: ${kcalLeft} left for ${proteinLeft} of protein.`, `${kcalLeft} left for ${proteinLeft} of protein: tight.`]);
       const directive = pick('tightDirective', [
-        'Keep the rest of today strictly to lean protein sources like chicken breast, egg whites, fish, or Greek yogurt.',
-        'Cut calorie-dense sides for the rest of today and spend your remaining budget on lean protein.',
+        'Lean protein only from here: chicken breast, egg whites, fish or Greek yogurt.',
+        'Cut the calorie-dense sides for the rest of today and spend what is left on lean protein.',
       ]);
       return `${lead}${driverClause} ${directive}`;
     }
     case 'targetsLocked': {
-      return pick('locked', [
-        `Protein is locked in at ${proteinLogged} with ${kcalLeft} remaining inside your ${kcalTarget} budget. Hold the line through the evening.`,
-        `Numbers are on point today: ${proteinLogged} protein hit with ${kcalLeft} left. Keep that execution steady.`,
-      ]);
+      return `Protein is covered today with ${kcalLeft} left. Hold the line through the evening.`;
     }
     case 'onTrack': {
-      return pick('onTrack', [
-        `${kcalLeft} and ${proteinLeft} of protein left today. Your runway is balanced; anchor your next meal with a solid protein source.`,
-        `On pace today with ${kcalLeft} left and ${proteinLeft} of protein to go. Keep protein at the center of your remaining meals.`,
-      ]);
+      // Nothing to fix (MM-711): which meals carry the protein, and not a number; the rows under the words hold those.
+      switch (brief.lastMeal) {
+        case 'breakfast':
+          return 'Breakfast is in and the day is on track. Nothing to fix. Build lunch and dinner around protein.';
+        case 'lunch':
+          return 'On track through lunch. Nothing to fix. Build dinner around protein.';
+        case 'dinner':
+          return 'On track through dinner with protein still to go. Close it before bed with lean protein.';
+        case undefined:
+          return 'Only a snack is in and the day is on track. Build your meals around protein.';
+      }
     }
   }
 }
