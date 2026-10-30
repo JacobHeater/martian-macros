@@ -2,7 +2,7 @@ import type { MoveOpener } from './MoveOpener';
 import type { MoveSealer } from './MoveSealer';
 
 /**
- * The sealing of a move (MM-697): a fresh key for each code shown, and a stream sealed under it in each direction.
+ * The sealing of a move (MM-698): a fresh key for each code shown, and a stream sealed under it in each direction.
  * Behind an interface so the library stays in one adapter (MM-162).
  */
 export interface MoveCipher {

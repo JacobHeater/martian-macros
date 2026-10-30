@@ -121,7 +121,7 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     // No real backup: a fake that keeps what is saved and gives what a test put there (MM-63).
     restorer: new FakeDataRestorer(),
     backup: new FakeBackupPlatform(),
-    // Never the network: a phone that waits for a code to be scanned, and one that sends at once (MM-697).
+    // Never the network: a phone that waits for a code to be scanned, and one that sends at once (MM-698).
     moveReceiver: new FakeMoveReceiver(),
     moveSender: new FakeMoveSender(),
     moveIdentity: async () => ({ app: '1.0 (1)', schema: 1 }),

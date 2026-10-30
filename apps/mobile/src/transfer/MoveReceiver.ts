@@ -40,7 +40,7 @@ function within<T>(promise: Promise<T>, ms: number): Promise<T | undefined> {
 }
 
 /**
- * The receiving phone's part of a move (MM-697). `open` makes a fresh key and listens, and gives the code to show;
+ * The receiving phone's part of a move (MM-698). `open` makes a fresh key and listens, and gives the code to show;
  * `receive` waits for the phone that scanned it. A connection that does not open under the key is dropped before
  * anything else is read, and the phone keeps waiting. The right phone's version is compared with this one's; only
  * when they are the same is the payload taken, every frame checked as it comes. The listener stops once a move is

@@ -1,5 +1,5 @@
 /**
- * Something that reads a QR code with the phone's camera (MM-697): the move
+ * Something that reads a QR code with the phone's camera (MM-698): the move
  * code another phone shows. Only QR codes are read through it; the food
  * scanner reads only retail barcodes.
  */

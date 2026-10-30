@@ -2,7 +2,7 @@ import { FormatError } from './FormatError';
 
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-/** The bytes `base32OfBytes` wrote (MM-697). Fails on any other letter. */
+/** The bytes `base32OfBytes` wrote (MM-698). Fails on any other letter. */
 export function bytesOfBase32(text: string): Uint8Array {
   const bytes: number[] = [];
   let buffer = 0;

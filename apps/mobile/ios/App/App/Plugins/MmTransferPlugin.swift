@@ -3,7 +3,7 @@ import Foundation
 import Network
 
 /**
- * Moving to another phone (MM-697): a listener on the phone's Wi-Fi while its code is shown, and connections to the
+ * Moving to another phone (MM-698): a listener on the phone's Wi-Fi while its code is shown, and connections to the
  * other phone's address, carrying whole frames, each sent with its length first. What crosses is sealed by the app
  * before it reaches this plugin; the plugin only carries bytes, and only on the local network. The first listen or
  * connect is when iOS asks for Local Network access.

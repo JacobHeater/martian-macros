@@ -14,7 +14,7 @@ const items = (c: BackupContents): string => {
 };
 
 /**
- * What a move replaces, said before it happens (MM-697), as the restore says it (MM-63): the loss first, then what
+ * What a move replaces, said before it happens (MM-698), as the restore says it (MM-63): the loss first, then what
  * arrived with its span of days, then the photos. A move always carries the photos, so the third paragraph always
  * says what becomes of this phone's: replaced by those that came, or removed when none came and this phone has some.
  */

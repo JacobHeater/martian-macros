@@ -79,6 +79,6 @@ export type MmIconName =
   // The person's own AI assistant (MM-598), and photos chosen from the phone's library (MM-599).
   | 'assistant'
   | 'photos'
-  // Moving to another phone (MM-697): the phone the records go to, and the code it shows.
+  // Moving to another phone (MM-698): the phone the records go to, and the code it shows.
   | 'movePhone'
   | 'qrCode';

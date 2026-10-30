@@ -60,7 +60,7 @@ it('supports iOS 15 and later, in portrait', () => {
   expect([...orientations.matchAll(/<string>(\w+)<\/string>/g)].map((m) => m[1])).toEqual(['UIInterfaceOrientationPortrait']);
 });
 
-it('says the local network is for moving to another phone (MM-697)', () => {
+it('says the local network is for moving to another phone (MM-698)', () => {
   const why = /<key>NSLocalNetworkUsageDescription<\/key>\s*<string>([^<]+)<\/string>/.exec(plist)?.[1] ?? '';
   expect(why).toMatch(/Move to another phone/);
   expect(why).toMatch(/Nothing goes to the internet/);

@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 
 /**
- * Moving to another phone (MM-697): a listener on the phone's Wi-Fi address while its code is shown, and connections
+ * Moving to another phone (MM-698): a listener on the phone's Wi-Fi address while its code is shown, and connections
  * to the other phone's, carrying whole frames, each sent with its length first. What crosses is sealed by the app
  * before it reaches this plugin; the plugin only carries bytes, and only on the local network.
  */

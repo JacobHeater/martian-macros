@@ -162,7 +162,7 @@ export function ComponentsCatalog() {
       {/* A wait in a line of text (MM-673), and the pull-to-refresh strip let go past its threshold (MM-670). */}
       <MmBusyLine label="The coach is writing…" />
       <MmPullToRefresh pull={{ phase: 'ready', distance: 72 }} />
-      {/* A move code (MM-697): dark on light in every palette, the app's icon in the middle. */}
+      {/* A move code (MM-698): dark on light in every palette, the app's icon in the middle. */}
       <MmQrCode text="MMMOVE1:YCUAAGF4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" label="QR code for your other phone to scan" />
       <MmSection icon="calendar" title="Weight events" summary="2 this month" trailing={<MmIconButton icon="plus" kind="add" label="Add a weight event" onPress={nothing} />}>
         <MmListRow title="Travel" subtitle="Yesterday · Scale noise widened around this event." leadingIcon="travel" />

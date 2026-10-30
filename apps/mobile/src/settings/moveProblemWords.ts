@@ -18,7 +18,7 @@ function older(here: MoveIdentity, other: MoveIdentity): number {
 }
 
 /**
- * What a move that did not happen says (MM-697), on either phone: what went wrong and what to do, and that nothing
+ * What a move that did not happen says (MM-698), on either phone: what went wrong and what to do, and that nothing
  * on this phone changed. For different versions it names the phone to update, or both when it cannot tell.
  */
 export function moveProblemWords(problem: MoveProblem, here: MoveIdentity, side: 'send' | 'receive'): string {

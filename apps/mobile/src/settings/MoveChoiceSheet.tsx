@@ -4,7 +4,7 @@ import { MmListRow } from '../ui/MmListRow';
 import './settings.css';
 
 /**
- * Which way a move goes (MM-697), asked on the phone where "Move to another phone" was pressed: send this phone's
+ * Which way a move goes (MM-698), asked on the phone where "Move to another phone" was pressed: send this phone's
  * records, or receive the other phone's here. The receiving side says that it replaces what this phone holds.
  */
 export function MoveChoiceSheet({ onChoose, onCancel }: { onChoose: (side: 'send' | 'receive') => void; onCancel: () => void }) {

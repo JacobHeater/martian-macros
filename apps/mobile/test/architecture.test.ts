@@ -29,7 +29,7 @@ const libraries: Record<string, readonly string[]> = {
   'react-dom/client': ['main.tsx'],
   '@sqlite.org/sqlite-wasm': ['sql/wasm/'],
   // Argon2id and XChaCha20-Poly1305 for the backup file (MM-63), behind BackupCipher.
-  // And the sealed stream between two phones (MM-697), behind MoveCipher.
+  // And the sealed stream between two phones (MM-698), behind MoveCipher.
   'libsodium-wrappers-sumo': ['backup/SodiumBackupCipher.ts', 'transfer/SodiumMoveCipher.ts'],
   '@capacitor/core': ['platform/', 'sql/native/', 'foodCatalog/download/native/'],
   '@capacitor/app': ['platform/'],

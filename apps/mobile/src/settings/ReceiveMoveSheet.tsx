@@ -11,7 +11,7 @@ import { MmQrCode } from '../ui/MmQrCode';
 import { moveProblemWords } from './moveProblemWords';
 import './settings.css';
 
-/** How long a code works before it expires and the phone stops listening (MM-697). */
+/** How long a code works before it expires and the phone stops listening (MM-698). */
 const moveCodeLifetimeMs = 5 * 60 * 1000;
 
 type Stage =
@@ -42,7 +42,7 @@ function spoken(stage: Stage): string {
 }
 
 /**
- * The receiving phone's side of a move (MM-697). When this phone holds records no backup has, it says so first and
+ * The receiving phone's side of a move (MM-698). When this phone holds records no backup has, it says so first and
  * offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
  * in it, until a move arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole, to be
  * confirmed before it replaces anything; nothing here changes this phone's data. One status region stays in place

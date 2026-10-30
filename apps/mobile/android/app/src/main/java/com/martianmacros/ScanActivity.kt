@@ -32,7 +32,7 @@ class ScanActivity : AppCompatActivity() {
     companion object {
         const val RESULT_FAILED = 9
 
-        /** Set to read a QR code (a move code, MM-697) instead of a retail barcode. */
+        /** Set to read a QR code (a move code, MM-698) instead of a retail barcode. */
         const val EXTRA_QR = "qr"
     }
 

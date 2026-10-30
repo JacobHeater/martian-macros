@@ -204,7 +204,7 @@
 
 /* Reduced motion: movement goes, the state change stays; fades keep 100 ms,
    and the spinner turns slowly (interaction-and-motion.md). */
-/* A QR code is read by a camera, which needs dark modules on a light ground whatever the palette (MM-697). */
+/* A QR code is read by a camera, which needs dark modules on a light ground whatever the palette (MM-698). */
 :root {
   --code-dark: #000000;
   --code-light: #ffffff;

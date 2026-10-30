@@ -16,7 +16,7 @@ const asked = async <T>(step: () => Promise<T>): Promise<T> => {
 
 /**
  * The phone's camera behind `BarcodeScanner` and `LabelTextReader` (MM-43,
- * MM-44), and `CodeScanner` for a move code (MM-697): read on the device, by ML Kit on Android and by AVFoundation and
+ * MM-44), and `CodeScanner` for a move code (MM-698): read on the device, by ML Kit on Android and by AVFoundation and
  * Vision on iOS (MM-406), and nothing is sent anywhere.
  */
 export class NativeCamera implements BarcodeScanner, CodeScanner, LabelTextReader {

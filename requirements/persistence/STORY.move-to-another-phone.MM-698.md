@@ -1,5 +1,5 @@
 ---
-id: MM-697
+id: MM-698
 status: in-progress
 component: persistence
 related: [MM-59, MM-63, MM-64, MM-65, MM-157, MM-95, MM-244, MM-453]

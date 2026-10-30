@@ -66,7 +66,7 @@ export function OnboardingScreen() {
   const today = state.today.peek();
 
   const [welcomed, setWelcomed] = useState(false);
-  // A fresh install holds nothing a backup could keep, so the move asks for none (MM-697).
+  // A fresh install holds nothing a backup could keep, so the move asks for none (MM-698).
   const move = useMoveToAnotherPhone();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);

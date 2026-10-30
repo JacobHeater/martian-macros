@@ -17,7 +17,7 @@ import type { StoryStage } from './StoryStage';
 import { storyToday } from './storyToday';
 
 /**
- * Moving to another phone on the same Wi-Fi (MM-697): which way, the backup nudge, the code to scan, receiving, the
+ * Moving to another phone on the same Wi-Fi (MM-698): which way, the backup nudge, the code to scan, receiving, the
  * confirmation before anything is replaced, sending, and every way a move does not happen, on both phones.
  */
 const meta = { title: 'Screens/Move to another phone', ...screensMeta } satisfies Meta;
