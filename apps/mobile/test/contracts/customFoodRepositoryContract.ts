@@ -75,6 +75,33 @@ export function customFoodRepositoryContract(
       expect(food.micros.of('iron')).toBeUndefined();
     });
 
+    // MM-710: a food's group, where its numbers came from, and what went into it are kept, and come back as saved.
+    it('a food keeps its group, its evidence and what went into it', async () => {
+      const id = await repo.saveCustomFood(
+        new CustomFood({
+          id: 0,
+          name: 'Buttermilk biscuit',
+          kind: 'food',
+          servingDescription: '1 biscuit',
+          servingGrams: 60,
+          perServing: new NutritionTotals({ kcal: 212, proteinG: 3.9, carbsG: 26.4, fatG: 9.8 }),
+          group: 'breadsAndGrains',
+          evidence: { kind: 'cited', citation: 'USDA FoodData Central, FDC ID 174986' },
+          madeOf: [{ name: 'All-purpose flour', grams: 30 }, { name: 'Butter' }],
+        }),
+      );
+      const biscuit = single(await first(repo.watchCustomFoods()));
+      expect(biscuit.group).toBe('breadsAndGrains');
+      expect(biscuit.evidence).toEqual({ kind: 'cited', citation: 'USDA FoodData Central, FDC ID 174986' });
+      expect(biscuit.madeOf).toEqual([{ name: 'All-purpose flour', grams: 30 }, { name: 'Butter', grams: undefined }]);
+      // Saved again without them, they are gone: the food is what was last saved.
+      await repo.saveCustomFood(food('Buttermilk biscuit', { id }));
+      const plain = single(await first(repo.watchCustomFoods()));
+      expect(plain.group).toBeUndefined();
+      expect(plain.evidence).toBeUndefined();
+      expect(plain.madeOf).toEqual([]);
+    });
+
     it('saving with an id replaces that food', async () => {
       const id = await repo.saveCustomFood(food('Bar'));
       await repo.saveCustomFood(food('Bar', { id, kcal: 150 }));

@@ -1,12 +1,25 @@
 import type { CustomFood } from '../../domain/food/custom/CustomFood';
 import { CatalogFood } from '../../foodCatalog/CatalogFood';
 import { PackMicronutrient } from '../../foodCatalog/PackMicronutrient';
+import type { TrustTier } from '../../foodCatalog/TrustTier';
+import { foodEvidenceLine } from '../../format/foodEvidenceLine';
+
+/** The tier a saved food's evidence stands for (MM-710): an unverified estimate is one to check; the rest read as a label or a reference. */
+function tierOf(food: CustomFood): { tier: TrustTier; tierReason: string } {
+  const evidence = food.evidence;
+  if (evidence === undefined || evidence.kind === 'yours') return { tier: 'label', tierReason: 'Entered by you.' };
+  const reason = `${foodEvidenceLine(evidence)}.`;
+  if (evidence.kind === 'estimated') return { tier: 'checkThis', tierReason: reason };
+  return { tier: evidence.kind === 'label' ? 'label' : 'reference', tierReason: reason };
+}
 
 /**
  * A saved food shown as the catalog food the amount step and trust mark
  * understand (MM-45). Per-100 g numbers follow from its serving weight;
  * with no serving weight the figures are per serving and only servings are
- * offered.
+ * offered. Its group and its evidence travel with it (MM-710): the mark
+ * says where the numbers came from, and an unverified estimate is one to
+ * check.
  */
 export function customCatalogFood(food: CustomFood): CatalogFood {
   const grams = food.servingGrams;
@@ -30,7 +43,7 @@ export function customCatalogFood(food: CustomFood): CatalogFood {
         .filter(([, value]) => value !== undefined),
     ),
     source: 'user',
-    tier: 'label',
-    tierReason: 'Entered by you.',
+    group: food.group,
+    ...tierOf(food),
   });
 }

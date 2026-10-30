@@ -8,6 +8,7 @@ import { SqlRepositories } from '../../src/data/SqlRepositories';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { CarbFatBalance } from '../../src/domain/CarbFatBalance';
 import { CustomFood } from '../../src/domain/food/custom/CustomFood';
+import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { CardioSession } from '../../src/domain/training/CardioSession';
 import { Workout } from '../../src/domain/training/Workout';
@@ -148,7 +149,18 @@ it('data saved by a newer version of the app is refused and left alone', async (
  * the goals and the water log (MM-305).
  */
 /** The schema as version 30 left it: no cardio session, no day of steps, and no cardio floor (MM-677, MM-678). */
-const versionThirty = currentSchema
+/** Version 31: the saved foods without their group, evidence and ingredients (MM-710). */
+const versionThirtyOne = currentSchema.replace(
+  '  "sugar_alcohols_g" REAL NULL,\n' +
+    '  "food_group" TEXT NULL,\n' +
+    '  "evidence_kind" TEXT NULL CHECK ("evidence_kind" IS NULL OR "evidence_kind" IN (\'cited\', \'matched\', \'estimated\', \'yours\', \'label\')),\n' +
+    '  "evidence_citation" TEXT NULL,\n' +
+    '  "ingredients" TEXT NULL\n' +
+    ');\nCREATE TABLE "recipe_ingredients"',
+  '  "sugar_alcohols_g" REAL NULL\n);\nCREATE TABLE "recipe_ingredients"',
+);
+
+const versionThirty = versionThirtyOne
   .replace(/CREATE TABLE "cardio_sessions" \([\s\S]*?\n\);\n/, '')
   .replace(/CREATE TABLE "daily_steps" \([\s\S]*?\n\);\n/, '')
   .replace(
@@ -1118,4 +1130,51 @@ it('a version 30 database comes up to date with no cardio and the default floors
   expect((await first(repos.preferences.watchCardioFloors())).stepsPerDay).toBe(10000);
   await expect(repos.dailySteps.saveDailySteps([{ date: day.addDays(1), steps: 0 }])).resolves.toBeUndefined();
   await expect(sql.execute("INSERT INTO cardio_sessions (platform_id, source_name, activity, started_at_ms, ended_at_ms, date_epoch_day) VALUES ('x', 'Watch', 'jogging', 1, 2, 1)"), 'an activity the app does not name').rejects.toThrow();
+});
+
+// MM-710: a version 31 database comes up to date with its saved foods kept, none with a group, an evidence or
+// ingredients; a food saved after keeps all three.
+it('a version 31 database comes up to date with its saved foods kept and unmarked, and keeps a marked one after', async () => {
+  expect(versionThirtyOne).not.toContain('food_group');
+  expect(versionThirtyOne).toContain('cardio_sessions');
+  const old = await openSql();
+  await AppDatabase.open(old, { version: 31, schema: versionThirtyOne });
+  await old.execute(
+    'INSERT INTO setups (id, sex, birth_epoch_day, height_cm, training_status, training_days_per_week, goal_mode, unit_system, onboarded_epoch_day) ' +
+      "VALUES (1, 'female', ?, 170, 'novice', 3, 'fatLoss', 'imperial', ?)",
+    [CalendarDate.of(1990, 1, 1).epochDay, CalendarDate.of(2026, 10, 1).epochDay],
+  );
+  await old.execute('INSERT INTO weight_entries (epoch_day, weight_kg) VALUES (?, 80)', [day.epochDay]);
+  await old.execute(
+    "INSERT INTO custom_foods (name, kind, serving_description, serving_grams, kcal, protein_g, carbs_g, fat_g) VALUES ('Protein bar', 'food', '1 bar', 30, 120, 10, 12, 4)",
+  );
+
+  const sql = await openSql({ bytes: await old.exportBytes() });
+  const repos = await SqlRepositories.open(sql);
+  expect(await versionOf(sql)).toBe(current);
+  await expectDataIntact(sql);
+  expect(await columnsOf(sql, 'custom_foods')).toEqual(expect.arrayContaining(['food_group', 'evidence_kind', 'evidence_citation', 'ingredients']));
+  const [bar] = await first(repos.customFoods.watchCustomFoods());
+  expect(bar?.name).toBe('Protein bar');
+  expect(bar?.group).toBeUndefined();
+  expect(bar?.evidence).toBeUndefined();
+  expect(bar?.madeOf).toEqual([]);
+  await repos.customFoods.saveCustomFood(
+    new CustomFood({
+      id: 0,
+      name: 'Buttermilk biscuit',
+      kind: 'food',
+      servingDescription: '1 biscuit',
+      servingGrams: 60,
+      perServing: new NutritionTotals({ kcal: 212, proteinG: 3.9, carbsG: 26.4, fatG: 9.8 }),
+      group: 'breadsAndGrains',
+      evidence: { kind: 'estimated', citation: 'Estimated from the ingredients' },
+      madeOf: [{ name: 'All-purpose flour', grams: 30 }, { name: 'Butter' }],
+    }),
+  );
+  const biscuit = (await first(repos.customFoods.watchCustomFoods())).find((f) => f.name === 'Buttermilk biscuit');
+  expect(biscuit?.group).toBe('breadsAndGrains');
+  expect(biscuit?.evidence).toEqual({ kind: 'estimated', citation: 'Estimated from the ingredients' });
+  expect(biscuit?.madeOf).toEqual([{ name: 'All-purpose flour', grams: 30 }, { name: 'Butter', grams: undefined }]);
+  await expect(sql.execute("INSERT INTO custom_foods (name, kind, serving_description, kcal, protein_g, carbs_g, fat_g, evidence_kind) VALUES ('x', 'food', '1', 1, 0, 0, 0, 'guessed')"), 'an evidence the app does not name').rejects.toThrow();
 });

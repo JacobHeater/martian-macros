@@ -9,14 +9,21 @@ import type { TradeTarget } from '../engine/analysis/TradeTarget';
 /**
  * A `TradeCatalog` over foods in memory (MM-607), each at its default
  * serving, found by its pack and id; each group's name index (MM-617) is
- * built when it is made.
+ * built when it is made. `savedFoodGroups` gives the group of a saved food
+ * by its id (MM-710).
  */
 export class InMemoryTradeCatalog implements TradeCatalog {
   private readonly foods: readonly { readonly packId: string; readonly foodId: number; readonly food: TradeCatalogFood }[];
   private readonly indexes: ReadonlyMap<FoodGroup, SwapNameIndex>;
 
-  constructor(foods: readonly { readonly packId: string; readonly foodId: number; readonly food: TradeCatalogFood }[]) {
+  private readonly savedGroups: ReadonlyMap<number, FoodGroup>;
+
+  constructor(
+    foods: readonly { readonly packId: string; readonly foodId: number; readonly food: TradeCatalogFood }[],
+    { savedFoodGroups = new Map() }: { savedFoodGroups?: ReadonlyMap<number, FoodGroup> } = {},
+  ) {
     this.foods = foods;
+    this.savedGroups = savedFoodGroups;
     const byGroup = new Map<FoodGroup, TradeCatalogFood[]>();
     for (const { food } of foods) {
       if (!(food.kcal > 0)) continue;
@@ -28,7 +35,8 @@ export class InMemoryTradeCatalog implements TradeCatalog {
   }
 
   groupOf(origin: Pick<FoodOrigin, 'packId' | 'foodId'>): FoodGroup | undefined {
-    if (origin.packId === 'custom') return undefined;
+    // A saved food is of the group it was given (MM-710), when it was given one.
+    if (origin.packId === 'custom') return this.savedGroups.get(origin.foodId);
     return this.foods.find((f) => f.packId === origin.packId && f.foodId === origin.foodId)?.food.group;
   }
 

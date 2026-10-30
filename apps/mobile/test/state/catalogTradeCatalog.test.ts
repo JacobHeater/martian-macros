@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { FoodEntry } from '../../src/domain/FoodEntry';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { CatalogFood } from '../../src/foodCatalog/CatalogFood';
@@ -134,4 +135,26 @@ it('lists the everyday proteins by name past the first foods of their group (MM-
   expect(names).toContain('Beaver');
   expect(names).not.toContain('Chicken breast tenders, breaded, cooked, microwaved');
   expect(names.filter((n) => n.startsWith('Chicken breast, baked'))).toHaveLength(1);
+});
+
+// MM-710: a saved food given a group is of that group wherever it was logged, so the coach may trade it within it.
+it('a saved food with a group answers groupOf by it; one without, or none given, stays unknown', async () => {
+  const bagel = packEntryOf({ ...seedOf(4, 'Bagel'), group: 'breadsAndGrains' });
+  const catalog = await catalogOf([bagel]);
+  const biscuit = new CustomFood({
+    id: 7,
+    name: 'Buttermilk biscuit',
+    kind: 'food',
+    servingDescription: '1 biscuit',
+    servingGrams: 60,
+    perServing: new NutritionTotals({ kcal: 212, proteinG: 3.9, carbsG: 26.4, fatG: 9.8 }),
+    group: 'breadsAndGrains',
+  });
+  const plain = new CustomFood({ ...biscuit, id: 8, group: undefined });
+  const trades = await CatalogTradeCatalog.load(catalog, [loggedFrom('custom', 7), loggedFrom('custom', 8)], { savedFoods: [biscuit, plain] });
+  expect(trades.groupOf({ packId: 'custom', foodId: 7 })).toBe('breadsAndGrains');
+  expect(trades.groupOf({ packId: 'custom', foodId: 8 })).toBeUndefined();
+  expect(trades.candidatesIn('breadsAndGrains', { minKcal: 0, maxKcal: undefined }).map((f) => f.name)).toEqual(['Bagel']);
+  const without = await CatalogTradeCatalog.load(catalog, [loggedFrom('custom', 7)]);
+  expect(without.groupOf({ packId: 'custom', foodId: 7 })).toBeUndefined();
 });
