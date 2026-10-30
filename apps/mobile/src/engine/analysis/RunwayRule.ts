@@ -1,5 +1,5 @@
 /**
- * When the rest of the day is tight (MM-711), chosen without asking and
+ * When the rest of the day is tight (MM-713), chosen without asking and
  * marked so in the ticket. The owner's breakfast of 2026-10-30, 243 kcal
  * for 5 g, left the rest of the day needing 38% protein against a 34%
  * target, and the brief called that a squeeze. Tight is lean-protein-only

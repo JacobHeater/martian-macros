@@ -48,7 +48,7 @@ export function executiveBriefOf(
   const minKcalForProtein = proteinRemainingG * 4;
   const requiredProteinDensity = kcalRemaining > 0 ? minKcalForProtein / kcalRemaining : proteinRemainingG > 0 ? 1 : 0;
   const targetProteinDensity = kcalTarget > 0 ? (proteinTargetG * 4) / kcalTarget : 0;
-  // The latest main meal with food today (MM-711), so the brief can say which meals carry the protein.
+  // The latest main meal with food today (MM-713), so the brief can say which meals carry the protein.
   const mains: readonly Meal[] = ['breakfast', 'lunch', 'dinner'];
   const lastMeal = [...mains].reverse().find((meal) => todayEntries.some((e) => e.meal === meal));
 
@@ -67,7 +67,7 @@ export function executiveBriefOf(
   } else if (proteinRemainingG <= 0) {
     runwayState = 'targetsLocked';
   } else if (runwayIsTight(requiredProteinDensity, targetProteinDensity)) {
-    // Tight is lean protein only from here (MM-711), never a few points over the day's own density.
+    // Tight is lean protein only from here (MM-713), never a few points over the day's own density.
     runwayState = 'tightRunway';
   } else {
     runwayState = 'onTrack';

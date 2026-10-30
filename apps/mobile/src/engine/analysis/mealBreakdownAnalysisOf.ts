@@ -93,7 +93,7 @@ export function mealBreakdownAnalysisOf(input: {
       ? undefined
       : { name: outlier.name, kcal: outlier.kcal, proteinG: outlier.proteinG, fatG: outlier.fatG ?? 0, proteinDensity: outlier.proteinDensity };
   const best = moves.best;
-  // The verdict (MM-711): a drag in the meal; else the day's order (a move, or the day over with protein covered); else fine.
+  // The verdict (MM-713): a drag in the meal; else the day's order (a move, or the day over with protein covered); else fine.
   const verdict: MealVerdict = outlierItem !== undefined ? 'drag' : best !== undefined || kcalRemaining < 0 ? 'order' : 'fine';
   const bestName = best === undefined ? '' : best.kind === 'nextMeal' ? (best.food?.name ?? '') : best.kind === 'addProtein' ? best.added.name : best.kind === 'swapSameGroup' ? best.replacement.name : '';
 

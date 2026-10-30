@@ -50,7 +50,7 @@ const sentenceEnd = /[.?!]["”’)]*(?=\s|$)/g;
  * given (MM-663), speak of the day, never of its figures, its
  * instructions or its tools (MM-689), and keep to the surface's sentences
  * and words (MM-693); given no numbers at all, it may say none beyond the
- * small ones (MM-711). The reason is shown by Settings' test of the voice
+ * small ones (MM-713). The reason is shown by Settings' test of the voice
  * (MM-671).
  */
 export function whyCoachNarrationRejected(
@@ -91,7 +91,7 @@ export function whyCoachNarrationRejected(
       return 'It asked for protein tonight that cannot fit in today’s calories';
     }
   }
-  // An empty list (MM-711) allows only the small numbers below: a fine meal or a day on track carries no totals.
+  // An empty list (MM-713) allows only the small numbers below: a fine meal or a day on track carries no totals.
   if (context.allowedNumbers !== undefined) {
     const allowed = new Set<number>([0, 1, 2, 3, 4, 7, 14, 24, 30, 90, 100]);
     for (const value of context.allowedNumbers) {

@@ -6,7 +6,7 @@ import { foodWithArticle } from './foodWithArticle';
 import { mealMoveOrder } from './mealMoveOrder';
 
 /**
- * A meal's fix for next time in the brief's few words (MM-711), after the
+ * A meal's fix for next time in the brief's few words (MM-713), after the
  * drag is named: the owner's approved draft (MM-693) closes "is the drag:
  * build lunch around chicken breast next time". The sheet's full order is
  * `mealMoveOrder`.

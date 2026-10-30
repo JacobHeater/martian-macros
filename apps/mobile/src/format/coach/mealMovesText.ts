@@ -14,7 +14,7 @@ const pct = (fraction: number) => `${roundHalfAwayFromZero(fraction * 100) + 0}%
  * owner approved (MM-682): what the meal took, the drag named with its
  * figures, and the one order (`moves.best`); then, after a fix for next
  * time, today's order when protein is still to go. A fine meal on a day
- * on track (MM-711) is told so, with where the protein comes from and
+ * on track (MM-713) is told so, with where the protein comes from and
  * not a number: the owner's breakfast of 243 kcal for 5 g is nothing to
  * fix.
  */
@@ -39,7 +39,7 @@ export function mealMovesText(analysis: MealBreakdownAnalysis): string {
   if (best === undefined) {
     if (analysis.kcalRemaining < 0) return `${lead}${drag} You are ${Fmt.kcal(-analysis.kcalRemaining)} over for the day. Stop here.`;
     if (analysis.proteinRemainingG <= 0) return `${lead}${drag} Protein is covered today with ${Fmt.kcal(analysis.kcalRemaining)} left. Hold the line.`;
-    // Fine, with protein still to go on a day on track (MM-711): nothing to fix, and where the protein comes from.
+    // Fine, with protein still to go on a day on track (MM-713): nothing to fix, and where the protein comes from.
     const next = nextMealSlot(analysis.meal);
     const carrier = next === undefined || next === 'snack' ? 'Close the protein before bed with lean protein.' : `Build ${mealLabel(next).toLowerCase()} around protein.`;
     return `${meal} is fine. Nothing to fix here. ${carrier}`;

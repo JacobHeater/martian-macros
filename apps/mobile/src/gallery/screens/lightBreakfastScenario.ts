@@ -7,7 +7,7 @@ import { storyTargets } from './storyTargets';
 const minuteMs = 60 * 1000;
 
 /**
- * The owner's morning of 2026-10-30 (MM-711): a 2,178 kcal and 187 g day,
+ * The owner's morning of 2026-10-30 (MM-713): a 2,178 kcal and 187 g day,
  * a breakfast of oatmeal, maple syrup and butter, 243 kcal for 5 g, and
  * nothing else logged yet; six days before it eaten on target. A watch
  * worn, one short walk this week and about 5,900 steps a day, no lift

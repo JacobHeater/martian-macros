@@ -12,7 +12,7 @@ import { trainingBriefText } from './trainingBriefText';
  * `ExecutiveBrief` (MM-663), in the owner's shape (MM-693): the verdict on
  * the day, the drag, the order, one training line; at most four sentences.
  * A day on track is told so, with which meals carry the protein and not
- * a number (MM-711): the rows under the words hold the figures.
+ * a number (MM-713): the rows under the words hold the figures.
  *
  * Used immediately in offline mode or when no BYOK key is configured, and as
  * the guaranteed fallback whenever a remote narration fails verification.
@@ -83,7 +83,7 @@ function foodBriefText(brief: ExecutiveBrief): string {
       return `${lead}${driverClause} ${directive}`;
     }
     case 'tightRunway': {
-      // Tight is lean protein only from here (MM-711): the two figures the order needs, and the order.
+      // Tight is lean protein only from here (MM-713): the two figures the order needs, and the order.
       const lead = pick('tight', [`Runway is tight: ${kcalLeft} left for ${proteinLeft} of protein.`, `${kcalLeft} left for ${proteinLeft} of protein: tight.`]);
       const directive = pick('tightDirective', [
         'Lean protein only from here: chicken breast, egg whites, fish or Greek yogurt.',
@@ -95,7 +95,7 @@ function foodBriefText(brief: ExecutiveBrief): string {
       return `Protein is covered today with ${kcalLeft} left. Hold the line through the evening.`;
     }
     case 'onTrack': {
-      // Nothing to fix (MM-711): which meals carry the protein, and not a number; the rows under the words hold those.
+      // Nothing to fix (MM-713): which meals carry the protein, and not a number; the rows under the words hold those.
       switch (brief.lastMeal) {
         case 'breakfast':
           return 'Breakfast is in and the day is on track. Nothing to fix. Build lunch and dinner around protein.';
