@@ -10,7 +10,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { giveDate, openSettings } from '../support/openSettings';
+import { giveDate, openProfile } from '../support/openSettings';
 import { openCoach } from '../support/openCoach';
 import { renderApp } from '../support/renderApp';
 import { targetsFrom } from '../support/targetsFrom';
@@ -51,7 +51,7 @@ async function seed({
 
 async function open() {
   renderApp(repos, today);
-  return openSettings();
+  return openProfile();
 }
 
 const history = () => first(repos.targets.watchTargetsHistory());

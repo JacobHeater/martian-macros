@@ -14,6 +14,8 @@ interface MmPressableProps {
   controls?: string | undefined;
   /** The ids of what says more about it, read after its name. */
   describedBy?: string | undefined;
+  /** Whether it stands for the place the person is at now, as the bar's current destination does (MM-704). */
+  current?: boolean | undefined;
   /** Given the pressed content's edges, for what opens beside it (MM-562). */
   onPress: (anchor: MmAnchor) => void;
   /** Takes focus when it first draws: where focus goes back to after something it stood for was replaced (MM-634). */
@@ -33,7 +35,7 @@ interface MmPressableProps {
  * nothing of its own, so the content keeps its look, and it is the one way
  * a screen makes a region pressable without a raw button (MM-246).
  */
-export function MmPressable({ label, expanded, controls, describedBy, onPress, children, autoFocus = false, onLongPress }: MmPressableProps) {
+export function MmPressable({ label, expanded, controls, describedBy, current, onPress, children, autoFocus = false, onLongPress }: MmPressableProps) {
   const hold = useRef<{ timer: ReturnType<typeof setTimeout>; x: number; y: number } | undefined>(undefined);
   const held = useRef(false);
   const letGo = () => {
@@ -49,6 +51,7 @@ export function MmPressable({ label, expanded, controls, describedBy, onPress, c
       aria-expanded={expanded}
       aria-controls={controls}
       aria-describedby={describedBy}
+      aria-current={current === true ? 'page' : undefined}
       autoFocus={autoFocus}
       onPointerDown={
         !holds
