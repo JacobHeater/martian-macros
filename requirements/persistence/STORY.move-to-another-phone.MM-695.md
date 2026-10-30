@@ -26,7 +26,9 @@ receiving phone shows in a QR code, and applies it through the same restore.
 - **The same Wi-Fi only.** No Bluetooth, no hotspot, nothing over the internet.
 - **The receiving phone shows a QR code and the sending phone scans it** with the app's own scanner. The code carries the Martian Macros
   logo in its centre.
-- **Data and progress photos only**, what a backup holds. Downloaded food packs and the phone's own settings stay where they are.
+- **Data and progress photos only**, what a backup holds. Downloaded food packs stay where they are. *Amended by the owner, 2026-10-29:*
+  the settings kept in the database (theme, units, reminders) travel too, as a restore carries them: the receiving phone becomes an
+  exact copy, and the confirmation says "your profile and your settings" are replaced.
 - **Two ways in:** a "Move to another phone" row in Settings > Backup, on both phones, and "I have Martian Macros on another phone" at
   the first-run welcome, so a new phone is not set up only to be overwritten. This settles MM-63's open question about restoring at the
   welcome step.
