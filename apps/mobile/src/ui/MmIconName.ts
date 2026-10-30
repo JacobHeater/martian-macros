@@ -81,4 +81,6 @@ export type MmIconName =
   | 'photos'
   // Moving to another phone (MM-698): the phone the records go to, and the code it shows.
   | 'movePhone'
-  | 'qrCode';
+  | 'qrCode'
+  // The drawer's menu button (MM-704).
+  | 'menu';

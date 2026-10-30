@@ -17,7 +17,11 @@ import { TrainScreen } from '../train/TrainScreen';
 import { useShownDay } from '../food/useShownDay';
 import { destinations } from './destinations';
 import { Fmt } from '../format/Fmt';
+import { ProfileScreen } from '../settings/ProfileScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
+import { useOverlays } from '../ui/useOverlays';
+import type { DrawerChoice } from './DrawerChoice';
+import { DrawerMenu } from './DrawerMenu';
 import { useApp } from './useApp';
 import { useCell } from './useCell';
 import { useKeptScroll } from './useKeptScroll';
@@ -25,14 +29,17 @@ import { useNavigator } from './useNavigator';
 import './app.css';
 
 /**
- * The frame every destination sits in (MM-90, MM-99, MM-667): its name and the way
- * to Settings above, the four destinations below. A swipe in from the right
+ * The frame every destination sits in (MM-90, MM-99, MM-667): its name and the
+ * menu button above, the four destinations below. The menu is a drawer from
+ * the left (MM-704): the destinations again, Profile and Settings, the last
+ * two pushed over the destination the person is on. A swipe in from the right
  * goes to the next destination, from the left to the one before (MM-582).
  * Coach pulled down from its top refreshes (MM-670).
  */
 export function HomeShell() {
   const { state } = useApp();
   const navigator = useNavigator();
+  const overlays = useOverlays();
   const rawCurrent = useCell(state.homeTab);
   const current: HomeDestination = rawCurrent === 'progress' ? 'coach' : rawCurrent;
   const shownDay = useShownDay();
@@ -44,6 +51,13 @@ export function HomeShell() {
   const select = (id: HomeDestination) => {
     scroll.leave(current);
     state.homeTab.put(id);
+  };
+  const openMenu = async () => {
+    const choice = await overlays.drawer<DrawerChoice>('Menu', (close) => <DrawerMenu current={current} onChoose={(chosen) => close(chosen)} />);
+    if (choice === undefined) return;
+    if (choice === 'profile') void navigator.push(() => <ProfileScreen />);
+    else if (choice === 'settings') void navigator.push(() => <SettingsScreen />);
+    else if (choice !== current) select(choice);
   };
   const at = destinations.findIndex((destination) => destination.id === current);
   const beside = (side: EdgeSide) => destinations[side === 'right' ? at + 1 : at - 1];
@@ -63,14 +77,9 @@ export function HomeShell() {
         // On Food the heading is the day shown, as its stepper says (MM-390).
         title={current === 'food' ? Fmt.day(shownDay, today) : HomeDestination.label(current)}
         titleContent={current === 'food' ? <FoodDayHeader /> : undefined}
+        // The menu button at the left opens the drawer (MM-704); the gear it replaces is gone.
+        leading={<MmIconButton icon="menu" label="Menu" opens="dialog" onPress={() => void openMenu()} />}
         // No screen has an Add food button: food is added from a meal's "+" on Food (MM-438).
-        actions={
-          <MmIconButton
-            icon="settings"
-            label="Settings"
-            onPress={() => void navigator.push(() => <SettingsScreen />)}
-          />
-        }
       />
       <main className="app-body" ref={body} {...pull.handlers}>
         <MmPullToRefresh pull={pull.state} />

@@ -12,6 +12,8 @@ export type OverlayKind =
   | 'pickers'
   | 'sheet'
   | 'sheetBare'
+  | 'drawer'
+  | 'drawerBare'
   | 'snack'
   | 'snackUndo'
   | 'menu'

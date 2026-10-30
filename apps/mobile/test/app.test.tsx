@@ -11,6 +11,7 @@ async function openAppearance(): Promise<void> {
   const header = await screen.findByRole('button', { name: /^Appearance/ });
   if (header.getAttribute('aria-expanded') === 'false') await userEvent.click(header);
 }
+import { chooseFromMenu } from './support/openSettings';
 import { renderApp } from './support/renderApp';
 
 /** MM-229, MM-232: the shell of the app, for someone who is set up. */
@@ -55,7 +56,7 @@ describe('the theme', () => {
 
   it('changes at once when another is chosen in Settings, and is kept', async () => {
     renderApp(repos, today);
-    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await chooseFromMenu('Settings');
     expect(screen.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
     // The look is a row that opens the chooser (MM-259); the value in force is marked.
     await openAppearance();
@@ -88,7 +89,7 @@ describe('the theme', () => {
         }),
       }),
     });
-    await userEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await chooseFromMenu('Settings');
     const choose = async (name: string) => {
       await openAppearance();
     await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
@@ -121,7 +122,7 @@ describe("the phone's bars", () => {
     await bar();
     expect(told.at(-1)).toBe(true);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Settings' }));
+    await chooseFromMenu('Settings');
     await openAppearance();
     await userEvent.click(screen.getByRole('button', { name: 'Change appearance' }));
     await userEvent.click(within(await screen.findByRole('dialog', { name: 'Appearance' })).getByRole('option', { name: 'Light' }));

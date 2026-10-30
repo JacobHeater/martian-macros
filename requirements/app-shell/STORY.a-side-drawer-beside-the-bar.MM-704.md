@@ -90,3 +90,21 @@ Scenario: Reduced motion
 - Where: `apps/mobile/src/ui/MmDrawer.tsx` and its rules in `ui.css`; `HomeShell.tsx` holds the open state and the
   rows; `destinations.ts` unchanged.
 - The owner reads it on both phones: the motion, the drag, the Android back.
+
+## Progress
+Built 2026-10-30 (PR A of MM-703, not run locally; CI validates): `MmDrawer` (`ui/`), the sibling of `MmSheet`: a panel
+from the left over the scrim, focus held, Escape, the scrim and the host's dismissal (the phone's back) close it, a
+sideways drag follows the finger on a transform set on the element and leaves past a third of the width or on a flick,
+an up-or-down finger scrolls instead; `MmDrawerGroup`, `MmDrawerRow` (over `MmPressable`, which gained `current` for
+`aria-current`) and `MmLettering` (the owner's art, `design/brand/lettering-art.png`, scaled to 960 px wide as
+`assets/brand/lettering.png`); `Overlays.drawer` on the host; `DrawerMenu` and `DrawerChoice` in `app/`; the menu button
+in the app bar's leading slot and the gear gone (`HomeShell`); the `menu` icon. Stories: `Drawer.stories.tsx`
+(DrawerOpen, DrawerOpenOnFood, DrawerDragged, DrawerOpensSettings, DrawerOpenSmallPhone at 360 px and twice the text
+size) and the Overlays catalog's Drawer and DrawerBare. Tests: `test/app/drawer.test.tsx` (every scenario, and the motion
+token rule), `test/support/openSettings.ts` reaches Settings through the drawer.
+
+**Not wired here: the Library row.** `LibraryScreen` (MM-706) is built in a sibling PR; whichever lands later adds the
+row beside Profile. Nothing is stubbed.
+
+Owed on the phone: the slide-in and the drag on both phones, Android's back closing it, the lettering at the drawer's
+width in each palette.

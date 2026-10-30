@@ -336,16 +336,20 @@ const pressAnywhere = (name: string | RegExp) => async (canvas: HTMLElement) => 
   await userEvent.click(button);
 };
 
-/** MM-321: the gear on the home screens opens Settings. */
+/** MM-321, MM-704: the menu button on the home screens opens the drawer, and its Settings row opens Settings. */
 export const HomeOpensSettings = screenStory({
   covers: ['DashboardScreen', 'SettingsScreen'],
   shows: 'Today’s setup',
-  walk: pressAnywhere('Settings'),
+  walk: async (canvas) => {
+    await pressAnywhere('Menu')(canvas);
+    const drawer = await within(canvas.ownerDocument.body).findByRole('dialog', { name: 'Menu' });
+    await userEvent.click(within(drawer).getByRole('button', { name: 'Settings' }));
+  },
 });
 
-/** MM-321: under eighteen: correcting the date of birth opens Settings at "You" (MM-398). */
+/** MM-321: under eighteen: correcting the date of birth opens Profile at "You" (MM-398, MM-705). */
 export const AdultsOnlyOpensSettings = screenStory({
-  covers: ['AdultsOnlyScreen', 'SettingsScreen'],
+  covers: ['AdultsOnlyScreen', 'ProfileScreen'],
   shows: 'Date of birth',
   scenario: minorScenario,
   walk: pressAnywhere('Correct date of birth'),

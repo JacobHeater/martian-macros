@@ -1,7 +1,7 @@
 import { MmButton } from '../ui/MmButton';
 import { Notice } from '../ui/Notice';
 import { Screen } from './Screen';
-import { SettingsScreen } from '../settings/SettingsScreen';
+import { openSettingsSection } from '../settings/openSettingsSection';
 import { useNavigator } from './useNavigator';
 
 /**
@@ -28,8 +28,8 @@ export function AdultsOnlyScreen() {
           label="Correct date of birth"
           kind="secondary"
           expand
-          // The date of birth is under "You": that section opens (MM-398, the UX role's UX-2).
-          onPress={() => void navigator.push(() => <SettingsScreen open="profile" />)}
+          // The date of birth is under "You", on Profile: that section opens (MM-398, MM-705, the UX role's UX-2).
+          onPress={() => void openSettingsSection(navigator, 'profile')}
         />
       </div>
     </Screen>

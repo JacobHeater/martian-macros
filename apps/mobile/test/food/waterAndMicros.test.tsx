@@ -11,7 +11,7 @@ import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { dashboardLoaded } from '../support/dashboardLoaded';
 import { first } from '../support/first';
 import { foodOn } from '../support/foodOn';
-import { openSettings } from '../support/openSettings';
+import { openProfile } from '../support/openSettings';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
@@ -138,7 +138,7 @@ it('a past day with nothing logged never says "today" in the Micros picture', as
 it('the sodium limit refuses an amount below 1,500 mg and says the range', async () => {
   await repos.preferences.saveSodiumLimit(2300, today);
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   const field = await settings.findByRole('textbox', { name: 'Daily sodium limit, milligrams' });
   await userEvent.clear(field);
   await userEvent.type(field, '800');
@@ -150,7 +150,7 @@ it('the sodium limit refuses an amount below 1,500 mg and says the range', async
 
 it('switched on, the sodium limit starts at 2,300 mg and is kept', async () => {
   renderApp(repos, today);
-  const settings = await openSettings();
+  const settings = await openProfile();
   await userEvent.click(await settings.findByRole('switch', { name: /^Daily sodium limit/ }));
   await expect.poll(async () => (await first(repos.preferences.watchNutritionGoals())).sodiumLimitMg).toBe(2300);
   expect((await first(repos.preferences.watchNutritionGoals())).sodiumLimitSince).toBe(today);
@@ -165,7 +165,7 @@ it('a sodium limit that cannot be saved says so, and the switch stays off', asyn
       return { ...services, preferences };
     },
   });
-  const settings = await openSettings();
+  const settings = await openProfile();
   const limit = await settings.findByRole('switch', { name: /^Daily sodium limit/ });
   await userEvent.click(limit);
   expect(await screen.findByText('The sodium limit could not be saved. Nothing was changed.')).toBeInTheDocument();
