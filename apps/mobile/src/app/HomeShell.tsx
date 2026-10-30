@@ -19,6 +19,8 @@ import { destinations } from './destinations';
 import { Fmt } from '../format/Fmt';
 import { ProfileScreen } from '../settings/ProfileScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
+import { useBackUp } from '../settings/useBackUp';
+import { useMoveToAnotherPhone } from '../settings/useMoveToAnotherPhone';
 import { useOverlays } from '../ui/useOverlays';
 import type { DrawerChoice } from './DrawerChoice';
 import { DrawerMenu } from './DrawerMenu';
@@ -50,6 +52,9 @@ export function HomeShell() {
   // A destination keeps its scroll position across a visit elsewhere (MM-286).
   const body = useRef<HTMLElement>(null);
   const scroll = useKeptScroll(body, current, state.destinationScroll);
+  // My QR Code (MM-716): this phone's move code at once; a whole move arriving may offer the Backup section's backup first.
+  const { backUp } = useBackUp();
+  const move = useMoveToAnotherPhone({ backUp });
   const select = (id: HomeDestination) => {
     scroll.leave(current);
     state.homeTab.put(id);
@@ -59,6 +64,7 @@ export function HomeShell() {
     if (choice === undefined) return;
     if (choice === 'profile') void navigator.push(() => <ProfileScreen />);
     else if (choice === 'library') void navigator.push(() => <LibraryScreen />);
+    else if (choice === 'qrCode') void move.receive({ nudge: 'onMove' });
     else if (choice === 'settings') void navigator.push(() => <SettingsScreen />);
     else if (choice !== current) select(choice);
   };

@@ -3,11 +3,9 @@ import { useApp } from '../app/useApp';
 import { CalendarDate } from '../domain/CalendarDate';
 import { useLoaded } from '../app/useLoaded';
 import { BackupFile } from '../backup/BackupFile';
-import { backupFileName } from '../backup/backupFileName';
 import { BackupProblem } from '../backup/BackupProblem';
 import { restoreWords } from './restoreWords';
 import { SodiumBackupCipher } from '../backup/SodiumBackupCipher';
-import { currentSchemaVersion } from '../data/currentSchemaVersion';
 import { Fmt } from '../format/Fmt';
 import { MmListGroup } from '../ui/MmListGroup';
 import { MmListRow } from '../ui/MmListRow';
@@ -16,6 +14,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { PassphraseSheet } from './PassphraseSheet';
 import { ProgressPhotoSwitches } from './ProgressPhotoSwitches';
 import { passphraseHeadline } from './passphraseHeadline';
+import { useBackUp } from './useBackUp';
 import { useMoveToAnotherPhone } from './useMoveToAnotherPhone';
 import { useSettingsSection } from './useSettingsSection';
 
@@ -39,47 +38,19 @@ export function BackupSection() {
   const lastBackup = useLoaded(state.lastBackupOn);
   const photoSettings = useLoaded(state.photoSettings);
   const setup = useLoaded(state.setup);
-  const [busy, setBusy] = useState<'backup' | 'restore' | undefined>();
+  const [restoring, setRestoring] = useState(false);
+  // Backing up now is its own hook (MM-716), so the drawer's code can offer it before a move replaces this phone.
+  const { backUp, backingUp } = useBackUp();
+  const busy: 'backup' | 'restore' | undefined = backingUp ? 'backup' : restoring ? 'restore' : undefined;
 
-  const passphrase = (purpose: 'set' | 'open', error?: string) =>
+  const passphrase = (purpose: 'open', error?: string) =>
     overlays.sheet<string>(passphraseHeadline(purpose), (close) => (
       <PassphraseSheet purpose={purpose} error={error} onContinue={(typed) => close(typed)} onCancel={() => close()} />
     ));
 
-  // The photos are behind the phone's lock wherever they are shown (MM-157), so a backup that carries them, or a
-  // restore that replaces them, asks for it first; not passed, nothing is done. A phone with no lock set asks nothing.
+  // The photos are behind the phone's lock wherever they are shown (MM-157), so a restore that replaces them asks
+  // for it first; not passed, nothing is done. A phone with no lock set asks nothing.
   const photosUnlocked = async (reason: string) => (await services.deviceLock.unlock(reason)) !== 'refused';
-
-  const backUp = async () => {
-    if (photoSettings?.backUp === true && !(await photosUnlocked('Unlock to back up your progress photos.'))) {
-      overlays.snack('Your progress photos stayed locked, so no backup was made.');
-      return;
-    }
-    const typed = await passphrase('set');
-    if (typed === undefined) return;
-    setBusy('backup');
-    try {
-      const today = services.clock.today();
-      const snapshot = await services.backup.snapshot();
-      // The photos are kept apart from the database and join the backup only when the person has chosen that (MM-157).
-      const photos = photoSettings?.backUp === true ? await services.progressPhotos.exportArchive() : undefined;
-      const file = await BackupFile.write(
-        snapshot,
-        typed,
-        { schemaVersion: currentSchemaVersion, createdOn: today.toString(), photos },
-        cipher,
-      );
-      const outcome = await services.backup.save(file, backupFileName(today));
-      if (outcome === 'cancelled') return;
-      await services.preferences.saveLastBackupOn(today);
-      overlays.snack(outcome === 'saved' ? 'Backup saved.' : 'Backup handed to the app you chose.');
-    } catch (error) {
-      // Never the library's or the plugin's words (MM-334); nothing changed.
-      overlays.snack('The backup could not be made. Nothing on this phone was changed.');
-    } finally {
-      setBusy(undefined);
-    }
-  };
 
   // Moving to another phone on the same Wi-Fi (MM-698): its backup nudge runs this section's own backup.
   const move = useMoveToAnotherPhone({ backUp: () => backUp() });
@@ -98,7 +69,7 @@ export function BackupSection() {
     for (;;) {
       const typed = await passphrase('open', error);
       if (typed === undefined) return;
-      setBusy('restore');
+      setRestoring(true);
       try {
         const { snapshot, photos } = await BackupFile.read(picked, typed, cipher);
         const contents = await services.restorer.describe(snapshot);
@@ -134,7 +105,7 @@ export function BackupSection() {
         overlays.snack(problem instanceof BackupProblem ? problem.message : 'This backup could not be opened.');
         return;
       } finally {
-        setBusy(undefined);
+        setRestoring(false);
       }
     }
   };

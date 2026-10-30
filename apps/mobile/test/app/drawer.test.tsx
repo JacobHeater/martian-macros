@@ -2,8 +2,17 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, expect, it, vi } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
+import { CoachAiConfig } from '../../src/domain/integration/CoachAiConfig';
+import { encodePhotoArchive } from '../../src/domain/photos/encodePhotoArchive';
+import { FakeDataRestorer } from '../../src/fixtures/FakeDataRestorer';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
+import { passphraseHeadline } from '../../src/settings/passphraseHeadline';
+import type { AppServices } from '../../src/state/AppServices';
+import { FakeMoveReceiver } from '../../src/transfer/FakeMoveReceiver';
+import { foodCopyBytes } from '../../src/transfer/foodCopyBytes';
+import type { MoveParcel } from '../../src/transfer/MoveParcel';
+import { foodOn } from '../support/foodOn';
 import { renderApp } from '../support/renderApp';
 import { declarationsOf } from '../support/stylesheetRules';
 import { topLayer } from '../support/topLayer';
@@ -11,8 +20,8 @@ import { topLayer } from '../support/topLayer';
 /**
  * MM-704: the app's menu is a drawer from the left, opened by the menu
  * button in the app bar: the lettering at its head, the four destinations,
- * Profile, Library and Settings. It is the one navigation: the bottom bar is
- * gone (MM-711), as is the settings gear.
+ * Profile, Library, My QR Code (MM-716) and Settings. It is the one
+ * navigation: the bottom bar is gone (MM-711), as is the settings gear.
  */
 const today = CalendarDate.of(2026, 10, 30);
 let repos: InMemoryRepositories;
@@ -34,10 +43,10 @@ async function openMenu(): Promise<HTMLElement> {
 
 const rowsOf = (drawer: HTMLElement) => within(drawer).getAllByRole('button').map((row) => row.textContent);
 
-it('opens from the menu button with the lettering, the destinations, Profile, Library and Settings, the current one marked', async () => {
+it('opens from the menu button with the lettering, the destinations, Profile, Library, My QR Code and Settings, the current one marked', async () => {
   renderApp(repos, today);
   const drawer = await openMenu();
-  expect(rowsOf(drawer)).toEqual(['Dashboard', 'Food', 'Train', 'Coach', 'Profile', 'Library', 'Settings']);
+  expect(rowsOf(drawer)).toEqual(['Dashboard', 'Food', 'Train', 'Coach', 'Profile', 'Library', 'My QR Code', 'Settings']);
   // The lettering is decoration: an image with no name, passed by.
   expect(drawer.querySelector('img.mm-lettering')).toHaveAttribute('alt', '');
   expect(within(drawer).getByRole('button', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
@@ -149,4 +158,52 @@ it('its slide-in, spring-back and leaving take the base motion token, 0 ms under
   expect(declarationsOf('src/ui/ui.css', '.mm-drawer')).toMatch(/animation:\s*mm-drawer-in var\(--motion-base\)/);
   expect(declarationsOf('src/ui/ui.css', '.mm-drawer-settling')).toMatch(/transition:\s*transform var\(--motion-base\)/);
   expect(declarationsOf('src/ui/ui.css', '.mm-drawer-leaving')).toMatch(/transition:\s*transform var\(--motion-base\)/);
+});
+
+/** A never-backed-up phone with records, and the other phone about to send `parcel` once the code is shown (MM-716). */
+const phoneShowingItsCode = (parcel?: MoveParcel) => {
+  const restorer = new FakeDataRestorer();
+  restorer.here = { weighIns: 30, foodDays: 20, workouts: 4, customFoods: 1, from: today.addDays(-30), to: today, hasSetup: true };
+  restorer.toDescribe = { ...restorer.here, weighIns: 45 };
+  const receiver = parcel === undefined ? new FakeMoveReceiver() : new FakeMoveReceiver({ kind: 'receives', parcel });
+  renderApp(repos, today, { change: (services: AppServices) => ({ ...services, restorer, moveReceiver: receiver }) });
+};
+const everything: MoveParcel = { kind: 'everything', payload: { snapshot: new Uint8Array([4, 5, 6]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } };
+const slowly = { timeout: 15000 };
+
+it('MM-716: My QR Code shows this phone’s code at once, with no offer to back up first', async () => {
+  phoneShowingItsCode();
+  const drawer = await openMenu();
+  await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
+  const sheet = within(await screen.findByRole('dialog', { name: 'Move to this phone' }, slowly));
+  expect(await sheet.findByRole('img', { name: 'QR code for your other phone to scan' }, slowly)).toBeInTheDocument();
+  expect(sheet.queryByText('Back up this phone first?')).toBeNull();
+});
+
+it('MM-716: a whole move arriving from it offers the backup first; skipped, the move’s own confirmation follows', async () => {
+  phoneShowingItsCode(everything);
+  const drawer = await openMenu();
+  await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
+  const asks = within(await screen.findByRole('dialog', { name: 'Back up this phone first?' }, slowly));
+  expect(asks.getByText(/Your other phone sent everything\. This phone has never been backed up\./)).toBeInTheDocument();
+  await userEvent.click(asks.getByRole('button', { name: 'Skip the backup' }));
+  expect(await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly)).toBeInTheDocument();
+});
+
+it('MM-716: Back up first runs the Backup section’s own backup, from the passphrase on', async () => {
+  phoneShowingItsCode(everything);
+  const drawer = await openMenu();
+  await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
+  const asks = within(await screen.findByRole('dialog', { name: 'Back up this phone first?' }, slowly));
+  await userEvent.click(asks.getByRole('button', { name: 'Back up first' }));
+  expect(await screen.findByRole('dialog', { name: passphraseHeadline('set') }, slowly)).toBeInTheDocument();
+});
+
+it('MM-716: a copy of foods arriving from it offers no backup: the foods’ own confirmation comes (MM-715)', async () => {
+  const foods = foodCopyBytes({ day: today, entries: [foodOn(today, { name: 'Apple', meal: 'snack', kcal: 95 })], foods: [] });
+  phoneShowingItsCode({ kind: 'foods', foods });
+  const drawer = await openMenu();
+  await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
+  expect(await screen.findByRole('dialog', { name: 'Add foods from your other phone?' }, slowly)).toBeInTheDocument();
+  expect(screen.queryByText('Back up this phone first?')).toBeNull();
 });
