@@ -10,7 +10,7 @@ related: [MM-58, MM-330, MM-596, MM-627, MM-637, MM-645]
 ## Context
 With a search typed, the Add food sheet listed the person's own foods and meals, then the food database's
 results, then what was found online, one long scrolling list with a heading over each part (MM-637, MM-58).
-The owner, 2026-10-27, from the phone: "this long ass scrolling list? what the fuck? switch this to a toggle
+The owner, 2026-10-27, from the phone: "this long scrolling list? switch this to a toggle
 chooser at the top and switch between those methods."
 
 ## Decisions

@@ -8,7 +8,7 @@ related: [MM-554, MM-375, MM-184, MM-437, MM-106]
 # Story: Martian on the art's near-black, with the brights lit
 
 ## Context
-The owner, 2026-10-22, on MM-554's Dashboard: "where the fuck is that deep dark that you see behind the text? i want that
+The owner, 2026-10-22, on MM-554's Dashboard: "where is that deep dark that you see behind the text? i want that
 to be the base bg color and the brights to be the accents, button bg colors, etc."
 
 MM-554 took the canvas from the night sky's indigo (`#0E0233`) and climbed the levels into the mountains' purple, so the

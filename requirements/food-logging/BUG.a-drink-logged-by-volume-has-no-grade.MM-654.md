@@ -47,7 +47,7 @@ No new screen; the badge and popover stand (MM-370). A bug the owner reported, s
 
 ## Notes
 - Built in `engine/gradeOfFoodEntry.ts`; test in `test/engine/foodGrade.test.ts`; `docs/food-grades.md` updated.
-- **The audit the owner asked for** ("what other shit is hiding"): every way a food ends in the question mark, on
+- **The audit the owner asked for** ("what else is hiding"): every way a food ends in the question mark, on
   the barcode pack of 2026-10-27 (521,079 foods: 459,297 per 100 g, 61,782 per 100 mL), for the owner's call:
   1. *A copied drink* ("Fix this food" on a per-100 mL food with no density) has no serving weight, and an own
      food is graded only by its serving's grams: `CustomFood` has no millilitres field. Same hole as this bug,

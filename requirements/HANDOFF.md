@@ -102,7 +102,7 @@ so Settings never asked again and HealthKit answered every workout query with no
 `getRequestStatusForAuthorization` per kind; the list is gone; `test/ios/healthAskedFromHealthKit.test.ts` reads the source.
 Built in the main checkout for the owner's rebuild; **owed: the owner presses Exercise sessions, allows Workouts, sees the walk.**
 Lesson: when the phone disagrees with the code, pull the phone's own data before reasoning further.
-**MM-691, same evening:** the owner, on the "Read from Apple Health" snack: "it needs a dismiss button right the fuck now."
+**MM-691, same evening:** the owner, on the "Read from Apple Health" snack: it needs a dismiss button, now.
 Every snack now has the Dismiss icon button, with an action or without, and no longer takes focus itself (a tap on a plain
 snack focused it, and a focused snack is held by MM-601, so it never went). `MmOverlays.tsx`, `test/ui/snack.test.tsx`.
 

@@ -12,7 +12,7 @@ The owner's phone, 2026-10-30, a 2,178 kcal and 187 g day, breakfast of oatmeal,
 5 g, nothing else logged. The sheet: "The banana nut with prebiotic fiber superfood oatmeal is the drag: 160 kcal for
 5 g. Next time build it around protein: add chicken breast filet". The brief: "Runway is tight with 1,935 kcal left and
 182 g of protein still to hit (38% of remaining calories from protein). Breakfast drove the squeeze". Then the three
-training rows recited. The owner: "oatmeal is the drag... what fucking squeeze? i fucking ate 243 calories... this is
+training rows recited. The owner: "oatmeal is the drag... what squeeze? i ate 243 calories... this is
 not coaching." Both texts were the model's, and the built-in words say the same.
 
 The words are not the cause; the verdict is. Three rules declared a problem where there was none, and the prompts then

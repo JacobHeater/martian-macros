@@ -18,7 +18,7 @@ On 2026-10-24 the owner logged a real day and opened the Coach tab:
 
 The tab restated the numbers ("Fat 159 g so far, against 60 g") and gave no advice. It never said the day was 1,054 kcal over, or that the buffet did it. The headline read "Protein is holding up; protein per 100 kcal is worth changing."
 
-The owner's words: "Where the fuck is the advice? … What would a real coach do? … Tell the user when the direction of their log could've been different if they hadn't eaten so many biscuits and gravy, or so much General Tso's chicken. … You will get this coach honest, terse, direct, blunt, and it will be the equivalent of having David Goggins in your pocket."
+The owner's words: "Where is the advice? … What would a real coach do? … Tell the user when the direction of their log could've been different if they hadn't eaten so many biscuits and gravy, or so much General Tso's chicken. … You will get this coach honest, terse, direct, blunt, and it will be the equivalent of having David Goggins in your pocket."
 
 The constraints that emptied the coach were never the owner's. Panels proposed them in MM-606, MM-607, MM-610 and MM-612:
 - "never say eat less";
@@ -39,8 +39,8 @@ By the product owner, 2026-10-24:
   - The coach says which meal and which food drove the miss, and by how much.
   - It says what the day would have been without it: "Without the General Tso's chicken you'd be 310 kcal over, not 1,054."
 - **Advice for the rest of today.** When the day is already over target, the coach says how to finish it: "You're done for calories. If you eat dinner, under 400 kcal: lean protein and vegetables. No sauce."
-- **Accountability, without profanity.** The owner: "It doesn't need to go so far as calling everyone little bitches and the
-  f-bomb every second word, but … how about just some good old accountability?"
+- **Accountability, without profanity.** The owner: "It doesn't need to go so far as insulting everyone and
+  swearing every second word, but … how about just some good old accountability?"
   - The coach keeps the record and holds the person to it.
   - It follows up on what it already told them: "Tuesday I told you to skip the General Tso's chicken. It's back: 744 kcal again."
   - It counts the repeats: "Third day this week over by 500 or more." "Peanut butter again: 9 of the last 14 days."

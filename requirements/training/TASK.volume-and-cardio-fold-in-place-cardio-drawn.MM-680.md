@@ -9,8 +9,8 @@ related: [MM-78, MM-253, MM-258, MM-677, MM-678]
 
 ## Context
 The owner, from the phone (2026-10-28), on MM-677's Cardio screen and MM-258's Weekly training volume screen: "Both of
-these need to be collapsibles not nav to sub views. Then, Cardio must have infographics. it's that shitty claude
-generated wall of text cruft fuckery." A phone call-out of the owner's: fixed without a panel.
+these need to be collapsibles not nav to sub views. Then, Cardio must have infographics. it's" an AI-generated
+wall of text. A phone call-out of the owner's: fixed without a panel.
 
 ## By the product owner
 - Weekly training volume and Cardio are folds on Train, in place; neither opens a screen.

@@ -4,7 +4,7 @@
   (2026-10-13), after the date dialog took three prompts to become a
   design-system component: "Why did it take me, the non-expert, three
   prompts to get a design-system component? This can't happen. You're the
-  panel. Get these experts doing shit right." Outcome: every component of
+  panel. Get these experts doing this right." Outcome: every component of
   the design system walked one by one by three roles, every finding with
   an outcome, and the findings turned into tickets with regression tests
   (MM-253's component walk).

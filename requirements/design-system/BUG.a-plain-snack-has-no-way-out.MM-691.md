@@ -10,7 +10,7 @@ related: [MM-272, MM-601]
 ## Context
 The owner, from the phone (2026-10-28), on "Read from Apple Health. Everything asked for is up to date." standing at the
 bottom of Settings: "this toast at the bottom of the screen never dismisses and there's no way to... it needs a dismiss
-button right the fuck now." Only a snack with an action (Undo) had a Dismiss (MM-272); a plain one had the ten-second
+button" now. Only a snack with an action (Undo) had a Dismiss (MM-272); a plain one had the ten-second
 timer (MM-601) and nothing to press. It also took focus itself (`tabIndex` 0), and a snack being focused is held
 (MM-601), so a tap on it on the phone held it until something else took focus: the "never dismisses" seen.
 

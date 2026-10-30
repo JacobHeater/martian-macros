@@ -8,7 +8,7 @@ related: [MM-42, MM-153, MM-383, MM-408, MM-410, MM-411]
 # Story: food search lists the closest name first, says the serving, and never ends at nothing for one stray word
 
 ## Context
-The owner, 2026-10-26: recent foods and database search are "kind of ass" next to MyFitnessPal and
+The owner, 2026-10-26: recent foods and database search are weak next to MyFitnessPal and
 MyNetDiary. The food-logging review (`docs/food-logging-plan.md`, F-07, F-08) found that pack results were
 sorted by the source's reliability score first (MM-383) and by text match only to break ties. So a
 well-documented record that matched loosely listed above the food the person typed, and two records from

@@ -9,7 +9,7 @@ related: [MM-665, MM-666, MM-667, MM-670, MM-672, MM-334]
 
 ## Context
 The owner (2026-10-28), on the Coach tab with a BYOK coach set up: "the coach tab starts with the default
-deterministic text and then suddenly shifts into ai generated content when it loads in. this is a shit user
+deterministic text and then suddenly shifts into ai generated content when it loads in. this is a bad user
 experience … loading indicators are going to be required at all times where network requests are involved. even
 if the default text is available, we don't show that, we need to show loading indicators when the ai model is
 loading, and then only show default text when the request fails or ai is unavailable." And: "this same behavior is

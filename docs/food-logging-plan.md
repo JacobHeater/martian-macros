@@ -292,7 +292,7 @@ runtime.
   loosely outranks a closer match from a lower tier, or a less complete
   record from the same source.
 - **Impact:**
-  - The owner: search is "kind of ass" next to MyFitnessPal and
+  - The owner: search is weak next to MyFitnessPal and
     MyNetDiary.
   - The size of the effect on real queries is unmeasured. There is no
     query set to measure it against: hypothesis H-07.

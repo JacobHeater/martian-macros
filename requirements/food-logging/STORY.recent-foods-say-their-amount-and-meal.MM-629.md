@@ -8,7 +8,7 @@ related: [MM-39, MM-439, MM-587, MM-596, MM-623]
 # Story: recent foods say the amount they repeat, and this meal's come first
 
 ## Context
-The owner, 2026-10-26: the recent foods are "kind of ass" next to MyFitnessPal and MyNetDiary. The
+The owner, 2026-10-26: the recent foods are weak next to MyFitnessPal and MyNetDiary. The
 food-logging review (`docs/food-logging-plan.md`, F-09, increments B2 and C5) found two gaps:
 - A recent food's row said only its calories, so the portion it would repeat was invisible.
 - The list was newest first whatever the meal, so breakfast's oats sat above dinner's rice when adding to

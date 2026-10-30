@@ -11,7 +11,7 @@ related: [MM-104, MM-237]
 
 The owner looked at the navigation bar and could not read two of the five
 icons: "The food icon looks like a fork with a spoon turned sideways, and
-the Train icon looks like hammers fucking each other." The icons were
+the Train icon looks like" two hammers tangled together. The icons were
 hand-drawn stroke paths carried over from the Flutter app, and the two
 worst were the two most used.
 

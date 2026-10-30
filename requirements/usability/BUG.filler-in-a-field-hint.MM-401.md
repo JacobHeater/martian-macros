@@ -8,7 +8,7 @@ related: [MM-389, MM-108, MM-358]
 # Bug: "Your own amount. From 17 to 202 fl oz." and filler like it
 
 ## Context
-The owner, on the water goal in Settings (2026-10-18): "Nothing has sounded more AI than this shit right
+The owner, on the water goal in Settings (2026-10-18): "Nothing has sounded more AI than this right
 here," and "This cannot happen again." The hint narrated the field ("Your own amount.", "Type your own
 to change it.") before giving the range. MM-389 removed such lines by hand; nothing stopped new ones.
 

@@ -20,7 +20,7 @@ What this supersedes:
 
 - **MM-210's convention** (HTML assets under `requirements/ui-ux-assets/`,
   linked under `## UI/UX Assets`): retired, then deleted on the owner's
-  call the same day ("Old html files need to get the fuck out of here"):
+  call the same day (the old HTML files had to go):
   the folder, and the `## UI/UX Assets` section of the 90 tickets that
   linked into it. Git history has both.
 - **MM-211's manifest** (`coverage.json`, a drawing of every surface):
