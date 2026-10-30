@@ -12,7 +12,7 @@ The owner, 2026-10-28, on the phone: the app opened to a dark, empty screen. A s
 object in MM-677's build, so the first subscription to it threw while the Dashboard drew. React drops the whole tree
 on an uncaught render error, and nothing in the app catches one: `main.tsx` catches only a failure to open the data
 (MM-333), and `ReadFailedNotice` covers only a read that fails (MM-334). The person saw nothing and had no way to know
-why. The owner: "the app is broken and the user doesn't even know why."
+why. The owner: the app is broken and the person doesn't even know why.
 
 ## Description
 A crash while drawing is caught and said in words, in the app's own notice, never a blank screen: what happened,

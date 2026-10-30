@@ -39,7 +39,8 @@ By the product owner, 2026-10-24:
   - The coach says which meal and which food drove the miss, and by how much.
   - It says what the day would have been without it: "Without the General Tso's chicken you'd be 310 kcal over, not 1,054."
 - **Advice for the rest of today.** When the day is already over target, the coach says how to finish it: "You're done for calories. If you eat dinner, under 400 kcal: lean protein and vegetables. No sauce."
-- **Accountability, without profanity.** The owner: "It doesn't need to go so far as insulting everyone and${1}swearing every second word, but … how about just some good old accountability?"
+- **Accountability, without profanity.** The owner: "It doesn't need to go so far as insulting everyone and
+  swearing every second word, but … how about just some good old accountability?"
   - The coach keeps the record and holds the person to it.
   - It follows up on what it already told them: "Tuesday I told you to skip the General Tso's chicken. It's back: 744 kcal again."
   - It counts the repeats: "Third day this week over by 500 or more." "Peanut butter again: 9 of the last 14 days."

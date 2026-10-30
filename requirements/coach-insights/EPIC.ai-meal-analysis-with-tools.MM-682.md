@@ -9,7 +9,7 @@ related: [MM-617, MM-663, MM-664, MM-665, MM-666, MM-674, MM-683, MM-684, MM-685
 
 ## Context
 The owner, 2026-10-28, from the breakfast breakdown on a build of main made moments before: "swapping a biscuit for a
-chicken breast is kind of a poor suggestion." The sheet (MM-666) finds the one worst food in a meal and asks `swapFor`
+chicken breast is" a poor suggestion. The sheet (MM-666) finds the one worst food in a meal and asks `swapFor`
 for a single replacement; its first strategy takes any food the person logs in the same meal slot that trades better,
 whatever its kind, so a bread gets a chicken fillet in its place. MM-674 stopped only a food already on the plate. And
 the model with the person's key (MM-665) sees nothing but the pre-digested figures and the swap already chosen, so it

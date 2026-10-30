@@ -54,6 +54,10 @@ Agent usage goes to feature work, not validation. CI validates.
 
 ## Working agreements
 
+- Never record the owner's profanity anywhere: tickets, docs, the handoff,
+  commit messages, PR titles, descriptions or comments, or memory (owner,
+  2026-10-30). Paraphrase what they asked for in plain words; quote only
+  their clean wording.
 - Inspect the repository state before editing. Preserve unrelated and
   pre-existing changes; never discard or overwrite work you did not make.
   The owner's team id in the Xcode project and their `.claude/settings.json`

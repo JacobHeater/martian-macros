@@ -9,7 +9,7 @@ related: [MM-665, MM-301, MM-297, MM-554]
 
 ## Context
 The owner, on a phone (2026-10-28), Settings > Coach with a provider chosen: "look at the save key button here.
-color scheme is wrong and it hugs the textbox."
+color scheme is" wrong "and it hugs the textbox."
 
 Two causes. MM-665 placed the field and the button in a `div` of class names (`number-entry`,
 `number-entry__field`) that no stylesheet defines, so they stacked with no gap, unlike every other field with a
