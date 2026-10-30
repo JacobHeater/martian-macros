@@ -13,7 +13,7 @@ function arcAt(elapsedMs: number): number {
 
 /**
  * The first screen: what the app is, the horizon arc drawn once, and a way in; or, for someone who already uses the
- * app on another phone, a way to move it here without answering the questions only to have them replaced (MM-695).
+ * app on another phone, a way to move it here without answering the questions only to have them replaced (MM-697).
  */
 export function WelcomeStep({ onStart, onMoveHere }: { onStart: () => void; onMoveHere: () => void }) {
   const still =

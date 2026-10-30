@@ -1,7 +1,7 @@
-/** RFC 4648's base32 letters: every one in a QR code's alphanumeric set (MM-695). */
+/** RFC 4648's base32 letters: every one in a QR code's alphanumeric set (MM-697). */
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-/** The bytes as RFC 4648 base32 without padding, so a QR code can carry them in its compact alphanumeric mode (MM-695). */
+/** The bytes as RFC 4648 base32 without padding, so a QR code can carry them in its compact alphanumeric mode (MM-697). */
 export function base32OfBytes(bytes: Uint8Array): string {
   let text = '';
   let buffer = 0;

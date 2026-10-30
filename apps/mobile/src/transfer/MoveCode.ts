@@ -7,7 +7,7 @@ const prefix = 'MMMOVE1:';
 const keyBytes = 32;
 
 /**
- * What the receiving phone's QR code carries (MM-695): where it listens and the one-time key, as 38 bytes (an IPv4
+ * What the receiving phone's QR code carries (MM-697): where it listens and the one-time key, as 38 bytes (an IPv4
  * address, a port, the key) in base32 after a prefix. Base32 keeps every character in the QR code's alphanumeric
  * set, so the code stays small enough to scan easily with a logo in its middle.
  */

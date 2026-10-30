@@ -4,7 +4,7 @@ import type { FakeSendOutcome } from './FakeSendOutcome';
 import type { MoveProgress } from './MoveProgress';
 import type { MoveSending } from './MoveSending';
 
-/** A sending phone for tests and stories (MM-695): it keeps what it was asked to send, and sends, stays part-way, or fails, as told. */
+/** A sending phone for tests and stories (MM-697): it keeps what it was asked to send, and sends, stays part-way, or fails, as told. */
 export class FakeMoveSender implements MoveSending {
   outcome: FakeSendOutcome;
   readonly sent: { code: MoveCode; payload: MovePayload }[] = [];

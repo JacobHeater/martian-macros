@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import type { MmScannerApi } from '../../src/platform/MmScannerApi';
 import { NativeCamera } from '../../src/platform/NativeCamera';
 
-/** MM-695: the move code is read through its own call; the food scanner still takes only retail barcodes. */
+/** MM-697: the move code is read through its own call; the food scanner still takes only retail barcodes. */
 const api = (scan: Awaited<ReturnType<MmScannerApi['scan']>>, code?: string): MmScannerApi => ({
   scan: async () => scan,
   scanCode: async () => (code === undefined ? { cancelled: true } : { cancelled: false, text: code }),

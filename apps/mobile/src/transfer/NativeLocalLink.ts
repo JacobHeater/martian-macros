@@ -19,7 +19,7 @@ async function asked<T>(step: () => Promise<T>, fallback: MoveProblemKind): Prom
 }
 
 /**
- * The phone's local network through the `MmTransfer` plugin (MM-695): a server socket on Android, an `NWListener` on
+ * The phone's local network through the `MmTransfer` plugin (MM-697): a server socket on Android, an `NWListener` on
  * iOS, and a connection to the other phone's address. Frames cross the bridge as base64; the plugin puts each one's
  * length before it on the wire.
  */

@@ -1,6 +1,6 @@
 import type { MoveProblem } from './MoveProblem';
 
-/** What a fake sender does with a scanned code (MM-695). */
+/** What a fake sender does with a scanned code (MM-697). */
 export type FakeSendOutcome =
   | { readonly kind: 'sends' }
   | { readonly kind: 'connecting' }

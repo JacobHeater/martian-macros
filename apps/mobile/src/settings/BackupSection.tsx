@@ -81,7 +81,7 @@ export function BackupSection() {
     }
   };
 
-  // Moving to another phone on the same Wi-Fi (MM-695): its backup nudge runs this section's own backup.
+  // Moving to another phone on the same Wi-Fi (MM-697): its backup nudge runs this section's own backup.
   const move = useMoveToAnotherPhone({ backUp: () => backUp() });
 
   const restore = async () => {

@@ -1,5 +1,5 @@
 /**
- * The square in the middle of a QR code of `size` modules left light for a logo (MM-695): from module `from`, `span`
+ * The square in the middle of a QR code of `size` modules left light for a logo (MM-697): from module `from`, `span`
  * modules on a side. About a third of the side, odd so it centres on a module, which keeps it near a tenth of the
  * code's area: far inside what level H restores, and short of the timing and alignment patterns at the edges.
  */

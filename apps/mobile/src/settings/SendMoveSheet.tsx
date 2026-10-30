@@ -37,7 +37,7 @@ function spoken(stage: Stage): string {
 }
 
 /**
- * The sending phone's side of a move (MM-695), once the other phone's code is scanned: this phone's records and
+ * The sending phone's side of a move (MM-697), once the other phone's code is scanned: this phone's records and
  * progress photos, as a backup takes them, sent to it sealed under the code's key. This phone keeps everything; the
  * other phone asks before it replaces anything, so the move finishes there. Something scanned that is not a move code
  * is a failure here too, with Scan again (the UX guard's F2). One status region stays in place across the stages,
