@@ -16,6 +16,7 @@ public class MmScannerPlugin: CAPPlugin, CAPBridgedPlugin {
     public let jsName = "MmScanner"
     public let pluginMethods: [CAPPluginMethod] = [
         CAPPluginMethod(name: "scan", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "scanCode", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "readLabel", returnType: CAPPluginReturnPromise),
     ]
 
@@ -26,6 +27,11 @@ public class MmScannerPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func scan(_ call: CAPPluginCall) {
         withCamera(call) { self.startScan(call) }
+    }
+
+    /// The other phone's move code (MM-695): the same full-screen scan, reading QR codes only.
+    @objc func scanCode(_ call: CAPPluginCall) {
+        withCamera(call) { self.startScan(call, readsQr: true) }
     }
 
     @objc func readLabel(_ call: CAPPluginCall) {
@@ -45,15 +51,19 @@ public class MmScannerPlugin: CAPPlugin, CAPBridgedPlugin {
         }
     }
 
-    private func startScan(_ call: CAPPluginCall) {
+    private func startScan(_ call: CAPPluginCall, readsQr: Bool = false) {
         DispatchQueue.main.async {
             guard AVCaptureDevice.default(for: .video) != nil, let presenter = self.bridge?.viewController else {
                 return call.reject(Self.unusable)
             }
-            let scan = ScanViewController { outcome in
+            let scan = ScanViewController(readsQr: readsQr) { outcome in
                 switch outcome {
                 case .read(let digits, let symbology):
-                    call.resolve(["cancelled": false, "digits": digits, "symbology": symbology])
+                    if readsQr {
+                        call.resolve(["cancelled": false, "text": digits])
+                    } else {
+                        call.resolve(["cancelled": false, "digits": digits, "symbology": symbology])
+                    }
                 case .cancelled:
                     call.resolve(["cancelled": true])
                 case .failed(let message):

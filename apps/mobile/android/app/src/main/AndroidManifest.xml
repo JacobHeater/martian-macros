@@ -77,8 +77,13 @@
     <!-- Permissions -->
 
     <!-- Used only to download the optional food database the user asks for
-         (MM-56). The app sends no analytics and uploads nothing. -->
+         (MM-56), and to move the user's records to their other phone on the
+         same Wi-Fi when they choose to (MM-695). The app sends no analytics
+         and uploads nothing. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- To find this phone's Wi-Fi address for a move to another phone
+         (MM-695). Granted at install; it asks nothing of the user. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Reading barcodes and nutrition labels (MM-43, MM-44), on the device. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />

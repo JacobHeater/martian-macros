@@ -16,11 +16,11 @@ export function MoveChoiceSheet({ onChoose, onCancel }: { onChoose: (side: 'send
         <MmListRow
           leadingIcon="camera"
           title="Send from this phone"
-          subtitle="Scan the code on the phone you are moving to. This phone keeps its records."
+          subtitle="On the phone you are moving to, choose Receive on this phone, then scan its code here. This phone keeps its records."
           onPress={() => onChoose('send')}
         />
         <MmListRow
-          leadingIcon="download"
+          leadingIcon="qrCode"
           title="Receive on this phone"
           subtitle="Shows a code for your other phone to scan. Replaces what this phone holds; you are asked first."
           onPress={() => onChoose('receive')}

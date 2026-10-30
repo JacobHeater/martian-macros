@@ -117,11 +117,8 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
         return;
       }
       if (text === undefined) return;
+      // Not a move code: the sheet says so, with Scan again (the UX guard's F2).
       const code = MoveCode.parse(text);
-      if (code === undefined) {
-        overlays.snack('That is not a Martian Macros move code. Scan the code on your other phone’s Move to this phone screen.');
-        return;
-      }
       const again = await overlays.sheet<'again'>(
         'Sending to your other phone',
         (close) => <SendMoveSheet code={code} onScanAgain={() => close('again')} onClose={() => close()} />,

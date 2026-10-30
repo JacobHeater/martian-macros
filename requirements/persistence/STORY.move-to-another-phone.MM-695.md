@@ -2,7 +2,7 @@
 id: MM-695
 status: in-progress
 component: persistence
-related: [MM-59, MM-63, MM-64, MM-65, MM-157, MM-95, MM-244]
+related: [MM-59, MM-63, MM-64, MM-65, MM-157, MM-95, MM-244, MM-453]
 ---
 
 # Story: Move to another phone over the same Wi-Fi
@@ -60,7 +60,8 @@ Choices I made without asking (say if any is wrong):
 ## Decisions on building (2026-10-29)
 - **Built like its siblings** (rule 9): the row sits in Settings > Backup beside Back up now and Restore, as an `MmListRow`; the
   sheets follow `PassphraseSheet` (a headline, a line of text, buttons at the end); the confirmation is the restore's own `confirm`,
-  its words built as `restoreWords` builds them (the loss first). The row's icon is `sync` (no phone glyph in the set; MM-253 rule 2).
+  its words built as `restoreWords` builds them (the loss first). The row's icon is `movePhone` and Receive's is `qrCode`, both added to the set by
+  meaning (MM-253 rule 2; `sync` already means Health sync on the same screen, the designer's PD-3).
 - **"The same version" is the version and build the shell reports, and the schema version.** A local build carries the same version
   string on every build, so the schema is what tells two of them apart in practice.
 - **The nudge works by day**: only the last backup's day is kept (MM-63), so a record on that day counts as unbacked; once the person
@@ -70,6 +71,20 @@ Choices I made without asking (say if any is wrong):
   the alphanumeric mode with the icon in it. **jsQR is a dev dependency, for tests only**: every drawn code is decoded by it.
 - **The photos are behind the phone's lock** (MM-157): sending asks for it when this phone holds any; replacing asks when this phone
   holds any.
+
+## Decisions after the panel (2026-10-29)
+The product designer and the UX guard read the stories, the small-phone ones among them, from source.
+- **The nudge's skip is "Skip the backup"**, so both actions fit one row at 360 px with the backup the strong one (PD-1, F6).
+- **One status region stays in each sheet** across its stages, and the headline takes focus on an outcome, so an expired code, a
+  failure or "Sent" is heard; the percentage is no longer a live region (F3, F4).
+- **A version mismatch offers only Close**: another try would fail the same way until a phone is updated (F5).
+- **Something scanned that is not a move code** is the send sheet's failure, with Scan again, not a snack (F2).
+- **Send says the other phone's step** ("On the phone you are moving to, choose Receive on this phone, then scan its code here"), and
+  the code's words say "the phone you are moving from" (F1, F8). The QR code is named "QR code for your other phone to scan".
+- **The confirmation is drawn at phone width** with the longest counts and photos on both sides (F7).
+- **The terms are not changed here.** They say "The app does not send your records anywhere" and avoid "encrypt", and the backup's
+  same gap waits on the owner and the attorney in MM-453; the move's sentence joins it there. The privacy policy (a draft for the same
+  attorney) says it now: in the short account, in section 6, and in the photos' sentence.
 
 ## Description
 On the receiving phone, "Move to another phone" checks for unbacked data and, if there is any, offers "Back up first". It then shows a
@@ -179,7 +194,7 @@ Scenario: The local network is explained
   Given the app as shipped
   When its iOS Local Network explanation, privacy policy and terms are read
   Then the explanation describes moving data to another phone on the same Wi-Fi
-  And the privacy policy and the terms say the two phones talk directly on the person's Wi-Fi and nothing goes to the internet
+  And the privacy policy and the terms say the two phones talk directly on the person's Wi-Fi and none of it goes to the internet
 ```
 
 ## UI/UX

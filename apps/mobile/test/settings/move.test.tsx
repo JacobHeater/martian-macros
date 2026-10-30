@@ -67,7 +67,7 @@ it('offers a backup first when this phone was never backed up, and replaces its 
   const nudge = within(await screen.findByRole('dialog', { name: 'Move to this phone' }, slowly));
   expect(nudge.getByText(/never been backed up/)).toBeInTheDocument();
   expect(restorer.restoredFrom).toHaveLength(0);
-  await userEvent.click(nudge.getByRole('button', { name: 'Continue without a backup' }));
+  await userEvent.click(nudge.getByRole('button', { name: 'Skip the backup' }));
   const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly);
   expect(within(asks).getByText(/Moving replaces everything on this phone: 30 weigh-ins/)).toBeInTheDocument();
   expect(within(asks).getByText(/Your other phone sent 45 weigh-ins/)).toBeInTheDocument();
@@ -103,7 +103,7 @@ it('warns of records logged since the last backup, and runs the backup when aske
   const code = within(await screen.findByRole('dialog', { name: 'Move to this phone' }, slowly));
   expect(await code.findByText('Waiting for your other phone…', {}, slowly)).toBeInTheDocument();
   expect(code.queryByText(/since its last backup/)).not.toBeInTheDocument();
-  expect(code.getByRole('img', { name: 'The code for your other phone to scan' })).toBeInTheDocument();
+  expect(code.getByRole('img', { name: 'QR code for your other phone to scan' })).toBeInTheDocument();
 });
 
 it('shows the code at once when nothing was logged since the last backup', async () => {
@@ -159,11 +159,14 @@ it('says the phones must share a Wi-Fi when the other cannot be reached, and off
   expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
 });
 
-it('sends nothing for a code that is not a move code', async () => {
+it('sends nothing for a code that is not a move code, and offers to scan again', async () => {
   scanned = '0123456789012';
   render();
   await startMove('Send from this phone');
-  expect(await screen.findByText(/not a Martian Macros move code/, {}, slowly)).toBeInTheDocument();
+  const sheet = within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly));
+  expect(await sheet.findByText(/not a Martian Macros move code/, {}, slowly)).toBeInTheDocument();
+  expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
+  expect(sheet.getByRole('heading', { name: 'The move did not happen' })).toHaveFocus();
   expect(sender.sent).toHaveLength(0);
 });
 

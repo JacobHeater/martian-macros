@@ -25,7 +25,7 @@ function summaryOn(platform: Platform): readonly string[] {
     platform === 'ios'
       ? 'Barcodes and nutrition labels are read on the phone by software that is part of iOS.'
       : 'The barcode and label reader is a Google component, and Google says it sends Google technical details about itself. It is not given your records.',
-    'A backup is made only when you choose to make one. It is encrypted on the phone with your passphrase and goes only where you send it.',
+    'A backup is made only when you choose to make one. It is encrypted on the phone with your passphrase and goes only where you send it. Moving to your other phone sends your records, encrypted, straight to that phone on your Wi-Fi.',
     'The app has no ads, no analytics and no tracking, and we do not sell information about you.',
     'You can erase everything from Settings at any time.',
   ];
@@ -76,8 +76,8 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
       heading: '5. The camera, and the reader inside the app',
       paragraphs: [
         ios
-          ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere, and they go into the app’s encrypted backup only if you turn that on.'
-          : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component, ML Kit. Google says that this component sends Google technical details about itself and the phone, such as the phone’s model, the operating system and app versions, an identifier for the installation, and performance and error information. It is not given your records. Google’s own policy covers what Google receives. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere, and they go into the app’s encrypted backup only if you turn that on.',
+          ? 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone by software that is part of iOS, and the label photo is not kept. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere except to your other phone when you move to it, and they go into the app’s encrypted backup only if you turn that on.'
+          : 'The camera is used only when you scan a barcode or photograph a nutrition label. Both are read on the phone, and a label photo is deleted as soon as it has been read. The barcode and label reader is a Google component, ML Kit. Google says that this component sends Google technical details about itself and the phone, such as the phone’s model, the operating system and app versions, an identifier for the installation, and performance and error information. It is not given your records. Google’s own policy covers what Google receives. If you take progress photos, the camera is used inside the app for those too: they are kept only in the app on this phone, never added to the phone’s photo library or its own backup, never analysed and never sent anywhere except to your other phone when you move to it, and they go into the app’s encrypted backup only if you turn that on.',
         ios
           ? 'The app runs inside the iPhone’s own web view, which is part of iOS. Apple’s policy, not this one, covers what iOS itself sends.'
           : 'The app runs inside Android’s own web view, which Google provides and updates. Google’s policy, not this one, covers what Android and its components send by themselves.',
@@ -91,6 +91,7 @@ function sectionsOn(platform: Platform): readonly TermsSection[] {
           ? 'The app then hands the encrypted file to the iPhone’s share sheet, and you choose where it goes: the Files app, a storage app, a message or an email. The app itself connects to no storage service. Whatever you choose receives the encrypted file and keeps it under its own terms and privacy policy.'
           : 'The app then hands the encrypted file to Android’s share menu, and you choose where it goes: a folder on the phone, a storage app, a message or an email. The app itself connects to no storage service. Whatever you choose receives the encrypted file and keeps it under its own terms and privacy policy.',
         'Restoring opens only the backup file you pick with the phone’s file picker. A downloaded food database is not in a backup.',
+        'Move to another phone, in Settings under Backup, sends your records and progress photos straight to your other phone on the same Wi-Fi, only when you choose it. The receiving phone shows a code holding a one-time key; everything the two phones exchange is encrypted with that key, and none of it goes over the internet or to any service of ours. The receiving phone asks before it replaces what it holds.',
       ],
     },
     {

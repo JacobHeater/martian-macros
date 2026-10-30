@@ -67,6 +67,8 @@ import SquareFootOutlined from '@mui/icons-material/SquareFootOutlined';
 import StraightenOutlined from '@mui/icons-material/StraightenOutlined';
 import SummarizeOutlined from '@mui/icons-material/SummarizeOutlined';
 import SyncOutlined from '@mui/icons-material/SyncOutlined';
+import MobileScreenShareOutlined from '@mui/icons-material/MobileScreenShareOutlined';
+import QrCode2Outlined from '@mui/icons-material/QrCode2Outlined';
 import TaskAltOutlined from '@mui/icons-material/TaskAltOutlined';
 import TimelapseOutlined from '@mui/icons-material/TimelapseOutlined';
 import TimerOutlined from '@mui/icons-material/TimerOutlined';
@@ -161,4 +163,6 @@ export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   sleep: BedtimeOutlined,
   assistant: AutoAwesomeOutlined,
   photos: PhotoLibraryOutlined,
+  movePhone: MobileScreenShareOutlined,
+  qrCode: QrCode2Outlined,
 };
