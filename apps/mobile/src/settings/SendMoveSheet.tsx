@@ -8,6 +8,7 @@ import { MmBusyLine } from '../ui/MmBusyLine';
 import { MmButton } from '../ui/MmButton';
 import { MmProgressBar } from '../ui/MmProgressBar';
 import { moveProblemWords } from './moveProblemWords';
+import type { SendWhat } from './SendWhat';
 import './settings.css';
 
 type Stage =
@@ -21,17 +22,23 @@ interface SendMoveSheetProps {
   code: MoveCode | undefined;
   /** What to send, gathered once the code is in hand. */
   parcel: () => Promise<MoveParcel>;
-  /** Whose words the sheet speaks: a move of everything (MM-698) or a copy of foods (MM-715). */
-  what: 'everything' | 'foods';
+  /** Whose words the sheet speaks: a move of everything (MM-698) or a copy of foods (MM-715) or water (MM-718). */
+  what: SendWhat;
   onScanAgain: () => void;
   onClose: () => void;
 }
 
 /** What did not happen, in the sheet's headline and what is said. */
-const didNotHappen = (what: SendMoveSheetProps['what']) => (what === 'foods' ? 'The copy did not happen' : 'The move did not happen');
+const didNotHappen = (what: SendWhat) => (what === 'everything' ? 'The move did not happen' : 'The copy did not happen');
+
+/** What the other phone has once it is sent, and what it does with it on confirming. */
+const sentWords = (what: SendWhat) =>
+  what === 'everything'
+    ? 'Your other phone has everything. Confirm there to finish; this phone keeps its records.'
+    : `Your other phone has the ${what}. Confirm there to add ${what === 'foods' ? 'them' : 'it'}; this phone keeps its own.`;
 
 /** What the status region says for a stage, once, when it begins (the UX guard's F3, F4). */
-function spoken(stage: Stage, what: SendMoveSheetProps['what']): string {
+function spoken(stage: Stage, what: SendWhat): string {
   switch (stage.kind) {
     case 'sending':
       return 'Sending to your other phone.';
@@ -45,8 +52,8 @@ function spoken(stage: Stage, what: SendMoveSheetProps['what']): string {
 }
 
 /**
- * The sending phone's side of a move (MM-698), or of a copy of foods (MM-715), once the other phone's code is
- * scanned: the parcel, this phone's records and progress photos as a backup takes them or the foods chosen, sent
+ * The sending phone's side of a move (MM-698), or of a copy of foods (MM-715) or water (MM-718), once the other phone's code is
+ * scanned: the parcel, this phone's records and progress photos as a backup takes them or the foods or drinks chosen, sent
  * to it sealed under the code's key. This phone keeps everything; the other phone asks before it replaces or adds
  * anything, so the move finishes there. Something scanned that is not a move code
  * is a failure here too, with Scan again (the UX guard's F2). One status region stays in place across the stages,
@@ -100,11 +107,7 @@ export function SendMoveSheet({ code, parcel, what, onScanAgain, onClose }: Send
           <h2 className="app-headline" ref={headline} tabIndex={-1}>
             Sent
           </h2>
-          <p className="app-text">
-            {what === 'foods'
-              ? 'Your other phone has the foods. Confirm there to add them; this phone keeps its own.'
-              : 'Your other phone has everything. Confirm there to finish; this phone keeps its records.'}
-          </p>
+          <p className="app-text">{sentWords(what)}</p>
           <div className="app-gap" />
           <div className="app-row app-row-end">
             <MmButton label="Done" onPress={onClose} />

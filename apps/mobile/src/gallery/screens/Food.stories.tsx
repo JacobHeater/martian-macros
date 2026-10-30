@@ -545,6 +545,20 @@ export const WaterSection = screenStory({
   },
 });
 
+/** MM-718: a drink's menu: Copy to another day, Copy to another phone, Delete, in a food's order (MM-714). */
+export const WaterEntryMenu = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Copy to another phone',
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for .* of water/ });
+    if (more !== undefined) {
+      reveal(more);
+      await userEvent.click(more);
+    }
+  },
+});
+
 /** MM-318: no water yet and no goal: the header alone, as an empty meal. */
 export const WaterNone = screenStory({
   covers: ['FoodScreen'],

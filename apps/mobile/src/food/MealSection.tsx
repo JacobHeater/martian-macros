@@ -146,7 +146,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
       slot: meal,
       day,
       today,
-      toPhone: (foods) => copyToPhone(foods, day),
+      toPhone: (foods) => copyToPhone(day, { entries: foods }),
     });
   };
 
@@ -197,7 +197,7 @@ export function MealSection({ meal, day, entries, selection, onStartSelection, f
         slot: entry.meal,
         day,
         today,
-        toPhone: (foods) => copyToPhone(foods, day),
+        toPhone: (foods) => copyToPhone(day, { entries: foods }),
       });
   };
 

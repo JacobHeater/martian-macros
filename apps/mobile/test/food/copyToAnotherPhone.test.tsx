@@ -152,7 +152,7 @@ async function otherPhone({ already = false, parcel }: { already?: boolean; parc
   const other = new InMemoryRepositories();
   await other.setup.saveSetup(typicalSetup({ onboardedOn: today.addDays(-40), healthCheckConfirmedOn: today }));
   if (already) await other.customFoods.saveCustomFood(momsSalmon(0));
-  const copy = foodCopyBytes({ day: yesterday, entries: [salmonFrom(42, yesterday, 19 * 60), foodOn(yesterday, { name: 'Rice', meal: 'dinner', kcal: 200 })], foods: [momsSalmon(42)] });
+  const copy = foodCopyBytes({ day: yesterday, entries: [salmonFrom(42, yesterday, 19 * 60), foodOn(yesterday, { name: 'Rice', meal: 'dinner', kcal: 200 })], water: [], foods: [momsSalmon(42)] });
   receiver = new FakeMoveReceiver({ kind: 'receives', parcel: parcel ?? { kind: 'foods', foods: copy } });
   render(other);
   const settings = await openSettings();

@@ -21,6 +21,7 @@ import type { ReferenceNutrition } from '../domain/food/portion/ReferenceNutriti
 import { FoodEntry } from '../domain/FoodEntry';
 import { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
+import { WaterEntry } from '../domain/water/WaterEntry';
 import type { FoodCopy } from './FoodCopy';
 import { foodCopyFormat } from './foodCopyFormat';
 
@@ -167,6 +168,18 @@ const entry = (value: unknown): FoodEntry => {
   });
 };
 
+/** A drink as it is to be logged on this phone: a new one (id 0), on its day, at the moment it was had there (MM-718). */
+const water = (value: unknown): WaterEntry => {
+  const o = object(value);
+  const date = number(o, 'date');
+  if (!Number.isInteger(date)) throw new Unreadable('date is not whole');
+  const ml = number(o, 'ml');
+  if (ml <= 0) throw new Unreadable('ml is not an amount');
+  const at = number(o, 'at');
+  if (!Number.isInteger(at)) throw new Unreadable('at is not a moment');
+  return new WaterEntry({ id: 0, date: CalendarDate.fromEpochDay(date), ml, at: new Date(at) });
+};
+
 const ingredient = (value: unknown): RecipeIngredient => {
   const o = object(value);
   const source = o['source'] === undefined || o['source'] === null ? undefined : object(o['source']);
@@ -212,9 +225,10 @@ const food = (value: unknown): CustomFood => {
 };
 
 /**
- * The copy of foods `bytes` hold (MM-715), as `foodCopyBytes` wrote it, or undefined when they hold anything else:
- * not JSON, another format or version, a missing field, a number that is not one, a meal, unit or kind the app
- * does not know. Nothing is guessed: a copy that does not read whole is not read at all.
+ * The copy of foods or water `bytes` hold (MM-715, MM-718), as `foodCopyBytes` wrote it, or undefined when they
+ * hold anything else: not JSON, another format or version, a missing field, a number that is not one, a meal, unit
+ * or kind the app does not know, nothing to add. Nothing is guessed: a copy that does not read whole is not read at
+ * all.
  */
 export function foodCopyOfBytes(bytes: Uint8Array): FoodCopy | undefined {
   try {
@@ -223,8 +237,9 @@ export function foodCopyOfBytes(bytes: Uint8Array): FoodCopy | undefined {
     const day = number(o, 'day');
     if (!Number.isInteger(day)) return undefined;
     const entries = list(o['entries']).map(entry);
-    if (entries.length === 0) return undefined;
-    return { day: CalendarDate.fromEpochDay(day), entries, foods: list(o['foods']).map(food) };
+    const drinks = list(o['water']).map(water);
+    if (entries.length === 0 && drinks.length === 0) return undefined;
+    return { day: CalendarDate.fromEpochDay(day), entries, water: drinks, foods: list(o['foods']).map(food) };
   } catch {
     return undefined;
   }

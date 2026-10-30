@@ -6,6 +6,7 @@ import { NutritionTotals } from '../../domain/food/portion/NutritionTotals';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CoachAiConfig } from '../../domain/integration/CoachAiConfig';
 import { encodePhotoArchive } from '../../domain/photos/encodePhotoArchive';
+import { WaterEntry } from '../../domain/water/WaterEntry';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
 import { SettingsScreen } from '../../settings/SettingsScreen';
 import type { AppServices } from '../../state/AppServices';
@@ -303,8 +304,39 @@ const foodsParcel = (): MoveParcel => {
     }),
     new FoodEntry({ id: 0, date: day, meal: 'lunch', name: '"Frizzle" High Heat Cooking Oil (Graza)', kcal: 118, proteinG: 0, carbsG: 0, fatG: 14, source: 'householdMeasure' }),
   ];
-  return { kind: 'foods', foods: foodCopyBytes({ day, entries, foods: [library] }) };
+  return { kind: 'foods', foods: foodCopyBytes({ day, entries, water: [], foods: [library] }) };
 };
+
+/** Two drinks of the demo's day, as a copy of water from the other phone (MM-718). */
+const waterParcel = (): MoveParcel => {
+  const day = storyToday;
+  const at = (hour: number) => new Date(day.year, day.month - 1, day.day, hour);
+  const water = [new WaterEntry({ id: 0, date: day, ml: 500, at: at(7) }), new WaterEntry({ id: 0, date: day, ml: 250, at: at(10) })];
+  return { kind: 'foods', foods: foodCopyBytes({ day, entries: [], water, foods: [] }) };
+};
+
+/** MM-718: a copy of water arrived: how much, in how many drinks, for which day, asked before it is added, at phone width. */
+export const CopyWaterConfirm = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Add water from your other phone?',
+  viewport: 'smallPhone',
+  device: withReceiver(new FakeMoveReceiver({ kind: 'receives', parcel: waterParcel() }), emptyPhone),
+  open: openBackup,
+  walk: choose('Receive on this phone'),
+});
+
+/** MM-718: "Copy to another phone" from a drink's menu: the water sent, with the copy's words for water. */
+export const CopyWaterSent = screenStory({
+  covers: ['SendMoveSheet'],
+  shows: 'Your other phone has the water. Confirm there to add it; this phone keeps its own.',
+  device: withSender(new FakeMoveSender({ kind: 'sends' })),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    const [more] = await within(canvas).findAllByRole('button', { name: /^More actions for .* of water/ });
+    if (more !== undefined) await userEvent.click(more);
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Copy to another phone' }));
+  },
+});
 
 /** MM-715: a copy of foods arrived: what came, for which meal and day, asked before it is added, at phone width with the longest names. */
 export const CopyFoodsConfirm = screenStory({

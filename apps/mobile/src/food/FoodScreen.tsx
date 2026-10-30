@@ -119,7 +119,7 @@ export function FoodScreen() {
       slot: meals.size === 1 ? foods[0]?.meal : undefined,
       day,
       today,
-      toPhone: (chosenFoods) => copyToPhone(chosenFoods, day),
+      toPhone: (chosenFoods) => copyToPhone(day, { entries: chosenFoods }),
     });
     // The row choosing started from may have left the day (deleted, or moved to another day): then the focus goes
     // to the first row still here, never nowhere (MM-649).
