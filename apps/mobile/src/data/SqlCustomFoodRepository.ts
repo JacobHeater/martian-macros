@@ -1,12 +1,15 @@
 import { CustomFood } from '../domain/food/custom/CustomFood';
 import { CustomFoodKind } from '../domain/food/custom/CustomFoodKind';
+import type { FoodIngredient } from '../domain/food/custom/FoodIngredient';
 import type { RecipeIngredient } from '../domain/food/custom/RecipeIngredient';
+import { FoodGroup } from '../domain/food/FoodGroup';
+import { FoodEvidenceKind } from '../domain/food/meal/FoodEvidenceKind';
 import { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import type { CustomFoodRepository } from '../domain/repositories/CustomFoodRepository';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
-import { integer, named, number, optionalInteger, optionalNumber, optionalText, orNull, text } from './columns';
+import { integer, named, number, optionalInteger, optionalNamed, optionalNumber, optionalText, orNull, text } from './columns';
 import { insert } from './insert';
 import { update } from './update';
 import { microsFromRow } from './microsFromRow';
@@ -21,6 +24,28 @@ const totalsOf = (r: SqlRow) =>
   });
 
 const both = ['custom_foods', 'recipe_ingredients'] as const;
+
+/** What went into a homemade food (MM-710), kept as a JSON list of name and grams; nothing when the column is empty or not a list. */
+function madeOfIn(json: string | undefined): FoodIngredient[] {
+  if (json === undefined) return [];
+  try {
+    const value: unknown = JSON.parse(json);
+    if (!Array.isArray(value)) return [];
+    return value.flatMap((line): FoodIngredient[] => {
+      if (typeof line !== 'object' || line === null) return [];
+      const { name, grams } = line as { name?: unknown; grams?: unknown };
+      return typeof name === 'string' && name !== '' ? [{ name, grams: typeof grams === 'number' && Number.isFinite(grams) ? grams : undefined }] : [];
+    });
+  } catch {
+    return [];
+  }
+}
+
+/** Where a saved food's numbers came from (MM-710); none for a food saved before it was kept. */
+function evidenceOf(r: SqlRow): CustomFood['evidence'] {
+  const kind = optionalNamed(FoodEvidenceKind.values, r, 'evidence_kind');
+  return kind === undefined ? undefined : { kind, citation: optionalText(r, 'evidence_citation') };
+}
 
 /** `CustomFoodRepository` kept in the database. Ids are never reused. */
 export class SqlCustomFoodRepository implements CustomFoodRepository {
@@ -65,6 +90,9 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
             fiberG: optionalNumber(r, 'fiber_g'),
             sugarAlcoholsG: optionalNumber(r, 'sugar_alcohols_g'),
             micros: microsFromRow(r),
+            group: FoodGroup.fromName(optionalText(r, 'food_group')),
+            evidence: evidenceOf(r),
+            madeOf: madeOfIn(optionalText(r, 'ingredients')),
           }),
       );
     });
@@ -88,6 +116,10 @@ export class SqlCustomFoodRepository implements CustomFoodRepository {
         sugar_alcohols_g: orNull(food.sugarAlcoholsG),
         sodium_mg: orNull(food.micros.of('sodium')),
         ...microsValues(food.micros),
+        food_group: orNull(food.group),
+        evidence_kind: orNull(food.evidence?.kind),
+        evidence_citation: orNull(food.evidence?.citation),
+        ingredients: food.madeOf.length === 0 ? null : JSON.stringify(food.madeOf.map((line) => ({ name: line.name, grams: line.grams }))),
       };
       let id = food.id;
       if (id === 0) {

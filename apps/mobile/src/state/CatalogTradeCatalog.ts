@@ -1,4 +1,5 @@
 import type { FoodEntry } from '../domain/FoodEntry';
+import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { FoodGroup } from '../domain/food/FoodGroup';
 import type { FoodOrigin } from '../domain/food/portion/FoodOrigin';
 import type { TradeCatalog } from '../engine/analysis/TradeCatalog';
@@ -26,7 +27,9 @@ const originKey = (origin: Pick<FoodOrigin, 'packId' | 'foodId'>) => `${origin.p
  * those groups, each at its default serving (the first the pack lists, or
  * 100 g). A group lists at most `perGroup` foods, in the order the packs
  * store them. Each group's name index for the swap (MM-617) is built there
- * too, over the same foods, so a swap never reads the catalog. The
+ * too, over the same foods, so a swap never reads the catalog. A saved
+ * food with a group (MM-710) answers `groupOf` by that group, so the
+ * coach's same-group swap may offer it or stand in its place. The
  * everyday proteins (MM-688) are searched by name on top, each at most
  * `perEveryday` foods, so chicken breast is listed however deep in its
  * group the pack stores it.
@@ -45,9 +48,13 @@ export class CatalogTradeCatalog implements TradeCatalog {
   static async load(
     catalog: CatalogSearch & CatalogFoodLookup & CatalogServingLookup,
     entries: readonly FoodEntry[],
-    { perGroup = 500, perEveryday = 40 }: { perGroup?: number; perEveryday?: number } = {},
+    { perGroup = 500, perEveryday = 40, savedFoods = [] }: { perGroup?: number; perEveryday?: number; savedFoods?: readonly CustomFood[] } = {},
   ): Promise<CatalogTradeCatalog> {
     const groups = new Map<string, FoodGroup>();
+    // A saved food with a group (MM-710) is of that group wherever it was logged, so the coach may trade it within it.
+    for (const saved of savedFoods) {
+      if (saved.group !== undefined) groups.set(originKey({ packId: 'custom', foodId: saved.id }), saved.group);
+    }
     const looked = new Set<string>();
     for (const entry of entries) {
       const origin = entry.portion?.origin;
@@ -89,7 +96,7 @@ export class CatalogTradeCatalog implements TradeCatalog {
   }
 
   groupOf(origin: Pick<FoodOrigin, 'packId' | 'foodId'>): FoodGroup | undefined {
-    if (origin.packId === 'custom') return undefined;
+    // A saved food is of the group it was given (MM-710), and of none otherwise.
     return this.groups.get(originKey(origin));
   }
 

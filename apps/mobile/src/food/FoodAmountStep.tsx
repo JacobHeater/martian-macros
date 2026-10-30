@@ -49,6 +49,7 @@ import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import type { AmountChoice } from './AmountChoice';
 import { FoodGrade } from './FoodGrade';
+import { foodEvidenceLine } from '../format/foodEvidenceLine';
 import { FoodTrustMark } from './FoodTrustMark';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { MealChips } from './MealChips';
@@ -526,6 +527,11 @@ export function FoodAmountStep({
         <p className="app-caption">{grade.kind === 'graded' ? 'Grade for the food itself, per calorie' : 'No grade for this food'}</p>
         {/* The numbers the entry rests on, as the source states them (MM-153); the edit sheet shows the same line (MM-221). */}
         <p className="app-caption food-reference-line">{referenceLine}</p>
+        {/* A saved food says where its numbers came from, and what went into it when homemade (MM-710). */}
+        {custom?.evidence === undefined ? null : <p className="app-caption">{foodEvidenceLine(custom.evidence)}</p>}
+        {custom === undefined || custom.madeOf.length === 0 ? null : (
+          <p className="app-caption">{`Made of: ${custom.madeOf.map((line) => (line.grams === undefined ? line.name : `${line.name} ${quantityText(line.grams)} g`)).join(', ')}.`}</p>
+        )}
         {/* Why a drink has no Grams chip: its density is not known, and none is guessed (MM-167; the UX guard's UX-3). */}
         {food.basis === 'per100ml' && food.densityGPerMl === undefined ? (
           <p className="app-caption">No weight is offered: its density is not known, so grams would be a guess.</p>

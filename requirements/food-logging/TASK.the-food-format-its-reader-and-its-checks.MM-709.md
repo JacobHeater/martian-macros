@@ -75,3 +75,21 @@ Scenario: Per serving derived
 - Tests: `test/domain/foodAnalysis.test.ts` (reading, every check, the evidence rule, the derivation, the fix message,
   the prompt's example).
 - A change to the prompt is reviewed here, as the meal prompt's is in MM-586.
+
+## Progress
+Built 2026-10-30 (PR C of MM-703), not run locally; CI validates.
+- In `apps/mobile/src/domain/food/custom/`: `foodAnalysisFormat` (the name and version), `FoodDraft`,
+  `FoodAnalysisReading`, `parseFoodAnalysis` (the block found in chatter; another format or version refused with a
+  reason), `foodDraftProblems` (every field required with 0 as given, nothing below zero, the serving between 0 and
+  3,000 g, at most `maxKcalPer100g`, each micronutrient at most its `maxPer100g`, the group one of `FoodGroup`, the
+  energy rule), `customFoodOfDraft` (per 100 g scaled to the serving, the group, evidence and ingredients carried),
+  `FoodQuestionAnswers` and `FoodIngredient`.
+- In `apps/mobile/src/food/ai/`: `resolveFoodDrafts` and `matchedFoodDraft` (the evidence rule: cited with a specific
+  citation, else the packs by `lookup`, a per-100 mL pack food never taken, else estimated).
+- In `apps/mobile/src/format/`: `foodPrompt` (fixed, with its own example), `foodPromptWith` (the answers and today's
+  date in place of what the prompt says it will be told), `foodDraftJson`, `foodFixMessage`, `foodGroupLabel`;
+  `foodEvidenceLine` says "Read from the label".
+- Tests: `test/domain/foodAnalysis.test.ts` (the prompt's example reads back with no problems, the reading, every
+  check, the evidence rule over the fixture pack, the derivation, the JSON round trip, the fix message).
+- One name differs from the ticket's: the saved food's ingredients are `madeOf` on `CustomFood`, since `ingredients`
+  already names a recipe's lines (MM-45).

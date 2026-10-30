@@ -19,6 +19,9 @@ function withId(f: CustomFood, id: number): CustomFood {
     fiberG: f.fiberG,
     sugarAlcoholsG: f.sugarAlcoholsG,
     micros: f.micros,
+    group: f.group,
+    evidence: f.evidence,
+    madeOf: f.madeOf,
   });
 }
 
