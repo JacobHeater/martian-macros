@@ -13,7 +13,7 @@ own foods, their profile and their settings have no place of their own; the owne
 becoming a liability. We may consider moving to a proper menu (with animations hardware accelerated)."
 
 ## Decisions
-The owner's (MM-703): a drawer from the left; the bar stays with its four; a menu button at the left of the app bar
+The owner's (MM-703): a drawer from the left; the bar stays with its four (*superseded the same day by MM-711: the bar goes, the drawer is the one navigation*); a menu button at the left of the app bar
 opens it; a tap on the scrim or a drag back closes it; no edge swipe opens it; its head is the Martian Macros lettering;
 its rows are the four destinations, Profile, Library and Settings; the last three open as pushed screens; the gear
 leaves the app bar.

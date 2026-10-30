@@ -52,7 +52,7 @@ disciplined palette and precise motion.
   the app bar and cannot be a fill, Ember text (`MmButton lead`, the
   Dashboard's Add food once the day is weighed). Every other action is a text
   action in `--text` at the heading weight (`MmButton text`, the icon action
-  kind likewise), never Ember. The current location in the navigation bar, a
+  kind likewise), never Ember. The current destination in the drawer, a
   selection's check and a switch's on-state are the Ember of state, not of
   action, and sit outside the count. `test/gallery/hierarchy.test.tsx` fails a
   destination story with more than one Ember action. Option (b), "one Ember

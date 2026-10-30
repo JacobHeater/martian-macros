@@ -10,7 +10,7 @@
    * levels that step up from it in the same hue. MM-558: three neons, one meaning each. Lime-yellow is "do it" (the
    * action); hot pink is "chosen" (a chosen segment, chip or card, the current tab); neon orange is "fuel" (a meal's
    * add plate and the calorie arc it fills); the owner put the pink on the section marks too. Violet is the frame (the
-   * hero's edge, the navigation bar's stripes, the arc's track, a field's edge) and means nothing. Macro, water and
+   * hero's edge, the arc's track, a field's edge) and means nothing. Macro, water and
    * grade colours stay inside the data. No gradients, no glow.
    */
   --canvas: #0a081b;

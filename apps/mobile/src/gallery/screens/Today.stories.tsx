@@ -151,7 +151,7 @@ export const BothTyped = screenStory({
   },
 });
 
-/** The weigh-in saved: the snack above the navigation bar offers Progress (MM-294, MM-301, MM-302). */
+/** The weigh-in saved: the snack above the safe area offers Progress (MM-294, MM-301, MM-302). */
 export const WeighInSaved = screenStory({
   covers: ['DashboardScreen'],
   shows: 'Open Progress',
@@ -159,7 +159,7 @@ export const WeighInSaved = screenStory({
   walk: type('Today’s weigh-in', '184.2{Enter}'),
 });
 
-/** The waist saved on the Dashboard: the snack confirms it above the navigation bar and offers Progress (MM-301, MM-302). */
+/** The waist saved on the Dashboard: the snack confirms it above the safe area and offers Progress (MM-301, MM-302). */
 export const WaistSaved = screenStory({
   covers: ['DashboardScreen'],
   shows: 'Open Progress',

@@ -53,6 +53,6 @@ it('Try again draws again, and a crash that does not recur leaves the app drawn'
   const again = await screen.findByRole('button', { name: 'Try again' });
   crashing = false;
   await userEvent.click(again);
-  expect(await screen.findByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Menu' })).toBeInTheDocument();
   expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 });

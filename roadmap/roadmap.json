@@ -1636,6 +1636,8 @@
      "MM-679",
      "MM-704",
      "MM-705",
+     "MM-711",
+     "MM-712",
      "MM-691"
     ]
    },
@@ -1961,10 +1963,12 @@
     },
     {
      "step": 25,
-     "title": "A side drawer beside the bar (the owner, 2026-10-30, MM-703): opened from a menu button, the Martian Macros lettering at its head, the four destinations, Profile, Library and Settings as rows; the gear leaves the app bar (MM-704); Profile is its own screen with the profile section and nutrition goals out of Settings (MM-705)",
+     "title": "A side drawer beside the bar (the owner, 2026-10-30, MM-703): opened from a menu button, the Martian Macros lettering at its head, the four destinations, Profile, Library and Settings as rows; the gear leaves the app bar (MM-704); Profile is its own screen with the profile section and nutrition goals out of Settings (MM-705); then the owner's two call-outs from the first build: the bar goes, the drawer is the one navigation (MM-711), and Profile's folds start closed (MM-712)",
      "tickets": [
       "MM-704",
-      "MM-705"
+      "MM-705",
+      "MM-711",
+      "MM-712"
      ]
     }
    ],

@@ -164,7 +164,7 @@ it('while a download runs, every screen shows a strip with Cancel', async () => 
   // Back out to the Dashboard, with the download going on underneath it.
   await userEvent.click(packs.getByRole('button', { name: 'Back' }));
   await userEvent.click(within(topLayer()).getByRole('button', { name: 'Back' }));
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
   expect(strip()).toHaveTextContent('Downloading Barcode foods, United States');
   await openTab('Food');
   // The strip stays on the next screen.
@@ -177,7 +177,7 @@ it('while a download runs, every screen shows a strip with Cancel', async () => 
 
 it('no strip when nothing is downloading', async () => {
   open();
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
   expect(screen.queryByText(/Downloading/)).not.toBeInTheDocument();
 });
 

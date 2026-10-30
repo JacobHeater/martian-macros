@@ -102,7 +102,7 @@ it('the first adaptive check-in runs through the app', async () => {
   // Thirty days of complete logs at maintenance; targets issued on day one.
   await seedHistory(30, 2600);
   renderApp(repos, today);
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
   await expect.poll(async () => (await first(repos.targets.watchTargetsHistory())).length).toBe(2);
   const history = await first(repos.targets.watchTargetsHistory());
   expect(history[1]?.effectiveFrom).toBe(today);

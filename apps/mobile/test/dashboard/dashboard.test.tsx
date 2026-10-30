@@ -66,9 +66,11 @@ async function seed({
 it('the app opens on the dashboard with its destinations', async () => {
   await seed({ history: [targets(today.addDays(-30), 2400)] });
   renderApp(repos, today);
-  const bar = await screen.findByRole('navigation', { name: 'Destinations' });
-  for (const label of ['Dashboard', 'Food', 'Train', 'Coach']) expect(bar).toHaveTextContent(label);
   expect(await screen.findByText('left of 2,400')).toBeInTheDocument();
+  await userEvent.click(await screen.findByRole('button', { name: 'Menu' }));
+  const drawer = await screen.findByRole('dialog', { name: 'Menu' });
+  for (const label of ['Dashboard', 'Food', 'Train', 'Coach']) expect(drawer).toHaveTextContent(label);
+  await userEvent.keyboard('{Escape}');
 });
 
 it('a normal day shows calories, protein and the trend weight', async () => {

@@ -10,6 +10,6 @@ import type { SettingsSectionId } from './SettingsSectionId';
  * which screen the row moved to.
  */
 export function openSettingsSection(navigator: Navigator, section: SettingsSectionId): Promise<void | undefined> {
-  if (section === 'profile' || section === 'nutritionGoals') return navigator.push(() => <ProfileScreen />);
+  if (section === 'profile' || section === 'nutritionGoals') return navigator.push(() => <ProfileScreen open={section} />);
   return navigator.push(() => <SettingsScreen open={section} />);
 }

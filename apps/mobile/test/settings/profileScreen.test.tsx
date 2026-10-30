@@ -11,7 +11,7 @@ import { topLayer } from '../support/topLayer';
 
 /**
  * MM-705: who the person is and what they aim for are on Profile, a screen
- * of their own from the drawer: "You" and "Nutrition goals", both open on
+ * of their own from the drawer: "You" and "Nutrition goals", both closed on
  * arrival. Settings no longer shows them, and a way in about one of their
  * rows lands on Profile.
  */
@@ -27,17 +27,20 @@ beforeEach(async () => {
 
 const header = (name: string) => within(topLayer()).getByRole('button', { name: new RegExp(`^${name}`) });
 
-it('Profile from the drawer shows You and Nutrition goals, both open', async () => {
+it('Profile from the drawer shows You and Nutrition goals, both closed until pressed (MM-712)', async () => {
   renderApp(repos, today);
-  const profile = await openProfile();
+  const profile = await openProfile({ closed: true });
   expect(profile.getByRole('heading', { level: 1, name: 'Profile' })).toBeInTheDocument();
-  expect(header('You')).toHaveAttribute('aria-expanded', 'true');
-  expect(header('Nutrition goals')).toHaveAttribute('aria-expanded', 'true');
-  expect(profile.getByText('Biological sex')).toBeVisible();
-  expect(profile.getByText('Daily water goal')).toBeVisible();
-  // Each still folds in place.
-  await userEvent.click(header('You'));
+  // Every fold starts closed (the owner, MM-712): nothing of either section is in sight.
   expect(header('You')).toHaveAttribute('aria-expanded', 'false');
+  expect(header('Nutrition goals')).toHaveAttribute('aria-expanded', 'false');
+  expect(profile.queryByText('Biological sex')).not.toBeVisible();
+  expect(profile.queryByText('Daily water goal')).not.toBeVisible();
+  // Each opens in place.
+  await userEvent.click(header('You'));
+  expect(header('You')).toHaveAttribute('aria-expanded', 'true');
+  expect(profile.getByText('Biological sex')).toBeVisible();
+  expect(header('Nutrition goals')).toHaveAttribute('aria-expanded', 'false');
   // Nothing of Settings' other sections is here.
   expect(profile.queryByRole('heading', { level: 2, name: 'Today’s setup' })).toBeNull();
   expect(profile.queryByRole('heading', { level: 2, name: 'Appearance' })).toBeNull();
