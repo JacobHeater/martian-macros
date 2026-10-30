@@ -33,10 +33,10 @@ async function openMenu(): Promise<HTMLElement> {
 
 const rowsOf = (drawer: HTMLElement) => within(drawer).getAllByRole('button').map((row) => row.textContent);
 
-it('opens from the menu button with the lettering, the destinations, Profile and Settings, the current one marked', async () => {
+it('opens from the menu button with the lettering, the destinations, Profile, Library and Settings, the current one marked', async () => {
   renderApp(repos, today);
   const drawer = await openMenu();
-  expect(rowsOf(drawer)).toEqual(['Dashboard', 'Food', 'Train', 'Coach', 'Profile', 'Settings']);
+  expect(rowsOf(drawer)).toEqual(['Dashboard', 'Food', 'Train', 'Coach', 'Profile', 'Library', 'Settings']);
   // The lettering is decoration: an image with no name, passed by.
   expect(drawer.querySelector('img.mm-lettering')).toHaveAttribute('alt', '');
   expect(within(drawer).getByRole('button', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
@@ -66,6 +66,14 @@ it('Settings from the drawer is pushed over the destination with Back, and back 
   await userEvent.click(settings.getByRole('button', { name: 'Back' }));
   await waitFor(() => expect(screen.queryByRole('heading', { level: 1, name: 'Settings' })).toBeNull());
   expect(within(await bar()).getByRole('button', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
+});
+
+it('the Library from the drawer is pushed over the destination (MM-706)', async () => {
+  renderApp(repos, today);
+  const drawer = await openMenu();
+  await userEvent.click(within(drawer).getByRole('button', { name: 'Library' }));
+  expect(await within(topLayer()).findByRole('heading', { level: 1, name: 'Library' })).toBeInTheDocument();
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull());
 });
 
 it('Profile from the drawer is pushed over the destination', async () => {

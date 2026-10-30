@@ -38,6 +38,7 @@ import LightbulbOutlined from '@mui/icons-material/LightbulbOutlined';
 import LocalDiningOutlined from '@mui/icons-material/LocalDiningOutlined';
 import LockOutlined from '@mui/icons-material/LockOutlined';
 import LunchDiningOutlined from '@mui/icons-material/LunchDiningOutlined';
+import LibraryBooksOutlined from '@mui/icons-material/LibraryBooksOutlined';
 import MenuOutlined from '@mui/icons-material/MenuOutlined';
 import MonitorWeightOutlined from '@mui/icons-material/MonitorWeightOutlined';
 import MoreVertOutlined from '@mui/icons-material/MoreVertOutlined';
@@ -142,6 +143,7 @@ export const mmIcons: Record<MmIconName, ComponentType<MmIconProps>> = {
   document: DescriptionOutlined,
   lock: LockOutlined,
   menu: MenuOutlined,
+  library: LibraryBooksOutlined,
   insight: LightbulbOutlined,
   report: SummarizeOutlined,
   flag: FlagOutlined,

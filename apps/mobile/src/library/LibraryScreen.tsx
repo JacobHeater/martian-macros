@@ -13,6 +13,7 @@ import { useNavigator } from '../app/useNavigator';
 import { CustomFoodForm } from '../food/custom/CustomFoodForm';
 import { customFoodOfEntry } from '../food/custom/customFoodOfEntry';
 import { RecipeForm } from '../food/custom/RecipeForm';
+import { MakeFoodWithAiScreen } from '../food/ai/MakeFoodWithAiScreen';
 import { CustomExerciseScreen } from '../train/CustomExerciseScreen';
 import { MmButton } from '../ui/MmButton';
 import { MmFoldsContext } from '../ui/MmFoldsContext';
@@ -96,7 +97,14 @@ export function LibraryScreen() {
   });
   const count = (title: string, n: number) => (n === 0 ? title : `${title} · ${n}`);
 
-  const saveFood = async (route: Exclude<NewFoodRoute, 'recipe'>) => {
+  // With the person's own AI (MM-708): the screen comes back with the foods it saved, and the Foods fold opens on them.
+  const makeWithAi = async () => {
+    const saved = await navigator.push<readonly CustomFood[]>((close) => <MakeFoodWithAiScreen onDone={(made) => close(made)} />);
+    const [one] = saved ?? [];
+    if (saved === undefined || one === undefined) return;
+    reveal('foods', one.id, saved.length === 1 ? `Saved ${one.name}` : `Saved ${saved.length} foods`);
+  };
+  const saveFood = async (route: Exclude<NewFoodRoute, 'recipe' | 'ai'>) => {
     const saved = await overlays.sheet<CustomFood>(
       'Save your own food',
       (close) => <CustomFoodForm readLabelAtStart={route === 'label'} onDone={close} />,
@@ -110,7 +118,8 @@ export function LibraryScreen() {
   };
   const newFood = async () => {
     const route = await overlays.sheet<NewFoodRoute>('New food', (close) => <NewFoodSheet onChoose={close} />);
-    if (route === 'recipe') await saveRecipe();
+    if (route === 'ai') await makeWithAi();
+    else if (route === 'recipe') await saveRecipe();
     else if (route !== undefined) await saveFood(route);
   };
   const editFood = (food: CustomFood) =>

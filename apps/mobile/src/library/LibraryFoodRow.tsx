@@ -5,6 +5,7 @@ import { gradeOfCustomFood } from '../engine/gradeOfCustomFood';
 import { Fmt } from '../format/Fmt';
 import { lastLoggedText } from '../format/lastLoggedText';
 import { quantityText } from '../format/quantityText';
+import { SavedFoodTrustMark } from '../food/custom/SavedFoodTrustMark';
 import { FoodGrade } from '../food/FoodGrade';
 import { MmListRow } from '../ui/MmListRow';
 import { MmMenuButton } from '../ui/MmMenuButton';
@@ -23,7 +24,8 @@ interface LibraryFoodRowProps {
 /**
  * A saved food or recipe in the Library (MM-706): its name; what one serving
  * is, its calories and macros as a logged food's row says them (MM-564);
- * how often it is logged; its grade when its numbers allow one (MM-382).
+ * how often it is logged; where its numbers came from (MM-710); its grade
+ * when its numbers allow one (MM-382).
  * Pressed, it opens to be changed; its menu edits or deletes it, as the
  * Saved step's did (MM-635).
  */
@@ -37,7 +39,12 @@ export function LibraryFoodRow({ food, usage, today, autoFocus = false, onEdit, 
   return (
     <MmListRow
       title={food.name}
-      detail={<LibraryRowLines lines={[`${serving} · ${numbers}`, lastLoggedText(usage, today)]} />}
+      detail={
+        <>
+          <LibraryRowLines lines={[`${serving} · ${numbers}`, lastLoggedText(usage, today)]} />
+          <SavedFoodTrustMark food={food} />
+        </>
+      }
       opens
       onPress={onEdit}
       autoFocus={autoFocus}

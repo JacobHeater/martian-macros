@@ -128,6 +128,8 @@ it("a food's row says what it is, how often it is logged, and its grade", async 
   const row = (await within(library).findByText('Buttermilk biscuit')).closest('.mm-list-row') as HTMLElement;
   expect(within(row).getByText('1 biscuit (60 g) · 220 kcal · P 4 · C 28 · F 10')).toBeInTheDocument();
   expect(within(row).getByText('Last logged 3 days ago · 12 times')).toBeInTheDocument();
+  // Where its numbers came from (MM-710): a food saved before its evidence was kept is only the person's.
+  expect(within(row).getByText('Your food')).toBeInTheDocument();
   expect(within(row).getByRole('button', { name: /^Grade .* for Buttermilk biscuit$/ })).toBeInTheDocument();
   expect(within(row).getByRole('button', { name: 'More actions for Buttermilk biscuit' })).toBeInTheDocument();
 });
@@ -187,14 +189,23 @@ it('a food is deleted from its menu after a question that says logged entries st
   expect(await within(library).findByText('Nothing saved yet. New food makes one.')).toBeInTheDocument();
 });
 
-it('New food offers a label, typing, and a recipe', async () => {
+it('New food offers the person’s AI, a label, typing, and a recipe', async () => {
   const library = await open();
   await press(library, 'New food');
   const chooser = await screen.findByRole('dialog', { name: 'New food' });
-  for (const route of ['Scan a label', 'Type it in', 'New recipe']) {
+  for (const route of ['With my AI', 'Scan a label', 'Type it in', 'New recipe']) {
     expect(within(chooser).getByRole('button', { name: new RegExp(`^${route}`) })).toBeInTheDocument();
   }
-  expect(within(chooser).queryByRole('button', { name: /^With my AI/ }), 'MM-708 lands in its own PR').not.toBeInTheDocument();
+});
+
+it('With my AI opens its screen over the Library (MM-708)', async () => {
+  const library = await open();
+  await press(library, 'New food');
+  const chooser = await screen.findByRole('dialog', { name: 'New food' });
+  await userEvent.click(within(chooser).getByRole('button', { name: /^With my AI/ }));
+  expect(await within(topLayer()).findByRole('heading', { level: 1, name: 'With my AI' })).toBeInTheDocument();
+  await press(topLayer(), 'Back');
+  expect(await within(topLayer()).findByRole('heading', { level: 1, name: 'Library' })).toBeInTheDocument();
 });
 
 it('a food typed in is saved, its fold opens on it, and the save is said', async () => {
