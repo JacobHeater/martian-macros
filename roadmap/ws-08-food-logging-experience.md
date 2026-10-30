@@ -186,6 +186,7 @@ workstream's.
 - Added 2026-10-30 (step 23, the owner from the phone): MM-715 (copy foods, a meal or the chosen foods to the other phone by the move's flow, with their Library foods; in progress, owed the owner's two phones).
 - Added 2026-10-30 (step 23, the owner from the phone): MM-717 (a copy to another phone keeps the time eaten; in progress, owed the owner's two phones).
 - Added 2026-10-30 (step 23, the owner from the phone): MM-718 (a drink of water copies to another day or to the other phone from its menu; in progress, owed the owner's two phones).
+- Added 2026-10-30 (step 23, the owner from the phone): MM-719 (Sync this day to another phone, a row above the day's mark; the other phone's day made to match, foods, water and marks, with Undo; in progress, owed the owner's two phones).
 - Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
 - Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
 - Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).

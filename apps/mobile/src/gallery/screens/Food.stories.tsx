@@ -545,6 +545,16 @@ export const WaterSection = screenStory({
   },
 });
 
+/** MM-719: "Sync this day to another phone" among the day's rows after the meals, above its mark, on a day with food logged. */
+export const SyncDayRow = screenStory({
+  covers: ['FoodScreen'],
+  shows: 'Sync this day to another phone',
+  open: yesterdaysFood,
+  walk: async (canvas) => {
+    reveal(await within(canvas).findByRole('button', { name: /^Sync this day to another phone/ }));
+  },
+});
+
 /** MM-718: a drink's menu: Copy to another day, Copy to another phone, Delete, in a food's order (MM-714). */
 export const WaterEntryMenu = screenStory({
   covers: ['FoodScreen'],

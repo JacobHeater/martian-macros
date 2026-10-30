@@ -22,20 +22,29 @@ interface SendMoveSheetProps {
   code: MoveCode | undefined;
   /** What to send, gathered once the code is in hand. */
   parcel: () => Promise<MoveParcel>;
-  /** Whose words the sheet speaks: a move of everything (MM-698) or a copy of foods (MM-715) or water (MM-718). */
+  /** Whose words the sheet speaks: a move of everything (MM-698), a copy of foods (MM-715) or water (MM-718), or a day synced (MM-719). */
   what: SendWhat;
   onScanAgain: () => void;
   onClose: () => void;
 }
 
 /** What did not happen, in the sheet's headline and what is said. */
-const didNotHappen = (what: SendWhat) => (what === 'everything' ? 'The move did not happen' : 'The copy did not happen');
+const didNotHappen = (what: SendWhat) =>
+  what === 'everything' ? 'The move did not happen' : what === 'day' ? 'The sync did not happen' : 'The copy did not happen';
 
 /** What the other phone has once it is sent, and what it does with it on confirming. */
-const sentWords = (what: SendWhat) =>
-  what === 'everything'
-    ? 'Your other phone has everything. Confirm there to finish; this phone keeps its records.'
-    : `Your other phone has the ${what}. Confirm there to add ${what === 'foods' ? 'them' : 'it'}; this phone keeps its own.`;
+const sentWords = (what: SendWhat) => {
+  switch (what) {
+    case 'everything':
+      return 'Your other phone has everything. Confirm there to finish; this phone keeps its records.';
+    case 'day':
+      return 'Your other phone has this day. Confirm there to make its day match; this phone keeps its own.';
+    case 'foods':
+      return 'Your other phone has the foods. Confirm there to add them; this phone keeps its own.';
+    case 'water':
+      return 'Your other phone has the water. Confirm there to add it; this phone keeps its own.';
+  }
+};
 
 /** What the status region says for a stage, once, when it begins (the UX guard's F3, F4). */
 function spoken(stage: Stage, what: SendWhat): string {

@@ -1,6 +1,8 @@
 import { CalendarDate } from '../domain/CalendarDate';
 import { CustomFood } from '../domain/food/custom/CustomFood';
 import { CustomFoodKind } from '../domain/food/custom/CustomFoodKind';
+import { DayCompleteness } from '../domain/DayCompleteness';
+import { DayKind } from '../domain/DayKind';
 import type { FoodIngredient } from '../domain/food/custom/FoodIngredient';
 import type { RecipeIngredient } from '../domain/food/custom/RecipeIngredient';
 import { FoodGroup } from '../domain/food/FoodGroup';
@@ -23,6 +25,7 @@ import { Meal } from '../domain/Meal';
 import { QuantitySource } from '../domain/QuantitySource';
 import { WaterEntry } from '../domain/water/WaterEntry';
 import type { FoodCopy } from './FoodCopy';
+import type { WholeDay } from './WholeDay';
 import { foodCopyFormat } from './foodCopyFormat';
 
 type Json = Record<string, unknown>;
@@ -141,6 +144,13 @@ const loggedMeal = (value: unknown): LoggedMealTag | undefined => {
   return { key: text(o, 'key'), name: text(o, 'name') };
 };
 
+/** The day's marks, when the copy is a whole day (MM-719). */
+const whole = (value: unknown): WholeDay | undefined => {
+  if (value === undefined || value === null) return undefined;
+  const o = object(value);
+  return { kind: named(DayKind.values, o, 'kind'), completeness: named(DayCompleteness.values, o, 'completeness') };
+};
+
 /** An entry as it is to be logged on this phone: a new one (id 0), whatever id it had. */
 const entry = (value: unknown): FoodEntry => {
   const o = object(value);
@@ -239,7 +249,7 @@ export function foodCopyOfBytes(bytes: Uint8Array): FoodCopy | undefined {
     const entries = list(o['entries']).map(entry);
     const drinks = list(o['water']).map(water);
     if (entries.length === 0 && drinks.length === 0) return undefined;
-    return { day: CalendarDate.fromEpochDay(day), entries, water: drinks, foods: list(o['foods']).map(food) };
+    return { day: CalendarDate.fromEpochDay(day), entries, water: drinks, foods: list(o['foods']).map(food), whole: whole(o['whole']) };
   } catch {
     return undefined;
   }

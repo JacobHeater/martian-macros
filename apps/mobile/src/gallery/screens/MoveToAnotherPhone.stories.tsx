@@ -338,6 +338,40 @@ export const CopyWaterSent = screenStory({
   },
 });
 
+/** The demo's day, whole, as the other phone's sync of it (MM-719): its foods, water and marks. */
+const dayParcel = (): MoveParcel => {
+  const day = storyToday;
+  const at = (hour: number) => new Date(day.year, day.month - 1, day.day, hour);
+  const entries = [
+    new FoodEntry({ id: 0, date: day, meal: 'breakfast', name: 'Oats with blueberries', kcal: 420, proteinG: 14, carbsG: 68, fatG: 9, source: 'weighed', eatenAt: 7 * 60 + 30 }),
+    new FoodEntry({ id: 0, date: day, meal: 'lunch', name: '80/20 Ground Beef (Aldi)', kcal: 375, proteinG: 25, carbsG: 0, fatG: 29, source: 'weighed', eatenAt: 12 * 60 + 15 }),
+    new FoodEntry({ id: 0, date: day, meal: 'dinner', name: 'Salmon and rice', kcal: 640, proteinG: 48, carbsG: 60, fatG: 20, source: 'householdMeasure', eatenAt: 19 * 60 }),
+  ];
+  const water = [new WaterEntry({ id: 0, date: day, ml: 500, at: at(7) }), new WaterEntry({ id: 0, date: day, ml: 500, at: at(13) })];
+  return { kind: 'foods', foods: foodCopyBytes({ day, entries, water, foods: [], whole: { kind: 'refeed', completeness: 'complete' } }) };
+};
+
+/** MM-719: a whole day arrived: what it holds and what this phone's day holds now, asked before the day is replaced, at phone width. */
+export const SyncDayConfirm = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Sync this day from your other phone?',
+  viewport: 'smallPhone',
+  device: withReceiver(new FakeMoveReceiver({ kind: 'receives', parcel: dayParcel() }), emptyPhone),
+  open: openBackup,
+  walk: choose('Receive on this phone'),
+});
+
+/** MM-719: "Sync this day to another phone" pressed: the day sent, with the sync's words. */
+export const SyncDaySent = screenStory({
+  covers: ['SendMoveSheet'],
+  shows: 'Your other phone has this day. Confirm there to make its day match; this phone keeps its own.',
+  device: withSender(new FakeMoveSender({ kind: 'sends' })),
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: /^Sync this day to another phone/ }));
+  },
+});
+
 /** MM-715: a copy of foods arrived: what came, for which meal and day, asked before it is added, at phone width with the longest names. */
 export const CopyFoodsConfirm = screenStory({
   covers: ['ReceiveMoveSheet'],
