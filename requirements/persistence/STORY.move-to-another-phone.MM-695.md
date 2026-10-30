@@ -57,6 +57,20 @@ Choices I made without asking (say if any is wrong):
   two phones talk directly on the person's Wi-Fi and nothing goes to the internet. The offline check is unaffected, because it checks the
   page's own addresses.
 
+## Decisions on building (2026-10-29)
+- **Built like its siblings** (rule 9): the row sits in Settings > Backup beside Back up now and Restore, as an `MmListRow`; the
+  sheets follow `PassphraseSheet` (a headline, a line of text, buttons at the end); the confirmation is the restore's own `confirm`,
+  its words built as `restoreWords` builds them (the loss first). The row's icon is `sync` (no phone glyph in the set; MM-253 rule 2).
+- **"The same version" is the version and build the shell reports, and the schema version.** A local build carries the same version
+  string on every build, so the schema is what tells two of them apart in practice.
+- **The nudge works by day**: only the last backup's day is kept (MM-63), so a record on that day counts as unbacked; once the person
+  has just backed up from the nudge, a backup made today counts as holding everything.
+- **One row, then a choice** of Send from this phone or Receive on this phone, rather than two rows, so the section keeps one way in.
+- **The code is in base32 behind `MMMOVE1:`**, 38 bytes (IPv4 address, port, key), so the QR code stays at version 6 (41 modules) in
+  the alphanumeric mode with the icon in it. **jsQR is a dev dependency, for tests only**: every drawn code is decoded by it.
+- **The photos are behind the phone's lock** (MM-157): sending asks for it when this phone holds any; replacing asks when this phone
+  holds any.
+
 ## Description
 On the receiving phone, "Move to another phone" checks for unbacked data and, if there is any, offers "Back up first". It then shows a
 QR code (with the logo) and a line saying to scan it from Martian Macros on the other phone, both phones on the same Wi-Fi. On the sending
@@ -169,9 +183,16 @@ Scenario: The local network is explained
 ```
 
 ## UI/UX
-To be designed in Storybook first (the receiving screen with its code, the backup nudge, waiting, receiving, the confirmation, the
-sending scanner and progress, the version and cannot-connect errors, and the welcome entry), every phone state with a story, and
-reviewed before any of it is built.
+All in apps/mobile/src/gallery/screens/MoveToAnotherPhone.stories.tsx; the ones at phone width (360 px) carry the longest labels.
+- Which way — (Story: MoveChoice, small phone). Send or receive, from Settings > Backup.
+- The nudge — (Stories: MoveNudgeNeverBackedUp, small phone; MoveNudgeSinceBackup).
+- The code — (Stories: MoveGettingCodeReady; MoveCodeWaiting, small phone). The QR code with the icon, and the wait.
+- Receiving — (Story: MoveReceiving).
+- The confirmation — (Story: MoveConfirm).
+- Receiving did not happen — (Stories: MoveReceiveNoWifi, MoveReceiveOtherVersion, MoveCodeExpired, MoveReceiveBroken).
+- Sending — (Stories: MoveReachingOtherPhone, MoveSending, MoveSent).
+- Sending did not happen — (Stories: MoveSendUnreachable, small phone; MoveSendOlderReceiver; MoveScannedNotACode).
+- From the welcome — (Story: MoveFromWelcome, small phone).
 
 ## Notes
 - **Out of scope:** merging two phones' data; Bluetooth, hotspot or internet relay; sending food packs or phone settings; a move between

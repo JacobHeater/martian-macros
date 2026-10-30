@@ -16,6 +16,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { PassphraseSheet } from './PassphraseSheet';
 import { ProgressPhotoSwitches } from './ProgressPhotoSwitches';
 import { passphraseHeadline } from './passphraseHeadline';
+import { useMoveToAnotherPhone } from './useMoveToAnotherPhone';
 import { useSettingsSection } from './useSettingsSection';
 
 const cipher = new SodiumBackupCipher();
@@ -79,6 +80,9 @@ export function BackupSection() {
       setBusy(undefined);
     }
   };
+
+  // Moving to another phone on the same Wi-Fi (MM-695): its backup nudge runs this section's own backup.
+  const move = useMoveToAnotherPhone({ backUp: () => backUp() });
 
   const restore = async () => {
     const picked = await services.backup.pick();
@@ -156,6 +160,14 @@ export function BackupSection() {
             if (busy === undefined) void restore();
           }}
         />
+        <MmListRow
+          leadingIcon="sync"
+          title="Move to another phone"
+          subtitle="Send this phone’s records to another phone on the same Wi-Fi, or receive them here."
+          onPress={() => {
+            if (busy === undefined) void move.choose();
+          }}
+        />
         <ProgressPhotoSwitches backup />
       </MmListGroup>
       {/* What is being done, for a reader: the row's words change, and this region says so. */}
@@ -163,7 +175,7 @@ export function BackupSection() {
         {busy === 'backup' ? 'Backing up…' : busy === 'restore' ? 'Opening the backup…' : ''}
       </span>
       <p className="app-caption">
-        Your records are not in your phone’s own cloud backup: a new phone starts empty unless you restore a backup file.
+        Your records are not in your phone’s own cloud backup: a new phone starts empty unless you restore a backup file or move your records from your other phone.
         Downloaded food databases are not in the file, since they can be fetched again. Progress photos are in it only
         when Back up photos is on; restoring a file without them leaves this phone’s photos as they are.
       </p>
