@@ -35,6 +35,8 @@ export interface ExecutiveBrief {
   readonly requiredProteinDensity: number;
   /** True when `runwayState === 'proteinUnrecoverable'`. */
   readonly proteinUnrecoverable: boolean;
+  /** The latest of breakfast, lunch and dinner with food logged today (MM-711); none when only snacks are, or nothing. */
+  readonly lastMeal?: Meal | undefined;
   /** Stable cache hash of the pre-calculated brief inputs and state. */
   readonly briefHash: string;
   /** The single primary meal or item driving calorie displacement today, when applicable. */
