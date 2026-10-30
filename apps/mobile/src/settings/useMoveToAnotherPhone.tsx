@@ -73,8 +73,8 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
       'Moving your records',
       (close) => (
         <MoveApplyingSheet
-          work={async () => {
-            await services.restorer.restoreFrom(payload.snapshot);
+          work={async (progress) => {
+            await services.restorer.restoreFrom(payload.snapshot, progress);
             try {
               await services.progressPhotos.restoreArchive(payload.photos);
             } catch (error) {
