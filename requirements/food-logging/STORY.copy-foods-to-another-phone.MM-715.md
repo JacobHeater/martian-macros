@@ -2,7 +2,7 @@
 id: MM-715
 status: in-progress
 component: food-logging
-related: [MM-45, MM-167, MM-587, MM-625, MM-633, MM-698, MM-701, MM-714]
+related: [MM-45, MM-167, MM-587, MM-625, MM-633, MM-698, MM-701, MM-714, MM-717]
 ---
 
 # Story: copy foods, a meal or the chosen foods to another phone, by the move's flow
@@ -16,7 +16,8 @@ the same sealed Wi-Fi link and adds them, replacing nothing.
 ## Decisions
 From the owner, in an interactive Q&A (2026-10-30):
 - **Where they land:** the same day and meal as on the sending phone, as a copy to another day lands (MM-633):
-  fresh entries, no time eaten, a logged meal as a new meal (MM-587). Nothing on the other phone is replaced.
+  fresh entries, a logged meal as a new meal (MM-587). Nothing on the other phone is replaced. (No time eaten at
+  first; the owner then asked for the time to travel, MM-717.)
 - **How the other phone gets ready:** the existing Receive screen (Settings > Backup > Move to another phone >
   Receive on this phone, and the welcome's "I have Martian Macros on another phone") shows the same code. What
   arrives is either a whole move or a copy of foods, and the confirmation says which.
@@ -63,7 +64,7 @@ Scenario: The item on every surface
 Scenario: Sent as fresh copies with their Library foods
   Given dinner holds salmon at 7:00 PM, logged from the saved food "Mom's salmon", and rice from the pack
   When "Copy to another phone" is chosen for both and the other phone's code scanned
-  Then the parcel sent holds two entries for that day at dinner with no time eaten, and the one saved food
+  Then the parcel sent holds two entries for that day at dinner, each with its time eaten (MM-717), and the one saved food
   And this phone's log is unchanged
 
 Scenario: Received, confirmed, Library kept

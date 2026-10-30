@@ -6,13 +6,14 @@ import { newMealKey } from './meal/newMealKey';
 /**
  * Fresh copies of `entries` on `day`, for logging again (MM-47). Each keeps
  * its meal unless `meal` is given. They are ordinary new entries (id 0), so
- * editing a copy never touches the original. A copy has no time eaten. A
- * meal's foods are copied as a new meal (MM-587).
+ * editing a copy never touches the original. A copy has no time eaten,
+ * unless `keepTimeEaten` says it is the same eating on another phone
+ * (MM-717). A meal's foods are copied as a new meal (MM-587).
  */
 export function entriesCopiedTo(
   day: CalendarDate,
   entries: readonly FoodEntry[],
-  { meal }: { meal?: Meal } = {},
+  { meal, keepTimeEaten = false }: { meal?: Meal; keepTimeEaten?: boolean } = {},
 ): FoodEntry[] {
   // Each meal copied is a new meal (MM-587): its foods share a new key, so the copy and the original stay apart.
   const keys = new Map<string, string>();
@@ -40,8 +41,9 @@ export function entriesCopiedTo(
         sodiumMg: e.sodiumMg,
         alcoholG: e.alcoholG,
         micros: e.micros,
-        // When the original was eaten says nothing about when the copy was (MM-570): it has no time until one is given.
-        eatenAt: undefined,
+        // When the original was eaten says nothing about when the copy was (MM-570): it has no time until one is
+        // given. A copy to the other phone is the same eating, so it keeps its time (MM-717).
+        eatenAt: keepTimeEaten ? e.eatenAt : undefined,
         loggedMeal: copiedMeal(e),
         evidence: e.evidence,
       }),
