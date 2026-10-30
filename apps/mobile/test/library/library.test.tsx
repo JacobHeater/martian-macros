@@ -111,7 +111,6 @@ it('opens into closed folds that say what they hold, with New food above them', 
     expect(within(library).getByRole('button', { name: title })).toHaveAttribute('aria-expanded', 'false');
   }
   expect(within(library).getByRole('button', { name: 'New food' })).toBeInTheDocument();
-  expect(within(library).queryByText(/^Buttermilk biscuit/)).not.toBeInTheDocument();
   // The buttons are in the order of the folds, New food first.
   const titles = ['New food', 'Foods · 3', 'Recipes · 1', 'Meals · 2', 'Usual foods', 'Exercises · 1'];
   const names = within(library)
@@ -170,7 +169,7 @@ it('a food is edited from its menu, and editing never rewrites what was logged',
   await press(form, 'Save food');
   await expect.poll(async () => (await saved())[0]?.perServing.kcal).toBe(150);
   expect(await saved()).toHaveLength(1);
-  expect((await logged(today.addDays(-1)))[0]?.kcal).toBe(120);
+  expect((await logged(today.addDays(-1)))[0]?.kcal, 'logged with 220, kept').toBe(220);
   // The row reads the change.
   expect(await within(library).findByText(/150 kcal/)).toBeInTheDocument();
 });

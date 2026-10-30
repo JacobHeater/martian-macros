@@ -19,8 +19,8 @@ interface CustomExerciseScreenProps {
   name?: string;
   /** An exercise of the user's own being changed (MM-706): the fields start from it, and saving replaces it. */
   exercise?: Exercise | undefined;
-  /** Called with the exercise's id once it is saved. */
-  onSaved: (id: string) => void;
+  /** Called with the exercise's id and name once it is saved. */
+  onSaved: (id: string, name: string) => void;
 }
 
 /** Adding an exercise of the user's own (MM-76), with the same fields as a built-in one; or changing one (MM-706). */
@@ -45,7 +45,7 @@ export function CustomExerciseScreen({ name: firstName = '', exercise, onSaved }
         load,
       }),
     );
-    onSaved(id);
+    onSaved(id, name.trim());
   };
 
   const toggle = (muscle: MuscleGroup) => {

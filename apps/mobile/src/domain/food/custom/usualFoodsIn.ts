@@ -21,7 +21,12 @@ export function usualFoodsIn(
     const before = counts.get(key);
     counts.set(key, {
       times: (before?.times ?? 0) + 1,
-      latest: before === undefined || before.latest.id < entry.id ? entry : before.latest,
+      latest:
+        before === undefined ||
+        before.latest.date.epochDay < entry.date.epochDay ||
+        (before.latest.date.epochDay === entry.date.epochDay && before.latest.id < entry.id)
+          ? entry
+          : before.latest,
     });
   }
   return [...counts.values()]

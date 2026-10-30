@@ -128,6 +128,19 @@ const withLibrary: StoryScenario = async (repos, today) => {
   }
 };
 
+/** The way this branch reaches the Library (MM-707): Add food, Saved, "Manage in Library"; the sheet closes and the Library opens over Food. */
+export const LibraryFromSaved = screenStory({
+  covers: ['LibraryScreen', 'MyFoodsStep'],
+  shows: 'Library',
+  scenario: withLibrary,
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    await press('Add food to breakfast')(canvas);
+    await press('Saved')(canvas);
+    await press('Manage in Library')(canvas);
+  },
+});
+
 export const Library = screenStory({
   covers: ['LibraryScreen'],
   shows: 'Foods · 2',
