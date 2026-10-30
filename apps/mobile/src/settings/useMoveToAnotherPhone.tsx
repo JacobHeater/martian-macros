@@ -115,7 +115,7 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
           <ReceiveMoveSheet
             unbacked={nudge}
             onBackUpFirst={() => close({ kind: 'backUpFirst' })}
-            onReceived={(payload) => close({ kind: 'received', payload })}
+            onReceived={(parcel) => close({ kind: 'received', parcel })}
             onCancel={() => close()}
           />
         ),

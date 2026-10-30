@@ -91,6 +91,7 @@ it('MM-714: chosen foods copied to another meal are fresh copies there; the orig
     'Move to another day',
     'Copy to another meal',
     'Copy to another day',
+    'Copy to another phone',
     'Delete',
   ]);
   await userEvent.click(within(dialog).getByRole('option', { name: 'Copy to another meal' }));
