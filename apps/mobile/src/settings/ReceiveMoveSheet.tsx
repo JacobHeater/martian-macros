@@ -109,7 +109,8 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
       return (
         <>
           <h2 className="app-headline">Back up this phone first?</h2>
-          <p className="app-text">{unbackedWords(unbacked)}</p>
+          {/* The nudge stage is only ever entered with a reason; 'never' here is for the type alone. */}
+          <p className="app-text">{unbackedWords(unbacked ?? 'never')}</p>
           <div className="app-gap" />
           <div className="app-row app-row-end">
             <MmButton label="Skip the backup" kind="text" onPress={() => setStage({ kind: 'opening' })} />
