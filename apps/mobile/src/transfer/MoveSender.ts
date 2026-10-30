@@ -59,7 +59,17 @@ export class MoveSender implements MoveSending {
       }
       if (reply.kind !== 'ready') throw new MoveProblem('broken');
       const total = payload.snapshot.length + payload.photos.length;
-      await connection.send(sealer.seal(message({ kind: 'sizes', snapshot: payload.snapshot.length, photos: payload.photos.length })));
+      // The coach's provider and key ride in this sealed frame (MM-701): small, and never part of the database.
+      await connection.send(
+        sealer.seal(
+          message({
+            kind: 'sizes',
+            snapshot: payload.snapshot.length,
+            photos: payload.photos.length,
+            coachAi: { provider: payload.coachAi.provider, apiKey: payload.coachAi.apiKey },
+          }),
+        ),
+      );
       const whole = new Uint8Array(total);
       whole.set(payload.snapshot, 0);
       whole.set(payload.photos, payload.snapshot.length);

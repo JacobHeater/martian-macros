@@ -24,7 +24,9 @@ const marked = (word: string, length: number) => {
 };
 
 /** A payload larger than one frame, so it crosses in several. */
-const payload = { snapshot: marked('Weigh-in 82.4 kg on 2026-10-12', moveChunkBytes + 1000), photos: marked('front pose photo', 5000) };
+const payload = { snapshot: marked('Weigh-in 82.4 kg on 2026-10-12', moveChunkBytes + 1000), photos: marked('front pose photo', 5000),
+  coachAi: { provider: 'anthropic' as const, apiKey: 'sk-ant-api03-SECRETKEYVALUE' },
+};
 
 function phones({ receiving = same, sending = same }: { receiving?: MoveIdentity; sending?: MoveIdentity } = {}) {
   const network = new FakeLocalNetwork();
@@ -52,6 +54,8 @@ describe('a move', () => {
     const arrived = await received;
     expect(arrived.snapshot).toEqual(payload.snapshot);
     expect(arrived.photos).toEqual(payload.photos);
+    // MM-701: the coach's provider and key come too.
+    expect(arrived.coachAi).toEqual(payload.coachAi);
     expect(progress.at(-1)).toBe(payload.snapshot.length + payload.photos.length);
     expect(payload.snapshot.length).toBe(moveChunkBytes + 1000);
   });
@@ -60,7 +64,7 @@ describe('a move', () => {
     const { receiver, sender } = phones();
     const code = await receiver.open();
     const received = receiver.receive();
-    await sender.send(code, { snapshot: payload.snapshot, photos: new Uint8Array() });
+    await sender.send(code, { snapshot: payload.snapshot, photos: new Uint8Array(), coachAi: payload.coachAi });
     expect((await received).photos).toHaveLength(0);
   });
 
@@ -71,7 +75,7 @@ describe('a move', () => {
     await sender.send(code, payload);
     await received;
     const wire = new TextDecoder('latin1').decode(new Uint8Array(network.frames.flatMap((frame) => [...frame])));
-    for (const word of ['Weigh-in', '82.4', '2026-10-12', 'front pose', 'hello', same.app]) expect(wire).not.toContain(word);
+    for (const word of ['Weigh-in', '82.4', '2026-10-12', 'front pose', 'hello', same.app, 'SECRETKEY', 'anthropic']) expect(wire).not.toContain(word);
   });
 
   it('refuses a phone without the key before reading anything, and keeps waiting for the right one', async () => {
