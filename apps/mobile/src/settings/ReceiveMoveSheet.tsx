@@ -1,0 +1,151 @@
+import { useEffect, useState } from 'react';
+import { useApp } from '../app/useApp';
+import type { MoveCode } from '../transfer/MoveCode';
+import type { MoveIdentity } from '../transfer/MoveIdentity';
+import type { MovePayload } from '../transfer/MovePayload';
+import { MoveProblem } from '../transfer/MoveProblem';
+import { MmBusyLine } from '../ui/MmBusyLine';
+import { MmButton } from '../ui/MmButton';
+import { MmProgressBar } from '../ui/MmProgressBar';
+import { MmQrCode } from '../ui/MmQrCode';
+import { moveProblemWords } from './moveProblemWords';
+import './settings.css';
+
+/** How long a code works before it expires and the phone stops listening (MM-695). */
+const moveCodeLifetimeMs = 5 * 60 * 1000;
+
+type Stage =
+  | { kind: 'nudge' }
+  | { kind: 'opening' }
+  | { kind: 'code'; code: MoveCode }
+  | { kind: 'receiving'; done: number; total: number }
+  | { kind: 'failed'; problem: MoveProblem; here: MoveIdentity };
+
+interface ReceiveMoveSheetProps {
+  /** Records on this phone that no backup holds: logged since the last one, or never backed up at all. */
+  unbacked: 'since' | 'never' | undefined;
+  onBackUpFirst: () => void;
+  onReceived: (payload: MovePayload) => void;
+  onCancel: () => void;
+}
+
+/**
+ * The receiving phone's side of a move (MM-695). When this phone holds records no backup has, it says so first and
+ * offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
+ * in it, until a move arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole, to be
+ * confirmed before it replaces anything; nothing here changes this phone's data.
+ */
+export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel }: ReceiveMoveSheetProps) {
+  const { services } = useApp();
+  const [stage, setStage] = useState<Stage>(unbacked === undefined ? { kind: 'opening' } : { kind: 'nudge' });
+  const [attempt, setAttempt] = useState(0);
+  const listening = stage.kind !== 'nudge';
+
+  useEffect(() => {
+    if (!listening) return undefined;
+    const receiver = services.moveReceiver;
+    let live = true;
+    const fail = async (error: unknown) => {
+      const here = await services.moveIdentity();
+      if (live) setStage({ kind: 'failed', problem: error instanceof MoveProblem ? error : new MoveProblem('broken'), here });
+    };
+    setStage({ kind: 'opening' });
+    let expiry: ReturnType<typeof setTimeout> | undefined;
+    void (async () => {
+      try {
+        const code = await receiver.open();
+        if (!live) return;
+        setStage({ kind: 'code', code });
+        expiry = setTimeout(() => void receiver.stop(), moveCodeLifetimeMs);
+        const payload = await receiver.receive((done, total) => {
+          if (live) setStage({ kind: 'receiving', done, total });
+        });
+        if (live) onReceived(payload);
+      } catch (error) {
+        if (live) await fail(error);
+      } finally {
+        if (expiry !== undefined) clearTimeout(expiry);
+      }
+    })();
+    return () => {
+      live = false;
+      if (expiry !== undefined) clearTimeout(expiry);
+      void receiver.stop();
+    };
+    // The callbacks are the sheet's own and do not change while it is open; a new attempt listens again.
+  }, [listening, attempt]);
+
+  if (stage.kind === 'nudge') {
+    return (
+      <div className="settings-sheet">
+        <h2 className="app-headline">Back up this phone first?</h2>
+        <p className="app-text">
+          {unbacked === 'never'
+            ? 'This phone has never been backed up. Moving replaces its records, and only a backup could bring them back.'
+            : 'This phone has records logged since its last backup. Moving replaces them, and only a backup could bring them back.'}
+        </p>
+        <div className="app-gap" />
+        <div className="app-row app-row-end">
+          <MmButton label="Continue without a backup" kind="text" onPress={() => setStage({ kind: 'opening' })} />
+          <MmButton label="Back up first" onPress={onBackUpFirst} />
+        </div>
+      </div>
+    );
+  }
+
+  if (stage.kind === 'failed') {
+    return (
+      <div className="settings-sheet">
+        <h2 className="app-headline">The move did not happen</h2>
+        <p className="app-text">{moveProblemWords(stage.problem, stage.here, 'receive')}</p>
+        <div className="app-gap" />
+        <div className="app-row app-row-end">
+          <MmButton label="Close" kind="text" onPress={onCancel} />
+          <MmButton label={stage.problem.kind === 'noWifi' ? 'Try again' : 'Show a new code'} onPress={() => setAttempt((was) => was + 1)} />
+        </div>
+      </div>
+    );
+  }
+
+  if (stage.kind === 'receiving') {
+    const share = stage.total === 0 ? 0 : stage.done / stage.total;
+    return (
+      <div className="settings-sheet">
+        <h2 className="app-headline">Receiving from your other phone</h2>
+        <p className="app-text">Keep both phones open and on the same Wi-Fi until it finishes.</p>
+        <MmProgressBar value={share} />
+        <div className="app-gap-small" />
+        <p className="app-caption" role="status">
+          {`${Math.floor(share * 100)}% received`}
+        </p>
+        <div className="app-gap" />
+        <div className="app-row app-row-end">
+          <MmButton label="Cancel" kind="text" onPress={onCancel} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="settings-sheet">
+      <h2 className="app-headline">Scan this from your other phone</h2>
+      <p className="app-text">
+        On the phone with your records, open Settings, then Backup, Move to another phone, and Send from this phone.
+      </p>
+      {stage.kind === 'code' ? (
+        <>
+          <MmQrCode text={stage.code.toText()} label="The code for your other phone to scan" />
+          <div className="app-gap-small" />
+          <MmBusyLine label="Waiting for your other phone…" />
+          <p className="app-caption">The code works once, for five minutes.</p>
+        </>
+      ) : (
+        <MmBusyLine label="Getting a code ready…" />
+      )}
+      <div className="app-gap" />
+      <div className="app-row app-row-end">
+        <MmButton label="Cancel" kind="text" onPress={onCancel} />
+      </div>
+    </div>
+  );
+}

@@ -2811,3 +2811,23 @@
     display: none;
   }
 }
+
+/* A QR code (MM-695): dark modules on a light ground in every palette, as large as the sheet allows. */
+.mm-qr {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+.mm-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.mm-qr-ground {
+  fill: var(--code-light);
+}
+.mm-qr-modules {
+  fill: var(--code-dark);
+}

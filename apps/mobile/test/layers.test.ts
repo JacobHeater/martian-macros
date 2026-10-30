@@ -25,7 +25,9 @@ const allowed: Record<string, readonly string[]> = {
   healthWrite: ['lang', 'domain', 'engine', 'healthIngest'],
   // The backup's format, cipher and the phone's part of it (MM-63): over the database connection and the plugin's API.
   backup: ['lang', 'domain', 'sql', 'platform'],
-  state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'foodOnline', 'platform', 'backup'],
+  // Moving to another phone (MM-695): the link, the sealed stream and the code, over the plugin's API.
+  transfer: ['lang', 'domain', 'platform'],
+  state: ['lang', 'domain', 'engine', 'healthIngest', 'foodCatalog', 'foodOnline', 'platform', 'backup', 'transfer'],
 };
 
 /**

@@ -34,6 +34,15 @@ import { constant } from '../lang/constant';
 import { mmHealth } from '../platform/mmHealth';
 import { mmReminders } from '../platform/mmReminders';
 import { mmScanner } from '../platform/mmScanner';
+import { mmTransfer } from '../platform/mmTransfer';
+import { CapacitorAppVersion } from '../platform/CapacitorAppVersion';
+import { FixedAppVersion } from '../platform/FixedAppVersion';
+import { currentSchemaVersion } from '../data/currentSchemaVersion';
+import { MoveReceiver } from '../transfer/MoveReceiver';
+import { MoveSender } from '../transfer/MoveSender';
+import { NativeLocalLink } from '../transfer/NativeLocalLink';
+import { NoLocalLink } from '../transfer/NoLocalLink';
+import { SodiumMoveCipher } from '../transfer/SodiumMoveCipher';
 import { NativeCamera } from '../platform/NativeCamera';
 import { NativeExternalLinks } from '../platform/NativeExternalLinks';
 import { NativeHealthProfile } from '../platform/NativeHealthProfile';
@@ -101,6 +110,12 @@ export async function openAppServices(): Promise<AppServices> {
     ? new NativePackStore({ api: mmPacks, db: mmDb })
     : new InMemoryPackStore((bytes) => WasmSqlDatabase.open({ bytes }));
   const camera = native ? new NativeCamera(mmScanner) : new NoCamera();
+  // Moving to another phone on the same Wi-Fi (MM-695): the shell's sockets, sealed under the key in the code. A
+  // browser has no socket to listen on, so there it says there is no Wi-Fi.
+  const localLink = native ? new NativeLocalLink(mmTransfer) : new NoLocalLink();
+  const appVersion = native ? new CapacitorAppVersion() : new FixedAppVersion('browser');
+  const moveIdentity = async () => ({ app: await appVersion.read(), schema: currentSchemaVersion });
+  const moveCipher = new SodiumMoveCipher();
   const onlineHttp = new CapacitorJsonHttp();
   const coachAi = native ? new LocalStorageCoachAiStore() : new InMemoryCoachAiStore();
   const coachNarrator = new HttpCoachNarrator({ store: coachAi, http: onlineHttp });
@@ -162,6 +177,9 @@ export async function openAppServices(): Promise<AppServices> {
     eraser: new RenewingEraser({ eraser: new EraserWithPhotos({ eraser: repositories.eraser, photos: progressPhotos }), ids: healthWriting }),
     restorer: new RenewingRestorer({ restorer: repositories.restorer, ids: healthWriting }),
     backup,
+    moveReceiver: new MoveReceiver({ listener: localLink, cipher: moveCipher, identity: moveIdentity }),
+    moveSender: new MoveSender({ dialer: localLink, cipher: moveCipher, identity: moveIdentity }),
+    moveIdentity,
     // The packs on this phone as one catalog, read again on each
     // subscription, which the app asks for when one is installed or
     // removed; the catalog it replaces is closed (MM-386). A browser has none. No camera plugin is in the shell yet
@@ -185,6 +203,7 @@ export async function openAppServices(): Promise<AppServices> {
     onlineFoods,
     barcodeScanner: camera,
     labelReader: camera,
+    codeScanner: camera,
     restSignal: new VibratingRestSignal(),
     // One tap when a long press starts choosing (MM-661): the phone's engine, or the browser's vibration.
     haptics: new CapacitorHaptics(),

@@ -5,6 +5,7 @@ import { NativeCamera } from '../../src/platform/NativeCamera';
 /** MM-43, MM-44: the camera behind the scanner and the label reader. */
 const api = (answers: Partial<MmScannerApi>): MmScannerApi => ({
   scan: async () => ({ cancelled: true }),
+  scanCode: async () => ({ cancelled: true }),
   readLabel: async () => ({ cancelled: true }),
   ...answers,
 });
