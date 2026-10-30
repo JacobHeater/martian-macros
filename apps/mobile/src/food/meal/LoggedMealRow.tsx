@@ -5,6 +5,7 @@ import type { LoggedMeal } from '../../domain/food/meal/LoggedMeal';
 import { Fmt } from '../../format/Fmt';
 import { roundHalfAwayFromZero } from '../../lang/roundHalfAwayFromZero';
 import { useApp } from '../../app/useApp';
+import { useCell } from '../../app/useCell';
 import { useLoaded } from '../../app/useLoaded';
 import { MmIcon } from '../../ui/MmIcon';
 import { MmMenuButton } from '../../ui/MmMenuButton';
@@ -14,6 +15,9 @@ import { MmSwipeToRemove } from '../../ui/MmSwipeToRemove';
 import { useOverlays } from '../../ui/useOverlays';
 import { FoodGrade } from '../FoodGrade';
 import { useNetCarbs } from '../useNetCarbs';
+import { changeTogether } from '../changeTogether';
+import type { TogetherAction } from '../TogetherAction';
+import { togetherActionItems } from '../togetherActionItems';
 import { removeMeal } from './removeMeal';
 import { showViewMealSheet } from './showViewMealSheet';
 import '../food.css';
@@ -37,11 +41,12 @@ const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
  * (MM-564), its name over "Meal · N foods" and its macros, its calories on
  * the right, its grade beside it. Pressed, or "View meal" in its menu, it
  * opens to its foods; swiped away or deleted, the whole meal goes, with
- * Undo.
+ * Undo. Its menu offers what a food's does (MM-714), for all its foods.
  */
 export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, autoFocus }: LoggedMealRowProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
+  const today = useCell(state.today);
   const level = useLoaded(state.detailLevel) ?? 'standard';
   const netCarbs = useNetCarbs();
   const linesId = `food-meal-${loggedMeal.key}-lines`;
@@ -51,6 +56,9 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, a
     : `P ${whole(loggedMeal.proteinG)}`;
   const view = () => void showViewMealSheet(overlays, day, loggedMeal.key);
   const remove = () => void removeMeal(services.food, overlays, loggedMeal);
+  /** The same actions a food's menu has, on every food of the meal, named by the meal (MM-714). */
+  const change = (action: Exclude<TogetherAction, 'delete'>) =>
+    void changeTogether(services.food, overlays, { action, entries: loggedMeal.items, subject: loggedMeal.name, slot: loggedMeal.meal, day, today });
   return (
     <MmSwipeToRemove onRemove={remove}>
       <div className="food-meal-entry">
@@ -69,15 +77,20 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, a
           </MmPressable>
         </div>
         {grade === undefined ? null : <FoodGrade grade={grade} subject={loggedMeal.name} scope="meal" />}
-        <MmMenuButton<'view' | 'select' | 'delete'>
+        <MmMenuButton<'view' | 'select' | TogetherAction>
           icon="more"
           label={`More actions for ${loggedMeal.name}`}
           items={[
             { value: 'view', label: 'View meal' },
             ...(onSelect === undefined ? [] : [{ value: 'select' as const, label: 'Select' }]),
-            { value: 'delete', label: 'Delete' },
+            ...togetherActionItems,
           ]}
-          onSelect={(action) => (action === 'view' ? view() : action === 'select' ? onSelect?.() : remove())}
+          onSelect={(action) => {
+            if (action === 'view') view();
+            else if (action === 'select') onSelect?.();
+            else if (action === 'delete') remove();
+            else change(action);
+          }}
         />
       </div>
     </MmSwipeToRemove>
