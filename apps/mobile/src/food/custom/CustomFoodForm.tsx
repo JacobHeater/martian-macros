@@ -1,4 +1,4 @@
-import { useState, useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { atwaterKcal } from '../../domain/atwaterKcal';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
 import { Micronutrient } from '../../domain/food/micros/Micronutrient';
@@ -28,6 +28,10 @@ interface CustomFoodFormProps {
   initialBarcode?: string | undefined;
   /** A database food copied to be corrected ("Fix this food", MM-153): the form starts from it and saves a new food. */
   draft?: CustomFood | undefined;
+  /** Where a draft came from: the database (MM-153), or the person's own log, a usual food saved as one of theirs (MM-706). */
+  draftFrom?: 'database' | 'log';
+  /** Reads the label as soon as the form opens: the Library's "Scan a label" (MM-706, MM-44). */
+  readLabelAtStart?: boolean;
   /** Called after saving, with the food as saved, or when the user backs out, with nothing (MM-635). */
   onDone: (saved?: CustomFood) => void;
 }
@@ -57,7 +61,7 @@ const optional = (value: number | undefined) => (value === undefined ? '' : oneD
  * numbers per serving (MM-45). Editing a saved food changes only the food,
  * never entries already logged from it.
  */
-export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFoodFormProps) {
+export function CustomFoodForm({ food, initialBarcode, draft, draftFrom = 'database', readLabelAtStart = false, onDone }: CustomFoodFormProps) {
   const start = food ?? draft;
   const ids = useId();
   const { services } = useApp();
@@ -147,6 +151,14 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
     );
   };
 
+  // Opened to scan a label (MM-706): the read starts at once, once.
+  const startedReading = useRef(false);
+  useEffect(() => {
+    if (!readLabelAtStart || startedReading.current) return;
+    startedReading.current = true;
+    void readLabel();
+  });
+
   const p = parseNumber(protein) ?? 0;
   const c = parseNumber(carbs) ?? 0;
   const f = parseNumber(fat) ?? 0;
@@ -194,11 +206,14 @@ export function CustomFoodForm({ food, initialBarcode, draft, onDone }: CustomFo
   const whole = roundHalfAwayFromZero(fromMacros) + 0;
   return (
     <div className="food-sheet">
-      <h2 className="app-headline">{food !== undefined ? 'Edit your food' : draft !== undefined ? 'Fix this food' : 'Save your own food'}</h2>
+      <h2 className="app-headline">
+        {food !== undefined ? 'Edit your food' : draft !== undefined ? (draftFrom === 'log' ? 'Save as a food' : 'Fix this food') : 'Save your own food'}
+      </h2>
       {draft !== undefined && food === undefined ? (
         <p className="app-caption">
-          Correct what differs from the package. Your copy is what you find from now on, and the food database is not
-          changed. Nothing is uploaded.
+          {draftFrom === 'log'
+            ? 'One serving is the amount you logged last time. Change anything, then save it to log in any amount.'
+            : 'Correct what differs from the package. Your copy is what you find from now on, and the food database is not changed. Nothing is uploaded.'}
         </p>
       ) : null}
       {food === undefined ? (

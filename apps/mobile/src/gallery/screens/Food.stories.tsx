@@ -32,6 +32,7 @@ import { storyToday } from './storyToday';
 import { valueOf } from './valueOf';
 import { waitingRead } from './waitingRead';
 import { weightLossMedicationScenario } from './weightLossMedicationScenario';
+import { withOwnFoods } from './withOwnFoods';
 
 /**
  * The food log, and every step of adding to it. Before MM-255 (main at
@@ -672,12 +673,6 @@ export const WaterBarNearlyThere = screenStory({
 const inSheet = (canvas: HTMLElement) => within(canvas.ownerDocument.body);
 
 /** Opens Add food, presses Enter manually, then the measuring method `method`. */
-/** Opens a saved food's editor from its menu in Saved: pressing it logs it (MM-635). */
-const editSaved = (name: string) => async (canvas: HTMLElement) => {
-  await press(`More actions for ${name}`)(canvas);
-  await userEvent.click(await inSheet(canvas).findByRole('menuitem', { name: 'Edit' }));
-};
-
 const manuallyAs = (method: string) => async (canvas: HTMLElement) => {
   await press('Enter manually')(canvas);
   const methods = await inSheet(canvas).findByRole('group', { name: 'How was it measured?' });
@@ -694,35 +689,6 @@ export const AddFoodEstimatedTotals = screenStory({
   open: addFood,
   walk: manuallyAs('Estimated totals'),
 });
-
-/** The demo with one food and one recipe of the person's own (MM-45). */
-const withOwnFoods: StoryScenario = async (repos, today) => {
-  await new DemoSeed(today).replace(repos);
-  await repos.customFoods.saveCustomFood(
-    new CustomFood({
-      id: 0,
-      name: 'Demo overnight oats',
-      kind: 'food',
-      servingDescription: '1 jar',
-      servingGrams: 250,
-      perServing: new NutritionTotals({ kcal: 410, proteinG: 24, carbsG: 52, fatG: 11 }),
-    }),
-  );
-  await repos.customFoods.saveCustomFood(
-    new CustomFood({
-      id: 0,
-      name: 'Demo chili',
-      kind: 'recipe',
-      servingDescription: '1 bowl',
-      servings: 4,
-      perServing: new NutritionTotals({ kcal: 511, proteinG: 46, carbsG: 36, fatG: 20 }),
-      ingredients: [
-        { name: 'Ground beef, lean, cooked', grams: 500, totals: new NutritionTotals({ kcal: 1250, proteinG: 130, carbsG: 0, fatG: 75 }) },
-        { name: 'Black beans, cooked', grams: 600, totals: new NutritionTotals({ kcal: 792, proteinG: 53, carbsG: 144, fatG: 3 }) },
-      ],
-    }),
-  );
-};
 
 /** MM-321, MM-596: a search that matches the person's own food and one from their log, above the pack's. */
 export const AddFoodOwnAndRecent = screenStory({
@@ -1077,156 +1043,6 @@ export const AddFoodSavedOwn = screenStory({
   walk: press('Saved'),
 });
 
-/** MM-321: a new food of the person's own. */
-export const NewOwnFood = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'One serving is',
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New food')(canvas);
-  },
-});
-
-/** MM-321: a recipe opened to change, its ingredients listed, one picked from the pack. */
-export const EditRecipe = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'Makes servings',
-  scenario: withOwnFoods,
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await editSaved('Demo chili')(canvas);
-    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'rice');
-    await press(/^White rice, cooked/)(canvas);
-  },
-});
-
-/** MM-321: a new recipe's ingredient entered by its numbers. */
-export const NewRecipeByNumbers = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'Totals for the amount you put in the pot.',
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New recipe')(canvas);
-    await press('Enter numbers instead')(canvas);
-  },
-});
-
-/** MM-45, MM-151: an ingredient the pack has raw and cooked, weighed: what the weight means either way. */
-export const NewRecipeIngredientWeighedAs = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: '200 g cooked is about 260 kcal. 200 g raw is about 730 kcal.',
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New recipe')(canvas);
-    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
-    await press(/^White rice, cooked/)(canvas);
-    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
-  },
-});
-
-/** MM-45: a recipe's ingredient line opened: move it or remove it. */
-export const EditRecipeLineMenu = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'Move down',
-  scenario: withOwnFoods,
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await editSaved('Demo chili')(canvas);
-    await press('More actions for Ground beef, lean, cooked')(canvas);
-  },
-});
-
-/** MM-456: a recipe whose rice was found in the pack (`packId`), 200 g raw, and whose butter was typed. */
-const withRiceBowl =
-  (packId: string): StoryScenario =>
-  async (repos, today) => {
-    await new DemoSeed(today).replace(repos);
-    await repos.customFoods.saveCustomFood(
-      new CustomFood({
-        id: 0,
-        name: 'Demo rice bowl',
-        kind: 'recipe',
-        servingDescription: '1 serving',
-        servings: 2,
-        perServing: new NutritionTotals({ kcal: 401, proteinG: 7, carbsG: 80, fatG: 4.7 }),
-        ingredients: [
-          {
-            name: 'White rice, raw',
-            grams: 200,
-            totals: new NutritionTotals({ kcal: 730, proteinG: 14, carbsG: 160, fatG: 1.4 }),
-            source: { packId, foodId: 3 },
-          },
-          { name: 'Butter', grams: 10, totals: new NutritionTotals({ kcal: 72, proteinG: 0, carbsG: 0, fatG: 8 }) },
-        ],
-      }),
-    );
-  };
-
-/** MM-456: a found line's weight changed in place, worked out again from the food as installed. */
-export const EditRecipeLineWeight = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: '200 g is about 730 kcal.',
-  scenario: withRiceBowl(FixturePack.packId),
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await editSaved('Demo rice bowl')(canvas);
-    await press('More actions for White rice, raw')(canvas);
-    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
-  },
-});
-
-/** MM-456: a found line's new weight saved: the line reads it, and focus is back on that line's menu button. */
-export const EditRecipeLineWeightSaved = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: '100 g · 365 kcal',
-  scenario: withRiceBowl(FixturePack.packId),
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await editSaved('Demo rice bowl')(canvas);
-    await press('More actions for White rice, raw')(canvas);
-    await userEvent.click(await within(canvas.ownerDocument.body).findByRole('menuitem', { name: 'Change weight' }));
-    const field = await inSheet(canvas).findByRole('textbox', { name: 'Weight g for White rice, raw' }, { timeout: 10000 });
-    await userEvent.clear(field);
-    await userEvent.type(field, '100');
-    await press('Save weight')(canvas);
-  },
-});
-
-/** MM-456: a found line whose food is no longer installed keeps its totals, says so, and its menu offers no weight change. */
-export const EditRecipeLineFoodGone = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: '200 g · 730 kcal · food not installed',
-  scenario: withRiceBowl('a-pack-since-removed'),
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await editSaved('Demo rice bowl')(canvas);
-    await press('More actions for White rice, raw')(canvas);
-  },
-});
-
-/** MM-456: an ingredient just added: focus back in the search, and "Added …" said politely. */
-export const NewRecipeIngredientAdded = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'Added White rice, cooked',
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New recipe')(canvas);
-    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Search ingredients' }), 'white rice');
-    await press(/^White rice, cooked/)(canvas);
-    await userEvent.type(await inSheet(canvas).findByRole('textbox', { name: 'Weight g' }), '200');
-    await press('Add ingredient')(canvas);
-  },
-});
-
 /** MM-321: a barcode the pack does not know: read the label, or enter it by hand. */
 export const ScanUnknownCode = screenStory({
   covers: ['BarcodeScanStep'],
@@ -1264,43 +1080,6 @@ export const EditFoodWithoutAmount = screenStory({
 });
 
 /** MM-321: a new food, the label read with no camera on the phone: it says so and the fields stay. */
-export const NewOwnFoodNoCamera = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'One serving is',
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New food')(canvas);
-    await press('Read the nutrition label')(canvas);
-  },
-});
-
-/**
- * MM-44: a label read from a panel whose labels and values came back in two columns: the numbers paired by
- * position, and each one marked unsure until it is changed.
- */
-export const NewOwnFoodLabelUnsure = screenStory({
-  covers: ['MyFoodsStep'],
-  shows: 'Numbers for one serving',
-  device: (services) =>
-    Promise.resolve({
-      ...services,
-      labelReader: {
-        readLabel: () =>
-          Promise.resolve(
-            'Nutrition Facts\nServing size 1 bar (40g)\nCalories 180\nTotal Fat\nSodium\nTotal Carbohydrate\nProtein\n6g\n95mg\n24g\n8g',
-          ),
-      },
-    }),
-  open: addFood,
-  walk: async (canvas) => {
-    await press('Saved')(canvas);
-    await press('New food')(canvas);
-    await press('Read the nutrition label')(canvas);
-    await within(canvas).findByText(/Numbers marked unsure were hard to read/);
-  },
-});
-
 /** MM-321: scanning on a phone whose camera is not allowed: type the digits instead. */
 export const ScanNoCamera = screenStory({
   covers: ['BarcodeScanStep'],

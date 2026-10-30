@@ -17,25 +17,27 @@ import { SectionLabel } from '../ui/SectionLabel';
 interface CustomExerciseScreenProps {
   /** What was typed in the search, as a start for the name. */
   name?: string;
-  /** Called with the new exercise's id once it is saved. */
+  /** An exercise of the user's own being changed (MM-706): the fields start from it, and saving replaces it. */
+  exercise?: Exercise | undefined;
+  /** Called with the exercise's id once it is saved. */
   onSaved: (id: string) => void;
 }
 
-/** Adding an exercise of the user's own (MM-76), with the same fields as a built-in one. */
-export function CustomExerciseScreen({ name: firstName = '', onSaved }: CustomExerciseScreenProps) {
+/** Adding an exercise of the user's own (MM-76), with the same fields as a built-in one; or changing one (MM-706). */
+export function CustomExerciseScreen({ name: firstName = '', exercise, onSaved }: CustomExerciseScreenProps) {
   const { services } = useApp();
-  const [name, setName] = useState(firstName);
-  const [equipment, setEquipment] = useState<Equipment>('barbell');
-  const [primary, setPrimary] = useState<MuscleGroup>('chest');
-  const [secondary, setSecondary] = useState<ReadonlySet<MuscleGroup>>(new Set());
-  const [load, setLoad] = useState<ExerciseLoad>('addedWeight');
+  const [name, setName] = useState(exercise?.name ?? firstName);
+  const [equipment, setEquipment] = useState<Equipment>(exercise?.equipment ?? 'barbell');
+  const [primary, setPrimary] = useState<MuscleGroup>(exercise?.primary ?? 'chest');
+  const [secondary, setSecondary] = useState<ReadonlySet<MuscleGroup>>(new Set(exercise?.secondary ?? []));
+  const [load, setLoad] = useState<ExerciseLoad>(exercise?.load ?? 'addedWeight');
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
     setSaving(true);
     const id = await services.customExercises.saveCustomExercise(
       new Exercise({
-        id: '',
+        id: exercise?.id ?? '',
         name: name.trim(),
         equipment,
         primary,
@@ -53,7 +55,7 @@ export function CustomExerciseScreen({ name: firstName = '', onSaved }: CustomEx
   };
 
   return (
-    <Screen title="Your own exercise">
+    <Screen title={exercise === undefined ? 'Your own exercise' : 'Edit your exercise'}>
       <MmTextField label="Name" value={name} onChange={setName} />
       <div className="app-gap" />
       <MmDropdown<Equipment>

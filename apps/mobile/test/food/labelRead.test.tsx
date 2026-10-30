@@ -6,6 +6,7 @@ import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import type { AppServices } from '../../src/state/AppServices';
 import { openAddFood, press, typeIn } from '../support/addFood';
+import { newFoodBy, openLibrary } from '../support/openLibrary';
 import { first } from '../support/first';
 import { fixtureCatalog, withCatalog } from '../support/fixtureCatalog';
 import { openTab } from '../support/openTab';
@@ -49,13 +50,11 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
+/** The form a food is typed into, from the Library's New food (MM-706), with the reader giving `text`. */
 async function openForm(text: string | undefined): Promise<HTMLElement> {
   renderApp(repos, today, { change: readerGiving(text) });
   await openTab('Food');
-  const sheet = await openAddFood();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
-  return sheet;
+  return newFoodBy(await openLibrary(), 'Type it in');
 }
 
 const field = (sheet: HTMLElement, label: string) => within(sheet).getByRole<HTMLInputElement>('textbox', { name: label });
@@ -114,9 +113,7 @@ it('cancelling the camera changes nothing', async () => {
 it('with no camera it says so, and the numbers can still be typed', async () => {
   renderApp(repos, today);
   await openTab('Food');
-  const sheet = await openAddFood();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
+  const sheet = await newFoodBy(await openLibrary(), 'Type it in');
   await press(sheet, 'Read the nutrition label');
   expect(await within(sheet).findByText(/The camera could not be used\./)).toBeInTheDocument();
   await typeIn(sheet, 'Calories', '120');

@@ -45,6 +45,7 @@ import { roundHalfAwayFromZero } from '../lang/roundHalfAwayFromZero';
 import { useApp } from '../app/useApp';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
+import { useNavigator } from '../app/useNavigator';
 import { DayStepper } from '../ui/DayStepper';
 import { MmButton } from '../ui/MmButton';
 import { MmIconButton } from '../ui/MmIconButton';
@@ -59,6 +60,7 @@ import { AlcoholFields } from './AlcoholFields';
 import { customCatalogFood } from './custom/customCatalogFood';
 import { MyFoodsStep } from './custom/MyFoodsStep';
 import { SavedFoodTrustMark } from './custom/SavedFoodTrustMark';
+import { LibraryScreen } from '../library/LibraryScreen';
 import { defaultMeal } from './defaultMeal';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
 import { editableNumber } from './editableNumber';
@@ -336,6 +338,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   const netCarbs = useNetCarbs();
   const today = useCell(state.today);
   const overlays = useOverlays();
+  const navigator = useNavigator();
   const hand = useCell(state.handSize);
   // Whether online is offered changes as the person's choice loads and is answered (MM-58); the chooser follows it (MM-652).
   useCell(state.onlineLookup.choice);
@@ -800,7 +803,18 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   }
   if (step.at === 'myFoods') {
     return (
-      <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} onPick={pickCustom} onPickMeal={(m) => void logSavedMeal(m)} />
+      <MyFoodsStep
+        initialBarcode={step.barcode}
+        draft={step.draft}
+        onBack={choices}
+        onPick={pickCustom}
+        onPickMeal={(m) => void logSavedMeal(m)}
+        // The sheet closes and the Library opens over the Food screen (MM-707).
+        onManage={() => {
+          onDone();
+          void navigator.push(() => <LibraryScreen />);
+        }}
+      />
     );
   }
   if (step.at === 'estimating') {

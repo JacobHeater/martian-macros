@@ -1,0 +1,6 @@
+/* The Library (MM-706): the rows' two lines of detail, under the title, in the row's caption type. */
+.library-row-line {
+  display: block;
+  color: var(--text2);
+  font: var(--type-caption);
+}
