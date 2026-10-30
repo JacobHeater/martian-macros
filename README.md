@@ -36,7 +36,7 @@ signing team, see [docs/ios-signing.md](docs/ios-signing.md).
 | `mm check` | CI gate: requirements, panel, the tool's tests, then the web check (type check, tests, build, offline) |
 | `mm web` | The web check alone |
 | `mm test [--tool]` | The tool's tests, then the web suite (`--tool` for the tool alone) |
-| `mm run [--prod] [--env dev\|prod\|phone] [-d DEVICE]` | Builds, installs and launches; `--env phone` selects the one physical phone, never an emulator; `--prod` (or `--env prod`) is the real app, otherwise the dev twin |
+| `mm run [--prod] [--phone \| -d DEVICE \| --env dev\|prod\|phone]` | Builds, installs and launches; `--phone` (or `--env phone`) selects the one physical phone, never an emulator, and an unknown argument refuses rather than running on the wrong device; `--prod` (or `--env prod`) is the real app, otherwise the dev twin |
 | `mm run --ios [-d UDID] [--prod \| --env prod\|dev\|demo]` | Builds, installs and launches on an iPhone simulator (`MM_SIMULATOR` sets the default); the dev twin unless said |
 | `mm run --ios --phone [name \| id] [--prod \| --env prod\|dev\|demo]` | Builds signed, installs and opens on the iPhone plugged in (`MM_IPHONE` sets the default; `MM_APPLE_TEAM` the signing team); the real app unless said |
 | `mm demo [--seed] -d <Android device ID>` | The isolated DEMO app on an exact device; `--seed` starts it from the demo scenario on every launch |
