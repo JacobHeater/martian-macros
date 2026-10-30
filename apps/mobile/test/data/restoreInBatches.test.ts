@@ -54,3 +54,25 @@ it('restores thousands of rows in tens of statements, each within 999 parameters
   expect(seen.statements).toBeLessThan(200);
   expect(seen.largest).toBeLessThanOrEqual(999);
 });
+
+// MM-702: the restore says how far it has come, after every batch, so the sheet after Replace can show a bar.
+it('reports the rows written of all rows after every batch, ending at all of them', async () => {
+  const from = await WasmSqlDatabase.open();
+  await SqlRepositories.open(from);
+  await from.transaction(async (db) => {
+    for (let i = 0; i < samples; i++) {
+      await db.execute(
+        'INSERT INTO imported_samples (type, platform_id, value, start_ms, end_ms, source_id, source_name) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['steps', `s-${i}`, i, 1_700_000_000_000 + i * 60_000, null, 'com.google.android.apps.fitness', 'Fit'],
+      );
+    }
+  });
+  const to = await WasmSqlDatabase.open();
+  const repos = await SqlRepositories.open(to);
+  const heard: [number, number][] = [];
+  await repos.restorer.restoreFrom(await from.exportBytes(), (done, total) => heard.push([done, total]));
+  expect(heard.length).toBeGreaterThan(10);
+  expect(heard.at(-1)?.[0]).toBe(heard.at(-1)?.[1]);
+  expect(heard.at(-1)?.[1]).toBeGreaterThanOrEqual(samples);
+  expect(heard.every(([done], i) => i === 0 || done >= (heard[i - 1] as [number, number])[0])).toBe(true);
+});

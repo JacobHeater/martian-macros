@@ -25,8 +25,8 @@ export class RenewingRestorer implements DataRestorer {
     return this.restorer.describeHere();
   }
 
-  async restoreFrom(snapshot: Uint8Array): Promise<void> {
-    await this.restorer.restoreFrom(snapshot);
+  async restoreFrom(snapshot: Uint8Array, progress?: (done: number, total: number) => void): Promise<void> {
+    await this.restorer.restoreFrom(snapshot, progress);
     await this.ids.renewWriteNamespace().catch(() => undefined);
   }
 }

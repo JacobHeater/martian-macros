@@ -45,10 +45,13 @@ export class SqlDataRestorer implements DataRestorer {
     return this.db.read((db) => describeDatabase(db));
   }
 
-  restoreFrom(snapshot: Uint8Array): Promise<void> {
+  restoreFrom(snapshot: Uint8Array, progress?: (done: number, total: number) => void): Promise<void> {
     return this.withCopy(snapshot, async (copy) => {
       const copied = new Map<string, SqlRow[]>();
       for (const table of tables) copied.set(table, await copy.select(`SELECT * FROM ${table}`));
+      const total = [...copied.values()].reduce((sum, rows) => sum + rows.length, 0);
+      let done = 0;
+      progress?.(0, total);
       await this.db.write(tables, async (db) => {
         for (const table of tables) await db.execute(`DELETE FROM ${table}`);
         for (const table of tables) {
@@ -66,6 +69,8 @@ export class SqlDataRestorer implements DataRestorer {
               `INSERT INTO ${table} (${columns.map((c) => `"${c}"`).join(', ')}) VALUES ${batch.map(() => tuple).join(', ')}`,
               batch.flatMap((row) => columns.map((c) => row[c] as SqlValue)),
             );
+            done += batch.length;
+            progress?.(done, total);
           }
         }
       });

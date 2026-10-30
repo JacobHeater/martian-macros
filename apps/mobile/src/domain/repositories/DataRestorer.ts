@@ -11,5 +11,6 @@ export interface DataRestorer {
   describe(snapshot: Uint8Array): Promise<BackupContents>;
   /** What this phone holds now. */
   describeHere(): Promise<BackupContents>;
-  restoreFrom(snapshot: Uint8Array): Promise<void>;
+  /** Replaces this phone's data; `progress`, when given, hears the rows written of all rows after each batch (MM-702). */
+  restoreFrom(snapshot: Uint8Array, progress?: (done: number, total: number) => void): Promise<void>;
 }
