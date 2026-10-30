@@ -1,5 +1,6 @@
 import type { Meta } from '@storybook/react-vite';
 import { screen, userEvent, within } from 'storybook/test';
+import type { BackupContents } from '../../domain/backup/BackupContents';
 import { encodePhotoArchive } from '../../domain/photos/encodePhotoArchive';
 import { FakeDataRestorer } from '../../fixtures/FakeDataRestorer';
 import { SettingsScreen } from '../../settings/SettingsScreen';
@@ -25,7 +26,7 @@ export default meta;
 const openBackup = ({ navigator }: StoryStage) => void navigator.push(() => <SettingsScreen open="backup" />);
 
 /** This phone as a long-used one holds it: what a move would replace. */
-const usedPhone = {
+const usedPhone: BackupContents = {
   weighIns: 71,
   foodDays: 58,
   workouts: 12,
@@ -35,7 +36,7 @@ const usedPhone = {
   hasSetup: true,
 };
 
-const withReceiver = (receiver: FakeMoveReceiver, here = usedPhone) => async (services: AppServices): Promise<AppServices> => {
+const withReceiver = (receiver: FakeMoveReceiver, here: BackupContents = usedPhone) => async (services: AppServices): Promise<AppServices> => {
   const restorer = new FakeDataRestorer();
   restorer.here = here;
   return { ...services, restorer, moveReceiver: receiver };
