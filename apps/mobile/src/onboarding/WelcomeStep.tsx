@@ -11,8 +11,11 @@ function arcAt(elapsedMs: number): number {
   return settledAt * (1 - (1 - t) ** 3);
 }
 
-/** The first screen: what the app is, the horizon arc drawn once, and a way in. */
-export function WelcomeStep({ onStart }: { onStart: () => void }) {
+/**
+ * The first screen: what the app is, the horizon arc drawn once, and a way in; or, for someone who already uses the
+ * app on another phone, a way to move it here without answering the questions only to have them replaced (MM-698).
+ */
+export function WelcomeStep({ onStart, onMoveHere }: { onStart: () => void; onMoveHere: () => void }) {
   const still =
     typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [progress, setProgress] = useState(still ? settledAt : 0);
@@ -47,6 +50,11 @@ export function WelcomeStep({ onStart }: { onStart: () => void }) {
       <div className="onboarding-welcome-bottom" />
       <div className="app-row app-row-end">
         <MmButton label="Begin" onPress={onStart} />
+      </div>
+      <div className="app-gap-small" />
+      {/* Its own row: the label is too long to share one with Begin on a small phone. */}
+      <div className="app-row app-row-end">
+        <MmButton label="I have Martian Macros on another phone" kind="text" onPress={onMoveHere} />
       </div>
     </div>
   );

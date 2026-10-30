@@ -17,6 +17,8 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
     }
 
     private let done: (Outcome) -> Void
+    /// Reading a move code's QR code (MM-698), not a product's barcode: the two never mix.
+    private let readsQr: Bool
     private let session = AVCaptureSession()
     private var preview: AVCaptureVideoPreviewLayer?
     private var finished = false
@@ -24,7 +26,8 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
     /// controller still being presented cannot be dismissed, and the app would never hear back.
     private var unusable = false
 
-    init(done: @escaping (Outcome) -> Void) {
+    init(readsQr: Bool = false, done: @escaping (Outcome) -> Void) {
+        self.readsQr = readsQr
         self.done = done
         super.init(nibName: nil, bundle: nil)
     }
@@ -47,7 +50,8 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
         session.addOutput(output)
         output.setMetadataObjectsDelegate(self, queue: .main)
         let wanted: [AVMetadataObject.ObjectType] = [.ean13, .ean8, .upce]
-        output.metadataObjectTypes = wanted.filter { output.availableMetadataObjectTypes.contains($0) }
+        let reading: [AVMetadataObject.ObjectType] = readsQr ? [.qr] : wanted
+        output.metadataObjectTypes = reading.filter { output.availableMetadataObjectTypes.contains($0) }
 
         let preview = AVCaptureVideoPreviewLayer(session: session)
         preview.videoGravity = .resizeAspectFill
@@ -91,7 +95,7 @@ final class ScanViewController: UIViewController, AVCaptureMetadataOutputObjects
         for object in metadataObjects {
             guard let code = object as? AVMetadataMachineReadableCodeObject,
                   let digits = code.stringValue,
-                  let symbology = Self.symbology(code.type)
+                  let symbology = readsQr ? (code.type == .qr ? "qr" : nil) : Self.symbology(code.type)
             else { continue }
             finish(.read(digits: digits, symbology: symbology))
             return

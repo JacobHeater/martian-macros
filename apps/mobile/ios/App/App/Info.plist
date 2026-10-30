@@ -60,7 +60,7 @@
 	<key>NSHealthShareUsageDescription</key>
 	<string>To read the kinds of health data you allow, such as weigh-ins from your scale, and, when you ask during setup, your sex, date of birth and height, so you need not type them. Nothing read leaves this device.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Only while the app is being developed: to load it from the developer's Mac on your Wi-Fi. The app sends nothing over your network.</string>
+	<string>To move your records between your phones on the same Wi-Fi, only when you choose Move to another phone. Nothing goes to the internet. In a developer's build, also to load the app from the developer's Mac.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

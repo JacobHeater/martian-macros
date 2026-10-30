@@ -44,6 +44,7 @@ import type { WeightFromHealth } from './WeightFromHealth';
 import { SexStep } from './SexStep';
 import { TrainingStep } from './TrainingStep';
 import { WelcomeStep } from './WelcomeStep';
+import { useMoveToAnotherPhone } from '../settings/useMoveToAnotherPhone';
 import { WhatToExpectStep } from './WhatToExpectStep';
 import { whatToExpectPoints } from '../format/whatToExpectPoints';
 import { ReminderRule } from '../engine/ReminderRule';
@@ -65,6 +66,8 @@ export function OnboardingScreen() {
   const today = state.today.peek();
 
   const [welcomed, setWelcomed] = useState(false);
+  // A fresh install holds nothing a backup could keep, so the move asks for none (MM-698).
+  const move = useMoveToAnotherPhone();
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [sex, setSex] = useState<BiologicalSex>();
@@ -267,7 +270,7 @@ export function OnboardingScreen() {
   if (!welcomed) {
     return (
       <div className="app-frame">
-        <WelcomeStep onStart={() => setWelcomed(true)} />
+        <WelcomeStep onStart={() => setWelcomed(true)} onMoveHere={() => void move.receive()} />
       </div>
     );
   }

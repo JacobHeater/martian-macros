@@ -14,6 +14,9 @@ import type { SavedMealRepository } from '../domain/repositories/SavedMealReposi
 import type { DataEraser } from '../domain/repositories/DataEraser';
 import type { DataRestorer } from '../domain/repositories/DataRestorer';
 import type { BackupPlatform } from '../backup/BackupPlatform';
+import type { MoveIdentity } from '../transfer/MoveIdentity';
+import type { MoveReceiving } from '../transfer/MoveReceiving';
+import type { MoveSending } from '../transfer/MoveSending';
 import type { DayKindRepository } from '../domain/repositories/DayKindRepository';
 import type { DayMarkRepository } from '../domain/repositories/DayMarkRepository';
 import type { ExerciseProgressionRepository } from '../domain/repositories/ExerciseProgressionRepository';
@@ -68,6 +71,7 @@ import type { Watched } from '../lang/Watched';
 import type { OnlineFoodCache } from '../foodCatalog/online/OnlineFoodCache';
 import type { OnlineFoodSource } from '../foodOnline/OnlineFoodSource';
 import type { BarcodeScanner } from '../platform/BarcodeScanner';
+import type { CodeScanner } from '../platform/CodeScanner';
 import type { LabelTextReader } from '../platform/LabelTextReader';
 
 /**
@@ -129,6 +133,12 @@ export interface AppServices {
   readonly restorer: DataRestorer;
   /** The phone's part of a backup: the snapshot, the share sheet and the file picker (MM-63). */
   readonly backup: BackupPlatform;
+  /** This phone receiving a move from another on the same Wi-Fi: listens while its code is shown (MM-698). */
+  readonly moveReceiver: MoveReceiving;
+  /** This phone sending a move to the one whose code it scanned (MM-698). */
+  readonly moveSender: MoveSending;
+  /** The app and schema versions two phones compare before a move (MM-698). */
+  readonly moveIdentity: () => Promise<MoveIdentity>;
 
   /**
    * The installed food packs read as one catalog (MM-42); given again when a
@@ -163,6 +173,8 @@ export interface AppServices {
   readonly onlineFoods: OnlineFoodCache;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
+  /** The camera reading another phone's move code (MM-698). */
+  readonly codeScanner: CodeScanner;
 
   /** The phone's own scheduled notifications (MM-146). Nothing here uses the network. */
   readonly reminderScheduler: ReminderScheduler;

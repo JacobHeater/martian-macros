@@ -21,8 +21,9 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 
 /**
- * The phone's camera (MM-43, MM-44): a barcode read live, and a photo of a
- * Nutrition Facts panel read as text with ML Kit. Both are read on the
+ * The phone's camera (MM-43, MM-44): a barcode read live, another phone's
+ * move code read live (MM-698), and a photo of a Nutrition Facts panel read
+ * as text with ML Kit. Both are read on the
  * device; the photo is deleted and nothing is uploaded.
  */
 @CapacitorPlugin(
@@ -36,6 +37,12 @@ class MmScannerPlugin : Plugin() {
 
     @PermissionCallback
     fun scanAllowed(call: PluginCall) = ifGranted(call) { startScan(it) }
+
+    @PluginMethod
+    fun scanCode(call: PluginCall) = withCamera(call, "scanCodeAllowed") { startCodeScan(it) }
+
+    @PermissionCallback
+    fun scanCodeAllowed(call: PluginCall) = ifGranted(call) { startCodeScan(it) }
 
     @PluginMethod
     fun readLabel(call: PluginCall) = withCamera(call, "labelAllowed") { startPhoto(it) }
@@ -75,6 +82,24 @@ class MmScannerPlugin : Plugin() {
                         .put("digits", data.getStringExtra("digits"))
                         .put("symbology", data.getStringExtra("symbology")),
                 )
+            result.resultCode == ScanActivity.RESULT_FAILED ->
+                call.reject(data?.getStringExtra("message") ?: "The camera cannot be used.")
+            else -> call.resolve(JSObject().put("cancelled", true))
+        }
+    }
+
+    /** The other phone's move code (MM-698): the same full-screen scan, reading QR codes only. */
+    private fun startCodeScan(call: PluginCall) {
+        startActivityForResult(call, Intent(context, ScanActivity::class.java).putExtra(ScanActivity.EXTRA_QR, true), "codeScanned")
+    }
+
+    @ActivityCallback
+    fun codeScanned(call: PluginCall?, result: ActivityResult) {
+        if (call == null) return
+        val data = result.data
+        when {
+            result.resultCode == android.app.Activity.RESULT_OK && data != null ->
+                call.resolve(JSObject().put("cancelled", false).put("text", data.getStringExtra("digits")))
             result.resultCode == ScanActivity.RESULT_FAILED ->
                 call.reject(data?.getStringExtra("message") ?: "The camera cannot be used.")
             else -> call.resolve(JSObject().put("cancelled", true))
