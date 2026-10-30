@@ -2,11 +2,13 @@ import type { CalendarDate } from '../domain/CalendarDate';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import { distinctByName } from '../domain/food/meal/distinctByName';
 import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
+import type { SavedFoodUsage } from '../domain/food/custom/SavedFoodUsage';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
 import type { Watched } from '../lang/Watched';
 import type { SqlRow } from '../sql/SqlRow';
 import type { AppDatabase } from './AppDatabase';
+import { day, integer } from './columns';
 import { foodEntryValues } from './foodEntryValues';
 import { foodFromRow } from './foodFromRow';
 import { insert } from './insert';
@@ -86,6 +88,17 @@ export class SqlFoodRepository implements FoodRepository {
       ),
     );
     return rows.length === 0 ? undefined : foodFromRow(rows[0] as SqlRow);
+  }
+
+  watchSavedFoodUsage(): Watched<ReadonlyMap<number, SavedFoodUsage>> {
+    return this.db.watch(['food_entries'], async (db) => {
+      // An entry logged from one of the person's own foods carries its id as its origin (MM-167, `custom`).
+      const rows = await db.select(
+        "SELECT origin_food_id AS food_id, COUNT(*) AS times, MAX(epoch_day) AS last_day FROM food_entries " +
+          "WHERE origin_pack_id = 'custom' AND origin_food_id IS NOT NULL GROUP BY origin_food_id",
+      );
+      return new Map(rows.map((row) => [integer(row, 'food_id'), { times: integer(row, 'times'), lastDay: day(row, 'last_day') }]));
+    });
   }
 
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {

@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../domain/CalendarDate';
+import type { SavedFoodUsage } from '../domain/food/custom/SavedFoodUsage';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
 import type { FoodEntry } from '../domain/FoodEntry';
 import type { FoodRepository } from '../domain/repositories/FoodRepository';
@@ -50,6 +51,10 @@ export class MirroredFoodLog implements FoodRepository {
 
   lastLoggedFrom(packId: string, foodIds: readonly number[]): Promise<FoodEntry | undefined> {
     return this.log.lastLoggedFrom(packId, foodIds);
+  }
+
+  watchSavedFoodUsage(): Watched<ReadonlyMap<number, SavedFoodUsage>> {
+    return this.log.watchSavedFoodUsage();
   }
 
   async addFood(entry: FoodEntry): Promise<number> {

@@ -1,5 +1,7 @@
 import type { CalendarDate } from '../domain/CalendarDate';
 import type { LoggedMeal } from '../domain/food/meal/LoggedMeal';
+import type { SavedFoodUsage } from '../domain/food/custom/SavedFoodUsage';
+import { savedFoodUsageOf } from '../domain/food/custom/savedFoodUsageOf';
 import { distinctByName } from '../domain/food/meal/distinctByName';
 import { recentMealsIn } from '../domain/food/meal/recentMealsIn';
 import { FoodEntry } from '../domain/FoodEntry';
@@ -74,6 +76,10 @@ export class InMemoryFoodRepository implements FoodRepository {
       if (origin !== undefined && origin.packId === packId && foodIds.includes(origin.foodId)) return all[i];
     }
     return undefined;
+  }
+
+  watchSavedFoodUsage(): Watched<ReadonlyMap<number, SavedFoodUsage>> {
+    return this.entries.watchAs(savedFoodUsageOf);
   }
 
   watchRecentFoods({ limit = 20 }: { limit?: number } = {}): Watched<FoodEntry[]> {

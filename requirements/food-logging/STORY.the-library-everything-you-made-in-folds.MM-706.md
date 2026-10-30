@@ -99,3 +99,37 @@ Scenario: Empty
   `food.css` has nothing to reuse.
 - The "With my AI" route opens MM-708's screen; if it is not yet on `main` when this merges, the route is added in the
   PR that brings it. Nothing is stubbed.
+
+## Progress
+Built 2026-10-30 (PR B of MM-703, branch `feat/mm-706-library`): `LibraryScreen` (`apps/mobile/src/library/`), a pushed
+screen with New food above five folds closed at first (`MmSection`, `remember` so they are kept across visits, MM-286),
+each saved thing's fold titled with its count; `NewFoodSheet` with Scan a label, Type it in and New recipe; rows
+`LibraryFoodRow` (serving, calories and macros as MM-564 writes them, "Last logged 3 days ago · 12 times" or "Never
+logged", the grade when the numbers allow one, Edit and Delete in the menu, pressed to edit), `LibraryMealRow`,
+`LibraryUsualRow` ("Save as a food"), `LibraryExerciseRow` ("Last trained … · 2 workouts"); usage from the log through
+`watchSavedFoodUsage()` on the food repository (`SavedFoodUsageReader`, SQL, in-memory and the mirrored log, in the
+contract suite), kept as `state.savedFoodUsage`; usual foods by `usualFoodsIn` (MM-639's count over every meal, the
+person's own foods left out); `customFoodOfEntry` fills the form from a usual food's latest entry; `CustomExerciseScreen`
+edits an exercise (`exercise`); `CustomFoodForm` reads the label as it opens (`readLabelAtStart`) and names a draft from
+the log ("Save as a food"); `RecipeForm` gives back what it saved. A save opens its fold on the new row, which takes
+focus, and a snack says "Saved X". Stories in `Library.stories.tsx` (the management stories moved here from
+`Food.stories.tsx`); tests in `test/library/library.test.tsx`, the food repository contract, and the re-pointed
+`test/food/customFoods.test.tsx` and `test/food/labelRead.test.tsx`.
+
+Decided while building (say if any is wrong):
+- **The forms open as sheets over the Library** (`overlays.sheet`, tall), not as pages inside it: they are drawn for a
+  sheet's padding (`.food-sheet`), and a page inside the screen's own padding would have doubled it at 360 px.
+- **A saved meal's row has no usage line**: a saved meal's foods are logged loose (MM-645, the owner's D-2), so the log
+  cannot say how often the meal itself was logged. Its row says its foods and calories, as the Saved step's does.
+- **Pressing a food's or an exercise's row opens its editor** (the row says it opens), besides the menu's Edit: the
+  sibling of Settings' rows, and it gives the new row somewhere to take focus.
+- **An exercise's usage** is read from the workouts already in the state (a workout with a set of it counts once), not a
+  new reader.
+
+Left to sibling PRs, wired by whichever lands later: the trust mark on a row (MM-710's evidence columns), the "With my
+AI" route in New food (MM-708), the drawer's Library row (MM-704). On this branch the Library is reached from the Saved
+step's "Manage in Library" (MM-707).
+
+Not run locally; CI validates. Owed on the phone: the folds and the sheets over the Library, the row at 360 px with the
+grade and the menu, "Scan a label" starting the camera at once.
+
