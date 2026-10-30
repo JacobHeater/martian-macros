@@ -4,6 +4,7 @@ import { CustomFood } from '../../src/domain/food/custom/CustomFood';
 import { Micronutrients } from '../../src/domain/food/micros/Micronutrients';
 import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { FoodEntry } from '../../src/domain/FoodEntry';
+import { WaterEntry } from '../../src/domain/water/WaterEntry';
 import type { FoodCopy } from '../../src/transfer/FoodCopy';
 import { foodCopyBytes } from '../../src/transfer/foodCopyBytes';
 import { foodCopyOfBytes } from '../../src/transfer/foodCopyOfBytes';
@@ -67,8 +68,11 @@ const salmon = new FoodEntry({
 
 const apple = new FoodEntry({ id: 0, date: day, meal: 'snack', name: 'Apple', kcal: 95, proteinG: 0, carbsG: 25, fatG: 0, source: 'quickAdd', eatenAt: 15 * 60 });
 
-/** What goes: two entries, one a logged meal's from a recipe, and that recipe. */
-const copy: FoodCopy = { day, entries: [salmon, apple], foods: [recipe] };
+/** A drink had at 8:30 that morning (MM-718). */
+const glass = new WaterEntry({ id: 5, date: day, ml: 250, at: new Date(2026, 9, 30, 8, 30) });
+
+/** What goes: two entries, one a logged meal's from a recipe, that recipe, and a drink of water. */
+const copy: FoodCopy = { day, entries: [salmon, apple], water: [glass], foods: [recipe] };
 
 describe('a copy of foods', () => {
   it('comes back as it went: the day, every entry with its portion, origin, micros, meal tag and evidence, and the Library food', () => {
@@ -96,11 +100,23 @@ describe('a copy of foods', () => {
     expect(food?.group).toBe('fish');
     expect(food?.madeOf).toEqual([{ name: 'dill', grams: 3 }]);
     expect(food?.servings).toBe(4);
+    const drink = read?.water[0];
+    expect(drink?.id, 'logged as a new drink').toBe(0);
+    expect(drink?.date).toBe(day);
+    expect(drink?.ml).toBe(250);
+    expect(drink?.at.getTime(), 'the moment it was had (MM-718)').toBe(glass.at.getTime());
+  });
+
+  it('MM-718: water alone is a copy; nothing at all is not', () => {
+    const read = foodCopyOfBytes(foodCopyBytes({ day, entries: [], water: [glass], foods: [] }));
+    expect(read?.entries).toEqual([]);
+    expect(read?.water).toHaveLength(1);
+    expect(foodCopyOfBytes(foodCopyBytes({ day, entries: [], water: [], foods: [] }))).toBeUndefined();
   });
 
   it('logs every entry as a new one, whatever id it carried', () => {
     const logged = salmon.copyWith({ id: 88 });
-    const read = foodCopyOfBytes(foodCopyBytes({ day, entries: [logged], foods: [] }));
+    const read = foodCopyOfBytes(foodCopyBytes({ day, entries: [logged], water: [], foods: [] }));
     expect(read?.entries[0]?.id).toBe(0);
   });
 
@@ -112,8 +128,11 @@ describe('a copy of foods', () => {
       'not json',
       '{}',
       JSON.stringify({ ...good, format: 'martian-macros-food' }),
-      JSON.stringify({ ...good, version: 2 }),
-      JSON.stringify({ ...good, entries: [] }),
+      JSON.stringify({ ...good, version: 1 }),
+      JSON.stringify({ ...good, entries: [], water: [] }),
+      JSON.stringify({ ...good, water: [{ date: day.epochDay, ml: 0, at: 1 }] }),
+      JSON.stringify({ ...good, water: [{ date: day.epochDay, ml: 250, at: 'morning' }] }),
+      JSON.stringify({ ...good, water: undefined }),
       JSON.stringify({ ...good, entries: [{ ...entries[0], meal: 'brunch' }] }),
       JSON.stringify({ ...good, entries: [{ ...entries[0], kcal: 'lots' }] }),
       JSON.stringify({ ...good, entries: [{ ...entries[1], portion: { method: 'weighed', basis: 'per100g' } }] }),

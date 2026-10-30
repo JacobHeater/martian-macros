@@ -19,7 +19,7 @@ type Received = { kind: 'backUpFirst' } | { kind: 'received'; parcel: MoveParcel
  * goes; `receive` shows this phone's code, after offering a backup when it holds records none has (`backUp`, absent
  * on a fresh install), and replaces this phone's data only once the person confirms what arrived; `send` scans the
  * other phone's code and sends this phone's records and photos. The photos are behind the phone's lock, so sending
- * them, or replacing this phone's, asks for it first. A copy of foods from the other phone (MM-715) arrives by the
+ * them, or replacing this phone's, asks for it first. A copy of foods or water from the other phone (MM-715, MM-718) arrives by the
  * same code and is added, once confirmed, never replacing anything. From My QR Code in the drawer (MM-716) the code
  * comes first (`nudge: 'onMove'`), and the backup is offered only once a whole move has arrived.
  */

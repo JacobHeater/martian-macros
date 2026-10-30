@@ -4,6 +4,7 @@ import type { Micronutrients } from '../domain/food/micros/Micronutrients';
 import type { NutritionTotals } from '../domain/food/portion/NutritionTotals';
 import type { Portion } from '../domain/food/portion/Portion';
 import type { FoodEntry } from '../domain/FoodEntry';
+import type { WaterEntry } from '../domain/water/WaterEntry';
 import type { FoodCopy } from './FoodCopy';
 import { foodCopyFormat } from './foodCopyFormat';
 
@@ -59,6 +60,9 @@ const entry = (e: FoodEntry) => ({
   evidence: e.evidence,
 });
 
+/** A drink: its day, amount and the moment it was logged, as epoch milliseconds (MM-718). */
+const water = (w: WaterEntry) => ({ date: w.date.epochDay, ml: w.ml, at: w.at.getTime() });
+
 const food = (f: CustomFood) => ({
   id: f.id,
   name: f.name,
@@ -79,12 +83,18 @@ const food = (f: CustomFood) => ({
 });
 
 /**
- * A copy of foods as the bytes that cross to the other phone (MM-715): JSON, the format named and versioned
- * first, the day as its epoch day, every entry and every Library food with all it holds. What is undefined is
- * left out. `foodCopyOfBytes` reads it back.
+ * A copy of foods or water as the bytes that cross to the other phone (MM-715, MM-718): JSON, the format named
+ * and versioned first, the day as its epoch day, every entry, every drink and every Library food with all it
+ * holds. What is undefined is left out. `foodCopyOfBytes` reads it back.
  */
 export function foodCopyBytes(copy: FoodCopy): Uint8Array {
   return new TextEncoder().encode(
-    JSON.stringify({ ...foodCopyFormat, day: copy.day.epochDay, entries: copy.entries.map(entry), foods: copy.foods.map(food) }),
+    JSON.stringify({
+      ...foodCopyFormat,
+      day: copy.day.epochDay,
+      entries: copy.entries.map(entry),
+      water: copy.water.map(water),
+      foods: copy.foods.map(food),
+    }),
   );
 }

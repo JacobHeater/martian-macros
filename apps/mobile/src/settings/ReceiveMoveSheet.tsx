@@ -43,7 +43,7 @@ function spoken(stage: Stage): string {
 }
 
 /**
- * The receiving phone's side of a move (MM-698), or of a copy of foods (MM-715). When this phone holds records no
+ * The receiving phone's side of a move (MM-698), or of a copy of foods or water (MM-715, MM-718). When this phone holds records no
  * backup has, it says so first and offers a backup. Then it listens on the Wi-Fi and shows the code for the other phone to scan, with the app's icon
  * in it, until a move or a copy arrives, the sheet is closed, or five minutes pass. What arrives is handed on whole,
  * to be confirmed before it replaces or adds anything; nothing here changes this phone's data. One status region stays in place
@@ -166,7 +166,7 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
         <h2 className="app-headline">Scan this from your other phone</h2>
         <p className="app-text">
           On the phone you are moving from, open Settings, then Backup, Move to another phone, and Send from this phone. To copy only some
-          foods, choose Copy to another phone from a food’s menu there.
+          foods or water, choose Copy to another phone from its menu there.
         </p>
         {stage.kind === 'code' ? (
           <>

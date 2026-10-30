@@ -200,7 +200,7 @@ it('MM-716: Back up first runs the Backup section’s own backup, from the passp
 });
 
 it('MM-716: a copy of foods arriving from it offers no backup: the foods’ own confirmation comes (MM-715)', async () => {
-  const foods = foodCopyBytes({ day: today, entries: [foodOn(today, { name: 'Apple', meal: 'snack', kcal: 95 })], foods: [] });
+  const foods = foodCopyBytes({ day: today, entries: [foodOn(today, { name: 'Apple', meal: 'snack', kcal: 95 })], water: [], foods: [] });
   phoneShowingItsCode({ kind: 'foods', foods });
   const drawer = await openMenu();
   await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));

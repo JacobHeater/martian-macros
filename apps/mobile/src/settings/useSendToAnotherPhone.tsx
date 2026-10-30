@@ -3,18 +3,19 @@ import { MoveCode } from '../transfer/MoveCode';
 import type { MoveParcel } from '../transfer/MoveParcel';
 import { useOverlays } from '../ui/useOverlays';
 import { SendMoveSheet } from './SendMoveSheet';
+import type { SendWhat } from './SendWhat';
 
 /**
  * Sending to the other phone (MM-698, MM-715): the camera reads the code the other phone shows, and the sending
  * sheet sends `parcel` to it; something scanned that is not a move code is said on the sheet, with Scan again.
- * `what` picks the sheet's words: a move of everything, or a copy of foods. The parcel is made only once a code is
+ * `what` picks the sheet's words: a move of everything, or a copy of foods or water. The parcel is made only once a code is
  * in hand, so nothing is gathered for a scan that is closed.
  */
 export function useSendToAnotherPhone() {
   const { services } = useApp();
   const overlays = useOverlays();
 
-  return async ({ parcel, what }: { parcel: () => Promise<MoveParcel>; what: 'everything' | 'foods' }): Promise<void> => {
+  return async ({ parcel, what }: { parcel: () => Promise<MoveParcel>; what: SendWhat }): Promise<void> => {
     for (;;) {
       let text: string | undefined;
       try {

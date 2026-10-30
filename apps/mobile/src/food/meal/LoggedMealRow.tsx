@@ -67,7 +67,7 @@ export function LoggedMealRow({ loggedMeal, day, grade, onSelect, onLongPress, a
       slot: loggedMeal.meal,
       day,
       today,
-      toPhone: (foods) => copyToPhone(foods, day),
+      toPhone: (foods) => copyToPhone(day, { entries: foods }),
     });
   return (
     <MmSwipeToRemove onRemove={remove}>

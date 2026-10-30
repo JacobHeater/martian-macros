@@ -3,9 +3,13 @@ import { CustomFood } from '../../domain/food/custom/CustomFood';
 import type { FoodEntry } from '../../domain/FoodEntry';
 import type { CustomFoodRepository } from '../../domain/repositories/CustomFoodRepository';
 import type { FoodEntryBatchWriter } from '../../domain/repositories/FoodEntryBatchWriter';
+import type { SetupReader } from '../../domain/repositories/SetupReader';
+import type { WaterWriter } from '../../domain/repositories/WaterWriter';
+import { waterAmount } from '../../format/waterAmount';
 import { currentValueOf } from '../../lang/currentValueOf';
 import { foodCopyOfBytes } from '../../transfer/foodCopyOfBytes';
 import type { Overlays } from '../../ui/Overlays';
+import { foodCopyKind } from './foodCopyKind';
 import { foodCopyWords } from './foodCopyWords';
 import { libraryFoodsWords } from './libraryFoodsWords';
 
@@ -46,15 +50,21 @@ const linked = (entry: FoodEntry, ids: ReadonlyMap<number, number>): FoodEntry =
 };
 
 /**
- * A copy of foods that arrived from the other phone (MM-715): read, said and confirmed, then added to this phone's
- * log on the day and at the meal they were for, with Undo. The Library foods that came with it are the person's
- * call: asked once the foods are confirmed; saved, each entry is logged from this phone's own copy, a food this
- * phone already has by name standing for it (not duplicated, not overwritten); declined, the entries are logged
- * from no saved food. Undo takes back the entries and the foods saved for them, never a food the phone had. A copy
- * that does not read, or a write that fails, changes nothing and says so.
+ * A copy of foods or water that arrived from the other phone (MM-715, MM-718): read, said and confirmed, then added
+ * to this phone's log on the day and at the meal they were for, each food with its time eaten (MM-717) and each
+ * drink at its moment, with Undo. The Library foods that came with it are the person's call: asked once the copy
+ * is confirmed; saved, each entry is logged from this phone's own copy, a food this phone already has by name
+ * standing for it (not duplicated, not overwritten); declined, the entries are logged from no saved food. Undo
+ * takes back the entries, the drinks and the foods saved for them, never a food the phone had. A copy that does
+ * not read, or a write that fails, changes nothing and says so.
  */
 export async function addReceivedFoods(
-  services: { readonly food: FoodEntryBatchWriter; readonly customFoods: CustomFoodRepository },
+  services: {
+    readonly food: FoodEntryBatchWriter;
+    readonly water: WaterWriter;
+    readonly customFoods: CustomFoodRepository;
+    readonly setup: SetupReader;
+  },
   overlays: Overlays,
   bytes: Uint8Array,
   today: CalendarDate,
@@ -64,9 +74,11 @@ export async function addReceivedFoods(
     overlays.snack('What arrived could not be read. Nothing on this phone was changed.');
     return;
   }
+  const units = (await currentValueOf(services.setup.watchSetup()))?.unitSystem ?? 'metric';
+  const kind = foodCopyKind(copy);
   const confirmed = await overlays.confirm({
-    title: 'Add foods from your other phone?',
-    message: foodCopyWords(copy, today),
+    title: `Add ${kind} from your other phone?`,
+    message: foodCopyWords(copy, today, units),
     confirmLabel: 'Add',
   });
   if (!confirmed) return;
@@ -88,9 +100,17 @@ export async function addReceivedFoods(
     }));
 
   const saved: number[] = [];
-  const count = copy.entries.length === 1 ? '1 food' : `${copy.entries.length} foods`;
-  const Count = count.charAt(0).toUpperCase() + count.slice(1);
-  let added: number[];
+  const drinks: number[] = [];
+  const foodsCount = copy.entries.length === 1 ? '1 food' : `${copy.entries.length} foods`;
+  const waterTotal = copy.water.reduce((sum, drink) => sum + drink.ml, 0);
+  const what = [...(copy.entries.length === 0 ? [] : [foodsCount]), ...(copy.water.length === 0 ? [] : [`${waterAmount(waterTotal, units)} of water`])].join(' and ');
+  const What = what.charAt(0).toUpperCase() + what.slice(1);
+  const undoAll = async (added: readonly number[]) => {
+    if (added.length > 0) await services.food.applyFoodChanges({ delete: added }).catch(() => undefined);
+    for (const id of drinks) await services.water.removeWater(id).catch(() => undefined);
+    for (const id of saved) await services.customFoods.deleteCustomFood(id).catch(() => undefined);
+  };
+  let added: number[] = [];
   try {
     if (keepLibrary) {
       for (const food of copy.foods) {
@@ -104,19 +124,16 @@ export async function addReceivedFoods(
         ids.set(food.id, id);
       }
     }
-    added = await services.food.applyFoodChanges({ add: copy.entries.map((entry) => linked(entry, ids)) });
+    if (copy.entries.length > 0) added = await services.food.applyFoodChanges({ add: copy.entries.map((entry) => linked(entry, ids)) });
+    for (const drink of copy.water) drinks.push(await services.water.addWater(drink));
   } catch {
-    for (const id of saved) await services.customFoods.deleteCustomFood(id).catch(() => undefined);
-    overlays.snack(`${Count} could not be added. Nothing on this phone was changed.`);
+    await undoAll(added);
+    overlays.snack(`${What} could not be added. Nothing on this phone was changed.`);
     return;
   }
   const toLibrary = saved.length === 0 ? '' : saved.length === 1 ? ', and 1 food to your Library' : `, and ${saved.length} foods to your Library`;
-  overlays.snack(`Added ${count} from your other phone${toLibrary}`, {
+  overlays.snack(`Added ${what} from your other phone${toLibrary}`, {
     label: 'Undo',
-    onAction: () =>
-      void (async () => {
-        await services.food.applyFoodChanges({ delete: added });
-        for (const id of saved) await services.customFoods.deleteCustomFood(id);
-      })(),
+    onAction: () => void undoAll(added),
   });
 }

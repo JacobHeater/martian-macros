@@ -17,6 +17,7 @@ import { MmSection } from '../ui/MmSection';
 import { MmSwipeToRemove } from '../ui/MmSwipeToRemove';
 import { useOverlays } from '../ui/useOverlays';
 import { logWater } from './logWater';
+import { useCopyToAnotherPhone } from './phone/useCopyToAnotherPhone';
 import { showAddWaterSheet } from './showAddWaterSheet';
 import { waterEntryWhen } from './waterEntryWhen';
 import { WaterEntryTile } from './WaterEntryTile';
@@ -27,7 +28,9 @@ import './food.css';
  * of the screen direction): its icon, its total in the summary, a "+" in
  * the header that opens the Add water sheet as a meal's opens Add food, and
  * the day's drinks as rows that open "Edit water" as a food opens "Edit
- * food", and swipe away or delete from "More actions", each with Undo. Plain water only: drinks logged as food are not counted.
+ * food", and swipe away or delete from "More actions", each with Undo. A drink's menu also copies it to another
+ * day, as a food's does (MM-633), logged at the moment it is copied, and to the other phone (MM-718, by MM-715's
+ * flow), with the moment it was had. Plain water only: drinks logged as food are not counted.
  * With a goal, the water pours into a bar across the section, folded or
  * not, the summary says it in glasses, and the goal reached carries a
  * meal's quiet check mark (MM-326).
@@ -35,6 +38,7 @@ import './food.css';
 export function WaterSection({ day }: { day: CalendarDate }) {
   const { services, state } = useApp();
   const overlays = useOverlays();
+  const copyToPhone = useCopyToAnotherPhone();
   const today = useCell(state.today);
   const setup = useLoaded(state.setup);
   const loaded = useLoaded(state.waterForDay(day));
@@ -76,6 +80,23 @@ export function WaterSection({ day }: { day: CalendarDate }) {
   const which = (entry: WaterEntry) => {
     const when = waterEntryWhen(entry);
     return `${waterAmount(entry.ml, units)} of water${when === 'Added later' ? ', added later' : ` at ${when}`}`;
+  };
+
+  /** A copy on the day picked, logged now (MM-718): when the original was had says nothing about the copy, as with a food (MM-633). */
+  const copyToDay = async (entry: WaterEntry) => {
+    const picked = await overlays.date({ helpText: `Copy ${which(entry)} to`, initial: today, first: today.addDays(-365), last: today, today });
+    if (picked === undefined) return;
+    const said = Fmt.day(picked, today);
+    const where = picked.epochDay >= today.epochDay - 1 ? said.toLowerCase() : said;
+    try {
+      const id = await logWater(services.water, services.clock, picked, entry.ml);
+      overlays.snack(`Copied ${waterAmount(entry.ml, units)} of water to ${where}`, {
+        label: 'Undo',
+        onAction: () => void services.water.removeWater(id),
+      });
+    } catch {
+      overlays.snack('The water could not be copied, so nothing was.');
+    }
   };
 
   const remove = (entry: WaterEntry) => {
@@ -132,12 +153,19 @@ export function WaterSection({ day }: { day: CalendarDate }) {
                 <WaterEntryTile entry={entry} units={units} />
               </MmPressable>
             </div>
-            <MmMenuButton<string>
+            <MmMenuButton<'copy' | 'phone' | 'delete'>
               icon="more"
               label={`More actions for ${which(entry)}`}
-              items={[{ value: 'delete', label: 'Delete' }]}
+              // The copies a food's menu offers, in its order (MM-714), then Delete (MM-718).
+              items={[
+                { value: 'copy', label: 'Copy to another day' },
+                { value: 'phone', label: 'Copy to another phone' },
+                { value: 'delete', label: 'Delete' },
+              ]}
               onSelect={(action) => {
-                if (action === 'delete') remove(entry);
+                if (action === 'copy') void copyToDay(entry);
+                else if (action === 'phone') void copyToPhone(day, { water: [entry] });
+                else remove(entry);
               }}
             />
           </div>
