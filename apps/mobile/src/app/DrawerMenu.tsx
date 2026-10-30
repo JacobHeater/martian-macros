@@ -14,8 +14,9 @@ interface DrawerMenuProps {
 
 /**
  * What the drawer holds (MM-704): the Martian Macros lettering at its head,
- * then the four destinations, the person's own places (Profile, and the
- * Library of everything they made, MM-706), and Settings.
+ * then the four destinations, the person's own places (Profile, the
+ * Library of everything they made, MM-706, and My QR Code, this phone's
+ * code for the other phone to scan, MM-716), and Settings.
  */
 export function DrawerMenu({ current, onChoose }: DrawerMenuProps) {
   return (
@@ -37,6 +38,7 @@ export function DrawerMenu({ current, onChoose }: DrawerMenuProps) {
       <MmDrawerGroup label="You">
         <MmDrawerRow icon="person" label="Profile" onPress={() => onChoose('profile')} />
         <MmDrawerRow icon="library" label="Library" onPress={() => onChoose('library')} />
+        <MmDrawerRow icon="qrCode" label="My QR Code" onPress={() => onChoose('qrCode')} />
       </MmDrawerGroup>
       <MmDrawerGroup label="Settings">
         <MmDrawerRow icon="settings" label="Settings" onPress={() => onChoose('settings')} />

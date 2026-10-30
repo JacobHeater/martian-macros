@@ -9,6 +9,7 @@ import { MmButton } from '../ui/MmButton';
 import { MmProgressBar } from '../ui/MmProgressBar';
 import { MmQrCode } from '../ui/MmQrCode';
 import { moveProblemWords } from './moveProblemWords';
+import { unbackedWords } from './unbackedWords';
 import './settings.css';
 
 /** How long a code works before it expires and the phone stops listening (MM-698). */
@@ -108,11 +109,8 @@ export function ReceiveMoveSheet({ unbacked, onBackUpFirst, onReceived, onCancel
       return (
         <>
           <h2 className="app-headline">Back up this phone first?</h2>
-          <p className="app-text">
-            {unbacked === 'never'
-              ? 'This phone has never been backed up. Moving replaces its records, and only a backup could bring them back.'
-              : 'This phone has records logged since its last backup. Moving replaces them, and only a backup could bring them back.'}
-          </p>
+          {/* The nudge stage is only ever entered with a reason; 'never' here is for the type alone. */}
+          <p className="app-text">{unbackedWords(unbacked ?? 'never')}</p>
           <div className="app-gap" />
           <div className="app-row app-row-end">
             <MmButton label="Skip the backup" kind="text" onPress={() => setStage({ kind: 'opening' })} />

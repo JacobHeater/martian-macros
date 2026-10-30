@@ -9,6 +9,7 @@ import { MoveApplyingSheet } from './MoveApplyingSheet';
 import { MoveChoiceSheet } from './MoveChoiceSheet';
 import { moveWords } from './moveWords';
 import { ReceiveMoveSheet } from './ReceiveMoveSheet';
+import { unbackedWords } from './unbackedWords';
 import { useSendToAnotherPhone } from './useSendToAnotherPhone';
 
 type Received = { kind: 'backUpFirst' } | { kind: 'received'; parcel: MoveParcel };
@@ -19,7 +20,8 @@ type Received = { kind: 'backUpFirst' } | { kind: 'received'; parcel: MoveParcel
  * on a fresh install), and replaces this phone's data only once the person confirms what arrived; `send` scans the
  * other phone's code and sends this phone's records and photos. The photos are behind the phone's lock, so sending
  * them, or replacing this phone's, asks for it first. A copy of foods from the other phone (MM-715) arrives by the
- * same code and is added, once confirmed, never replacing anything.
+ * same code and is added, once confirmed, never replacing anything. From My QR Code in the drawer (MM-716) the code
+ * comes first (`nudge: 'onMove'`), and the backup is offered only once a whole move has arrived.
  */
 export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void> } = {}) {
   const { services } = useApp();
@@ -105,15 +107,28 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
     );
   };
 
-  const receive = async () => {
+  /** A whole move has arrived on a phone with records no backup holds (MM-716): the backup offered now, before anything is replaced. */
+  const offerBackUpNow = async () => {
+    const reason = await unbacked(false);
+    if (reason === undefined) return;
+    const backUpFirst = await overlays.confirm({
+      title: 'Back up this phone first?',
+      message: `Your other phone sent everything. ${unbackedWords(reason)}`,
+      confirmLabel: 'Back up first',
+      cancelLabel: 'Skip the backup',
+    });
+    if (backUpFirst) await backUp?.();
+  };
+
+  const receive = async ({ nudge = 'beforeCode' }: { nudge?: 'beforeCode' | 'onMove' } = {}) => {
     let justBackedUp = false;
     for (;;) {
-      const nudge = await unbacked(justBackedUp);
+      const offer = nudge === 'beforeCode' ? await unbacked(justBackedUp) : undefined;
       const answer = await overlays.sheet<Received>(
         'Move to this phone',
         (close) => (
           <ReceiveMoveSheet
-            unbacked={nudge}
+            unbacked={offer}
             onBackUpFirst={() => close({ kind: 'backUpFirst' })}
             onReceived={(parcel) => close({ kind: 'received', parcel })}
             onCancel={() => close()}
@@ -123,8 +138,12 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
       );
       if (answer === undefined) return;
       if (answer.kind === 'received') {
-        if (answer.parcel.kind === 'foods') await addReceivedFoods(services, overlays, answer.parcel.foods, services.clock.today());
-        else await apply(answer.parcel.payload);
+        if (answer.parcel.kind === 'foods') {
+          await addReceivedFoods(services, overlays, answer.parcel.foods, services.clock.today());
+          return;
+        }
+        if (nudge === 'onMove') await offerBackUpNow();
+        await apply(answer.parcel.payload);
         return;
       }
       await backUp?.();

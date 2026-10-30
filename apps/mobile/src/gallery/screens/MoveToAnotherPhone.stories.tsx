@@ -343,6 +343,24 @@ export const CopyFoodsSent = screenStory({
   },
 });
 
+/** MM-716: from My QR Code the code came first; a whole move arriving on a never-backed-up phone offers the backup now, at phone width. */
+export const MyQrCodeBackUpOnMove = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Back up this phone first?',
+  viewport: 'smallPhone',
+  device: withReceiver(
+    new FakeMoveReceiver({
+      kind: 'receives',
+      parcel: { kind: 'everything', payload: { snapshot: new Uint8Array([1, 2, 3]), photos: encodePhotoArchive([]), coachAi: CoachAiConfig.off } },
+    }),
+  ),
+  walk: async (canvas) => {
+    await userEvent.click(await within(canvas).findByRole('button', { name: 'Menu' }, { timeout: 10000 }));
+    const drawer = await screen.findByRole('dialog', { name: 'Menu' });
+    await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
+  },
+});
+
 /** MM-700, MM-702: confirmed, while what arrived replaces this phone's records: a bar that fills, which cannot be closed half-way. */
 export const MoveApplying = screenStory({
   covers: ['MoveApplyingSheet'],

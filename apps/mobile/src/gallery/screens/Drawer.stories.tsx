@@ -6,7 +6,7 @@ import { screenStory } from './screenStory';
 /**
  * MM-704: the app's menu, a drawer slid in from the left over the
  * destination the person is on: the Martian Macros lettering at its head,
- * the four destinations, Profile and Settings. The bar keeps its four.
+ * the four destinations, Profile, Library, My QR Code (MM-716) and Settings.
  */
 const meta = { title: 'Screens/Drawer', ...screensMeta } satisfies Meta;
 export default meta;
@@ -66,6 +66,16 @@ export const DrawerOpensLibrary = screenStory({
   walk: async (canvas) => {
     const drawer = await openMenu(canvas);
     await userEvent.click(within(drawer).getByRole('button', { name: 'Library' }));
+  },
+});
+
+/** MM-716: My QR Code from the drawer: this phone's code at once, with no offer to back up first. */
+export const DrawerMyQrCode = screenStory({
+  covers: ['ReceiveMoveSheet'],
+  shows: 'Scan this from your other phone',
+  walk: async (canvas) => {
+    const drawer = await openMenu(canvas);
+    await userEvent.click(within(drawer).getByRole('button', { name: 'My QR Code' }));
   },
 });
 

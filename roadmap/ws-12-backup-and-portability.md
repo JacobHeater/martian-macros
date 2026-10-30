@@ -107,7 +107,7 @@ Everything in group C. It touches the schema lane only to read the version.
   platforms; one encrypted file the person places).
 - Built: MM-63 (2026-10-19), MM-64 (closed 2026-10-20 by the owner's
   decision: the share sheet only). Epic: MM-59, done 2026-10-21 with MM-404.
-- Remaining: MM-698 (move to another phone, 2026-10-29).
+- Remaining: MM-698 (move to another phone, 2026-10-29); MM-716 (My QR Code in the drawer, the code first and the backup offered only when a whole move arrives, 2026-10-30).
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app
