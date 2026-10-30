@@ -12,8 +12,8 @@ import type { TogetherAction } from './TogetherAction';
 
 /**
  * Asks what `action` needs and does it to every one of `entries` at once,
- * in one step (MM-625), with Undo (MM-630, MM-633, MM-634): one time eaten,
- * another meal or day, copies on another day, or removal. Only the field
+ * in one step (MM-625), with Undo (MM-630, MM-633, MM-634, MM-714): one time eaten,
+ * another meal or day, copies at another meal or on another day, or removal. Only the field
  * chosen changes; amounts, numbers and where they came from never do. A
  * food moved to another day keeps its time eaten (the owner, 2026-10-26).
  * `subject` names them in what is said: "dinner" with "all 3 foods", or
@@ -57,6 +57,20 @@ export async function changeTogether(
     overlays.snack(said, { label: 'Undo', onAction: () => void writer.applyFoodChanges({ update: entries }) });
   };
 
+  /** Fresh copies on the day picked, at their own meals (MM-633); none when the asking is dismissed. */
+  const copiesOnAnotherDay = async () => {
+    const picked = await overlays.date({ helpText: `Copy ${subject} to`, initial: today, first: today.addDays(-365), last: today, today });
+    return picked === undefined ? undefined : { entries: entriesCopiedTo(picked, entries), where: dayInSentence(picked) };
+  };
+  /** Fresh copies at the meal picked, on this day (MM-714); the one meal they are all in is not offered. */
+  const copiesAtAnotherMeal = async () => {
+    const picked = await overlays.options({
+      title: `Copy ${subject} to`,
+      options: Meal.values.filter((m) => m !== slot).map((m) => ({ value: m, label: mealLabel(m) })),
+    });
+    return picked === undefined ? undefined : { entries: entriesCopiedTo(day, entries, { meal: picked.value }), where: picked.label.toLowerCase() };
+  };
+
   if (action === 'time') {
     const times = new Set(entries.map((entry) => entry.eatenAt));
     const usual = mealUsualMinute(slot ?? entries[0]?.meal ?? 'snack');
@@ -80,12 +94,12 @@ export async function changeTogether(
     const picked = await overlays.date({ helpText: `Move ${subject} to`, initial: day, first: day.addDays(-365), last: today, today });
     if (picked === undefined || picked.epochDay === day.epochDay) return;
     await changeAll((entry) => entry.copyWith({ date: picked }), `Moved ${subject} to ${dayInSentence(picked)}`);
-  } else if (action === 'copy') {
-    const picked = await overlays.date({ helpText: `Copy ${subject} to`, initial: today, first: today.addDays(-365), last: today, today });
-    if (picked === undefined) return;
+  } else if (action === 'copy' || action === 'copyMeal') {
+    const copies = action === 'copy' ? await copiesOnAnotherDay() : await copiesAtAnotherMeal();
+    if (copies === undefined) return;
     try {
-      const ids = await writer.applyFoodChanges({ add: entriesCopiedTo(picked, entries) });
-      overlays.snack(`Copied ${subject} to ${dayInSentence(picked)}`, {
+      const ids = await writer.applyFoodChanges({ add: copies.entries });
+      overlays.snack(`Copied ${subject} to ${copies.where}`, {
         label: 'Undo',
         onAction: () => void writer.applyFoodChanges({ delete: ids }),
       });

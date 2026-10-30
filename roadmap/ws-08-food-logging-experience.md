@@ -182,6 +182,7 @@ workstream's.
 - Added 2026-10-26 (step 23): MM-634 (choose foods to change together; done).
 - Added 2026-10-26 (step 23): MM-640 (the chosen count said as it changes; done).
 - Added 2026-10-26 (step 23): MM-641 (take one food out of a logged meal; done).
+- Added 2026-10-30 (step 23, the owner from the phone): MM-714 (a food's menu offers what the chosen foods' dialog does, and both copy to another meal; in progress, owed the owner's phone read).
 - Added 2026-10-26 (step 24): MM-635 (saved foods log when pressed; done).
 - Added 2026-10-26 (step 25): MM-636 (volume through a volume serving; done).
 - Added 2026-10-26 (step 26): MM-637 (own results apart from the database's; done).
