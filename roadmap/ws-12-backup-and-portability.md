@@ -1,6 +1,6 @@
 # WS-12: Backup and portability
 
-**Order** 12 · **Group** C · **State** built (every step built; the epic MM-59 done with MM-404, 2026-10-21) · **Risk** medium
+**Order** 12 · **Group** C · **State** in progress (steps 1 to 3 built, the epic MM-59 done with MM-404, 2026-10-21; step 4, MM-695, added 2026-10-29) · **Risk** medium
 
 ## Summary
 A user-initiated, encrypted snapshot of the user's data that they can restore,
@@ -33,6 +33,9 @@ ever holding their data on a server.
 - Encrypted backup to a file and restore from it.
 - The share sheet as the only way out and the document picker the only way
   back (MM-64, decided 2026-10-20).
+- Moving to another phone (MM-695, 2026-10-29): the same sealed snapshot
+  sent directly to the person's other phone on the same Wi-Fi, paired by a
+  QR code that carries a one-time key, and applied through the restore.
 
 ## Excluded or deferred
 - iCloud as a provider: the founding decision is no, because of the App Store
@@ -40,6 +43,8 @@ ever holding their data on a server.
   reading of the rule.
 - Automatic or scheduled backup: the design is user-initiated.
 - Sync between devices: not a goal. This is a snapshot, not replication.
+  Moving to another phone (MM-695) replaces the receiving phone's data; it
+  never merges.
 - Progress photos in a backup: off by default, specified in the photos ticket
   in WS-07.
 - The food pack: never included. It is downloadable and large.
@@ -82,6 +87,9 @@ feed the privacy declarations.
    a backup made at an earlier schema version in the tests from the start.
 3. **Where the file goes (MM-64).** M2. The share sheet and the document
    picker only; no provider connectors.
+4. **Move to another phone (MM-695).** M3. The snapshot sent over the same
+   Wi-Fi to a phone that shows a QR code, with no passphrase; Bluetooth,
+   hotspots and merging are out of scope.
 
 ## Done enough to unblock others
 MM-63 is done: a backup written at one schema version restores correctly at a
@@ -99,6 +107,7 @@ Everything in group C. It touches the schema lane only to read the version.
   platforms; one encrypted file the person places).
 - Built: MM-63 (2026-10-19), MM-64 (closed 2026-10-20 by the owner's
   decision: the share sheet only). Epic: MM-59, done 2026-10-21 with MM-404.
+- Remaining: MM-695 (move to another phone, 2026-10-29).
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app
