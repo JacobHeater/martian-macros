@@ -4,6 +4,7 @@ import { decodePhotoArchive } from '../domain/photos/decodePhotoArchive';
 import { MoveCode } from '../transfer/MoveCode';
 import type { MovePayload } from '../transfer/MovePayload';
 import { useOverlays } from '../ui/useOverlays';
+import { MoveApplyingSheet } from './MoveApplyingSheet';
 import { MoveChoiceSheet } from './MoveChoiceSheet';
 import { moveWords } from './moveWords';
 import { ReceiveMoveSheet } from './ReceiveMoveSheet';
@@ -66,15 +67,37 @@ export function useMoveToAnotherPhone({ backUp }: { backUp?: () => Promise<void>
       overlays.snack('Your progress photos stayed locked, so nothing was replaced.');
       return;
     }
-    await services.restorer.restoreFrom(payload.snapshot);
-    try {
-      await services.progressPhotos.restoreArchive(payload.photos);
-    } catch {
-      // The records are already moved; the photos are replaced in one step or not at all, so they are as they were.
-      overlays.snack('Your records were moved, but the progress photos could not be. This phone’s photos are as they were.');
+    // The wait is shown, and it cannot be dismissed half-way (MM-700); what failed is said, and logged for the phone.
+    let photosFailed = false;
+    const failure = await overlays.sheet<{ error: unknown }>(
+      'Moving your records',
+      (close) => (
+        <MoveApplyingSheet
+          work={async () => {
+            await services.restorer.restoreFrom(payload.snapshot);
+            try {
+              await services.progressPhotos.restoreArchive(payload.photos);
+            } catch (error) {
+              // The records are already moved; the photos are replaced in one step or not at all, so they are as they were.
+              console.error('The moved photos could not be put in place.', error);
+              photosFailed = true;
+            }
+          }}
+          onSettled={(error) => close(error === undefined ? undefined : { error })}
+        />
+      ),
+      { mayLeave: { current: async () => false } },
+    );
+    if (failure !== undefined) {
+      console.error('The move could not replace this phone’s records.', failure.error);
+      overlays.snack('Your records could not be moved. Nothing on this phone was changed.');
       return;
     }
-    overlays.snack('Moved. This phone now holds what your other phone holds.');
+    overlays.snack(
+      photosFailed
+        ? 'Your records were moved, but the progress photos could not be. This phone’s photos are as they were.'
+        : 'Moved. This phone now holds what your other phone holds.',
+    );
   };
 
   const receive = async () => {

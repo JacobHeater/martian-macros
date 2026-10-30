@@ -723,7 +723,9 @@
      "workstream": "WS-12",
      "tickets": [
       "MM-65",
-      "MM-698"
+      "MM-698",
+      "MM-699",
+      "MM-700"
      ]
     }
    ]
@@ -3799,7 +3801,9 @@
      "MM-64"
     ],
     "remaining": [
-     "MM-698"
+     "MM-698",
+     "MM-699",
+     "MM-700"
     ]
    },
    "sequence": [
@@ -3831,7 +3835,9 @@
      "step": 4,
      "title": "Move to another phone: the snapshot sent over the same Wi-Fi, paired by a QR code",
      "tickets": [
-      "MM-698"
+      "MM-698",
+      "MM-699",
+      "MM-700"
      ],
      "milestone": "M3"
     }

@@ -198,3 +198,35 @@ it('returns to the welcome with nothing stored when a move from it is cancelled'
   expect(restorer.restoredFrom).toHaveLength(0);
   expect(await fresh.setup.loadSetup()).toBeUndefined();
 });
+
+// MM-700: on the owner's Pixel the confirmation closed onto the welcome while the records were still being written,
+// minutes long, with nothing said; a failure there would have been silent too.
+it('shows the wait while the records are put in place, and it cannot be closed half-way', async () => {
+  const fresh = new InMemoryRepositories();
+  await fresh.preferences.saveThemePreference('martian');
+  restorer.here = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: false };
+  restorer.onRestore = () => new Promise<void>(() => undefined);
+  render(fresh);
+  await userEvent.click(await screen.findByRole('button', { name: 'I have Martian Macros on another phone' }, slowly));
+  const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly);
+  await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
+  const wait = await screen.findByRole('dialog', { name: 'Moving your records' }, slowly);
+  expect(within(wait).getByText('Putting your records in place…')).toBeInTheDocument();
+  await userEvent.keyboard('{Escape}');
+  expect(screen.getByRole('dialog', { name: 'Moving your records' })).toBeInTheDocument();
+});
+
+it('says when the records could not be moved, instead of nothing', async () => {
+  const fresh = new InMemoryRepositories();
+  await fresh.preferences.saveThemePreference('martian');
+  restorer.here = { weighIns: 0, foodDays: 0, workouts: 0, customFoods: 0, from: undefined, to: undefined, hasSetup: false };
+  restorer.onRestore = async () => {
+    throw new Error('disk full');
+  };
+  render(fresh);
+  await userEvent.click(await screen.findByRole('button', { name: 'I have Martian Macros on another phone' }, slowly));
+  const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly);
+  await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
+  expect(await screen.findByText('Your records could not be moved. Nothing on this phone was changed.', {}, slowly)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Begin' })).toBeInTheDocument();
+});
