@@ -77,7 +77,7 @@ WS-10, WS-11, WS-12. And WS-13, which releases through CI.
 4. **Dev and prod app ids (MM-8).** M3. Needed before release so both builds
    install side by side; not needed before.
 5. **The agents’ workflow: handoff, roadmap page and checks, CI watch, the expert panel, no telemetry (MM-166, MM-174, MM-197, MM-198, MM-199, MM-200, MM-201, MM-205, MM-209, MM-210, MM-211, MM-212, MM-241, MM-243, MM-245).** M0. Placed 2026-10-13.
-6. **Devices from the runner: run on a phone, the isolated demo app, screenshots (MM-175, MM-177, MM-178, MM-182, MM-234, MM-235, MM-238).** M2. Placed 2026-10-13.
+6. **Devices from the runner: run on a phone, the isolated demo app, screenshots (MM-175, MM-177, MM-178, MM-182, MM-234, MM-235, MM-238, MM-695, MM-696).** M2. Placed 2026-10-13; MM-695 (`mm run --phone` went to the emulator) and MM-696 ("No Android phone connected" when adb's server would not start) added 2026-10-29.
 - Also placed 2026-10-13 in earlier steps: step 2: MM-190.
 
    MM-412 (2026-10-19, done): `mm run --ios --phone` builds signed, installs and opens the real app on the iPhone plugged in; the team from `MM_APPLE_TEAM` or the project's uncommitted line.
