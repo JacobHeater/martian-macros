@@ -42,9 +42,9 @@ it('the Executive summary holds the person to the sessions set, the cardio floor
   renderApp(repos, today);
   await openCoach();
   const card = await summary();
-  await expect.poll(() => card.textContent).toContain('Lifting: 1 of the 3 sessions you set this week; 2 to go.');
-  expect(card).toHaveTextContent('Cardio 1 h 36 min against the 2 h 30 min floor: 54 min more on the watch this week.');
-  expect(card).toHaveTextContent('Steps about 6,100 a day against 8,000: 1,900 more a day.');
+  // One training line, lifting first (MM-711); the cardio and steps stand in the rows under the words.
+  await expect.poll(() => card.textContent).toContain('One of the three lifts you set is in: two to go this week.');
+  expect(card.textContent).not.toContain('Cardio 1 h 36 min against');
   expect(within(card).getByText('Lifting this week')).toBeInTheDocument();
   expect(within(card).getByText('1 / 3 sessions')).toBeInTheDocument();
   expect(within(card).getByText('Last session 2 days ago')).toBeInTheDocument();
@@ -70,7 +70,8 @@ it('without a watch on a cut the summary says nothing is being counted; on maint
   const { unmount } = renderApp(repos, today);
   await openCoach();
   let card = await summary();
-  await expect.poll(() => card.textContent).toContain('No watch connected: cardio and steps are not being counted.');
+  // Lifting behind is the one line (MM-711); the row under it says no watch is connected.
+  await expect.poll(() => card.textContent).toContain('Zero lifts of the three you set this week: book one tonight.');
   expect(within(card).getByText('No watch connected')).toBeInTheDocument();
   unmount();
 
@@ -79,7 +80,7 @@ it('without a watch on a cut the summary says nothing is being counted; on maint
   renderApp(repos, today);
   await openCoach();
   card = await summary();
-  await expect.poll(() => card.textContent).toContain('No lifting logged yet. 3 sessions a week is what you set; log the first one.');
+  await expect.poll(() => card.textContent).toContain('Zero lifts of the three you set this week: book one tonight.');
   expect(card.textContent).not.toContain('watch');
   expect(within(card).queryByText('Cardio and steps')).not.toBeInTheDocument();
 });
