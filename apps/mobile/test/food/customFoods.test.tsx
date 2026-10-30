@@ -7,9 +7,11 @@ import { NutritionTotals } from '../../src/domain/food/portion/NutritionTotals';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { typicalSetup } from '../../src/fixtures/typicalSetup';
 import { openAddFood, press, typeIn } from '../support/addFood';
+import { editInLibrary, libraryForm, newFoodBy, openFold, openLibrary } from '../support/openLibrary';
 import { expectClose } from '../support/expectClose';
 import { first } from '../support/first';
 import { fixtureCatalog, withCatalog } from '../support/fixtureCatalog';
+import { topLayer } from '../support/topLayer';
 import { openTab } from '../support/openTab';
 import { renderApp } from '../support/renderApp';
 
@@ -32,26 +34,10 @@ async function open(): Promise<HTMLElement> {
 
 const logged = () => first(repos.food.watchFood(today));
 
-/** Opens a saved food's editor from its menu in Saved (MM-635). */
-async function editSaved(sheet: HTMLElement, name: string): Promise<void> {
-  await press(sheet, `More actions for ${name}`);
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
-}
 const saved = () => first(repos.customFoods.watchCustomFoods());
 
-async function createBar(sheet: HTMLElement): Promise<void> {
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
-  await typeIn(sheet, 'Name', 'Protein bar');
-  await typeIn(sheet, 'One serving is', '1 bar');
-  await typeIn(sheet, 'Weighs g', '30');
-  await typeIn(sheet, 'Protein g', '10');
-  await typeIn(sheet, 'Carbs g', '12');
-  await typeIn(sheet, 'Fat g', '4');
-  await typeIn(sheet, 'Calories', '120');
-  await press(sheet, 'Save food');
-  await within(sheet).findByRole('heading', { name: 'My foods' });
-}
+/** A protein bar of the person's own, saved as the Library's form saves one (MM-706; its form is tested there). */
+const bar = () => food({ name: 'Protein bar', servingDescription: '1 bar', servingGrams: 30, kcal: 120, proteinG: 10, carbsG: 12, fatG: 4 });
 
 /** Leaves "My foods", searches for `query` and picks the saved food called `name`. */
 async function pickSaved(sheet: HTMLElement, query: string, name: string): Promise<void> {
@@ -86,8 +72,9 @@ const food = (init: {
   });
 
 it('a saved food is logged in any amount', async () => {
+  await repos.customFoods.saveCustomFood(bar());
   const sheet = await open();
-  await createBar(sheet);
+  await press(sheet, 'Saved');
   expect(within(sheet).getByRole('button', { name: /^Protein bar(?!:)/ })).toBeInTheDocument();
   await press(sheet, 'Back');
   await typeIn(sheet, 'Search foods', 'protein');
@@ -108,32 +95,10 @@ it('a saved food is logged in any amount', async () => {
   expect(entry?.portion?.reference?.basis).toBe('perServing');
 });
 
-it('editing a saved food does not rewrite what was logged', async () => {
-  let sheet = await open();
-  await createBar(sheet);
-  await press(sheet, 'Back');
-  await pickSaved(sheet, 'protein', 'Protein bar');
-  await press(sheet, 'Log it');
-  await expect.poll(async () => (await logged()).length).toBe(1);
-  expect((await logged())[0]?.kcal).toBe(120);
-
-  // Change the food's calories afterwards.
-  await expect.poll(() => screen.queryByRole('dialog')).toBeNull();
-  sheet = await openAddFood();
-  await press(sheet, 'Saved');
-  // MM-635: in Add food a saved food is edited from its menu; pressing it logs it.
-  await editSaved(sheet, 'Protein bar');
-  await typeIn(sheet, 'Calories', '150');
-  await press(sheet, 'Save food');
-  await expect.poll(async () => (await saved())[0]?.perServing.kcal).toBe(150);
-  expect(await saved()).toHaveLength(1);
-  expect((await logged())[0]?.kcal).toBe(120);
-});
-
 it('calories that disagree with the macros warn', async () => {
-  const sheet = await open();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
+  renderApp(repos, today);
+  await openTab('Food');
+  const sheet = await newFoodBy(await openLibrary(), 'Type it in');
   await typeIn(sheet, 'Protein g', '10');
   await typeIn(sheet, 'Carbs g', '10');
   await typeIn(sheet, 'Fat g', '5');
@@ -142,9 +107,9 @@ it('calories that disagree with the macros warn', async () => {
 });
 
 it('a recipe divides its ingredients into servings', async () => {
-  const sheet = await open();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New recipe');
+  renderApp(repos, today);
+  await openTab('Food');
+  let sheet = await newFoodBy(await openLibrary(), 'New recipe');
   await typeIn(sheet, 'Name', 'Chili');
   await typeIn(sheet, 'Makes servings', '4');
   await press(sheet, 'Enter numbers instead');
@@ -168,7 +133,10 @@ it('a recipe divides its ingredients into servings', async () => {
   expect(chili?.servingGrams, 'no cooked weight given').toBeUndefined();
   expect(chili?.ingredients).toHaveLength(2);
 
-  await press(sheet, 'Back');
+  // Logged from Add food, by servings only.
+  await expect.poll(() => screen.queryByRole('dialog', { name: 'New recipe' })).toBeNull();
+  await press(topLayer(), 'Back');
+  sheet = await openAddFood();
   await pickSaved(sheet, 'chili', 'Chili');
   expect(within(sheet).queryByRole('button', { name: 'Grams' }), 'servings only').not.toBeInTheDocument();
   await typeIn(sheet, 'How many servings', '1.5');
@@ -224,26 +192,11 @@ it('scanning a barcode that is a saved food finds it', async () => {
   expect(within(sheet).getByRole('button', { name: 'Log it' })).toBeInTheDocument();
 });
 
-it('deleting a saved food asks first and keeps the sheet open', async () => {
-  await repos.customFoods.saveCustomFood(
-    food({ name: 'Old bar', servingDescription: '1 bar', servingGrams: 40, kcal: 200, proteinG: 5, carbsG: 30, fatG: 7 }),
-  );
-  const sheet = await open();
-  await press(sheet, 'Saved');
-  await press(sheet, 'More actions for Old bar');
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
-  const question = await screen.findByRole('dialog', { name: 'Delete Old bar?' });
-  await userEvent.click(within(question).getByRole('button', { name: 'Delete' }));
-  expect(await within(sheet).findByText('Nothing saved yet.')).toBeInTheDocument();
-});
-
-/** Opens a new recipe called `name`, with the fixture pack installed. */
+/** Opens a new recipe called `name` from the Library (MM-706), with the fixture pack installed; gives its form. */
 async function newRecipe(name: string): Promise<HTMLElement> {
   renderApp(repos, today, { change: withCatalog(await fixtureCatalog()) });
   await openTab('Food');
-  const sheet = await openAddFood();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New recipe');
+  const sheet = await newFoodBy(await openLibrary(), 'New recipe');
   await typeIn(sheet, 'Name', name);
   return sheet;
 }
@@ -291,13 +244,14 @@ async function saveRiceBowl(packId: string, kcal = 730): Promise<void> {
   );
 }
 
-/** Opens the saved recipe called `name` to change it, with the fixture pack installed. */
+/** Opens the saved recipe called `name` to change it, from the Library (MM-706), with the fixture pack installed; gives its form. */
 async function editRecipe(name: string): Promise<HTMLElement> {
   renderApp(repos, today, { change: withCatalog(await fixtureCatalog()) });
   await openTab('Food');
-  const sheet = await openAddFood();
-  await press(sheet, 'Saved');
-  await editSaved(sheet, name);
+  const library = await openLibrary();
+  await openFold(library, /^Recipes/);
+  await editInLibrary(library, name);
+  const sheet = await libraryForm('Edit recipe');
   await within(sheet).findByRole('heading', { name: 'Edit your recipe' });
   return sheet;
 }
@@ -431,32 +385,35 @@ it('MM-635: pressing a saved food in Add food opens its amount step and logs it'
 
 
 // MM-710: a saved food carries its group, where its numbers came from, and what went into it.
-it('MM-710: the typed form chooses a food group, a typed food is the person’s own, and the Saved step says so', async () => {
-  const sheet = await open();
-  await press(sheet, 'Saved');
-  await press(sheet, 'New food');
-  await typeIn(sheet, 'Name', 'Protein bar');
-  await typeIn(sheet, 'One serving is', '1 bar');
-  await typeIn(sheet, 'Weighs g', '30');
-  await typeIn(sheet, 'Protein g', '10');
-  await typeIn(sheet, 'Carbs g', '12');
-  await typeIn(sheet, 'Fat g', '4');
-  await typeIn(sheet, 'Calories', '120');
-  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+it('MM-710: the typed form chooses a food group, a typed food is the person’s own, and the Library’s row says so', async () => {
+  renderApp(repos, today);
+  await openTab('Food');
+  const library = await openLibrary();
+  let form = await newFoodBy(library, 'Type it in');
+  await typeIn(form, 'Name', 'Protein bar');
+  await typeIn(form, 'One serving is', '1 bar');
+  await typeIn(form, 'Weighs g', '30');
+  await typeIn(form, 'Protein g', '10');
+  await typeIn(form, 'Carbs g', '12');
+  await typeIn(form, 'Fat g', '4');
+  await typeIn(form, 'Calories', '120');
+  await userEvent.click(within(form).getByRole('button', { name: /^Food group \(optional\)/ }));
   await userEvent.click(await screen.findByRole('option', { name: 'Snacks and sweets' }));
-  await press(sheet, 'Save food');
-  await within(sheet).findByRole('heading', { name: 'My foods' });
+  await press(form, 'Save food');
+  await expect.poll(async () => (await saved()).length).toBe(1);
   const [bar] = await saved();
   expect(bar?.group).toBe('snacksAndSweets');
   expect(bar?.evidence).toEqual({ kind: 'yours' });
   expect(bar?.madeOf).toEqual([]);
-  expect(within(sheet).getByText('Entered by you')).toBeInTheDocument();
+  // The Foods fold opened on it (MM-706), and its row says where its numbers came from (MM-710).
+  expect(await within(library).findByText('Entered by you')).toBeInTheDocument();
   // Edited, it keeps its group and its evidence; None takes the group away.
-  await editSaved(sheet, 'Protein bar');
-  expect(await within(sheet).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
-  await userEvent.click(within(sheet).getByRole('button', { name: /^Food group \(optional\)/ }));
+  await editInLibrary(library, 'Protein bar');
+  form = await libraryForm('Edit your food');
+  expect(await within(form).findByRole('button', { name: /^Food group \(optional\)/ })).toHaveTextContent('Snacks and sweets');
+  await userEvent.click(within(form).getByRole('button', { name: /^Food group \(optional\)/ }));
   await userEvent.click(await screen.findByRole('option', { name: 'None' }));
-  await press(sheet, 'Save food');
+  await press(form, 'Save food');
   await expect.poll(async () => (await saved())[0]?.group).toBeUndefined();
   expect((await saved())[0]?.evidence).toEqual({ kind: 'yours' });
 });

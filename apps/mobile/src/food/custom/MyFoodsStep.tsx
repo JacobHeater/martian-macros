@@ -6,10 +6,7 @@ import { useApp } from '../../app/useApp';
 import { useLoaded } from '../../app/useLoaded';
 import { MmButton } from '../../ui/MmButton';
 import { MmListRow } from '../../ui/MmListRow';
-import { MmMenuButton } from '../../ui/MmMenuButton';
-import { useOverlays } from '../../ui/useOverlays';
 import { CustomFoodForm } from './CustomFoodForm';
-import { RecipeForm } from './RecipeForm';
 import { SavedFoodTrustMark } from './SavedFoodTrustMark';
 import '../food.css';
 
@@ -30,62 +27,36 @@ interface MyFoodsStepProps {
   onPick: (food: CustomFood) => void;
   /** Logs a saved meal's foods, at the meal and time of the sheet (MM-645). */
   onPickMeal: (meal: SavedMeal) => void;
+  /** Leaves the sheet for the Library, where saved foods are made, changed and deleted (MM-707). */
+  onManage: () => void;
 }
 
-/** Which screen of "My foods" is showing. */
-type MyFoodsPage = 'list' | 'foodForm' | 'recipeForm';
-
-/** The foods and recipes the user saved: add, edit and delete them (MM-45). */
-export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal }: MyFoodsStepProps) {
-  const { services, state } = useApp();
-  const overlays = useOverlays();
+/**
+ * The foods and meals the user saved, to log one (MM-45, MM-635, MM-645).
+ * Making, changing and deleting them is the Library's (MM-706, MM-707);
+ * only a food made for what is being logged, from a scanned label (MM-44)
+ * or a corrected copy (MM-153), is still made here, since it goes on to be
+ * logged.
+ */
+export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal, onManage }: MyFoodsStepProps) {
+  const { state } = useApp();
   const foods = useLoaded(state.customFoods) ?? [];
   const meals = useLoaded(state.savedMeals) ?? [];
+  const [form, setForm] = useState(initialBarcode !== undefined || draft !== undefined);
 
-  const removeMeal = async (meal: SavedMeal) => {
-    const ok = await overlays.confirm({
-      title: `Delete ${meal.name}?`,
-      message: 'What you already logged from it stays as it is. This only removes it from your saved meals.',
-      confirmLabel: 'Delete',
-    });
-    if (ok) await services.savedMeals.deleteSavedMeal(meal.id);
-  };
-  const [page, setPage] = useState<MyFoodsPage>(initialBarcode === undefined && draft === undefined ? 'list' : 'foodForm');
-  const [editing, setEditing] = useState<CustomFood>();
-  const [barcode, setBarcode] = useState(initialBarcode);
-
-  const show = (next: MyFoodsPage, food?: CustomFood) => {
-    setPage(next);
-    setEditing(food);
-    setBarcode(undefined);
-  };
-
-  const remove = async (food: CustomFood) => {
-    const ok = await overlays.confirm({
-      title: `Delete ${food.name}?`,
-      message:
-        'Entries you already logged from it stay as they are. This only removes it from your saved foods.',
-      confirmLabel: 'Delete',
-    });
-    if (ok) await services.customFoods.deleteCustomFood(food.id);
-  };
-
-  // A food made for what was being logged (a scanned label, a corrected copy) goes on to be logged (MM-635).
-  const madeToLog = initialBarcode !== undefined || draft !== undefined;
   const formDone = (saved?: CustomFood) => {
-    if (saved !== undefined && editing === undefined && madeToLog) onPick(saved);
-    else show('list');
+    if (saved !== undefined) onPick(saved);
+    else setForm(false);
   };
-  if (page === 'foodForm') return <CustomFoodForm food={editing} initialBarcode={barcode} draft={editing === undefined ? draft : undefined} onDone={formDone} />;
-  if (page === 'recipeForm') return <RecipeForm recipe={editing} onDone={() => show('list')} />;
+  if (form) return <CustomFoodForm initialBarcode={initialBarcode} draft={draft} onDone={formDone} />;
   return (
     <div className="food-sheet">
       <h2 className="app-headline">My foods</h2>
       <p className="app-caption">
-        Press one to log it. What you save here is also found first when you search.
+        Press one to log it. What you save is also found first when you search.
       </p>
       <div className="app-gap-small" />
-      {foods.length === 0 && meals.length === 0 ? <p className="app-text food-no-hits">Nothing saved yet.</p> : null}
+      {foods.length === 0 && meals.length === 0 ? <p className="app-text food-no-hits">Nothing saved yet. Make a food in the Library.</p> : null}
       {/* The meals saved to log again, each its foods in one press (MM-645), apart from the foods. */}
       {meals.length === 0 ? null : (
         <>
@@ -98,14 +69,6 @@ export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal 
               subtitle={`Meal · logs ${meal.foods.length === 1 ? '1 food' : `${meal.foods.length} foods`} · ${Fmt.kcal(meal.foods.reduce((sum, f) => sum + f.kcal, 0))}`}
               // Pressed, it logs at once, as a recent meal does: nothing opens, so no chevron.
               onPress={() => onPickMeal(meal)}
-              trailingAction={
-                <MmMenuButton<'delete'>
-                  icon="more"
-                  label={`More actions for ${meal.name}`}
-                  items={[{ value: 'delete', label: 'Delete' }]}
-                  onSelect={() => void removeMeal(meal)}
-                />
-              }
             />
           ))}
           {foods.length === 0 ? null : <p className="food-label food-label-spaced">Your foods and recipes</p>}
@@ -124,25 +87,13 @@ export function MyFoodsStep({ onBack, initialBarcode, draft, onPick, onPickMeal 
               <SavedFoodTrustMark food={food} />
             </span>
           }
-          // Pressing a saved food logs it; its editing and deleting are in its menu (MM-635).
+          // Pressing a saved food logs it (MM-635); it is changed or deleted in the Library (MM-707).
           opens
           onPress={() => onPick(food)}
-          trailingAction={
-            <MmMenuButton<'edit' | 'delete'>
-              icon="more"
-              label={`More actions for ${food.name}`}
-              items={[
-                { value: 'edit', label: 'Edit' },
-                { value: 'delete', label: 'Delete' },
-              ]}
-              onSelect={(action) => (action === 'edit' ? show(food.kind === 'recipe' ? 'recipeForm' : 'foodForm', food) : void remove(food))}
-            />
-          }
         />
       ))}
       <div className="app-gap-small" />
-      <MmButton label="New food" kind="secondary" icon="plus" expand onPress={() => show('foodForm')} />
-      <MmButton label="New recipe" kind="secondary" icon="plus" expand onPress={() => show('recipeForm')} />
+      <MmButton label="Manage in Library" kind="text" onPress={onManage} />
       <MmButton label="Back" kind="text" onPress={onBack} />
     </div>
   );

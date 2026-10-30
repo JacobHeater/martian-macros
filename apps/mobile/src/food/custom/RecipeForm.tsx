@@ -23,7 +23,8 @@ import '../food.css';
 interface RecipeFormProps {
   /** The recipe being edited, or undefined for a new one. */
   recipe?: CustomFood | undefined;
-  onDone: () => void;
+  /** Called after saving, with the recipe as saved, or when the user backs out, with nothing (MM-706). */
+  onDone: (saved?: CustomFood) => void;
 }
 
 const whole = (value: number) => roundHalfAwayFromZero(value) + 0;
@@ -107,20 +108,19 @@ export function RecipeForm({ recipe, onDone }: RecipeFormProps) {
 
   const save = async () => {
     if (servingCount === undefined || per === undefined) return;
-    await services.customFoods.saveCustomFood(
-      new CustomFood({
-        id: recipe?.id ?? 0,
-        name: name.trim(),
-        kind: 'recipe',
-        servingDescription: '1 serving',
-        servingGrams: recipeServingGrams(cookedGrams, servingCount),
-        perServing: per,
-        servings: servingCount,
-        cookedWeightGrams: cookedGrams,
-        ingredients,
-      }),
-    );
-    onDone();
+    const made = new CustomFood({
+      id: recipe?.id ?? 0,
+      name: name.trim(),
+      kind: 'recipe',
+      servingDescription: '1 serving',
+      servingGrams: recipeServingGrams(cookedGrams, servingCount),
+      perServing: per,
+      servings: servingCount,
+      cookedWeightGrams: cookedGrams,
+      ingredients,
+    });
+    const id = await services.customFoods.saveCustomFood(made);
+    onDone(new CustomFood({ ...made, id }));
   };
 
   return (

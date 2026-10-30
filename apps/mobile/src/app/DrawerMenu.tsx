@@ -14,8 +14,8 @@ interface DrawerMenuProps {
 
 /**
  * What the drawer holds (MM-704): the Martian Macros lettering at its head,
- * then the bar's destinations, the person's own places, and Settings. The
- * Library (MM-706) takes its row beside Profile once it is built.
+ * then the bar's destinations, the person's own places (Profile, and the
+ * Library of everything they made, MM-706), and Settings.
  */
 export function DrawerMenu({ current, onChoose }: DrawerMenuProps) {
   return (
@@ -36,6 +36,7 @@ export function DrawerMenu({ current, onChoose }: DrawerMenuProps) {
       </MmDrawerGroup>
       <MmDrawerGroup label="You">
         <MmDrawerRow icon="person" label="Profile" onPress={() => onChoose('profile')} />
+        <MmDrawerRow icon="library" label="Library" onPress={() => onChoose('library')} />
       </MmDrawerGroup>
       <MmDrawerGroup label="Settings">
         <MmDrawerRow icon="settings" label="Settings" onPress={() => onChoose('settings')} />

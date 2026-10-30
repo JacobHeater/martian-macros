@@ -14,6 +14,7 @@ import { DashboardScreen } from '../dashboard/DashboardScreen';
 import { FoodDayHeader } from '../food/FoodDayHeader';
 import { FoodScreen } from '../food/FoodScreen';
 import { TrainScreen } from '../train/TrainScreen';
+import { LibraryScreen } from '../library/LibraryScreen';
 import { useShownDay } from '../food/useShownDay';
 import { destinations } from './destinations';
 import { Fmt } from '../format/Fmt';
@@ -31,8 +32,8 @@ import './app.css';
 /**
  * The frame every destination sits in (MM-90, MM-99, MM-667): its name and the
  * menu button above, the four destinations below. The menu is a drawer from
- * the left (MM-704): the destinations again, Profile and Settings, the last
- * two pushed over the destination the person is on. A swipe in from the right
+ * the left (MM-704): the destinations again, Profile, the Library (MM-706) and
+ * Settings, the last three pushed over the destination the person is on. A swipe in from the right
  * goes to the next destination, from the left to the one before (MM-582).
  * Coach pulled down from its top refreshes (MM-670).
  */
@@ -56,6 +57,7 @@ export function HomeShell() {
     const choice = await overlays.drawer<DrawerChoice>('Menu', (close) => <DrawerMenu current={current} onChoose={(chosen) => close(chosen)} />);
     if (choice === undefined) return;
     if (choice === 'profile') void navigator.push(() => <ProfileScreen />);
+    else if (choice === 'library') void navigator.push(() => <LibraryScreen />);
     else if (choice === 'settings') void navigator.push(() => <SettingsScreen />);
     else if (choice !== current) select(choice);
   };

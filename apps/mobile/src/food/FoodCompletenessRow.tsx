@@ -3,6 +3,7 @@ import type { DayCompleteness } from '../domain/DayCompleteness';
 import { easyToMissVisible } from '../domain/food/easyToMiss/easyToMissVisible';
 import type { FoodEntry } from '../domain/FoodEntry';
 import { useApp } from '../app/useApp';
+import { useNavigator } from '../app/useNavigator';
 import { useCell } from '../app/useCell';
 import { useLoaded } from '../app/useLoaded';
 import { MmListRow } from '../ui/MmListRow';
@@ -10,7 +11,7 @@ import { useOverlays } from '../ui/useOverlays';
 import { askLowDayComplete } from './askLowDayComplete';
 import { completenessIcon } from './completenessIcon';
 import { completenessLabel } from './completenessLabel';
-import { showAddFoodSheet } from './showAddFoodSheet';
+import { addFoodFrom } from './addFoodFrom';
 import { showEasyToMissSheet } from './showEasyToMissSheet';
 
 interface FoodCompletenessRowProps {
@@ -29,6 +30,7 @@ interface FoodCompletenessRowProps {
 export function FoodCompletenessRow({ day, entries }: FoodCompletenessRowProps) {
   const { services, state } = useApp();
   const overlays = useOverlays();
+  const navigator = useNavigator();
   const completeness = useLoaded(state.completeness(day)) ?? 'unmarked';
   const floor = useCell(state.coach)?.calorieFloorKcal;
   const setup = useLoaded(state.setup);
@@ -64,7 +66,7 @@ export function FoodCompletenessRow({ day, entries }: FoodCompletenessRowProps) 
       const answer = await showEasyToMissSheet(overlays);
       if (answer === undefined) return;
       if (answer.kind === 'add') {
-        void showAddFoodSheet(overlays, day, {
+        void addFoodFrom({ overlays, navigator }, day, {
           ...(answer.query === undefined ? {} : { initialQuery: answer.query }),
           ...(answer.estimateSize === undefined ? {} : { estimateSize: answer.estimateSize }),
         });

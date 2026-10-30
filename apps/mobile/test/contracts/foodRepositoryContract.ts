@@ -383,6 +383,40 @@ export function foodRepositoryContract(name: string, create: () => FoodRepositor
       expect(await repo.lastLoggedFrom('fixture', [])).toBeUndefined();
     });
 
+    it('how often and when last each saved food was logged, by its id (MM-706)', async () => {
+      const from = (date: CalendarDate, name: string, packId: string, foodId: number) =>
+        new FoodEntry({
+          id: 0,
+          date,
+          meal: 'lunch',
+          name,
+          kcal: 100,
+          proteinG: 1,
+          carbsG: 1,
+          fatG: 1,
+          source: 'weighed',
+          portion: { method: 'weighed', basis: 'calculated', quantity: 1, unit: 'gram', origin: { packId, foodId, source: packId === 'custom' ? 'user' : 'fixture' } },
+        });
+      expect((await first(repo.watchSavedFoodUsage())).size).toBe(0);
+      await repo.addFood(from(d2, 'Protein bar', 'custom', 7));
+      await repo.addFood(from(d1, 'Protein bar', 'custom', 7));
+      await repo.addFood(from(d1, 'Overnight oats', 'custom', 9));
+      await repo.addFood(from(d2, 'White rice, raw', 'fixture', 7));
+      await repo.addFood(entry(d2, 'Typed food'));
+      const usage = await first(repo.watchSavedFoodUsage());
+      expect([...usage.keys()].sort()).toEqual([7, 9]);
+      expect(usage.get(7)?.times).toBe(2);
+      expect(usage.get(7)?.lastDay.epochDay, 'the latest day, not the latest entry').toBe(d2.epochDay);
+      expect(usage.get(9)?.times).toBe(1);
+      expect(usage.get(9)?.lastDay.epochDay).toBe(d1.epochDay);
+      await expectChangeEmits(repo.watchSavedFoodUsage(), {
+        see: (all) => all.get(9)?.times,
+        before: 1,
+        change: () => repo.addFood(from(d2, 'Overnight oats', 'custom', 9)),
+        after: 2,
+      });
+    });
+
     it('ids are never reused after a delete', async () => {
       const a = await repo.addFood(entry(d1, 'Oats'));
       await repo.deleteFood(a);

@@ -9,6 +9,7 @@ import type { DayCompleteness } from '../domain/DayCompleteness';
 import type { DayKind } from '../domain/DayKind';
 import type { CustomFood } from '../domain/food/custom/CustomFood';
 import type { SavedMeal } from '../domain/food/meal/SavedMeal';
+import type { SavedFoodUsage } from '../domain/food/custom/SavedFoodUsage';
 import { DetailLevel } from '../domain/food/detail/DetailLevel';
 import type { CookingFatKind } from '../domain/food/CookingFatKind';
 import { SodiumDay } from '../domain/food/micros/SodiumDay';
@@ -360,6 +361,8 @@ export class AppState {
   readonly customFoods: Cell<Loadable<CustomFood[]>>;
   /** The meals saved to log again (MM-645). */
   readonly savedMeals: Cell<Loadable<SavedMeal[]>>;
+  /** How often each saved food was logged and when last, by its id (MM-706). */
+  readonly savedFoodUsage: Cell<Loadable<ReadonlyMap<number, SavedFoodUsage>>>;
 
   /** The setting for the easy-to-miss line (MM-152). */
   readonly easyToMiss: Cell<Loadable<EasyToMissPreference>>;
@@ -753,6 +756,7 @@ export class AppState {
     this.photoLock = new PhotoLock(s.deviceLock);
     this.customFoods = stream(() => s.customFoods.watchCustomFoods());
     this.savedMeals = stream(() => s.savedMeals.watchSavedMeals());
+    this.savedFoodUsage = stream(() => s.food.watchSavedFoodUsage());
     this.easyToMiss = stream(() => s.preferences.watchEasyToMiss());
     this.handSize = derived(() => {
       const profile = of(this.setup)?.profile;

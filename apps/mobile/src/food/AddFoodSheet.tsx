@@ -92,6 +92,8 @@ interface AddFoodSheetProps {
   estimateSize?: MealSize | undefined;
   /** Called once the food is logged or saved. */
   onDone: () => void;
+  /** Called when the Saved step asks for the Library (MM-707): the sheet is closed and the Library opened by the screen under it. */
+  onManage: () => void;
   /** Set while the meal's list holds foods, to ask before the sheet is left with them (MM-631). */
   mayLeave?: { current: (() => Promise<boolean>) | undefined } | undefined;
 }
@@ -330,7 +332,7 @@ type Step =
  * estimated, or typed by its macros. Recent foods refill the form in one
  * tap. An entry already logged is corrected here too.
  */
-export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone, mayLeave }: AddFoodSheetProps) {
+export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQuery, estimateSize, onDone, onManage, mayLeave }: AddFoodSheetProps) {
   const { services, state } = useApp();
   const { gradeOfFood } = useInsightPreview();
   const netCarbs = useNetCarbs();
@@ -800,7 +802,15 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
   }
   if (step.at === 'myFoods') {
     return (
-      <MyFoodsStep initialBarcode={step.barcode} draft={step.draft} onBack={choices} onPick={pickCustom} onPickMeal={(m) => void logSavedMeal(m)} />
+      <MyFoodsStep
+        initialBarcode={step.barcode}
+        draft={step.draft}
+        onBack={choices}
+        onPick={pickCustom}
+        onPickMeal={(m) => void logSavedMeal(m)}
+        // The sheet closes, and the screen that opened it pushes the Library (MM-707).
+        onManage={onManage}
+      />
     );
   }
   if (step.at === 'estimating') {
