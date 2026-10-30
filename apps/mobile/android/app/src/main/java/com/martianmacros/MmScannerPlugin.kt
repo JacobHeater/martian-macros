@@ -22,7 +22,7 @@ import java.io.File
 
 /**
  * The phone's camera (MM-43, MM-44): a barcode read live, another phone's
- * move code read live (MM-697), and a photo of a Nutrition Facts panel read
+ * move code read live (MM-698), and a photo of a Nutrition Facts panel read
  * as text with ML Kit. Both are read on the
  * device; the photo is deleted and nothing is uploaded.
  */
@@ -88,7 +88,7 @@ class MmScannerPlugin : Plugin() {
         }
     }
 
-    /** The other phone's move code (MM-697): the same full-screen scan, reading QR codes only. */
+    /** The other phone's move code (MM-698): the same full-screen scan, reading QR codes only. */
     private fun startCodeScan(call: PluginCall) {
         startActivityForResult(call, Intent(context, ScanActivity::class.java).putExtra(ScanActivity.EXTRA_QR, true), "codeScanned")
     }

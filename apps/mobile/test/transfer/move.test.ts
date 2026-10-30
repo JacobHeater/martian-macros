@@ -9,7 +9,7 @@ import { SodiumMoveCipher } from '../../src/transfer/SodiumMoveCipher';
 import { moveChunkBytes } from '../../src/transfer/moveChunkBytes';
 
 /**
- * MM-697: a move between two phones, the real sender and receiver sealing under the real cipher, over a Wi-Fi in
+ * MM-698: a move between two phones, the real sender and receiver sealing under the real cipher, over a Wi-Fi in
  * memory that keeps every frame as someone watching the network would see it.
  */
 const cipher = new SodiumMoveCipher();

@@ -21,7 +21,7 @@ async function next(connection: LinkConnection): Promise<Uint8Array> {
 }
 
 /**
- * The sending phone's part of a move (MM-697). It connects to the address in the scanned code and says, sealed under
+ * The sending phone's part of a move (MM-698). It connects to the address in the scanned code and says, sealed under
  * the code's key, which version it runs; the receiving phone answers whether it runs the same. Only then is the
  * payload sent, in sealed frames, the last one marked final, and the move is done when the receiving phone says it
  * has it all. Nothing of the person's data crosses the network before both phones agree, and nothing unsealed ever.

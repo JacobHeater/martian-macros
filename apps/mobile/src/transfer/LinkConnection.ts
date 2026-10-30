@@ -1,5 +1,5 @@
 /**
- * One connection between the two phones (MM-697), carrying whole frames: what
+ * One connection between the two phones (MM-698), carrying whole frames: what
  * one side sends in one `send` the other gets in one `receive`.
  */
 export interface LinkConnection {

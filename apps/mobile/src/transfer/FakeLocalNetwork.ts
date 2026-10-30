@@ -50,7 +50,7 @@ class End implements LinkConnection {
 }
 
 /**
- * A Wi-Fi in memory for tests (MM-697): one phone listens on it and any number may connect. Every frame either way
+ * A Wi-Fi in memory for tests (MM-698): one phone listens on it and any number may connect. Every frame either way
  * is kept in `frames`, as someone watching the network would see it, and `tamper` may change one on the way.
  */
 export class FakeLocalNetwork implements LinkListener, LinkDialer {

@@ -1,5 +1,5 @@
 /**
- * The native `MmTransfer` plugin (MM-697): a listener and connections on the
+ * The native `MmTransfer` plugin (MM-698): a listener and connections on the
  * local network, carrying whole frames (each sent with its length first).
  * A connection is named by the id the plugin gives. Nothing is sent to the
  * internet: the address is the other phone's on the same Wi-Fi.

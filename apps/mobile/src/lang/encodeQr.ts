@@ -288,7 +288,7 @@ function penalty(grid: Grid): number {
 }
 
 /**
- * `text` as a QR code at error-correction level H (MM-697), in the alphanumeric mode: digits, capital letters and
+ * `text` as a QR code at error-correction level H (MM-698), in the alphanumeric mode: digits, capital letters and
  * ` $%*+-./:`. The smallest version from 1 to 10 that holds it, with the mask the standard's penalty prefers. It
  * fails on a character outside that set, or on text too long for version 10.
  */

@@ -133,11 +133,11 @@ export interface AppServices {
   readonly restorer: DataRestorer;
   /** The phone's part of a backup: the snapshot, the share sheet and the file picker (MM-63). */
   readonly backup: BackupPlatform;
-  /** This phone receiving a move from another on the same Wi-Fi: listens while its code is shown (MM-697). */
+  /** This phone receiving a move from another on the same Wi-Fi: listens while its code is shown (MM-698). */
   readonly moveReceiver: MoveReceiving;
-  /** This phone sending a move to the one whose code it scanned (MM-697). */
+  /** This phone sending a move to the one whose code it scanned (MM-698). */
   readonly moveSender: MoveSending;
-  /** The app and schema versions two phones compare before a move (MM-697). */
+  /** The app and schema versions two phones compare before a move (MM-698). */
   readonly moveIdentity: () => Promise<MoveIdentity>;
 
   /**
@@ -173,7 +173,7 @@ export interface AppServices {
   readonly onlineFoods: OnlineFoodCache;
   readonly barcodeScanner: BarcodeScanner;
   readonly labelReader: LabelTextReader;
-  /** The camera reading another phone's move code (MM-697). */
+  /** The camera reading another phone's move code (MM-698). */
   readonly codeScanner: CodeScanner;
 
   /** The phone's own scheduled notifications (MM-146). Nothing here uses the network. */

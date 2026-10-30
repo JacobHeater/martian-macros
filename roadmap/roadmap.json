@@ -722,7 +722,7 @@
      "workstream": "WS-12",
      "tickets": [
       "MM-65",
-      "MM-697"
+      "MM-698"
      ]
     }
    ]
@@ -3796,7 +3796,7 @@
      "MM-64"
     ],
     "remaining": [
-     "MM-697"
+     "MM-698"
     ]
    },
    "sequence": [
@@ -3828,7 +3828,7 @@
      "step": 4,
      "title": "Move to another phone: the snapshot sent over the same Wi-Fi, paired by a QR code",
      "tickets": [
-      "MM-697"
+      "MM-698"
      ],
      "milestone": "M3"
     }
@@ -3839,7 +3839,7 @@
     ],
     "meaning": "A backup made at one schema version restores at a later one."
    },
-   "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring. 2026-10-19: MM-63 and MM-64 built as far as the share sheet and picker (the providers wait on the owner's registrations); moved into M2. 2026-10-20: the owner dropped the provider connectors (MM-64): the share sheet is the only way out, the file stays .mmbackup, and there is no export for reading outside the app. MM-63 and MM-64 done; the epic stays open for MM-404. 2026-10-29: MM-697 (move to another phone over the same Wi-Fi, paired by a QR code) added as step 4, in M3; its welcome entry adds one line to the welcome step (HS-onboarding-screen)."
+   "notes": "Restore runs migrations on the restored file, so it depends on MM-61 absolutely. Building it late is deliberate: every schema change before it is one less old format to keep restoring. 2026-10-19: MM-63 and MM-64 built as far as the share sheet and picker (the providers wait on the owner's registrations); moved into M2. 2026-10-20: the owner dropped the provider connectors (MM-64): the share sheet is the only way out, the file stays .mmbackup, and there is no export for reading outside the app. MM-63 and MM-64 done; the epic stays open for MM-404. 2026-10-29: MM-698 (move to another phone over the same Wi-Fi, paired by a QR code) added as step 4, in M3; its welcome entry adds one line to the welcome step (HS-onboarding-screen)."
   },
   {
    "id": "WS-13",

@@ -6,7 +6,7 @@ import type { MoveProgress } from './MoveProgress';
 import type { MoveReceiving } from './MoveReceiving';
 
 /**
- * A receiving phone for tests and stories (MM-697): its code is a fixed address with a key of counted bytes, and once
+ * A receiving phone for tests and stories (MM-698): its code is a fixed address with a key of counted bytes, and once
  * shown it waits, stays part-way, receives the payload it was given, or fails, as told. `open` fails with `noWifi`
  * when told there is none. Every code it opens carries a new key, as the real one's do.
  */

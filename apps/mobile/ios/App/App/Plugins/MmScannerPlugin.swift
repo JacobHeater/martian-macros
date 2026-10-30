@@ -29,7 +29,7 @@ public class MmScannerPlugin: CAPPlugin, CAPBridgedPlugin {
         withCamera(call) { self.startScan(call) }
     }
 
-    /// The other phone's move code (MM-697): the same full-screen scan, reading QR codes only.
+    /// The other phone's move code (MM-698): the same full-screen scan, reading QR codes only.
     @objc func scanCode(_ call: CAPPluginCall) {
         withCamera(call) { self.startScan(call, readsQr: true) }
     }

@@ -7,7 +7,7 @@ import type { MoveSealer } from './MoveSealer';
 const local = (bytes: Uint8Array): Uint8Array => new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
 
 /**
- * libsodium's secretstream, XChaCha20-Poly1305 (MM-697): every frame authenticated, in order, the last one marked,
+ * libsodium's secretstream, XChaCha20-Poly1305 (MM-698): every frame authenticated, in order, the last one marked,
  * so a frame changed, dropped, repeated or cut short is refused. The key is the one in the code, never derived from
  * anything typed.
  */
