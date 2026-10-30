@@ -9,7 +9,7 @@ import { renderApp } from '../support/renderApp';
 
 /**
  * MM-667: Progress and Coach are consolidated into the unified Coach tab:
- * four destinations in the bottom bar, the Executive summary card at the top,
+ * four destinations in the drawer, the Executive summary card at the top,
  * the Weight trend chart and body measurements in the same scroll, collapsible
  * telemetry sections at the bottom, and no 14-day Recent insights feed.
  */
@@ -22,15 +22,17 @@ beforeEach(async () => {
   await new DemoSeed(today).replace(repos);
 });
 
-it('shows four destinations in the bottom bar and unifies Executive summary, Weight trend, Measurements, and collapsible telemetry on Coach', async () => {
+it('shows four destinations in the drawer and unifies Executive summary, Weight trend, Measurements, and collapsible telemetry on Coach', async () => {
   renderApp(repos, today);
-  const bar = await screen.findByRole('navigation', { name: 'Destinations' });
-  expect(within(bar).getAllByRole('button').map((b) => b.textContent?.trim())).toEqual([
+  await userEvent.click(await screen.findByRole('button', { name: 'Menu' }));
+  const drawer = await screen.findByRole('dialog', { name: 'Menu' });
+  expect(within(within(drawer).getByRole('group', { name: 'Destinations' })).getAllByRole('button').map((b) => b.textContent?.trim())).toEqual([
     'Dashboard',
     'Food',
     'Train',
     'Coach',
   ]);
+  await userEvent.keyboard('{Escape}');
 
   await openCoach();
   const summaryHeading = await screen.findByRole('heading', { name: 'Executive summary' });

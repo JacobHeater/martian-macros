@@ -124,7 +124,7 @@ Allowed, in this fixed budget. The point is a recognizable identity, not a theme
 | Orbit hairline | 1 dp concentric arcs, `text` at 6% (dark) / `ink` at 5% (light), partially clipped by the card | Behind hero figures | One cluster per screen |
 | Limb glow | Radial `ion`, 12% / 8%, top-trailing, ~60% radius | One hero surface per screen | Never behind text under 22 sp |
 | Starfield | ≤ 24 static points, ≤ 30% opacity, seeded so it never changes | Onboarding welcome (Martian, MM-558) and the Coach unlock screen only | Never on a routine screen; never animated |
-| Stripe set (Martian, MM-558) | Three 1 dp lines, 3 dp apart, `accent-line` at 100 / 50 / 22%, the stripes beside the lettering | The navigation bar's top edge | Nowhere else; one plain line under more contrast |
+| Stripe set (Martian, MM-558) | The stripes beside the lettering, as the brand art draws them | The drawer's head, inside the lettering (MM-711: the bar that carried a drawn set is gone) | Nowhere else |
 | Ridge and its alien (Martian, MM-558) | A 56 dp mountain silhouette, `accent-line` at 16% over the canvas, with a small green alien behind its tallest peak that rises, looks about, blinks and ducks every 9 s (`--motion-idle`) | After the last of each page's content | Still under reduced motion; gone under more contrast |
 | Naming | Words like "orbit" or "launch" | Marketing, the app icon, store listing | **Never** in functional labels or buttons. A button says "Log food". |
 

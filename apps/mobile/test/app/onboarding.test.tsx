@@ -78,7 +78,7 @@ it('onboarding requires sex and birth date, then creates a plan', async () => {
   await press('Start');
 
   // Lands on the main shell with targets already issued.
-  expect(await screen.findByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Menu' })).toBeInTheDocument();
   const setup = await repos.setup.loadSetup();
   expect(setup?.profile.sex).toBe('male');
   expectClose(setup?.profile.heightCm, 180.3, 0.1);

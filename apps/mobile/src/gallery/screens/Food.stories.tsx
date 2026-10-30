@@ -101,7 +101,7 @@ export const EntryMenu = screenStory({
   },
 });
 
-/** MM-302: an entry deleted; the Undo snack stands above the navigation bar. */
+/** MM-302: an entry deleted; the Undo snack stands above the safe area (no bar since MM-711). */
 export const EntryRemoved = screenStory({
   covers: ['FoodScreen'],
   shows: 'Undo',

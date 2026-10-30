@@ -61,9 +61,6 @@ describe('every destination', () => {
       expect(bar.querySelector('.mm-macro-bar-name')?.textContent?.trim(), 'a macro bar carries its name').toMatch(/\S/);
       expect(bar.querySelector('.mm-macro-bar-figures')?.textContent?.trim(), 'a macro bar carries its figures').toMatch(/\d/);
     }
-    const current = view.container.querySelectorAll('.mm-nav-destination-current');
-    expect(current).toHaveLength(1);
-    expect(current[0]).toHaveAttribute('aria-current', 'page');
     for (const segment of view.container.querySelectorAll('.mm-segment-selected')) {
       expect(segment).toHaveAttribute('aria-pressed', 'true');
       // Seen, not only spoken: the chosen segment carries its check mark, compact or not (MM-437).

@@ -14,15 +14,22 @@ requirements folders or internal packages.
    check-in, and optional supporting evidence.
 5. **Train — "What did I do?"** Add as the fifth destination when its roadmap
    workstream lands.
-6. **Settings — "What has the user chosen or connected?"** Reached from a
-   settings action in the app bar, not promoted to a primary tab.
+6. **Settings — "What has the user chosen or connected?"** A row of the
+   drawer, not a destination; Profile (who the person is, their goals) is
+   its own row beside it (MM-705).
 
 ## Primary navigation
 
-Use a labeled Material bottom navigation bar with Dashboard, Food, Progress,
-and Coach in that order. Add Train between Food and Progress when the training
-log is implemented. Five destinations is the limit. Settings stays behind the
-gear/action in the top bar.
+The app's one navigation is a drawer from the left (MM-704, MM-711), opened
+by a menu button at the left of the app bar and closed by its scrim, a drag
+back, Escape or the phone's back. Its head is the Martian Macros lettering;
+its rows are the destinations (Dashboard, Food, Train, Coach), then Profile
+and Library, then Settings. Profile, Library and Settings are pushed over the
+destination the person is on. There is no bottom bar: the owner removed it the
+day the drawer landed (2026-10-30), since two ways to the same four places is
+one too many. A swipe in from a side still moves between destinations
+(MM-582); it is an accelerator, the drawer is the way. The app bar's heading
+names the destination.
 
 Keep each destination's state when switching tabs. Navigation changes should
 not discard an in-progress entry, scroll position, or selected detail without

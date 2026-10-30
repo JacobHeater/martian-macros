@@ -7,6 +7,7 @@ import { CalendarDate } from '../../src/domain/CalendarDate';
 import { DemoSeed } from '../../src/fixtures/DemoSeed';
 import { InMemoryRepositories } from '../../src/fixtures/InMemoryRepositories';
 import { MmOverlays } from '../../src/ui/MmOverlays';
+import { Fmt } from '../../src/format/Fmt';
 import { renderApp } from '../support/renderApp';
 
 /**
@@ -88,21 +89,20 @@ describe('at home', () => {
     await new DemoSeed(today).replace(repos);
   });
 
-  const current = async () => {
-    const bar = await screen.findByRole('navigation', { name: 'Destinations' });
-    return bar.querySelector('[aria-current="page"]')?.textContent;
-  };
+  // The destination is named by the app bar's heading (on Food, the day shown, MM-390); there is no bar to read (MM-711).
+  const current = async () => (await screen.findByRole('heading', { level: 1 })).textContent;
+  const food = Fmt.day(today, today);
   const page = () => document.querySelector('.app-body')!;
 
   it('a swipe in from the right goes to the next destination, from the left to the one before', async () => {
     renderApp(repos, today);
     expect(await current()).toContain('Dashboard');
     swipe(page(), right, right - 500);
-    await waitFor(async () => expect(await current()).toContain('Food'));
+    await waitFor(async () => expect(await current()).toContain(food));
     swipe(page(), right, right - 500);
     await waitFor(async () => expect(await current()).toContain('Train'));
     swipe(page(), 4, 500);
-    await waitFor(async () => expect(await current()).toContain('Food'));
+    await waitFor(async () => expect(await current()).toContain(food));
   });
 
   it('nothing goes before Dashboard', async () => {

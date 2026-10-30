@@ -11,7 +11,8 @@ import { topLayer } from '../support/topLayer';
 /**
  * MM-704: the app's menu is a drawer from the left, opened by the menu
  * button in the app bar: the lettering at its head, the four destinations,
- * Profile and Settings. The bar keeps its four; the settings gear is gone.
+ * Profile, Library and Settings. It is the one navigation: the bottom bar is
+ * gone (MM-711), as is the settings gear.
  */
 const today = CalendarDate.of(2026, 10, 30);
 let repos: InMemoryRepositories;
@@ -23,7 +24,7 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
-const bar = () => screen.findByRole('navigation', { name: 'Destinations' });
+const bar = () => screen.findByRole('button', { name: 'Menu' });
 
 async function openMenu(): Promise<HTMLElement> {
   await bar();
@@ -45,12 +46,18 @@ it('opens from the menu button with the lettering, the destinations, Profile, Li
   expect(within(drawer).getAllByRole('group').map((group) => group.getAttribute('aria-label'))).toEqual(['Destinations', 'You', 'Settings']);
 });
 
-it('a destination chosen in the drawer closes it and is the current one in the bar', async () => {
+it('there is no bottom bar: the drawer is the one way between destinations (MM-711)', async () => {
+  renderApp(repos, today);
+  await bar();
+  expect(screen.queryByRole('navigation')).toBeNull();
+  expect(document.querySelector('.mm-navigation-bar')).toBeNull();
+});
+
+it('a destination chosen in the drawer closes it and is the current one', async () => {
   renderApp(repos, today);
   const drawer = await openMenu();
   await userEvent.click(within(drawer).getByRole('button', { name: 'Food' }));
   await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull());
-  expect(within(await bar()).getByRole('button', { name: 'Food' })).toHaveAttribute('aria-current', 'page');
   expect(await screen.findByRole('heading', { name: 'Breakfast' })).toBeInTheDocument();
   // Opened again, Food is the row marked.
   expect(within(await openMenu()).getByRole('button', { name: 'Food' })).toHaveAttribute('aria-current', 'page');
@@ -65,7 +72,7 @@ it('Settings from the drawer is pushed over the destination with Back, and back 
   expect(await settings.findByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
   await userEvent.click(settings.getByRole('button', { name: 'Back' }));
   await waitFor(() => expect(screen.queryByRole('heading', { level: 1, name: 'Settings' })).toBeNull());
-  expect(within(await bar()).getByRole('button', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Dashboard');
 });
 
 it('the Library from the drawer is pushed over the destination (MM-706)', async () => {
