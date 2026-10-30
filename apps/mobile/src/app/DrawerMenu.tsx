@@ -7,14 +7,14 @@ import { destinations } from './destinations';
 import './app.css';
 
 interface DrawerMenuProps {
-  /** The destination the person is at, marked as the bar marks it. */
+  /** The destination the person is at, marked as current. */
   current: HomeDestination;
   onChoose: (choice: DrawerChoice) => void;
 }
 
 /**
  * What the drawer holds (MM-704): the Martian Macros lettering at its head,
- * then the bar's destinations, the person's own places (Profile, and the
+ * then the four destinations, the person's own places (Profile, and the
  * Library of everything they made, MM-706), and Settings.
  */
 export function DrawerMenu({ current, onChoose }: DrawerMenuProps) {

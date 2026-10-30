@@ -32,7 +32,7 @@ const pause = (from: number, to: number, reason: PauseReason = 'travel') =>
 const eat = (kcal: number) =>
   repos.food.addFood(foodOn(today, { name: 'Wedding dinner', kcal, proteinG: 120, carbsG: 380, fatG: 140 }));
 
-const shell = () => screen.findByRole('navigation', { name: 'Destinations' });
+const shell = () => screen.findByRole('button', { name: 'Menu' });
 
 async function openPause(): Promise<void> {
   renderApp(repos, today);
@@ -111,7 +111,7 @@ it('resuming early asks for a weigh-in and nothing else', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Resume now' }));
   expect(await screen.findByRole('heading', { name: 'Ready to resume?' })).toBeInTheDocument();
   expect((await pauses())[0]?.to).toBe(today.addDays(-1));
-  expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
   expect(screen.queryByRole('heading', { name: 'Settings' })).not.toBeInTheDocument();
 });
 

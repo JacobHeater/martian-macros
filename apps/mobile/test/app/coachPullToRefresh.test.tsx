@@ -37,7 +37,7 @@ it('MM-670: Coach pulled down from its top says it is refreshing, then settles',
 
 it('MM-670: the Dashboard does not pull', async () => {
   renderApp(repos, today);
-  await screen.findByRole('navigation', { name: 'Destinations' });
+  await screen.findByRole('button', { name: 'Menu' });
   pull(body());
   expect(strip().dataset['phase']).toBe('idle');
 });

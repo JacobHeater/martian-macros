@@ -142,7 +142,7 @@ describe('the field border', () => {
       }
     });
 
-    // MM-556, MM-558: a section's mark, the calorie arc and the navigation bar's line are graphics (3:1), the ink holds
+    // MM-556, MM-558: a section's mark, the calorie arc and the hero's line are graphics (3:1), the ink holds
     // 4.5:1 on the neon-orange fill, and Dark and Light show no line.
     it(`gives the section mark, the arc and the bar's line their contrast in ${palette}`, () => {
       const tokens = cssBlock(`.theme-${palette}`);

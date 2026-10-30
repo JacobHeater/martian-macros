@@ -34,7 +34,7 @@ describe('the Martian ridge', () => {
     }
   });
 
-  it('meets the navigation bar: the Martian body keeps no padding under it', () => {
+  it('meets the bottom of the screen (once the navigation bar, MM-711): the Martian body keeps no padding under it', () => {
     const css = readFileSync('src/app/app.css', 'utf8');
     expect(css).toMatch(/\.theme-martian \.app-body \{\n  padding-bottom: 0;/);
     expect(css).toMatch(/\.app-body > \.mm-ridge \{\n  margin: auto calc\(-1 \* var\(--space-16\)\) 0;/);

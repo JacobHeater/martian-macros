@@ -67,5 +67,5 @@ it('Manage in Library closes the sheet and opens the Library', async () => {
   // Back returns to Food.
   await press(topLayer(), 'Back');
   await waitFor(() => expect(screen.queryByRole('heading', { name: 'Library' })).toBeNull());
-  expect(screen.getByRole('navigation', { name: 'Destinations' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument();
 });

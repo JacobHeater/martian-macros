@@ -185,7 +185,7 @@ it('moves onto a fresh install from the welcome, with no backup to offer and no 
   const asks = await screen.findByRole('dialog', { name: 'Replace this phone’s data?' }, slowly);
   expect(within(asks).getByText(/This phone holds nothing yet/)).toBeInTheDocument();
   await userEvent.click(within(asks).getByRole('button', { name: 'Replace' }));
-  expect(await screen.findByRole('navigation', { name: 'Destinations' }, slowly)).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Menu' }, slowly)).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Begin' })).not.toBeInTheDocument();
 });
 

@@ -85,7 +85,6 @@ const buttonHomes: readonly string[] = [
   'ui/MmIconButton.tsx',
   'ui/MmListRow.tsx',
   'ui/MmMenuItemRow.tsx',
-  'ui/MmNavigationBar.tsx',
   'ui/MmOption.tsx',
   'ui/MmPickerField.tsx',
   'ui/MmPressable.tsx',

@@ -1,9 +1,12 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { expect } from 'vitest';
 
-/** Presses a destination in the bar at the bottom, once the shell is showing. */
+/** Goes to a destination through the drawer (MM-704; the one navigation since MM-711), once the shell is showing. */
 export async function openTab(label: string): Promise<void> {
-  const bar = await screen.findByRole('navigation', { name: 'Destinations' });
-  const target = label === 'Progress' && within(bar).queryByText('Progress') === null ? 'Coach' : label;
-  await userEvent.click(within(bar).getByText(target));
+  await userEvent.click(await screen.findByRole('button', { name: 'Menu' }));
+  const drawer = await screen.findByRole('dialog', { name: 'Menu' });
+  const target = label === 'Progress' ? 'Coach' : label;
+  await userEvent.click(within(drawer).getByRole('button', { name: target }));
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull());
 }

@@ -3,7 +3,6 @@ import { HomeDestination } from '../state/HomeDestination';
 import { MartianRidge } from '../ui/MartianRidge';
 import { MmAppBar } from '../ui/MmAppBar';
 import { MmIconButton } from '../ui/MmIconButton';
-import { MmNavigationBar } from '../ui/MmNavigationBar';
 import { MmPullToRefresh } from '../ui/MmPullToRefresh';
 import type { EdgeSide } from '../ui/EdgeSide';
 import { useEdgeSwipe } from '../ui/useEdgeSwipe';
@@ -31,11 +30,13 @@ import './app.css';
 
 /**
  * The frame every destination sits in (MM-90, MM-99, MM-667): its name and the
- * menu button above, the four destinations below. The menu is a drawer from
- * the left (MM-704): the destinations again, Profile, the Library (MM-706) and
- * Settings, the last three pushed over the destination the person is on. A swipe in from the right
- * goes to the next destination, from the left to the one before (MM-582).
- * Coach pulled down from its top refreshes (MM-670).
+ * menu button above, the destination below, nothing else. The menu is a
+ * drawer from the left and the one way between destinations (MM-704, MM-711:
+ * the bottom bar is gone): the four destinations, Profile, the Library
+ * (MM-706) and Settings, the last three pushed over the destination the
+ * person is on. A swipe in from the right goes to the next destination, from
+ * the left to the one before (MM-582). Coach pulled down from its top
+ * refreshes (MM-670).
  */
 export function HomeShell() {
   const { state } = useApp();
@@ -96,11 +97,6 @@ export function HomeShell() {
         )}
         <MartianRidge />
       </main>
-      <MmNavigationBar
-        destinations={destinations}
-        current={current}
-        onSelect={select}
-      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CalendarDate } from '../src/domain/CalendarDate';
@@ -25,25 +25,31 @@ beforeEach(async () => {
   await repos.weights.saveWeight(today, 82);
 });
 
-const bar = () => screen.findByRole('navigation', { name: 'Destinations' });
+const bar = () => screen.findByRole('button', { name: 'Menu' });
+const drawer = async () => {
+  await userEvent.click(await bar());
+  return screen.findByRole('dialog', { name: 'Menu' });
+};
 
 describe('the four destinations', () => {
-  it('are in a bottom bar, Dashboard first and current', async () => {
+  it('are in the drawer, Dashboard first and current, and there is no bar below the screen (MM-711)', async () => {
     renderApp(repos, today);
-    const places = within(await bar()).getAllByRole('button');
+    // The Dashboard is named Dashboard, as the drawer names it (MM-254).
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Dashboard');
+    expect(screen.queryByRole('navigation')).toBeNull();
+    const places = within(within(await drawer()).getByRole('group', { name: 'Destinations' })).getAllByRole('button');
     expect(places.map((place) => place.textContent)).toEqual(['Dashboard', 'Food', 'Train', 'Coach']);
     expect(places[0]).toHaveAttribute('aria-current', 'page');
-    // The Dashboard is named Dashboard, as the bar names it (MM-254).
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Dashboard');
   });
 
   it('show the chosen one and mark it current in words', async () => {
     renderApp(repos, today);
-    const destinations = await bar();
-    await userEvent.click(within(destinations).getByRole('button', { name: 'Coach' }));
-    expect(within(destinations).getByRole('button', { name: 'Coach' })).toHaveAttribute('aria-current', 'page');
-    expect(within(destinations).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
+    await userEvent.click(within(await drawer()).getByRole('button', { name: 'Coach' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Menu' })).toBeNull());
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Coach');
+    const again = await drawer();
+    expect(within(again).getByRole('button', { name: 'Coach' })).toHaveAttribute('aria-current', 'page');
+    expect(within(again).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
   });
 });
 

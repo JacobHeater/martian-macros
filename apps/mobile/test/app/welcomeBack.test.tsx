@@ -20,13 +20,13 @@ async function lastActive(daysAgo: number): Promise<InMemoryRepositories> {
   return repos;
 }
 
-const shell = () => screen.findByRole('navigation', { name: 'Destinations' });
+const shell = () => screen.findByRole('button', { name: 'Menu' });
 
 it('after three weeks away, one screen asks only for a weigh-in', async () => {
   renderApp(await lastActive(22), today);
   expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
   expect(screen.getByText('To pick up, the coach needs one thing: a weigh-in.')).toBeInTheDocument();
-  expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
 });
 
 it('nothing says how long, or that anything ended', async () => {
@@ -77,6 +77,6 @@ it('after a long gap the health check is asked again', async () => {
   renderApp(repos, today);
   await userEvent.click(await screen.findByRole('button', { name: 'Later' }));
   expect(await screen.findByRole('heading', { name: 'Health check' })).toBeInTheDocument();
-  expect(screen.queryByRole('navigation', { name: 'Destinations' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Menu' })).not.toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Later' })).not.toBeInTheDocument();
 });

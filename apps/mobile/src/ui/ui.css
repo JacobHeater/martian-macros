@@ -176,64 +176,6 @@
   flex-shrink: 0;
 }
 
-.mm-navigation-bar {
-  display: flex;
-  min-height: 72px;
-  padding: var(--space-8) var(--space-4) calc(var(--space-8) + env(safe-area-inset-bottom));
-  background: var(--raised);
-  /* Martian's violet frame line along the top (MM-556, MM-558); none elsewhere. */
-  box-shadow: 0 -1px 0 var(--accent-line);
-}
-.mm-nav-destination {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: none;
-  color: var(--text2);
-  font: var(--type-nav);
-  cursor: pointer;
-  transition: background var(--motion-fast);
-}
-/* The label stays inside its destination at any text size: it wraps, breaking a word if it must (MM-373). */
-.mm-nav-label {
-  display: block;
-  max-width: 100%;
-  padding: 0 var(--space-4);
-  overflow-wrap: anywhere;
-  hyphens: auto;
-  text-align: center;
-  line-height: 1.15;
-}
-.mm-nav-indicator {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 30px;
-  border-radius: var(--radius-nav-indicator);
-  transition: background var(--motion-base);
-}
-.mm-nav-destination-current {
-  color: var(--ember);
-  font-weight: 700;
-}
-.mm-nav-destination-current .mm-nav-indicator {
-  background: var(--chosen);
-}
-/* Martian lights the current tab's plate in hot pink (MM-555, MM-558), so its icon takes the ink and its label the text
-   colour: one neon per destination, and lime stays the action's. */
-.theme-martian .mm-nav-destination-current .mm-nav-indicator {
-  color: var(--on-chosen);
-}
-.theme-martian .mm-nav-destination-current {
-  color: var(--text);
-}
-
 /* ---- Surfaces (MM-277: cards carry their per-theme elevation) ---- */
 
 .mm-surface {
@@ -284,24 +226,8 @@
 .theme-dark .mm-hero {
   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent);
 }
-/* Martian's frame: the stripe set beside the brand lettering along the navigation bar's top, three violet lines, each
-   fainter. One solid colour per line; no text behind them, as the bar's top padding clears them. */
-.theme-martian .mm-navigation-bar {
-  box-shadow: none;
-  background-image:
-    linear-gradient(var(--accent-line), var(--accent-line)),
-    linear-gradient(color-mix(in srgb, var(--accent-line) 50%, transparent), color-mix(in srgb, var(--accent-line) 50%, transparent)),
-    linear-gradient(color-mix(in srgb, var(--accent-line) 22%, transparent), color-mix(in srgb, var(--accent-line) 22%, transparent));
-  background-size: 100% 1px, 100% 1px, 100% 1px;
-  background-position: 0 0, 0 3px, 0 6px;
-  background-repeat: no-repeat;
-}
-/* With more contrast asked for, decoration goes: the stripes become one plain line, the hero's rings and limb go. */
+/* With more contrast asked for, decoration goes: the hero's rings and limb go. */
 @media (prefers-contrast: more), (forced-colors: active) {
-  .theme-martian .mm-navigation-bar {
-    background-image: none;
-    box-shadow: 0 -1px 0 var(--accent-line);
-  }
   .mm-hero-backdrop {
     display: none;
   }
@@ -327,7 +253,6 @@
 .theme-martian .mm-button-primary:not(:disabled),
 .theme-martian .mm-segment-selected,
 .theme-martian .mm-chip-selected,
-.theme-martian .mm-nav-destination-current .mm-nav-indicator,
 .theme-martian .mm-icon-button-plate {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
 }
@@ -1687,12 +1612,12 @@
 
 /*
  * A snack (MM-272, MM-601, MM-691): every one goes after ten seconds, one with an Undo too, and every one has Dismiss.
- * It stands above the navigation bar while one is shown (MM-302), else above the safe area.
+ * It stands above the safe area at the bottom (MM-302, MM-711: there is no bar below the screen).
  */
 .mm-snack-host {
   position: fixed;
   right: var(--space-16);
-  bottom: calc(var(--mm-navigation-bar-height, env(safe-area-inset-bottom)) + var(--space-16));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-16));
   left: var(--space-16);
   z-index: 90;
   display: flex;
@@ -2442,8 +2367,6 @@
 .mm-pressed .mm-button:not(:disabled),
 .mm-icon-button:not(:disabled):active,
 .mm-pressed .mm-icon-button:not(:disabled),
-.mm-nav-destination:active,
-.mm-pressed .mm-nav-destination,
 .mm-pressable:active,
 .mm-pressed .mm-pressable,
 .mm-list-row-button:active,
@@ -2671,7 +2594,7 @@
   background: var(--mm-ridge) bottom / 100% 100% no-repeat;
 }
 /* The alien ducks below the ridge's bottom edge; the pit clips it there, as WebKit counts a moved child's overflow and
-   the page scrolled 10 px past the ridge, bare canvas above the navigation bar (MM-577). It reaches 16 px above the
+   the page scrolled 10 px past the ridge, bare canvas below it (MM-577). It reaches 16 px above the
    ridge for the alien's climb into the UFO. */
 .mm-ridge-pit {
   position: absolute;

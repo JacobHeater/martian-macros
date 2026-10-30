@@ -59,7 +59,8 @@ recorded here so nothing is re-asked.
 
 **Navigation: a side drawer; the bottom bar stays (MM-704, MM-705)**
 - **A drawer slides in from the left**, on a transform that the compositor alone pays for, zeroed under reduced motion.
-  **The bottom bar keeps Dashboard, Food, Train and Coach.** (Declined: the drawer replacing the bar; a "More" item on
+  **The bottom bar keeps Dashboard, Food, Train and Coach.** *Superseded by MM-711 (the owner, the same day, on the first
+  build): the bar goes; the drawer is the one navigation.* (Declined: the drawer replacing the bar; a "More" item on
   the bar; a full-screen menu page.)
 - **Opened by a menu button at the left of the app bar. Closed by a tap on the scrim or by dragging it back.** No swipe
   from the left edge opens it: MM-582 keeps the edge swipes for the destinations and the pushed screens.
@@ -105,7 +106,8 @@ recorded here so nothing is re-asked.
   chose a pushed screen and this costs nothing.
 
 ## Narrative
-- MM-704: the drawer, its head, its rows, the menu button; the gear leaves.
+- MM-704: the drawer, its head, its rows, the menu button; the gear leaves. MM-711: the bottom bar goes too.
+- MM-712: Profile's folds start closed, as every fold does.
 - MM-705: Profile as its own screen; Settings without those sections; what opened Settings on them opens Profile.
 - MM-706: the Library screen, its folds, rows, usage, New food's chooser.
 - MM-707: the Saved step as a picker with "Manage in Library".

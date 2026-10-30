@@ -6,12 +6,12 @@ import './ui.css';
 interface MmDrawerRowProps {
   icon: MmIconName;
   label: string;
-  /** Whether it is the place the person is at now: marked as the bar marks its current destination. */
+  /** Whether it is the place the person is at now: said as current, and shown by weight and its plate. */
   current?: boolean | undefined;
   onPress: () => void;
 }
 
-/** A row of the drawer (MM-704): an icon on its plate and a label, pressed as a whole, as the bar's destinations are. */
+/** A row of the drawer (MM-704): an icon on its plate and a label, pressed as a whole (MM-711: the one navigation, the bottom bar is gone). */
 export function MmDrawerRow({ icon, label, current = false, onPress }: MmDrawerRowProps) {
   return (
     <MmPressable current={current} onPress={() => onPress()}>
