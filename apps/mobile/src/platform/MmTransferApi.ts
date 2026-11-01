@@ -10,7 +10,10 @@ export interface MmTransferApi {
   /** The next connection. Rejects with code `stopped` once `stopListening` is called. */
   accept(): Promise<{ connection: string }>;
   stopListening(): Promise<void>;
-  /** Rejects with code `unreachable` when the other phone does not answer within a few seconds. */
+  /**
+   * Rejects with code `unreachable` when the other phone does not answer in time, or `noLocalNetwork` when this phone
+   * refused the app the local network (iOS, MM-720). The wait is long enough for iOS's Local Network question.
+   */
   connect(options: { host: string; port: number }): Promise<{ connection: string }>;
   send(options: { connection: string; data: string }): Promise<void>;
   /** The next frame as base64, or `closed` once the other side hung up. */

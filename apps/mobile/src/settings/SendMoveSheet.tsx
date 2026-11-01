@@ -153,7 +153,9 @@ export function SendMoveSheet({ code, parcel, what, onScanAgain, onClose }: Send
     return (
       <>
         <h2 className="app-headline">Sending to your other phone</h2>
-        <p className="app-text">Keep both phones open and on the same Wi-Fi until it finishes.</p>
+        <p className="app-text">
+          Keep both phones open and on the same Wi-Fi until it finishes. If this phone asks to find devices on your network, allow it.
+        </p>
         {stage.kind === 'connecting' ? (
           <MmBusyLine label="Reaching your other phone…" />
         ) : (
