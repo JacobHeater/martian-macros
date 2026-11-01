@@ -243,6 +243,16 @@ export const MoveSendUnreachable = screenStory({
   walk: choose('Send from this phone'),
 });
 
+/** This phone refused the app the local network (iOS, MM-720): where to allow it. */
+export const MoveSendNoLocalNetwork = screenStory({
+  covers: ['SendMoveSheet'],
+  shows: /not allowed to find devices on its Wi-Fi/,
+  viewport: 'smallPhone',
+  device: withSender(new FakeMoveSender({ kind: 'fails', problem: new MoveProblem('noLocalNetwork') })),
+  open: openBackup,
+  walk: choose('Send from this phone'),
+});
+
 /** The other phone runs an older version: it is the one to update. */
 export const MoveSendOlderReceiver = screenStory({
   covers: ['SendMoveSheet'],

@@ -1,12 +1,14 @@
 import Capacitor
 import Foundation
 import Network
+import UIKit
 
 /**
  * Moving to another phone (MM-698): a listener on the phone's Wi-Fi while its code is shown, and connections to the
  * other phone's address, carrying whole frames, each sent with its length first. What crosses is sealed by the app
- * before it reaches this plugin; the plugin only carries bytes, and only on the local network. The first listen or
- * connect is when iOS asks for Local Network access.
+ * before it reaches this plugin; the plugin only carries bytes, and only on the local network. The first connect is
+ * when iOS asks for Local Network access: the connection waits while the person answers, so waiting is not failure
+ * (MM-720). The screen stays on while the phone listens or a connection is open, so a move is not cut by the lock.
  */
 @objc(MmTransferPlugin)
 public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
@@ -24,6 +26,9 @@ public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// A sealed frame of the app's largest chunk, with room to spare: anything longer is not the app's.
     private static let largestFrame = 1024 * 1024 + 1024
+
+    /// How long a connect may take: long enough to read iOS's Local Network question and allow it (MM-720).
+    private static let connectWithin: TimeInterval = 30
 
     private let queue = DispatchQueue(label: "com.martianmacros.transfer")
     private var listener: NWListener?
@@ -49,6 +54,7 @@ public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
                 switch state {
                 case .ready:
                     self.listenCall = nil
+                    self.screenStaysOn()
                     call.resolve(["host": host, "port": Int(listener?.port?.rawValue ?? 0)])
                 case .failed, .cancelled:
                     self.listenCall = nil
@@ -85,25 +91,33 @@ public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
         queue.async {
             let connection = NWConnection(host: NWEndpoint.Host(host), port: port, using: .tcp)
             var answered = false
-            let answer: (Bool) -> Void = { reached in
+            /// Answers once: reached (nil), or the code of why not.
+            let answer: (String?) -> Void = { problem in
                 guard !answered else { return }
                 answered = true
-                if reached {
-                    call.resolve(["connection": self.register(connection)])
-                } else {
-                    connection.cancel()
-                    call.reject("Could not reach the other phone.", "unreachable")
-                }
+                guard let code = problem else { return call.resolve(["connection": self.register(connection)]) }
+                connection.cancel()
+                call.reject(
+                    code == "noLocalNetwork" ? "This phone may not reach devices on its Wi-Fi." : "Could not reach the other phone.",
+                    code
+                )
             }
             connection.stateUpdateHandler = { state in
                 switch state {
-                case .ready: answer(true)
-                case .failed, .waiting, .cancelled: answer(false)
-                default: break
+                case .ready: answer(nil)
+                case .failed, .cancelled: answer("unreachable")
+                // Waiting is iOS asking for Local Network access, or a network not there yet: the connection goes on
+                // by itself once the person allows it, so it is given until the deadline (MM-720).
+                case .waiting, .preparing, .setup: break
+                @unknown default: break
                 }
             }
             connection.start(queue: self.queue)
-            self.queue.asyncAfter(deadline: .now() + 5) { answer(false) }
+            self.queue.asyncAfter(deadline: .now() + Self.connectWithin) {
+                // Still not through: refused Local Network access is told apart from a phone that is not there.
+                let denied = connection.currentPath?.unsatisfiedReason == .localNetworkDenied
+                answer(denied ? "noLocalNetwork" : "unreachable")
+            }
         }
     }
 
@@ -148,6 +162,7 @@ public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
     @objc func close(_ call: CAPPluginCall) {
         queue.async {
             self.connections.removeValue(forKey: call.getString("connection") ?? "")?.cancel()
+            self.screenStaysOn()
             call.resolve()
         }
     }
@@ -171,11 +186,19 @@ public class MmTransferPlugin: CAPPlugin, CAPBridgedPlugin {
         accepting.removeAll()
         for connection in pending { connection.cancel() }
         pending.removeAll()
+        screenStaysOn()
+    }
+
+    /// On the queue: the screen stays on while the phone listens or holds a connection, and locks as usual once neither (MM-720).
+    private func screenStaysOn() {
+        let awake = listener != nil || !connections.isEmpty
+        DispatchQueue.main.async { UIApplication.shared.isIdleTimerDisabled = awake }
     }
 
     private func register(_ connection: NWConnection) -> String {
         let id = UUID().uuidString
         connections[id] = connection
+        screenStaysOn()
         return id
     }
 

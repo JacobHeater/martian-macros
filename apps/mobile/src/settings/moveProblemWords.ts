@@ -27,6 +27,8 @@ export function moveProblemWords(problem: MoveProblem, here: MoveIdentity, side:
       return 'This phone is not on Wi-Fi. Join the same Wi-Fi as your other phone, then try again.';
     case 'unreachable':
       return 'Could not reach the other phone. Both phones need the same Wi-Fi, and the other phone must still show its code.';
+    case 'noLocalNetwork':
+      return 'This phone is not allowed to find devices on its Wi-Fi. In the phone’s Settings, under Privacy & Security, Local Network, allow Martian Macros, then try again.';
     case 'versionMismatch': {
       const which = problem.other === undefined ? 0 : older(here, problem.other);
       const advice =

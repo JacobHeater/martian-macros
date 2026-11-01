@@ -14,7 +14,7 @@ async function asked<T>(step: () => Promise<T>, fallback: MoveProblemKind): Prom
     return await step();
   } catch (error) {
     const code = (error as { code?: unknown } | undefined)?.code;
-    throw new MoveProblem(code === 'noWifi' || code === 'unreachable' || code === 'stopped' ? code : fallback);
+    throw new MoveProblem(code === 'noWifi' || code === 'unreachable' || code === 'noLocalNetwork' || code === 'stopped' ? code : fallback);
   }
 }
 
