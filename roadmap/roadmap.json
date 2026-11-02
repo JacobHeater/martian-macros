@@ -3693,7 +3693,8 @@
     ],
     "remaining": [
      "MM-66",
-     "MM-690"
+     "MM-690",
+     "MM-721"
     ]
    },
    "sequence": [
@@ -3717,7 +3718,8 @@
      "step": 3,
      "title": "Import from Health Connect",
      "tickets": [
-      "MM-68"
+      "MM-68",
+      "MM-721"
      ],
      "milestone": "M3"
     },

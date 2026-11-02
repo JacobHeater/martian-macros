@@ -119,6 +119,7 @@ can run during group A.
 - Remaining: MM-67, MM-71, MM-68, MM-73, MM-72, MM-70, MM-69, MM-188. Epic: MM-66.
 - Added 2026-10-21 (step 5): MM-516 (the scheduled background run, split from MM-72; declined by the owner), MM-523 (a gap says what it costs).
 - Added 2026-10-21 (step 4): MM-498 (a re-read after an expired token keeps the history read by MM-73).
+- Added 2026-11-02 (step 3): MM-721 (a health import writes samples in multi-row statements; one row a statement was twenty minutes on the owner's Pixel after the iPhone's records moved in).
 - Added 2026-10-21 (step 12): MM-441 (a weigh-in window) and MM-442 (steps through the platform's aggregation), moved out of MM-71 when it was done.
 - Added 2026-10-14 (step 9): MM-314 (water written to the health platform, on MM-70 write path).
 - Added 2026-10-21 (step 6): MM-522 (written ids made unique across an erase or a restore, done).

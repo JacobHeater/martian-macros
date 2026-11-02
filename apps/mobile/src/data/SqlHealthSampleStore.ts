@@ -3,24 +3,49 @@ import { HealthDataType } from '../healthIngest/HealthDataType';
 import type { HealthSample } from '../healthIngest/HealthSample';
 import type { HealthSampleStore } from '../healthIngest/HealthSampleStore';
 import type { SqlDatabase } from '../sql/SqlDatabase';
+import type { SqlValue } from '../sql/SqlValue';
 import type { AppDatabase } from './AppDatabase';
 import { moment, named, number, optionalMoment, orNull, text } from './columns';
+import { placeholders } from './placeholders';
 import { upsert } from './upsert';
 
 /** How many ids go into one statement: well under what SQLite allows. */
 const idsPerStatement = 500;
 
+/** The columns of a sample's row, in the order its values are bound. */
+const sampleColumns = ['type', 'platform_id', 'value', 'start_ms', 'end_ms', 'source_id', 'source_name'] as const;
+
+/**
+ * How many samples go into one statement (MM-721): under 999 parameters, SQLite's limit before 3.32, which Android
+ * 8's SQLite has. On a phone every statement is a round trip over the native bridge, and a re-read after a move or
+ * an expired token brings tens of thousands of samples: one statement a row was twenty minutes on the owner's Pixel.
+ */
+const samplesPerStatement = Math.floor(999 / sampleColumns.length);
+
+const sampleValues = (sample: HealthSample): SqlValue[] => [
+  sample.type,
+  sample.platformId,
+  sample.value,
+  sample.start.getTime(),
+  orNull(sample.end?.getTime()),
+  sample.sourceId,
+  sample.sourceName,
+];
+
+/** Adds the samples, or changes those already there (by type and platform id), in multi-row statements. */
 async function upsertAll(db: SqlDatabase, samples: readonly HealthSample[]): Promise<void> {
-  for (const sample of samples) {
-    await upsert(db, 'imported_samples', ['type', 'platform_id'], {
-      type: sample.type,
-      platform_id: sample.platformId,
-      value: sample.value,
-      start_ms: sample.start.getTime(),
-      end_ms: orNull(sample.end?.getTime()),
-      source_id: sample.sourceId,
-      source_name: sample.sourceName,
-    });
+  const tuple = `(${placeholders(sampleColumns.length)})`;
+  const changed = sampleColumns
+    .filter((column) => column !== 'type' && column !== 'platform_id')
+    .map((column) => `${column} = excluded.${column}`)
+    .join(', ');
+  for (let at = 0; at < samples.length; at += samplesPerStatement) {
+    const batch = samples.slice(at, at + samplesPerStatement);
+    await db.execute(
+      `INSERT INTO imported_samples (${sampleColumns.join(', ')}) VALUES ${batch.map(() => tuple).join(', ')} ` +
+        `ON CONFLICT (type, platform_id) DO UPDATE SET ${changed}`,
+      batch.flatMap(sampleValues),
+    );
   }
 }
 
