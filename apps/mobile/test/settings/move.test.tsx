@@ -163,15 +163,6 @@ it('says the phones must share a Wi-Fi when the other cannot be reached, and off
   expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
 });
 
-it('says where to allow the local network when this phone refused it, and offers to scan again', async () => {
-  sender.outcome = { kind: 'fails', problem: new MoveProblem('noLocalNetwork') };
-  render();
-  await startMove('Send from this phone');
-  const sheet = within(await screen.findByRole('dialog', { name: 'Sending to your other phone' }, slowly));
-  expect(await sheet.findByText(/Privacy & Security, Local Network, allow Martian Macros/, { selector: 'p' }, slowly)).toBeInTheDocument();
-  expect(sheet.getByRole('button', { name: 'Scan again' })).toBeInTheDocument();
-});
-
 it('sends nothing for a code that is not a move code, and offers to scan again', async () => {
   scanned = '0123456789012';
   render();

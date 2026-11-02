@@ -3,7 +3,6 @@ package com.martianmacros
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Base64
-import android.view.WindowManager
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -25,8 +24,7 @@ import java.util.concurrent.Executors
 /**
  * Moving to another phone (MM-698): a listener on the phone's Wi-Fi address while its code is shown, and connections
  * to the other phone's, carrying whole frames, each sent with its length first. What crosses is sealed by the app
- * before it reaches this plugin; the plugin only carries bytes, and only on the local network. The screen stays on
- * while the phone listens or a connection is open, so a move is not cut by the lock (MM-720).
+ * before it reaches this plugin; the plugin only carries bytes, and only on the local network.
  */
 @CapacitorPlugin(name = "MmTransfer")
 class MmTransferPlugin : Plugin() {
@@ -52,7 +50,6 @@ class MmTransferPlugin : Plugin() {
             socket.reuseAddress = true
             socket.bind(InetSocketAddress(host, 0))
             server = socket
-            screenStaysOn()
             call.resolve(JSObject().put("host", host.hostAddress).put("port", socket.localPort))
         } catch (error: IOException) {
             call.reject("Could not listen on the Wi-Fi.", "noWifi")
@@ -76,7 +73,6 @@ class MmTransferPlugin : Plugin() {
         } catch (_: IOException) {
         }
         server = null
-        screenStaysOn()
         call.resolve()
     }
 
@@ -145,7 +141,6 @@ class MmTransferPlugin : Plugin() {
             socket?.close()
         } catch (_: IOException) {
         }
-        screenStaysOn()
         call.resolve()
     }
 
@@ -164,21 +159,10 @@ class MmTransferPlugin : Plugin() {
         io.shutdownNow()
     }
 
-    /** The screen stays on while the phone listens or holds a connection, and locks as usual once neither (MM-720). */
-    private fun screenStaysOn() {
-        val activity = bridge?.activity ?: return
-        val awake = server != null || connections.isNotEmpty()
-        activity.runOnUiThread {
-            if (awake) activity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-            else activity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-    }
-
     private fun register(socket: Socket): String {
         socket.tcpNoDelay = true
         val id = UUID.randomUUID().toString()
         connections[id] = socket
-        screenStaysOn()
         return id
     }
 

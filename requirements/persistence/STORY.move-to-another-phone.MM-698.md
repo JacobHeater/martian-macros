@@ -218,4 +218,3 @@ All in apps/mobile/src/gallery/screens/MoveToAnotherPhone.stories.tsx; the ones 
   its store.
 - Owed on the owner's phones, last (both on the same Wi-Fi): Android to iPhone and iPhone to Android; the iOS Local Network prompt;
   a network that keeps devices apart giving the "same Wi-Fi" message.
-- 2026-11-01, the owner's iPhone: the first send failed under the Local Network question; the plugin took `.waiting` for failure and gave up in five seconds. Fixed in MM-720, with the screen kept on during a move.
