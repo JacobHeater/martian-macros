@@ -328,7 +328,7 @@ it('MM-722: Log meal pressed again while the write is slow logs the meal once, t
   await expect.poll(async () => (await logged()).length).toBe(3);
   expect(await screen.findByText('Logged Chicken and rice')).toBeInTheDocument();
   expect(new Set((await logged()).map((f) => f.loggedMeal?.key)).size, 'one meal').toBe(1);
-  await expect.poll(() => screen.queryByRole('dialog', { name: 'Add food' }), 'the sheet closed by itself').toBeNull();
+  await expect.poll(() => screen.queryByRole('dialog', { name: 'Add food' }), { message: 'the sheet closed by itself' }).toBeNull();
 });
 
 it('MM-591: a meal that cannot be logged says so, logs nothing, and keeps the review', async () => {

@@ -280,7 +280,8 @@ export const AnalyzeMealLogFailed = screenStory({
   covers: ['AnalyzeMealStep'],
   shows: /^The meal could not be logged/,
   device: clipboard(cleanMealAnswer),
-  stores: failingWrite('food', 'addFood'),
+  // The meal is one write (MM-722), so that is the write that fails.
+  stores: failingWrite('food', 'applyFoodChanges'),
   open: addFood,
   walk: async (canvas) => {
     await pasted(canvas);
