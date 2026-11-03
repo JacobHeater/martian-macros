@@ -2733,7 +2733,9 @@
      "MM-596",
      "MM-588",
      "MM-592",
-     "MM-593"
+     "MM-593",
+     "MM-722",
+     "MM-723"
     ]
    },
    "sequence": [
@@ -3106,6 +3108,14 @@
       "MM-708",
       "MM-709",
       "MM-710"
+     ]
+    },
+    {
+     "step": 34,
+     "title": "AI meal analysis on the owner's Pixel, 2026-11-03: the meal logged in one write and Log meal pressed once (MM-722); the prompt sent to the assistant with no photos, and no photos promised (MM-723)",
+     "tickets": [
+      "MM-722",
+      "MM-723"
      ]
     }
    ],

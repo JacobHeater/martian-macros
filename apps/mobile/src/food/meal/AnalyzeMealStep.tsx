@@ -109,7 +109,7 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
     ? 'Looking up foods…'
     : copied === 'prompt'
       ? photos.length === 0
-        ? 'Copied. Paste it into your assistant, then send your photos.'
+        ? 'Copied. Paste it into your assistant.'
         : 'Copied. Paste it into your assistant with your photos.'
       : copied === 'fixes'
         ? 'Copied. Paste it into your assistant, then paste its answer here.'
@@ -151,19 +151,29 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
   /** The prompt with the answers given here (MM-599). */
   const prompt = (photosAttached: boolean) =>
     mealAnalysisPromptWith({ name, eaten, notEaten, from, notes, day, eatenAt, photosAttached }, today);
-  const canShare = photos.length > 0 && services.mealShare.available;
+  // The share is offered with or without photos (MM-723): the prompt alone goes to the assistant the same way.
+  const canShare = services.mealShare.available;
 
-  /** The photos and the prompt to the share sheet; the prompt is copied too, as some assistants keep only the photos. */
+  /** The prompt to the clipboard, once the meal has a name. */
+  const copyPrompt = async () => {
+    if (!named) {
+      setTriedToSend(true);
+      return;
+    }
+    await copy(prompt(false), 'prompt');
+  };
+
+  /** The photos, if any, and the prompt to the share sheet; the prompt is copied too, as some assistants keep only the photos. */
   const send = async () => {
     if (!named) {
       setTriedToSend(true);
       return;
     }
     if (!canShare) {
-      await copy(prompt(false), 'prompt');
+      await copyPrompt();
       return;
     }
-    const text = prompt(true);
+    const text = prompt(photos.length > 0);
     // Before any await: copying needs the press that asked for it (MM-589).
     const copying = services.clipboard.write(text);
     const outcome = await services.mealShare.send({ text, photos });
@@ -286,7 +296,9 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
           <Notice text="This phone cannot hand photos to another app. Copy the prompt, then attach the photos in your assistant." />
         ) : null}
         <div className="app-gap" />
-        {/* Sent or copied, the button says so itself, with a check (MM-586). */}
+        {/* Sent or copied, the button says so itself, with a check (MM-586). Both ways stand whenever the phone can
+            share (MM-723): the prompt alone is sent as the photos are, and copying stays for an assistant that keeps
+            only what is pasted. */}
         {canShare ? (
           <MmButton
             label={copied === 'sent' ? 'Sent' : 'Send to assistant'}
@@ -294,16 +306,23 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
             expand
             onPress={() => void send()}
           />
-        ) : (
-          <MmButton
-            label={copied === 'prompt' ? 'Prompt copied' : 'Copy prompt'}
-            icon={copied === 'prompt' ? 'check' : 'copy'}
-            expand
-            onPress={() => void send()}
-          />
-        )}
+        ) : null}
+        <MmButton
+          label={copied === 'prompt' ? 'Prompt copied' : 'Copy prompt'}
+          kind={canShare ? 'secondary' : 'primary'}
+          icon={copied === 'prompt' ? 'check' : 'copy'}
+          expand
+          onPress={() => void copyPrompt()}
+        />
         {shareFailed ? (
-          <Notice icon="warning" text="The share sheet could not be opened. The prompt is copied: paste it into your assistant and attach the photos there." />
+          <Notice
+            icon="warning"
+            text={
+              photos.length === 0
+                ? 'The share sheet could not be opened. The prompt is copied: paste it into your assistant.'
+                : 'The share sheet could not be opened. The prompt is copied: paste it into your assistant and attach the photos there.'
+            }
+          />
         ) : null}
         {refusal}
         {heard}
@@ -352,7 +371,7 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
       setTriedToLog(true);
       return;
     }
-    // A failure is said, never swallowed (MM-591): nothing is logged, and the review stays to try again.
+    // One write, all or nothing (MM-591, MM-722); a failure is said, never swallowed, and the review stays to try again.
     try {
       await logMeal(services.food, draft, { date: day, meal, eatenAt });
     } catch {
@@ -447,7 +466,8 @@ export function AnalyzeMealStep({ day: firstDay, meal: firstMeal, onBack, onDone
       <MmCheckRow title="Also save to Saved" value={saveToSaved} onChange={setSaveToSaved} />
       <div className="app-gap" />
       {logFailed ? <Notice icon="warning" text="The meal could not be logged, so nothing was. Press Log meal to try again." /> : null}
-      <MmButton label="Log meal" expand onPress={() => void log()} />
+      {/* Pressed once: the button is busy until the write settles, and a second press does nothing (MM-624, MM-722). */}
+      <MmButton label="Log meal" expand onPress={log} />
       {!triedToLog || blocked === undefined ? null : (
         <p className="app-caption food-still-needed" role="alert">
           {blocked}

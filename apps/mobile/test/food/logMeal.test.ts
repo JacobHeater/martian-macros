@@ -1,7 +1,6 @@
 import { afterEach, expect, it, vi } from 'vitest';
 import { CalendarDate } from '../../src/domain/CalendarDate';
 import { parseMealAnalysis } from '../../src/domain/food/meal/parseMealAnalysis';
-import type { FoodEntry } from '../../src/domain/FoodEntry';
 import { InMemoryFoodRepository } from '../../src/fixtures/InMemoryFoodRepository';
 import { logMeal } from '../../src/food/meal/logMeal';
 import { newMealKey } from '../../src/food/meal/newMealKey';
@@ -37,11 +36,24 @@ it('MM-591: a meal is logged where randomUUID does not exist', async () => {
   expect((await first(food.watchFood(day))).map((f) => f.loggedMeal?.key)).toEqual([key, key, key]);
 });
 
-it('MM-591: a food that fails to log takes the meal’s others with it, and the failure is thrown on', async () => {
+it('MM-591: a write that fails logs none of the meal, and the failure is thrown on', async () => {
   const food = new InMemoryFoodRepository();
-  const add = food.addFood.bind(food);
-  let calls = 0;
-  food.addFood = (entry: FoodEntry) => (++calls === 3 ? Promise.reject(new Error('The disk is full.')) : add(entry));
+  food.applyFoodChanges = () => Promise.reject(new Error('The disk is full.'));
   await expect(logMeal(food, draft(), { date: day, meal: 'dinner', eatenAt: undefined })).rejects.toThrow('The disk is full.');
   expect(await first(food.watchFood(day)), 'nothing half logged').toEqual([]);
+});
+
+// The owner's Pixel, 2026-11-03: a meal written food by food, each write waiting its turn behind the health import.
+it('MM-722: a meal is logged in one write, never food by food', async () => {
+  const food = new InMemoryFoodRepository();
+  const batch = food.applyFoodChanges.bind(food);
+  const writes: number[] = [];
+  food.applyFoodChanges = (changes) => {
+    writes.push(changes.add?.length ?? 0);
+    return batch(changes);
+  };
+  food.addFood = () => Promise.reject(new Error('Not food by food.'));
+  await logMeal(food, draft(), { date: day, meal: 'dinner', eatenAt: undefined });
+  expect(writes, 'one write of the three foods').toEqual([3]);
+  expect(await first(food.watchFood(day))).toHaveLength(3);
 });

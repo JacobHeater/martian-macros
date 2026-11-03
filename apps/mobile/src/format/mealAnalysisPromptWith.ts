@@ -48,9 +48,10 @@ export function mealAnalysisPromptWith(answers: MealQuestionAnswers, today: Cale
     ...(notes === '' ? [] : [`- Something else that may help: ${notes}`]),
     `- I ate it on ${when}`,
     `- Today is ${said(today)}.`,
+    // With no photos the meal may be told in words alone (MM-723), or the photos may follow in the chat (MM-599).
     answers.photosAttached
       ? 'My photos are attached to this message.'
-      : 'I will send my photos in my next message. Wait for them before you answer.',
+      : 'I am not attaching photos to this message. If I send photos in my next message, wait for them before you answer; if I do not, go by what I told you above.',
   ].join('\n');
   return `${mealAnalysisPrompt.slice(0, start)}${told}\n\n${mealAnalysisPrompt.slice(end + questionsEnd.length)}`;
 }

@@ -81,12 +81,13 @@ it('MM-599: the questions come first, and nothing is copied until the meal has a
   expect(clipboard.text, 'nothing copied').toBeUndefined();
 });
 
-it('MM-599: with no photos, Copy prompt puts the prompt with the answers on the clipboard, and says the photos follow', async () => {
+it('MM-599, MM-723: with no photos, Copy prompt puts the prompt with the answers on the clipboard, and says no photos are attached', async () => {
   const sheet = await open();
   await typeIn(sheet, 'Meal name', 'Taco night');
   await press(sheet, 'Most');
   await typeIn(sheet, 'Brand or restaurant', 'Chipotle');
   await typeIn(sheet, 'Anything else that would help your assistant?', 'Extra guacamole');
+  expect(within(sheet).getByRole('button', { name: 'Send to assistant' }), 'MM-723: the share is offered without photos').toBeInTheDocument();
   await press(sheet, 'Copy prompt');
   const prompt = mealAnalysisPromptWith(
     { name: 'Taco night', eaten: 'most', notEaten: '', from: 'Chipotle', notes: 'Extra guacamole', day: today, eatenAt: 12 * 60, photosAttached: false },
@@ -99,11 +100,25 @@ it('MM-599: with no photos, Copy prompt puts the prompt with the answers on the 
   expect(prompt, 'MM-602').toContain('- Something else that may help: Extra guacamole');
   expect(prompt).toContain('Use "eaten_at": "2026-10-22T12:00".');
   expect(prompt).toContain('- Today is Thursday, October 22, 2026.');
-  expect(prompt).toContain('I will send my photos in my next message.');
+  expect(prompt).toContain('I am not attaching photos to this message.');
   expect(prompt, 'the assistant is not told to ask').not.toContain('Before you answer, ask me');
   expect(await within(sheet).findByRole('button', { name: 'Prompt copied' }), 'the button says so, with a check').toBeInTheDocument();
-  expect(within(sheet).getByText('Copied. Paste it into your assistant, then send your photos.'), 'and a screen reader hears it').toHaveAttribute('role', 'status');
-  expect(mealShare.sent, 'nothing shared without photos').toBeUndefined();
+  expect(within(sheet).getByText('Copied. Paste it into your assistant.'), 'and a screen reader hears it').toHaveAttribute('role', 'status');
+  expect(mealShare.sent, 'copying shares nothing').toBeUndefined();
+});
+
+// The owner, 2026-11-03: a meal told in words alone, with no photos, had no way to the assistant but the clipboard.
+it('MM-723: with no photos, Send to assistant hands the prompt alone to the share sheet, and copies it too', async () => {
+  const sheet = await open();
+  await typeIn(sheet, 'Meal name', 'Eggs on toast');
+  await typeIn(sheet, 'Anything else that would help your assistant?', 'Two fried eggs on one slice of sourdough, buttered');
+  await press(sheet, 'Send to assistant');
+  expect(await within(sheet).findByRole('button', { name: 'Sent' })).toBeInTheDocument();
+  expect(mealShare.sent?.photos).toEqual([]);
+  expect(mealShare.sent?.text).toContain('- Something else that may help: Two fried eggs on one slice of sourdough, buttered');
+  expect(mealShare.sent?.text).toContain('I am not attaching photos to this message.');
+  expect(clipboard.text, 'the prompt is on the clipboard too').toBe(mealShare.sent?.text);
+  expect(within(sheet).getByRole('button', { name: 'Copy prompt' }), 'copying stays on offer').toBeInTheDocument();
 });
 
 it('a phone that refuses to copy says so', async () => {
@@ -150,8 +165,9 @@ it('MM-599: a phone that cannot share copies the prompt and says to attach the p
   await typeIn(sheet, 'Meal name', 'Taco night');
   await press(sheet, 'Choose photos');
   expect(await within(sheet).findByText(/^This phone cannot hand photos to another app/)).toBeInTheDocument();
+  expect(within(sheet).queryByRole('button', { name: 'Send to assistant' }), 'no share to offer').not.toBeInTheDocument();
   await press(sheet, 'Copy prompt');
-  expect(clipboard.text).toContain('I will send my photos in my next message.');
+  expect(clipboard.text).toContain('I am not attaching photos to this message.');
 });
 
 it('MM-599: the day given here is the review’s when the answer has no time', async () => {
@@ -285,10 +301,40 @@ it('text that holds no meal says why, and so does a clipboard the phone will not
 });
 
 // MM-591: a meal that could not be logged said nothing at all.
+/**
+ * The owner's Pixel, 2026-11-03: Log meal pressed, the sheet stayed; pressed again and again, and the meal was
+ * logged once a press, each write waiting its turn behind the health import's long transaction.
+ */
+it('MM-722: Log meal pressed again while the write is slow logs the meal once, the button busy meanwhile', async () => {
+  let release: () => void = () => undefined;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const sheet = await open((services) => {
+    const food = Object.create(services.food) as AppServices['food'];
+    const write = services.food.applyFoodChanges.bind(services.food);
+    food.applyFoodChanges = async (changes) => {
+      await gate;
+      return write(changes);
+    };
+    return { ...services, food };
+  });
+  await paste(sheet, cleanMealAnswer);
+  await press(sheet, 'Log meal');
+  await press(sheet, 'Log meal');
+  expect(within(sheet).getByRole('button', { name: 'Log meal' }), 'busy while the write is pending').toHaveAttribute('aria-busy', 'true');
+  expect(await logged(), 'nothing yet').toEqual([]);
+  release();
+  await expect.poll(async () => (await logged()).length).toBe(3);
+  expect(await screen.findByText('Logged Chicken and rice')).toBeInTheDocument();
+  expect(new Set((await logged()).map((f) => f.loggedMeal?.key)).size, 'one meal').toBe(1);
+  await expect.poll(() => screen.queryByRole('dialog', { name: 'Add food' }), 'the sheet closed by itself').toBeNull();
+});
+
 it('MM-591: a meal that cannot be logged says so, logs nothing, and keeps the review', async () => {
   const sheet = await open((services) => {
     const food = Object.create(services.food) as AppServices['food'];
-    food.addFood = () => Promise.reject(new Error('The disk is full.'));
+    food.applyFoodChanges = () => Promise.reject(new Error('The disk is full.'));
     return { ...services, food };
   });
   await paste(sheet, cleanMealAnswer);

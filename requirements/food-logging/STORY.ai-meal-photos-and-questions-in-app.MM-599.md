@@ -113,6 +113,8 @@ Scenario: A phone that cannot share
   the review's day stepper, progress photos' thumbnails (`MmPhoto`) and their camera (`MmCameraPreview`).
 
 ## Notes
+- Changed by MM-723 (the owner, 2026-11-03): "Send to assistant" is offered with no photos too, and the
+  prompt no longer says photos will follow.
 - Where: the questions and the share in `apps/mobile/src/food/meal/AnalyzeMealStep.tsx`; the prompt with
   answers in `apps/mobile/src/format/mealAnalysisPrompt.ts` (a change to it is reviewed in MM-586); the
   share behind `apps/mobile/src/domain/integration/` with its plugin in `apps/mobile/src/platform/` and the

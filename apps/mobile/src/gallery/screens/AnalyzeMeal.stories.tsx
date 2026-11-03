@@ -149,6 +149,21 @@ export const AnalyzeMealSent = screenStory({
   },
 });
 
+/** MM-723: no photos, the meal told in words: Send to assistant hands the prompt alone to the share sheet. */
+export const AnalyzeMealSentWithoutPhotos = screenStory({
+  covers: ['AnalyzeMealStep'],
+  shows: 'Sent',
+  open: addFood,
+  walk: async (canvas) => {
+    await named(canvas);
+    await userEvent.type(
+      await sheet(canvas).findByRole('textbox', { name: 'Anything else that would help your assistant?' }),
+      'Three soft tacos with carnitas, no sour cream',
+    );
+    await press('Send to assistant')(canvas);
+  },
+});
+
 /** MM-599: a share sheet that would not open: the prompt is copied, and the photos are attached in the assistant. */
 export const AnalyzeMealShareFailed = screenStory({
   covers: ['AnalyzeMealStep'],

@@ -35,6 +35,14 @@ it('MM-602: adds what else the person said, in their words, and nothing when the
   expect(prompt).toContain('- It is not from a brand or a restaurant.\n- Something else that may help: Cooked in a lot of butter.\n- I ate it on');
 });
 
+it('MM-723: with no photos, says none are attached, and that the meal may be told in words or the photos may follow', () => {
+  const prompt = mealAnalysisPromptWith({ ...answers, photosAttached: false }, today);
+  expect(prompt).not.toContain('My photos are attached');
+  expect(prompt).toContain(
+    'I am not attaching photos to this message. If I send photos in my next message, wait for them before you answer; if I do not, go by what I told you above.',
+  );
+});
+
 it('gives the time eaten as the eaten_at to use', () => {
   const prompt = mealAnalysisPromptWith({ ...answers, day: today, eatenAt: 18 * 60 + 5 }, today);
   expect(prompt).toContain('- I ate it on Saturday, October 24, 2026 at 6:05 PM. Use "eaten_at": "2026-10-24T18:05".');
