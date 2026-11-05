@@ -129,6 +129,7 @@ class MmBackupPlugin : Plugin() {
             dir.mkdirs()
             val file = File(dir, File(name).name)
             file.writeBytes(Base64.decode(call.getString("data") ?: "", Base64.DEFAULT))
+            lightened(call, "data")
             val uri: Uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file)
             val send = Intent(Intent.ACTION_SEND)
                 .setType("application/octet-stream")
@@ -139,6 +140,16 @@ class MmBackupPlugin : Plugin() {
         } catch (error: Throwable) {
             call.reject(error.message ?: error.toString())
         }
+    }
+
+    /**
+     * The bytes a chooser call carried are dropped from the call once they are on disk (MM-724). Capacitor
+     * keeps the call of an activity it started in the activity's saved state, its options twice over, and
+     * Android refuses a saved state near a megabyte: the app died with `TransactionTooLargeException` the
+     * moment the chooser put it in the background: one photo, or a backup past a few hundred kilobytes, is enough.
+     */
+    private fun lightened(call: PluginCall, key: String) {
+        call.data.remove(key)
     }
 
     @ActivityCallback
@@ -291,6 +302,7 @@ class MmBackupPlugin : Plugin() {
                 file.writeBytes(Base64.decode(data, Base64.DEFAULT))
                 uris.add(FileProvider.getUriForFile(context, context.packageName + ".fileprovider", file))
             }
+            lightened(call, "photos")
             val send =
                 when (uris.size) {
                     0 -> Intent(Intent.ACTION_SEND).setType("text/plain")

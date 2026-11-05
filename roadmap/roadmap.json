@@ -2735,7 +2735,8 @@
      "MM-592",
      "MM-593",
      "MM-722",
-     "MM-723"
+     "MM-723",
+     "MM-724"
     ]
    },
    "sequence": [
@@ -3116,6 +3117,13 @@
      "tickets": [
       "MM-722",
       "MM-723"
+     ]
+    },
+    {
+     "step": 35,
+     "title": "The Android app read on the owner's Pixel, 2026-11-05: the share chooser no longer takes the app down with a meal's photos or a backup behind it (MM-724)",
+     "tickets": [
+      "MM-724"
      ]
     }
    ],
