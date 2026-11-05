@@ -16,7 +16,11 @@
     </style>
 
 
+    <!-- The launch screen's sky, as the iOS launch screen's (MM-725): the
+         phone's own theme never shows a white launch. -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/launch_sky</item>
+        <item name="android:windowBackground">@color/launch_sky</item>
         <item name="android:background">@drawable/splash</item>
     </style>
 </resources>

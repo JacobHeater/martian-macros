@@ -60,6 +60,7 @@ import type { HealthWriting } from '../healthIngest/HealthWriting';
 import type { WeighInWindowReader } from '../healthIngest/WeighInWindowReader';
 import type { WeighInWindowWriter } from '../healthIngest/WeighInWindowWriter';
 import type { HealthProfileReader } from '../domain/integration/HealthProfileReader';
+import type { HealthRationale } from '../domain/integration/HealthRationale';
 import type { HealthWorkoutReader } from '../domain/integration/HealthWorkoutReader';
 import type { DeviceLock } from '../domain/integration/DeviceLock';
 import type { MealShare } from '../domain/integration/MealShare';
@@ -217,6 +218,8 @@ export interface AppServices {
 
   /** Sex, date of birth and height from Apple Health, offered on onboarding's first step (MM-69). */
   readonly healthProfile: HealthProfileReader;
+  /** Whether Health Connect sent the person here to read why the app asks (MM-731). */
+  readonly healthRationale: HealthRationale;
 
   /** The evidence register as written (MM-143): the Markdown the "How this works" screens are read from. */
   readonly evidence: () => Promise<string>;

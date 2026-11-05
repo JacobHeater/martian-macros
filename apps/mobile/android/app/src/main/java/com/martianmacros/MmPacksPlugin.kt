@@ -237,10 +237,13 @@ class MmPacksPlugin : Plugin() {
         }
     }
 
+    /** Where a download carries on from, a byte offset too large for an `Int` past two gigabytes (MM-729). */
+    private fun rangeStartOf(call: PluginCall): Long? = if (call.data.has("rangeStart")) call.data.optLong("rangeStart") else null
+
     @PluginMethod
     fun httpGet(call: PluginCall) {
         val url = call.getString("url") ?: return call.reject("httpGet needs a url.")
-        val rangeStart = call.getInt("rangeStart")
+        val rangeStart = rangeStartOf(call)
         val request = nextId.getAndIncrement()
         thread(name = "mm-pack-http-$request") {
             var connection: HttpURLConnection? = null
@@ -307,7 +310,7 @@ class MmPacksPlugin : Plugin() {
         val url = call.getString("url") ?: return call.reject("httpGetToFile needs a url.")
         val id = fileId(call, "id") ?: return
         val version = fileId(call, "version") ?: return
-        val rangeStart = call.getInt("rangeStart")
+        val rangeStart = rangeStartOf(call)
         val request = nextId.getAndIncrement()
         val file = partialFile(id, version)
         thread(name = "mm-pack-file-$request") {
@@ -328,7 +331,7 @@ class MmPacksPlugin : Plugin() {
                     notifyListeners("packFileProgress", progress(request, 0).put("done", true))
                     return@thread
                 }
-                val from = if (status == 206 && rangeStart != null && rangeStart > 0) rangeStart.toLong() else 0L
+                val from = if (status == 206 && rangeStart != null && rangeStart > 0) rangeStart else 0L
                 synchronized(fileLocks.getOrPut(file.path) { Any() }) {
                     val out = try {
                         root.mkdirs()

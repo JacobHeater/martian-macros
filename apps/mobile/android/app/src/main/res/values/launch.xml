@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The sky of design/loading-screen.png, the same value as the iOS launch screen's (MM-725). -->
+    <color name="launch_sky">#02010D</color>
+</resources>

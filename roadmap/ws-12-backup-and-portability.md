@@ -108,6 +108,7 @@ Everything in group C. It touches the schema lane only to read the version.
 - Built: MM-63 (2026-10-19), MM-64 (closed 2026-10-20 by the owner's
   decision: the share sheet only). Epic: MM-59, done 2026-10-21 with MM-404.
 - Remaining: MM-698 (move to another phone, 2026-10-29); MM-716 (My QR Code in the drawer, the code first and the backup offered only when a whole move arrives, 2026-10-30).
+- Added 2026-11-05 (the move and backup plugins read against the iOS ones; step 5): MM-729 (a VPN's address never in the move code; nothing thrown on the plugin's threads ends the app; a download offset read as a long), MM-730 (a chosen backup read off the main thread; a meal's photo upright on Android 8).
 
 ## Notes for whoever builds it
 - The backup file records the schema version it was written at and the app

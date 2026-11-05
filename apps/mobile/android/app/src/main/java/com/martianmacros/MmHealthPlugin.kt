@@ -70,6 +70,24 @@ import kotlin.reflect.KClass
  */
 @CapacitorPlugin(name = "MmHealth")
 class MmHealthPlugin : Plugin() {
+    companion object {
+        /**
+         * Whether Health Connect sent the person here to read why the app asks (MM-731): `MainActivity` sets it
+         * from the intent, and the web app asks once it is up, or back in front.
+         */
+        @JvmStatic
+        @Volatile
+        var rationaleRequested: Boolean = false
+    }
+
+    /** Whether Health Connect sent the person here to read why the app asks (MM-731), said once. */
+    @PluginMethod
+    fun rationaleRequested(call: PluginCall) {
+        val requested = rationaleRequested
+        rationaleRequested = false
+        call.resolve(JSObject().put("requested", requested))
+    }
+
 
     /** What the app calls each kind of reading, and what Health Connect calls it. */
     private val types: Map<String, KClass<out Record>> = mapOf(
@@ -94,11 +112,12 @@ class MmHealthPlugin : Plugin() {
     /**
      * Minutes asleep in a session (MM-250): the asleep stages summed when the
      * platform recorded stages, else the whole span, since an app that writes
-     * no stages writes the session as the time asleep.
+     * no stages writes the session as the time asleep. A session whose stages
+     * are all awake is no sleep at all, as on iOS (MM-728).
      */
     private fun minutesAsleep(record: SleepSessionRecord): Double {
         val asleep = record.stages.filter { it.stage in asleepStages }
-        val millis = if (asleep.isEmpty()) {
+        val millis = if (record.stages.isEmpty()) {
             Duration.between(record.startTime, record.endTime).toMillis()
         } else {
             asleep.sumOf { Duration.between(it.startTime, it.endTime).toMillis() }
@@ -177,7 +196,7 @@ class MmHealthPlugin : Plugin() {
 
     private fun typeNames(call: PluginCall, key: String = "types"): List<String> {
         val asked = call.getArray(key) ?: JSArray()
-        return (0 until asked.length()).map { asked.getString(it) }
+        return (0 until asked.length()).map { asked.optString(it) }
     }
 
     @PluginMethod
@@ -215,9 +234,14 @@ class MmHealthPlugin : Plugin() {
         val wanted = readPermissions(typeNames(call))
         if (wanted.isEmpty()) return call.resolve(JSObject().put("types", JSArray()))
         val contract = PermissionController.createRequestPermissionResultContract()
-        val intent = contract.createIntent(context, wanted.values.toSet())
-        requestStartedAt = SystemClock.elapsedRealtime()
-        startActivityForResult(call, intent, "permissionAnswered")
+        try {
+            val intent = contract.createIntent(context, wanted.values.toSet())
+            requestStartedAt = SystemClock.elapsedRealtime()
+            startActivityForResult(call, intent, "permissionAnswered")
+        } catch (error: Throwable) {
+            // Health Connect gone since it was found (MM-728): said, never thrown through the bridge.
+            call.reject(error.message ?: error.toString())
+        }
     }
 
     @ActivityCallback
@@ -290,9 +314,14 @@ class MmHealthPlugin : Plugin() {
             false
         }
         if (!offered) return call.resolve(JSObject().put("granted", false).put("unavailable", true))
-        prefs.edit().putBoolean(historyAskedKey, true).apply()
         val contract = PermissionController.createRequestPermissionResultContract()
-        startActivityForResult(call, contract.createIntent(context, setOf(historyPermission)), "historyAnswered")
+        try {
+            startActivityForResult(call, contract.createIntent(context, setOf(historyPermission)), "historyAnswered")
+        } catch (error: Throwable) {
+            return call.reject(error.message ?: error.toString())
+        }
+        // Marked asked only once the question is on its way (MM-728): a question never shown is not spent.
+        prefs.edit().putBoolean(historyAskedKey, true).apply()
     }
 
     @ActivityCallback
@@ -487,7 +516,11 @@ class MmHealthPlugin : Plugin() {
         val kind = call.getString("kind") ?: return call.reject("startWriting needs a kind.")
         val type = writeTypes[kind] ?: return call.reject("Not a kind this app writes: $kind.")
         val contract = PermissionController.createRequestPermissionResultContract()
-        startActivityForResult(call, contract.createIntent(context, setOf(HealthPermission.getWritePermission(type))), "writeAnswered")
+        try {
+            startActivityForResult(call, contract.createIntent(context, setOf(HealthPermission.getWritePermission(type))), "writeAnswered")
+        } catch (error: Throwable) {
+            call.reject(error.message ?: error.toString())
+        }
     }
 
     @ActivityCallback

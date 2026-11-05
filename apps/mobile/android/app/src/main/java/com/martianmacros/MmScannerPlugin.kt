@@ -1,6 +1,7 @@
 package com.martianmacros
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
@@ -111,7 +112,12 @@ class MmScannerPlugin : Plugin() {
     private fun startPhoto(call: PluginCall) {
         val uri: Uri = FileProvider.getUriForFile(context, context.packageName + ".fileprovider", photoFile())
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, uri)
-        startActivityForResult(call, intent, "photographed")
+        try {
+            startActivityForResult(call, intent, "photographed")
+        } catch (error: ActivityNotFoundException) {
+            // No camera app can take the picture (a phone whose camera a policy disabled): said, as iOS says it (MM-726).
+            call.reject("The camera cannot be used.")
+        }
     }
 
     @ActivityCallback

@@ -182,6 +182,7 @@ independent of step 3.
 - Added 2026-10-28 (the owner's phone, step 21): MM-688 (the coach added a beaver: an everyday list of lean proteins, chicken breast first, searched by name across the whole group), MM-689 (the coach read its instructions aloud, "the JSON you supplied": the prompts speak of the figures and the check refuses words about them).
 - Added 2026-10-28 (the owner's phone, step 21): MM-693 (the brief rambles: the owner's shape, verdict, drag, order, one training line, at most 4 sentences and 60 words, refused as "It rambled" past that; never recites the rows under it; "figures" and "tools" refused as words).
 - Added 2026-10-30 (the owner's phone, step 21): MM-713 (a 243 kcal breakfast called "the drag" and the day "a squeeze": a verdict needs a signal; tight means lean protein only from here; a food is worth a drag only when its own unbacked calories are 7% of the day; a fine meal and a day on track are told so, and the model is asked without the totals; one training line).
+- Added 2026-11-05 (read against the iOS reminders; step 22): MM-727 (a reminder shown over an open app; a plan read whole before anything is cancelled; each reminder keeps its wall-clock time after the phone's time zone changes).
 
 ## Notes for whoever builds it
 - New engine code goes in new files beside `nextTargets.ts`. Do not add branches

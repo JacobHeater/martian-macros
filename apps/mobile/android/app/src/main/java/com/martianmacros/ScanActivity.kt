@@ -16,6 +16,9 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import kotlin.math.roundToInt
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
@@ -74,15 +77,24 @@ class ScanActivity : AppCompatActivity() {
             text = "Cancel"
             setOnClickListener { finish() }
         }
+        // Cancel stands 32 dp above the navigation bar, whatever the bar's kind (MM-726): the activity is drawn
+        // edge to edge, so the bar's height is added to the margin as the window reports it.
+        val margin = (32 * resources.displayMetrics.density).roundToInt()
         val layout = FrameLayout(this).apply {
             addView(view, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
             addView(
                 cancel,
                 FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT).apply {
                     gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                    bottomMargin = 120
+                    bottomMargin = margin
                 },
             )
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(layout) { _, insets ->
+            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            (cancel.layoutParams as FrameLayout.LayoutParams).bottomMargin = margin + bars.bottom
+            cancel.requestLayout()
+            insets
         }
         setContentView(layout)
 

@@ -1,4 +1,5 @@
 import { HardwareBack } from './HardwareBack';
+import { HealthRationaleLink } from './HealthRationaleLink';
 import { DownloadStatusHost } from '../foodPacks/DownloadStatusHost';
 import { type ReactNode, useEffect, useMemo } from 'react';
 import type { SystemBars } from '../platform/SystemBars';
@@ -100,6 +101,7 @@ export function App({ services, systemBars, demo = false, children }: AppProps) 
         <DownloadStatusHost>
           <NavigatorHost>
             <HardwareBack />
+            <HealthRationaleLink />
             <AppRoot />
             {children}
           </NavigatorHost>

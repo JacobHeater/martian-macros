@@ -25,6 +25,7 @@ import { InMemoryExternalLinks } from '../fixtures/InMemoryExternalLinks';
 import { FakeHealthSource } from '../healthIngest/testing/FakeHealthSource';
 import { constant } from '../lang/constant';
 import { NoCamera } from '../platform/NoCamera';
+import { InMemoryHealthRationale } from '../fixtures/InMemoryHealthRationale';
 import { NoHealthProfile } from '../platform/NoHealthProfile';
 import { WasmSqlDatabase } from '../sql/wasm/WasmSqlDatabase';
 import type { AppServices } from '../state/AppServices';
@@ -78,6 +79,8 @@ export function fixtureServices(repos: InMemoryRepositories, clock: FixedClock):
     privateScreen: new InMemoryPrivateScreen(),
     // Onboarding offers no platform to fill in from, unless a story or a test brings Apple Health (MM-69).
     healthProfile: new NoHealthProfile(),
+    // Health Connect sent nobody here, unless a test says so (MM-731).
+    healthRationale: new InMemoryHealthRationale(),
     evidence: () => import('../app/evidenceText').then((module) => module.evidenceText),
     environment: 'dev',
     // The app as on an Android phone, unless a story or a test is about an iPhone (`onIos`, MM-403).

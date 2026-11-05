@@ -23,6 +23,8 @@ import com.getcapacitor.annotation.Permission
 import com.getcapacitor.annotation.PermissionCallback
 import org.json.JSONArray
 import org.json.JSONObject
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * Reminders scheduled on the device itself (MM-146). Exact alarms when the
@@ -100,8 +102,28 @@ class MmRemindersPlugin : Plugin() {
 object Reminders {
     private const val PREFS = "mm_reminders"
     private const val KEY = "scheduled"
+    private const val ZONE = "zone"
     private const val ASKED = "exactAlarmsAsked"
-    const val CHANNEL = "reminders"
+
+    /**
+     * A reminder is shown as it arrives, over whatever is open, as iOS shows it (MM-727). Android keeps a
+     * channel's importance as first made, so the channel with the lower one is deleted and this one made.
+     */
+    const val CHANNEL = "reminders-shown"
+    private const val QUIET_CHANNEL = "reminders"
+
+    /** One planned reminder, read whole before anything scheduled is touched (MM-727). */
+    class Planned(val atMs: Long, val title: String)
+
+    private fun planned(reminders: JSONArray): List<Planned> =
+        (0 until reminders.length()).map { index ->
+            val reminder = reminders.optJSONObject(index)
+            val title = reminder?.optString("title", "") ?: ""
+            if (reminder == null || title.isEmpty() || !reminder.has("atMs")) {
+                throw IllegalArgumentException("A reminder needs a title and a time.")
+            }
+            Planned(reminder.getLong("atMs"), title)
+        }
 
     private fun alarms(context: Context) = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
@@ -130,28 +152,53 @@ object Reminders {
         else -> "notAsked"
     }
 
-    /** Cancels everything scheduled before and schedules exactly `reminders`. */
+    /**
+     * Cancels everything scheduled before and schedules exactly `reminders`: the whole plan is read first, so a
+     * plan with a fault in it changes nothing (MM-727). The phone's time zone is kept with it, for `rezoned`.
+     */
     fun replaceAll(context: Context, reminders: JSONArray) {
+        val plan = planned(reminders)
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val before = JSONArray(prefs.getString(KEY, "[]") ?: "[]")
         for (index in 0 until before.length()) alarms(context).cancel(pending(context, index, null))
-        prefs.edit().putString(KEY, reminders.toString()).apply()
-        schedule(context, reminders)
+        prefs.edit().putString(KEY, reminders.toString()).putString(ZONE, ZoneId.systemDefault().id).apply()
+        schedule(context, plan)
     }
 
     /**
-     * Schedules `reminders` whose times have not already passed: exact when
+     * After the phone's time zone changed (MM-727): each reminder keeps its wall-clock time, as an iOS calendar
+     * trigger does, so a weigh-in at 7:00 is at 7:00 where the phone now is, not where it was.
+     */
+    fun rezoned(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val was = prefs.getString(ZONE, null)?.let { runCatching { ZoneId.of(it) }.getOrNull() } ?: return
+        val now = ZoneId.systemDefault()
+        if (was == now) return
+        val before = JSONArray(prefs.getString(KEY, "[]") ?: "[]")
+        val moved = JSONArray()
+        for (index in 0 until before.length()) {
+            val reminder = before.getJSONObject(index)
+            val local = Instant.ofEpochMilli(reminder.getLong("atMs")).atZone(was).toLocalDateTime()
+            moved.put(JSONObject(reminder.toString()).put("atMs", local.atZone(now).toInstant().toEpochMilli()))
+        }
+        prefs.edit().putString(KEY, moved.toString()).putString(ZONE, now.id).apply()
+    }
+
+    /** Schedules what was last planned again (the boot receiver, and exact alarms newly allowed). */
+    fun schedule(context: Context, reminders: JSONArray) = schedule(context, planned(reminders))
+
+    /**
+     * Schedules `plan`'s reminders whose times have not already passed: exact when
      * allowed, inexact otherwise (MM-248). Setting one again replaces it.
      */
-    fun schedule(context: Context, reminders: JSONArray) {
+    private fun schedule(context: Context, plan: List<Planned>) {
         ensureChannel(context)
         val now = System.currentTimeMillis()
         val onTheMinute = exact(context)
-        for (index in 0 until reminders.length()) {
-            val reminder = reminders.getJSONObject(index)
-            val at = reminder.getLong("atMs")
+        for ((index, reminder) in plan.withIndex()) {
+            val at = reminder.atMs
             if (at < now) continue
-            val intent = pending(context, index, reminder.getString("title"))
+            val intent = pending(context, index, reminder.title)
             try {
                 if (onTheMinute) {
                     alarms(context).setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, intent)
@@ -171,8 +218,9 @@ object Reminders {
 
     fun ensureChannel(context: Context) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.deleteNotificationChannel(QUIET_CHANNEL)
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL, "Reminders", NotificationManager.IMPORTANCE_DEFAULT).apply {
+            NotificationChannel(CHANNEL, "Reminders", NotificationManager.IMPORTANCE_HIGH).apply {
                 description = "The reminders you turn on in Settings."
             },
         )

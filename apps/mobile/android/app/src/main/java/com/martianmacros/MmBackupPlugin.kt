@@ -10,6 +10,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.os.Build
 import android.net.Uri
 import android.util.Base64
@@ -203,11 +205,14 @@ class MmBackupPlugin : Plugin() {
         if (call == null) return
         val uri = result.data?.data
         if (result.resultCode != Activity.RESULT_OK || uri == null) return call.resolve(JSObject().put("cancelled", true))
-        try {
-            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: throw IllegalStateException("The file could not be read.")
-            call.resolve(JSObject().put("cancelled", false).put("data", Base64.encodeToString(bytes, Base64.NO_WRAP)))
-        } catch (error: Throwable) {
-            call.reject(error.message ?: error.toString())
+        // Read off the main thread (MM-730): a backup of many megabytes would otherwise hold the screen.
+        executor.execute {
+            try {
+                val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: throw IllegalStateException("The file could not be read.")
+                call.resolve(JSObject().put("cancelled", false).put("data", Base64.encodeToString(bytes, Base64.NO_WRAP)))
+            } catch (error: Throwable) {
+                call.reject(error.message ?: error.toString())
+            }
         }
     }
 
@@ -277,11 +282,37 @@ class MmBackupPlugin : Plugin() {
             BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample })
         } ?: return null
         val pixels = decoded.width.toDouble() * decoded.height
-        if (pixels <= limit) return decoded
+        if (pixels <= limit) return upright(decoded, uri)
         val factor = sqrt(limit / pixels)
         val scaled = Bitmap.createScaledBitmap(decoded, (decoded.width * factor).roundToInt(), (decoded.height * factor).roundToInt(), true)
         if (scaled != decoded) decoded.recycle()
-        return scaled
+        return upright(scaled, uri)
+    }
+
+    /**
+     * `bitmap` turned the way the photo's own orientation tag says is up (MM-730): Android 8's decoder leaves a
+     * photo as the sensor saw it, and a phone held upright shoots sideways.
+     */
+    private fun upright(bitmap: Bitmap, uri: Uri): Bitmap {
+        val orientation = runCatching {
+            context.contentResolver.openInputStream(uri)?.use {
+                ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            }
+        }.getOrNull() ?: ExifInterface.ORIENTATION_NORMAL
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.preScale(-1f, 1f)
+            ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.preScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> matrix.apply { postRotate(90f); preScale(-1f, 1f) }
+            ExifInterface.ORIENTATION_TRANSVERSE -> matrix.apply { postRotate(270f); preScale(-1f, 1f) }
+            else -> return bitmap
+        }
+        val turned = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        if (turned != bitmap) bitmap.recycle()
+        return turned
     }
 
     /**

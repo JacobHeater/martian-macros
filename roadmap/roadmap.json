@@ -1640,7 +1640,8 @@
      "MM-705",
      "MM-711",
      "MM-712",
-     "MM-691"
+     "MM-691",
+     "MM-725"
     ]
    },
    "sequence": [
@@ -1971,6 +1972,13 @@
       "MM-705",
       "MM-711",
       "MM-712"
+     ]
+    },
+    {
+     "step": 26,
+     "title": "The Android shell read against the iOS one, 2026-11-05: portrait only on both activities, as MM-403 says, and the launch screen the loading screen's sky on a phone of any theme (MM-725)",
+     "tickets": [
+      "MM-725"
      ]
     }
    ],
@@ -2736,7 +2744,8 @@
      "MM-593",
      "MM-722",
      "MM-723",
-     "MM-724"
+     "MM-724",
+     "MM-726"
     ]
    },
    "sequence": [
@@ -3125,6 +3134,13 @@
      "tickets": [
       "MM-724"
      ]
+    },
+    {
+     "step": 36,
+     "title": "The Android scanner, 2026-11-05: Cancel above the navigation bar in dp with the bar's inset, and no camera app refused in words instead of ending the app (MM-726)",
+     "tickets": [
+      "MM-726"
+     ]
     }
    ],
    "gate": {
@@ -3263,7 +3279,8 @@
      "MM-688",
      "MM-689",
      "MM-693",
-     "MM-713"
+     "MM-713",
+     "MM-727"
     ]
    },
    "sequence": [
@@ -3479,6 +3496,13 @@
       "MM-689",
       "MM-693",
       "MM-713"
+     ]
+    },
+    {
+     "step": 22,
+     "title": "Android's reminders as iOS's, 2026-11-05: shown over an open app, a plan read whole before anything is cancelled, and each reminder keeping its wall-clock time after the phone's time zone changes (MM-727)",
+     "tickets": [
+      "MM-727"
      ]
     }
    ],
@@ -3713,7 +3737,9 @@
     "remaining": [
      "MM-66",
      "MM-690",
-     "MM-721"
+     "MM-721",
+     "MM-728",
+     "MM-731"
     ]
    },
    "sequence": [
@@ -3822,6 +3848,14 @@
       "MM-442"
      ],
      "milestone": "M4"
+    },
+    {
+     "step": 13,
+     "title": "The Health Connect plugin read against the HealthKit one, 2026-11-05: its questions refused in words when Health Connect is gone, the history ask spent only once shown, a night of awake stages no sleep (MM-728); Health Connect's link to why the app asks opens the privacy policy (MM-731)",
+     "tickets": [
+      "MM-728",
+      "MM-731"
+     ]
     }
    ],
    "gate": {
@@ -3874,7 +3908,9 @@
      "MM-700",
      "MM-701",
      "MM-702",
-     "MM-716"
+     "MM-716",
+     "MM-729",
+     "MM-730"
     ]
    },
    "sequence": [
@@ -3914,6 +3950,14 @@
       "MM-716"
      ],
      "milestone": "M3"
+    },
+    {
+     "step": 5,
+     "title": "The move and backup plugins on Android, 2026-11-05: a VPN's address never in the move code, nothing thrown on the plugin's threads ending the app, a download offset read as a long (MM-729); a chosen backup read off the main thread and a meal's photo upright on Android 8 (MM-730)",
+     "tickets": [
+      "MM-729",
+      "MM-730"
+     ]
     }
    ],
    "gate": {

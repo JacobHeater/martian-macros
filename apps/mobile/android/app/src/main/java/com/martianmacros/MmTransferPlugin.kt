@@ -43,15 +43,16 @@ class MmTransferPlugin : Plugin() {
 
     @PluginMethod
     fun listen(call: PluginCall) = io.execute {
-        val host = wifiAddress() ?: return@execute call.reject("This phone has no Wi-Fi address.", "noWifi")
         try {
+            val host = wifiAddress() ?: return@execute call.reject("This phone has no Wi-Fi address.", "noWifi")
             server?.close()
             val socket = ServerSocket()
             socket.reuseAddress = true
             socket.bind(InetSocketAddress(host, 0))
             server = socket
             call.resolve(JSObject().put("host", host.hostAddress).put("port", socket.localPort))
-        } catch (error: IOException) {
+        } catch (error: Throwable) {
+            // Anything thrown on this thread would end the app (MM-729): every failure is an answer instead.
             call.reject("Could not listen on the Wi-Fi.", "noWifi")
         }
     }
@@ -61,7 +62,7 @@ class MmTransferPlugin : Plugin() {
         val listening = server ?: return@execute call.reject("Not listening.", "stopped")
         try {
             call.resolve(JSObject().put("connection", register(listening.accept())))
-        } catch (error: IOException) {
+        } catch (error: Throwable) {
             call.reject("Stopped listening.", "stopped")
         }
     }
@@ -86,8 +87,8 @@ class MmTransferPlugin : Plugin() {
             try {
                 socket.connect(InetSocketAddress(InetAddress.getByName(host), port), CONNECT_WITHIN_MS)
                 call.resolve(JSObject().put("connection", register(socket)))
-            } catch (error: IOException) {
-                socket.close()
+            } catch (error: Throwable) {
+                runCatching { socket.close() }
                 call.reject("Could not reach the other phone.", "unreachable")
             }
         }
@@ -107,7 +108,7 @@ class MmTransferPlugin : Plugin() {
                     out.flush()
                 }
                 call.resolve()
-            } catch (error: IOException) {
+            } catch (error: Throwable) {
                 call.reject("The connection dropped.", "broken")
             }
         }
@@ -127,7 +128,7 @@ class MmTransferPlugin : Plugin() {
                 val bytes = ByteArray(length)
                 input.readFully(bytes)
                 call.resolve(JSObject().put("closed", false).put("data", Base64.encodeToString(bytes, Base64.NO_WRAP)))
-            } catch (error: IOException) {
+            } catch (error: Throwable) {
                 // The other phone hung up, or the connection dropped: either way, nothing more comes.
                 call.resolve(JSObject().put("closed", true))
             }
@@ -172,6 +173,9 @@ class MmTransferPlugin : Plugin() {
         @Suppress("DEPRECATION")
         for (network in manager?.allNetworks.orEmpty()) {
             val capabilities = manager?.getNetworkCapabilities(network) ?: continue
+            // A VPN's network carries the Wi-Fi it rides on among its transports; its own address reaches no phone
+            // on the Wi-Fi (MM-729), so the Wi-Fi network itself is the one wanted.
+            if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) continue
             if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) continue
             val address = manager.getLinkProperties(network)?.linkAddresses
                 ?.map { it.address }

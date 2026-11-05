@@ -46,6 +46,7 @@ import { SodiumMoveCipher } from '../transfer/SodiumMoveCipher';
 import { NativeCamera } from '../platform/NativeCamera';
 import { NativeExternalLinks } from '../platform/NativeExternalLinks';
 import { NativeHealthProfile } from '../platform/NativeHealthProfile';
+import { NativeHealthRationale } from '../platform/NativeHealthRationale';
 import { NativeHealthSource } from '../platform/NativeHealthSource';
 import { NativeHealthWorkouts } from '../platform/NativeHealthWorkouts';
 import { NativeHealthWriting } from '../platform/NativeHealthWriting';
@@ -57,6 +58,7 @@ import { runningNatively } from '../platform/runningNatively';
 import { runningOn } from '../platform/runningOn';
 import { NoHealthPlatform } from '../platform/NoHealthPlatform';
 import { NoHealthProfile } from '../platform/NoHealthProfile';
+import { NoHealthRationale } from '../platform/NoHealthRationale';
 import { NoHealthWorkouts } from '../platform/NoHealthWorkouts';
 import { NoHealthWriting } from '../platform/NoHealthWriting';
 import { MirroredFoodLog } from '../healthWrite/MirroredFoodLog';
@@ -234,6 +236,8 @@ export async function openAppServices(): Promise<AppServices> {
     privateScreen: native ? new NativePrivateScreen(mmBackup) : new NoPrivateScreen(),
     // Only Apple Health keeps a sex and a date of birth to fill onboarding in from (MM-69).
     healthProfile: native && platform === 'ios' ? new NativeHealthProfile(mmHealth) : new NoHealthProfile(),
+    // Only Health Connect links into the app to say why it asks (MM-731).
+    healthRationale: native && platform === 'android' ? new NativeHealthRationale(mmHealth) : new NoHealthRationale(),
     evidence: () => import('./evidenceText').then((module) => module.evidenceText),
     environment: import.meta.env.DEV ? 'dev' : 'prod',
     platform,
