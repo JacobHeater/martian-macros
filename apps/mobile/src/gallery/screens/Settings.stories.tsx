@@ -22,6 +22,7 @@ import { EvidenceRegister } from '../../domain/evidence/EvidenceRegister';
 import { Profile } from '../../domain/Profile';
 import { EditHeightSheet } from '../../settings/EditHeightSheet';
 import { HealthCheckScreen } from '../../settings/HealthCheckScreen';
+import { InMemoryHealthRationale } from '../../fixtures/InMemoryHealthRationale';
 import { PrivacyPolicyScreen } from '../../terms/PrivacyPolicyScreen';
 import { TermsScreen } from '../../terms/TermsScreen';
 import { healthPlatform } from './healthPlatform';
@@ -175,6 +176,13 @@ export const PrivacyPolicy = screenStory({
   covers: ['PrivacyPolicyScreen'],
   shows: 'In short',
   open: ({ navigator }) => void navigator.push(() => <PrivacyPolicyScreen />),
+});
+
+/** MM-731: sent into the app by Health Connect's link to why it asks, the app opens on its privacy policy. */
+export const PrivacyPolicyFromHealthConnect = screenStory({
+  covers: ['PrivacyPolicyScreen'],
+  shows: 'In short',
+  device: (services) => Promise.resolve({ ...services, healthRationale: new InMemoryHealthRationale(true) }),
 });
 
 /** MM-95, MM-403: on an iPhone the policy names Apple Health and the reader that is part of iOS. */

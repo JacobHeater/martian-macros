@@ -2,7 +2,7 @@
 id: MM-729
 status: in-progress
 component: persistence
-related: [MM-698, MM-716, MM-56, MM-720]
+related: [MM-698, MM-716, MM-56]
 ---
 
 # Bug: the move's QR code can carry a VPN address on Android, and an error on its threads ends the app
