@@ -1179,7 +1179,8 @@
      "MM-1",
      "MM-695",
      "MM-696",
-     "MM-697"
+     "MM-697",
+     "MM-732"
     ]
    },
    "sequence": [
@@ -1279,6 +1280,13 @@
      "title": "CI in minutes, not half an hour: the stories run once in shards, parallel jobs through mm, slow screen tests fixed from CI's profile (the owner, 2026-10-25, MM-619)",
      "tickets": [
       "MM-619"
+     ]
+    },
+    {
+     "step": 10,
+     "title": "mm screenshot --phone is the Android phone, as mm run --phone means; the iPhone is --phone --ios (the owner on the Pixel, 2026-11-05, MM-732)",
+     "tickets": [
+      "MM-732"
      ]
     }
    ],

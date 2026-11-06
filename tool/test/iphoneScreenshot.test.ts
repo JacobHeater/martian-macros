@@ -20,6 +20,7 @@ test('--phone takes no value, so a path after it is a path; -d and --env values 
   assert.deepEqual(screenshotArgs(['--phone', 'shot.png', '--clipboard']), {
     device: undefined,
     phone: true,
+    ios: false,
     identity: 'prod',
     out: 'shot.png',
     clipboard: true,
@@ -27,6 +28,7 @@ test('--phone takes no value, so a path after it is a path; -d and --env values 
   assert.deepEqual(screenshotArgs(['-d', 'Test iPhone', '--env', 'demo', 'a.png']), {
     device: 'Test iPhone',
     phone: false,
+    ios: false,
     identity: 'demo',
     out: 'a.png',
     clipboard: false,
@@ -38,13 +40,28 @@ test('--phone takes no value, so a path after it is a path; -d and --env values 
 });
 
 test('a paired iPhone by name or id is the phone, before a simulator UDID; anything else is adb', () => {
-  assert.equal(screenshotTarget(undefined, true, []), 'phone');
-  assert.equal(screenshotTarget('Test iPhone', false, [phone]), 'phone');
-  assert.equal(screenshotTarget(phone.id, false, [phone]), 'phone');
-  assert.equal(screenshotTarget(simulator, false, [phone]), 'simulator');
-  assert.equal(screenshotTarget(simulator, false, []), 'simulator');
-  assert.equal(screenshotTarget('emulator-5554', false, [phone]), 'android');
-  assert.equal(screenshotTarget(undefined, false, [phone]), 'android');
+  assert.equal(screenshotTarget(undefined, true, true, []), 'phone');
+  assert.equal(screenshotTarget('Test iPhone', false, false, [phone]), 'phone');
+  assert.equal(screenshotTarget(phone.id, false, false, [phone]), 'phone');
+  assert.equal(screenshotTarget(simulator, false, false, [phone]), 'simulator');
+  assert.equal(screenshotTarget(simulator, false, false, []), 'simulator');
+  assert.equal(screenshotTarget('emulator-5554', false, false, [phone]), 'android');
+  assert.equal(screenshotTarget(undefined, false, false, [phone]), 'android');
+});
+
+/**
+ * MM-732: `mm screenshot --phone` went to the iPhone while `mm run --phone`
+ * means the Android phone; the owner, on the Pixel, waited 20 s for a
+ * picture from an iPhone that was not there. `--phone` is now the Android
+ * phone, and the iPhone is `--phone --ios` or its name.
+ */
+test('--phone is the Android phone, as mm run --phone means; --ios makes it the iPhone', () => {
+  assert.equal(screenshotTarget(undefined, true, false, []), 'android');
+  assert.equal(screenshotTarget(undefined, true, false, [phone]), 'android');
+  assert.equal(screenshotTarget(undefined, true, true, [phone]), 'phone');
+  assert.equal(screenshotArgs(['--phone', '--ios', '--clipboard']).ios, true);
+  assert.equal(screenshotArgs(['--phone', '--clipboard']).ios, false);
+  assert.equal(screenshotArgs(['--phone', '--ios', 'shot.png']).out, 'shot.png');
 });
 
 test('the devicectl command lines: the request in, the app opened without a restart, the nudge, the picture out', () => {

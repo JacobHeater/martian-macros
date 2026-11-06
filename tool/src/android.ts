@@ -512,7 +512,8 @@ export async function runScreenshot(args: readonly string[]): Promise<number> {
   try {
     if (device === undefined) {
       const ids = await deviceIds();
-      device = ids.some((id) => !id.startsWith('emulator-')) ? physicalAndroidDeviceId(ids) : ids.length === 1 ? ids[0] : undefined;
+      // `--phone` is the one physical phone, never an emulator, as `mm run --phone` means (MM-732).
+      device = args.includes('--phone') || ids.some((id) => !id.startsWith('emulator-')) ? physicalAndroidDeviceId(ids) : ids.length === 1 ? ids[0] : undefined;
       if (device === undefined) {
         stderr.write(
           ids.length === 0
