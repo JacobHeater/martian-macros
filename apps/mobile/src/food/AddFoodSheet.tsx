@@ -1118,8 +1118,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     return gradeOfFood?.(form.name.trim()) ?? (live === undefined ? undefined : gradeOfFoodEntry(live, { hand }));
   })();
 
-  /** The entry as it will be saved, for its micros (MM-733): only when editing, where it carries the source's. */
-  const edited = isEditing ? toSave() : undefined;
+  /** The entry as it will be saved, for its micros (MM-733): an entry edited or a food logged again, which carry the source's. */
+  const edited = base === undefined ? undefined : toSave();
 
   const formFields = () => (
     <>
@@ -1170,7 +1170,7 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           {servingsLogged !== undefined ? ` (${editableNumber(servingsLogged)} servings)` : ''}
         </p>
       ) : null}
-      {/* The entry's micros as they will be saved, folded under the numbers (MM-733, the owner); the typed form has none to show. */}
+      {/* The entry's micros as they will be saved, folded under the numbers (MM-733, the owner); a food typed from nothing has none to show. */}
       {edited === undefined ? null : <FoodMicrosFold entries={[edited]} one />}
       <div className="app-gap" />
       {valid ? null : (

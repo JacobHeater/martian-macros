@@ -30,9 +30,10 @@ show up.
   list the food itself.
 - **View meal's fold is the meal's.** Its foods summed, "from 1 of 3 foods" where some do not state a nutrient, and the
   foods that add the most under each row, as the day's: a meal is several foods, and the day panel is the sibling.
-- **The typed form shows none.** "Enter manually" collects calories, macros and the label's few other lines; the fold
-  is drawn only when an entry is edited, where it carries the source's micros, and on the amount step, where the
-  pack's are scaled to the amount.
+- **A food typed from nothing shows none.** "Enter manually" collects calories, macros and the label's few other
+  lines. The fold is drawn on the amount step, where the pack's micros are scaled to the amount, and on the form
+  whenever it has an entry to scale from: one being edited, or a recent food or one from the log being logged again
+  (MM-623), which the owner's Pixel showed is how a food is most often entered.
 - **The fold has no memory.** Every fold starts collapsed (the owner, 2026-10-30).
 
 ## Description
@@ -47,6 +48,11 @@ Scenario: Entry
   Given a pack food stating potassium per 100 g
   When 100 g of it is chosen on the amount step and the Micros fold opened
   Then a Potassium row shows its amount against the daily reference, and the nutrients it does not state are named once
+
+Scenario: Entry from the log
+  Given a recent food carrying its source's micros
+  When it is chosen from the add-food sheet and the Micros fold opened
+  Then the same rows show its micros as they will be logged
 
 Scenario: Edit
   Given a logged entry carrying its source's micros

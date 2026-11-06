@@ -92,6 +92,27 @@ it('edit: the sheet folds the entry’s micros as they will be saved', async () 
   expect(within(sheet).getByText('Not stated by this food: Calcium, Iron, Magnesium, Zinc.')).toBeInTheDocument();
 });
 
+it('entry: a recent food logged again carries its micros into the form, and the fold shows them', async () => {
+  await repos.food.addFood(
+    foodOn(today.addDays(-1), { name: 'Greek yogurt', meal: 'breakfast', kcal: 150, proteinG: 12, carbsG: 17, fatG: 4, sodiumMg: 60, micros: new Micronutrients({ calcium: 200, sugars: 15 }) }),
+  );
+  renderApp(repos, today);
+  const sheet = await openAddFood();
+  await userEvent.click(await within(sheet).findByRole('button', { name: /^Greek yogurt/ }));
+  await within(sheet).findByText(/^Logs 150 kcal/);
+  await openMicros(sheet);
+  expect(await within(sheet).findByText('Calcium, 200 milligrams, reference 1,000 milligrams')).toBeInTheDocument();
+  expect(within(sheet).getByText('Total sugars, 15 grams')).toBeInTheDocument();
+});
+
+it('entry: a food typed from nothing has no Micros fold', async () => {
+  renderApp(repos, today);
+  const sheet = await openAddFood();
+  await userEvent.click(within(sheet).getByRole('button', { name: 'Enter manually' }));
+  await within(sheet).findByRole('textbox', { name: 'Food name' });
+  expect(within(sheet).queryByRole('button', { name: 'Micros' })).not.toBeInTheDocument();
+});
+
 it('edit: a food stating none of them says so in one line', async () => {
   await repos.food.addFood(foodOn(today, { name: 'Mystery bar', meal: 'lunch', kcal: 200, proteinG: 10, carbsG: 20, fatG: 8 }));
   renderApp(repos, today);
