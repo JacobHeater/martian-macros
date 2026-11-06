@@ -117,7 +117,8 @@ it('view: View meal folds the meal’s micros over its foods, with how many stat
   expect(within(sheet).queryByText('Minerals')).not.toBeInTheDocument();
   await openMicros(sheet);
   expect(await within(sheet).findByText(/^Potassium, 384 milligrams, from 1 of 3 foods · reference 3,400 milligrams$/)).toBeInTheDocument();
-  expect(within(sheet).getByText(/^Not stated by any food: /)).toBeInTheDocument();
+  // One line per group, as the day's panel: the minerals none of the three state.
+  expect(within(sheet).getByText('Not stated by any food: Calcium, Iron, Magnesium, Zinc.')).toBeInTheDocument();
   // A meal's rows open to the foods that add the most, as the day's do (MM-561).
   expect(within(sheet).getByRole('button', { name: /^Potassium, 384 milligrams/ })).toBeInTheDocument();
 });
