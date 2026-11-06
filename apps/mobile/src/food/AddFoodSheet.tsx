@@ -71,6 +71,7 @@ import { showSaveMealSheet } from './meal/showSaveMealSheet';
 import { relogMeal } from './meal/relogMeal';
 import { FoodAmountStep } from './FoodAmountStep';
 import { FoodGrade } from './FoodGrade';
+import { FoodMicrosFold } from './FoodMicrosFold';
 import { FoodSearchResults } from './FoodSearchResults';
 import { copyOfPackFood } from './custom/copyOfPackFood';
 import { OnlineSearchResults } from './online/OnlineSearchResults';
@@ -1117,6 +1118,9 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
     return gradeOfFood?.(form.name.trim()) ?? (live === undefined ? undefined : gradeOfFoodEntry(live, { hand }));
   })();
 
+  /** The entry as it will be saved, for its micros (MM-733): only when editing, where it carries the source's. */
+  const edited = isEditing ? toSave() : undefined;
+
   const formFields = () => (
     <>
       {/* When it was eaten comes first, before what and how much (MM-576). */}
@@ -1166,6 +1170,8 @@ export function AddFoodSheet({ day: firstDay, meal: firstMeal, entry, initialQue
           {servingsLogged !== undefined ? ` (${editableNumber(servingsLogged)} servings)` : ''}
         </p>
       ) : null}
+      {/* The entry's micros as they will be saved, folded under the numbers (MM-733, the owner); the typed form has none to show. */}
+      {edited === undefined ? null : <FoodMicrosFold entries={[edited]} one />}
       <div className="app-gap" />
       {valid ? null : (
         // An action that is off says what is still needed, beside it (MM-220).

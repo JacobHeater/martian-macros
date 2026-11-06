@@ -212,6 +212,7 @@ workstream's.
 - Added 2026-11-03 (step 34, the owner from the Pixel): MM-722 (Log meal writes the meal in one step and is pressed once; on the phone each food waited behind the health import's transaction and every press logged the meal again), MM-723 (Send to assistant offered with no photos; the prompt no longer promises photos).
 - Added 2026-11-05 (step 35, read off the owner's Pixel): MM-724 (on Android the share chooser's call dropped its photos or backup bytes before it opens; Capacitor saved them in the activity's state and Android killed the app for its size).
 - Added 2026-11-05 (step 36, read against the iOS scanner): MM-726 (Cancel above the navigation bar in dp with the bar's inset; no camera app refused in words instead of ending the app).
+- Added 2026-11-05 (step 37, the owner): MM-733 (the micros of a food on its sheet: a Micros fold on the amount step, Edit food and View meal, the day panel's rows against the daily reference, the rest named once).
 
 ## Notes for whoever builds it
 - There is one data model for every way of logging. A hand portion or an

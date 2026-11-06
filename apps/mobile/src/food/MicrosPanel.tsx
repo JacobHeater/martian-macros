@@ -20,6 +20,11 @@ interface MicrosPanelProps {
   setup: UserSetup | undefined;
   today: CalendarDate;
   goals: NutritionGoals;
+  /**
+   * The micros of one food at the amount chosen (MM-733): no foods to list
+   * under a row, and what it leaves unstated said as its own.
+   */
+  one?: boolean | undefined;
 }
 
 const withheldLine: Readonly<Record<ReferenceWithheld, string>> = {
@@ -52,9 +57,10 @@ const joined = (...parts: (string | undefined)[]) => {
  * state and how many of them state it. A vitamin or mineral is drawn
  * against its reference amount; sodium against the user's limit when one is
  * set (MM-311). Nothing changes colour for being under or over. Each row
- * opens to the five foods that add the most of it (MM-561).
+ * opens to the five foods that add the most of it (MM-561). With `one`, the
+ * same rows for one food at the amount chosen, on the food sheet (MM-733).
  */
-export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) {
+export function MicrosPanel({ entries, setup, today, goals, one = false }: MicrosPanelProps) {
   const totals = microsDayOf(entries);
   const withheld = setup === undefined ? undefined : ReferenceWithheld.of(setup, today);
   const reference = (nutrient: Micronutrient) =>
@@ -66,7 +72,7 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
   const row = (total: MicronutrientTotal) => {
     const n = total.nutrient;
     const name = Micronutrient.label(n);
-    const sources = topSourcesOf(entries, n).map((s) => ({ name: s.name, figures: nutrientAmount(n, s.amount) }));
+    const sources = one ? undefined : topSourcesOf(entries, n).map((s) => ({ name: s.name, figures: nutrientAmount(n, s.amount) }));
     if (n === 'sodium' && limit !== undefined) {
       const over = total.over(limit);
       return (
@@ -100,6 +106,14 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
 
   // With nothing logged there is nothing to list, and the screen already says so (MM-316).
   if (entries.length === 0) return null;
+  // One food stating none of them is said once, not three groups of "not stated" (MM-733).
+  if (one && totals.every((t) => t.noData)) {
+    return (
+      <div className="food-micros">
+        <p className="app-caption app-muted food-micros-line">No micronutrients are stated for this food.</p>
+      </div>
+    );
+  }
   return (
     <div className="food-micros">
       {withheld !== undefined ? (
@@ -116,7 +130,7 @@ export function MicrosPanel({ entries, setup, today, goals }: MicrosPanelProps) 
             <SectionLabel text={MicronutrientGroup.label(group)} />
             {inGroup.filter((t) => !t.noData).map(row)}
             {unstated.length === 0 ? null : (
-              <p className="app-caption app-muted food-micros-line">Not stated by any food: {unstated.join(', ')}.</p>
+              <p className="app-caption app-muted food-micros-line">{`Not stated by ${one ? 'this' : 'any'} food: ${unstated.join(', ')}.`}</p>
             )}
           </div>
         );

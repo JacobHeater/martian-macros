@@ -18,6 +18,7 @@ import { MmButton } from '../../ui/MmButton';
 import { MmTextField } from '../../ui/MmTextField';
 import { Notice } from '../../ui/Notice';
 import { useOverlays } from '../../ui/useOverlays';
+import { FoodMicrosFold } from '../FoodMicrosFold';
 import { MealChips } from '../MealChips';
 import { TimeEatenRow } from '../TimeEatenRow';
 import { useNetCarbs } from '../useNetCarbs';
@@ -166,6 +167,8 @@ export function ViewMealSheet({ day: firstDay, mealKey, onDone }: ViewMealSheetP
           })
         }
       />
+      {/* The meal's micros over its foods, with how many state each, folded under the split (MM-733, the owner). */}
+      <FoodMicrosFold entries={loggedMeal.items} />
       <MmTextField label="Meal name" value={name ?? loggedMeal.name} onChange={setName} onBlur={() => void attempt(rename)} onSubmit={() => void attempt(rename)} />
       <p className="food-label food-label-spaced">{loggedMeal.items.length === 1 ? '1 food' : `${loggedMeal.items.length} foods`}</p>
       {loggedMeal.items.map((entry) => (

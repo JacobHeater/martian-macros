@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/react-vite';
 import { expect, fireEvent, screen, userEvent, waitFor, within } from 'storybook/test';
 import { showAddFoodSheet } from '../../food/showAddFoodSheet';
 import { showSaveMealSheet } from '../../food/meal/showSaveMealSheet';
+import { showViewMealSheet } from '../../food/meal/showViewMealSheet';
 import { showEasyToMissSheet } from '../../food/showEasyToMissSheet';
 import { FoodEntry } from '../../domain/FoodEntry';
 import { CustomFood } from '../../domain/food/custom/CustomFood';
@@ -26,6 +27,7 @@ import { screensMeta } from './screensMeta';
 import { reveal } from './reveal';
 import { screenStory } from './screenStory';
 import { lightBreakfastScenario } from './lightBreakfastScenario';
+import { loggedMealScenario, storyMealKey } from './loggedMealScenario';
 import { writingCoach } from './writingCoach';
 import type { StoryScenario } from './StoryScenario';
 import type { StoryStage } from './StoryStage';
@@ -1873,5 +1875,56 @@ export const AddFoodAmountDrinkFluidOunces = screenStory({
     await userEvent.clear(servings);
     await userEvent.type(servings, '1');
     await userEvent.click(await inSheet(canvas).findByRole('button', { name: 'Fluid ounces' }));
+  },
+});
+
+// ---- MM-733 (the owner, 2026-11-05): the micros of a food or a meal on its sheet, under a Micros fold ----
+
+/** MM-733: a fortified oat drink at the amount chosen, each nutrient against the daily reference, the rest named once. */
+export const AddFoodAmountMicros = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'Not stated by this food: Iron, Magnesium, Zinc.',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'oat drink' }),
+  walk: async (canvas) => {
+    await press(/^Oat drink/)(canvas);
+    const sheet = await inSheet(canvas).findByRole('dialog', { name: 'Add food' });
+    await userEvent.click(await within(sheet).findByRole('button', { name: 'Micros' }));
+  },
+});
+
+/** MM-733: a food that states none of them says so in one line, not three groups of "not stated". */
+export const AddFoodAmountMicrosNoneStated = screenStory({
+  covers: ['FoodAmountStep'],
+  shows: 'No micronutrients are stated for this food.',
+  open: ({ overlays, today }) => void showAddFoodSheet(overlays, today, { initialQuery: 'white rice, cooked' }),
+  walk: async (canvas) => {
+    await press(/^White rice, cooked/)(canvas);
+    const sheet = await inSheet(canvas).findByRole('dialog', { name: 'Add food' });
+    await userEvent.click(await within(sheet).findByRole('button', { name: 'Micros' }));
+  },
+});
+
+/** MM-733: an entry being edited carries its source's micros; the fold shows them as they will be saved. */
+export const EditFoodMicros = screenStory({
+  covers: ['AddFoodSheet'],
+  shows: 'Vitamins',
+  open: ({ state }) => state.homeTab.put('food'),
+  walk: async (canvas) => {
+    // The demo's today holds the morning's meals; its breakfast states every nutrient.
+    await press('Edit Demo oats and yogurt')(canvas);
+    const sheet = await inSheet(canvas).findByRole('dialog', { name: 'Edit food' });
+    await userEvent.click(await within(sheet).findByRole('button', { name: 'Micros' }));
+  },
+});
+
+/** MM-733: a logged meal's micros over its foods, with how many state each and the foods under a row, as the day's. */
+export const ViewMealMicros = screenStory({
+  covers: ['ViewMealSheet'],
+  shows: 'Minerals',
+  scenario: loggedMealScenario,
+  open: ({ overlays, today }) => void showViewMealSheet(overlays, today, storyMealKey),
+  walk: async (canvas) => {
+    const sheet = await inSheet(canvas).findByRole('dialog', { name: 'View meal' });
+    await userEvent.click(await within(sheet).findByRole('button', { name: 'Micros' }));
   },
 });

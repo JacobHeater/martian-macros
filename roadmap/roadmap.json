@@ -2753,7 +2753,8 @@
      "MM-722",
      "MM-723",
      "MM-724",
-     "MM-726"
+     "MM-726",
+     "MM-733"
     ]
    },
    "sequence": [
@@ -3148,6 +3149,13 @@
      "title": "The Android scanner, 2026-11-05: Cancel above the navigation bar in dp with the bar's inset, and no camera app refused in words instead of ending the app (MM-726)",
      "tickets": [
       "MM-726"
+     ]
+    },
+    {
+     "step": 37,
+     "title": "The micros of a food on its sheet (the owner, 2026-11-05, MM-733): a Micros fold on the amount step, Edit food and View meal, the day panel's rows against the daily reference",
+     "tickets": [
+      "MM-733"
      ]
     }
    ],

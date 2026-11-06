@@ -79,6 +79,8 @@ export const storyFoods: readonly PackEntry[] = [
       fatG: 3,
       fiberG: 0.8,
       sodiumMg: 40,
+      // Fortified, as a barista oat drink's label states (MM-733): calcium, vitamin D and B12, some potassium.
+      micros: { potassium: 60, calcium: 120, vitaminD: 1.5, vitaminB12: 0.38, sugars: 4 },
       densityGPerMl: 1.02,
       preparation: 'packaged',
       source: 'fixture',

@@ -49,6 +49,7 @@ import { MmTextField } from '../ui/MmTextField';
 import { Notice } from '../ui/Notice';
 import type { AmountChoice } from './AmountChoice';
 import { FoodGrade } from './FoodGrade';
+import { FoodMicrosFold } from './FoodMicrosFold';
 import { foodEvidenceLine } from '../format/foodEvidenceLine';
 import { FoodTrustMark } from './FoodTrustMark';
 import { eatenAtWhenLogged } from './eatenAtWhenLogged';
@@ -418,6 +419,8 @@ export function FoodAmountStep({
   const inList = listed > 0 && onLogWithList !== undefined;
   const logLabel = inList ? `Log ${listed + (toLog()?.length ?? 1)} foods` : 'Log it';
   const grade = preview.gradeOfFood?.(food.name) ?? (custom === undefined ? gradeOfCatalogFood(food) : gradeOfCustomFood(custom));
+  /** The food as it will be logged, for its micros (MM-733); the fat it was cooked in is its own entry. */
+  const logged = toLog()?.[0];
 
   return (
     <div className="food-sheet">
@@ -557,6 +560,8 @@ export function FoodAmountStep({
           </>
         )}
       </MmDisclosure>
+      {/* The food's micros at this amount, folded beside the rest (MM-733, the owner): drawn only with an amount to scale by. */}
+      {logged === undefined ? null : <FoodMicrosFold entries={[logged]} one />}
       <div className="app-gap" />
       {logFailed ? <Notice icon="warning" text={`The food could not be logged, so nothing was. Press ${logLabel} to try again.`} /> : null}
       <MmButton
