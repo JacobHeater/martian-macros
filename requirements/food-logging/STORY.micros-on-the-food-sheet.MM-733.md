@@ -81,4 +81,8 @@ reviewed at phone width (MM-310).
 
 ## Notes
 - `test/food/foodSheetMicros.test.tsx` holds the four scenarios.
-- Not run locally; CI validates. Owed: the owner's look on the phone.
+- Not run locally; CI validates.
+- Seen on the owner's Pixel, 2026-11-05, main at 74db39d7: the fold closed on arrival on all three sheets, and open
+  showing the rows against the references: a pack kale on the amount step (potassium 417 mg of 3,400), the owner's
+  eggs logged again from Recent on the form (vitamin D 12 µg of 15), a Snickers in Edit food, and a logged meal in
+  View meal with its rows pressable (`mm screenshot --phone`, MM-732, took the pictures). No record was added.
